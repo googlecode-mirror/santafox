@@ -1,0 +1,198 @@
+<!-- @form -->
+<script type="text/javascript">
+    Ext.onReady(function () {
+
+        var Edit_Form = new Ext.form.Form({
+            labelWidth: 180
+            , labelAlign: 'top'
+          	, fileUpload : false
+          	, method : 'POST'
+          	, url : '%form_action%'
+        });
+
+        %lines%
+
+        Edit_Form.addButton({text: "[#admin_backof_global_save#]", disabled: %but1disabled%}, function() {Edit_Form.el.dom.submit();});
+		Edit_Form.addButton({text: "[#feedback_create_template#]", disabled: %but2disabled%}, function() {
+			//Необходимо спросить имя нового файла с шаблоном
+			Ext.Msg.prompt('[#feedback_create_template_winlabel#]', '[#feedback_create_template_label#]', function(btn, text){
+				if (btn == 'ok'){
+					// process text value...
+					Edit_Form.el.dom.setAttribute('action', "%form_action_3%"+text);
+					Edit_Form.el.dom.submit();
+				}
+			});
+		});
+        Edit_Form.render('FeedBackForm');
+
+        %buttons%
+
+        Edit_Form.el.un('submit', Edit_Form.onSubmit, Edit_Form);
+    	Edit_Form.el.dom.setAttribute('action', Edit_Form.url);
+
+        var Add_Form = new Ext.form.Form({
+            labelWidth: 180
+            , labelAlign: 'top'
+          	, fileUpload : false
+          	, method : 'POST'
+          	, url : '%form_action_2%'
+        });
+
+        Add_Form.fieldset({legend:'[#feedback_field_new#]'},
+            new Ext.form.TextField({
+            name: 'field_id'
+            , fieldLabel: '[#feedback_field_id#]'
+        }));
+        Add_Form.addButton('[#feedback_field_add#]', function() {
+            Add_Form.submit({
+                clientValidation: false,
+                method: 'POST',
+                waitTitle: '[#feedback_field_saving#]',
+                waitMsg: '[#feedback_field_waiting#]',
+                success:function(form, action){
+                    jspub_click('edit_ini');
+                },
+                failure: function(form, action){
+                    Ext.Msg.show({title:'[#feedback_field_info#]', msg: '[#feedback_field_failure#]', buttons: Ext.Msg.OK});
+                }
+            })
+        });
+        Add_Form.render('FeedBackAddForm');
+    });
+</script>
+<div style="width: 700px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <div id="FeedBackForm"></div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+    <br/>
+    <br/>
+</div>
+<div style="width: 200px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <div id="FeedBackAddForm"></div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+<!-- @line -->
+        Edit_Form.fieldset({
+            legend:'[#feedback_field_id#] : %legend%'
+            , id: '%legend%'
+            , labelWidth: 180
+        });
+        //Имя поля
+        Edit_Form.column({
+            allowDomMove : false
+            //, hideLabels: true
+            //, clear : true
+            , hideMode : 'display'
+            //, labelAlign : 'left'
+            , labelSeparator : ':'
+            , width : 180}
+            , new Ext.form.TextField({
+                name: '%legend%[label]'
+                , fieldLabel: '[#feedback_field_label#]'
+                , value: '%label%'
+                , width : "95%"
+            })
+        );
+
+        //Тип поля
+        Edit_Form.column({
+            allowDomMove : false
+            //, hideLabels: true
+            //, clear : true
+            , hideMode : 'display'
+            //, labelAlign : 'left'
+            , labelSeparator : ':'
+            , width : 125}
+            , new Ext.form.ComboBox({
+                fieldLabel: '[#feedback_field_type#]',
+                hiddenName:"%legend%[type]",
+                width : 115,
+                name: "%legend%[type]",
+                store: new Ext.data.SimpleStore({
+                    fields: ["key", "value"],
+                    data : [['text', '[#feedback_field_type_blank1#]'],['checkbox', '[#feedback_field_type_blank2#]'],['textarea', '[#feedback_field_type_blank3#]']]}),
+                valueField: "key",
+                displayField:"value",
+                typeAhead: true,
+                mode: "local",
+                triggerAction: "all",
+                emptyText:"Не выбран...",
+                selectOnFocus: false,
+    			validateOnBlur: false,
+    			forceSelection: true,
+    			editable: false,
+    			value: '%type_value%'
+            })
+        );
+
+        //Обязательность заполения поля в форме
+        Edit_Form.column({
+            allowDomMove : false
+            //, hideLabels: true
+            //, clear : true
+            , hideMode : 'display'
+            //, labelAlign : 'left'
+            , labelSeparator : ':'
+            , width : 60}
+            , new Ext.form.Checkbox({
+                fieldLabel: '[#feedback_field_blank#]',
+                hiddenName:"%legend%[allowBlank]",
+                name: "%legend%[allowBlank]",
+                selectOnFocus: false,
+    			validateOnBlur: false,
+    			forceSelection: true,
+    			editable: false,
+    			checked: %allow_value%
+            })
+        );
+
+        //Вариант регулярноого выражения
+        Edit_Form.column({
+            allowDomMove : false
+            //, hideLabels: true
+            //, clear : true
+            , hideMode : 'display'
+            //, labelAlign : 'left'
+            , labelSeparator : ':'
+            , width : 200}
+            , new Ext.form.ComboBox({
+                fieldLabel: '[#feedback_field_regexp#]',
+                hiddenName:"%legend%[regexp]",
+                name: "%legend%[allowBlank]",
+                store: new Ext.data.SimpleStore({
+                    fields: ["key", "value"],
+                    data : [['numeric', '[#feedback_field_regexp_blank1#]'],['email', '[#feedback_field_regexp_blank2#]'],['string', '[#feedback_field_regexp_blank3#]'],['text', '[#feedback_field_regexp_blank4#]']]}),
+                valueField: "key",
+                displayField:"value",
+                typeAhead: true,
+                mode: "local",
+                triggerAction: "all",
+                emptyText:"[#feedback_field_regexp_noselect#]",
+                selectOnFocus: false,
+    			validateOnBlur: false,
+    			forceSelection: true,
+    			editable: true,
+    			value: '%regexp_value%',
+                disabled: %regexp_disabe%
+            })
+        );
+        //Иконка с удалением поля
+        Edit_Form.column({
+            allowDomMove : false
+            , hideLabels: true
+            , clear : true
+            , hideMode : 'display'
+            , labelAlign : 'left'
+            , labelSeparator : ':'
+            , width : 30
+            , id: 'delete_icons_%legend%'
+        });
+        Edit_Form.end();
+        Edit_Form.end();
+<!-- @button -->
+Ext.get('delete_icons_%legend%').insertHtml("beforeEnd", '<img style="cursor: pointer;" width="26" height="26" src="/admin/templates/default/images/icon_delet.gif" alt="[#feedback_item_action_remove#]" border="0" onclick="jspub_confirm(\'delete&id=%legend%\', \'[#feedback_item_remove#]\')"/><br/>');

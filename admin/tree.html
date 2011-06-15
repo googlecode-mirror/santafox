@@ -1,0 +1,287 @@
+<!-- @tree_data_url -->
+
+,"ajax" : {
+			    "url" : "[#data_url#]",
+ 	             "data":function(n) {
+					return { pid : n.attr ? n.attr("id") : "" };
+				}
+ 	        }
+
+
+<!-- @main -->
+<div id="[#tree_id#]"></div>
+<script type="text/javascript">
+
+//data.inst._get_parent(data.rslt.obj).attr("id")
+
+    jQuery("#[#tree_id#]")
+            [#dnd_action2#]
+            .bind("select_node.jstree", function (e,data) {
+                //var treeInstance = data.inst;
+                var currNodeId = data.rslt.obj.attr("id");
+                //alert("node selected: "+currNodeId);
+                var dc = [#direct_click#];
+                //if (!n.attributes.notclick)
+                //{
+                    if (!dc)
+                    {
+                        //var selectedNode = data.inst.data.ui.selected[0];//works!
+                        var selectedNode = data.rslt.obj;//!works!
+                        var node_way = jQuery.jstree._reference("#[#tree_id#]").get_path(selectedNode, true);//works!
+                        //Теперь, в куках храниться дорога до текущей ноды
+                        jspub_cookie_set("%cookie_name_tree%",node_way.join(","));
+                        //alert("after cookie set");
+                        //Если надо, то уберём текущее выделение с пункта левого меню
+                        start_interface.left_menu_clear_select();
+                        //alert("after left_menu_clear_select");
+                        start_interface.save_link_node_select(selectedNode);
+                        //structure_tree_click_node("view&id=" + currNodeId);
+                        [#linkmenu#]
+
+                    }
+                    else
+                    {
+                        //Это клик когда надо будет проставить значение выбранной ноды
+                        //и вызвать событие на закрытие окна. Используется для выбора
+                        //страницы сайта в качестве свойства чего-либо.
+                        //console.dir($('#[#tree_id#]').jstree('get_selected'));//works
+                        //console.log($('#[#tree_id#]').jstree('get_selected').attr('id'));//
+                        $('#'+start_interface.select_element).val(currNodeId);//start_interface.select_element.setValue(n.attributes.id);
+                        //if (start_interface.dialog != null)
+                        //    start_interface.dialog.hide();
+                        //$('#popup_div').css('display','none');
+                        $("#popup_sitemap_div").dialog("destroy");
+                    }
+
+            })
+            .bind("loaded.jstree", function (event, data) {
+                var str_cook = jspub_cookie_get("%cookie_name_tree%");
+                var arr_node = new Array([#node_default#]);
+                if (str_cook.length > 0)
+                {
+                    //Так как ID могут быть строками, надо заменить там запятые на
+                    //кавычки
+                    str_cook = '"'+str_cook.replace(/,/g,'","')+'"';
+                    //Массив нужно создать таким страшным способом.
+                    var arr_node = eval(' new Array(' + str_cook.toString() + ')');
+                }
+                var sel_node=false;
+                //Теперь начнём раскрывать необходимые ноды
+
+                for (i = 0; i < arr_node.length; i++)
+                {
+                    sel_node=arr_node[i];
+                    //alert('checkin '+arr_node[i]);
+                    //This can be a DOM node, jQuery node or selector pointing to an element we want opened.
+                    if (!data.inst.is_open("#"+arr_node[i]))
+                    {
+                        data.inst.open_node("#"+arr_node[i],false, true); //no callback, skip animation
+                    }
+                }
+                //И теперь поставим самую последнюю ноду в текущую
+                if (sel_node)
+                {
+                    //alert('before click_node_default');
+                    [#click_node_default#]
+                    data.inst.select_node("#"+sel_node);
+                }
+                //И последнее - нужно обновить центрульную область контента
+
+
+
+	    }).jstree({  //сначала привязываем  loaded.jstree, select_node.jstree и только ПОТОМ создаём дерево
+
+        "ui": {
+                "select_limit": 1 //no multiselect
+        },
+		"json_data" : {
+			//"data" : [{"data":"[#root_name#]","attr":{"id":"[#root_id#]"},"state":"opened","children":
+			"data" : [{"data":"[#root_name#]","attr":{"id":"[#root_id#]"},"state":"closed","children":
+                    %tree_data_children%
+                    }]
+
+            %tree_data_url%  ,
+
+            "correct_state":true
+			//,"progressive_render" : true
+		},
+
+
+		"plugins" : [ "json_data", "ui", [#dnd_enabled#]  "contextmenu","themes"],
+        "themes" : {
+			"theme" : "classic",
+			"dots" : true,
+			"icons" : true
+		},
+        [#dnd_action1#]
+
+		"contextmenu" : {
+            //"show_at_node" : true,
+            "items" : {
+                "rename" : false,
+                "remove" : false,//Delete
+                "ccp" : false,
+                "create":false
+                [#context_menu_functions#]
+
+
+            }
+		}
+	});
+
+</script>
+
+<!-- @dnd_action1 -->
+        "crrm" : {
+            "move" : {
+				//"default_position" : "first",
+				"default_position" : "inside",
+				//"move" : function (m) {alert('moving!');}
+				"check_move" : function (m) {
+
+				/*
+				m = lastly prepared move. The returned object contains:
+                .o - the node being moved
+                .r - the reference node in the move
+                .ot - the origin tree instance
+                .rt - the reference tree instance
+                .p - the position to move to (may be a string - "last", "first", etc)
+                .cp - the calculated position to move to (always a number)
+                .np - the new parent
+                */
+
+                    if (m.o[0].id=="index" || m.np[0].id=="[#tree_id#]")
+                        return false;//no index node drag && no drag to top
+                    return true;
+				}
+			}
+        },
+<!-- @dnd_action2 -->
+ .bind("move_node.jstree", function (e, data) {
+
+
+                    $.post("/admin/index.php?action=set_left_menu&leftmenu=move",
+                            { node :  data.rslt.o.attr("id"), newParent:data.rslt.np.attr("id"), index:data.rslt.cp}, function(data){
+                        //document.location.href = "/admin/index.php";
+                        santaUpdateRegion('west','index.php?action=get_left_menu');
+                    });
+                /*
+                data.rslt.o.each(function (i) {
+                    $.ajax({
+                        async : false,
+                        type: 'POST',
+                        url: "./server.php",
+                        data : {
+                            "operation" : "move_node",
+                            "id" : $(this).attr("id").replace("node_",""),
+                            "ref" : data.rslt.cr === -1 ? 1 : data.rslt.np.attr("id").replace("node_",""),
+                            "position" : data.rslt.cp + i,
+                            "title" : data.rslt.name,
+                            "copy" : data.rslt.cy ? 1 : 0
+                        },
+                        success : function (r) {
+                            if(!r.status) {
+                                $.jstree.rollback(data.rlbk);
+                            }
+                            else {
+                                $(data.rslt.oc).attr("id", "node_" + r.id);
+                                if(data.rslt.cy && $(data.rslt.oc).children("UL").length) {
+                                    data.inst.refresh(data.inst._get_parent(data.rslt.oc));
+                                }
+                            }
+                        }
+                    });
+                });
+                */
+
+            })
+<!-- @dnd_enabled -->
+"crrm", "dnd",
+<!-- @context_menu_not -->
+        //@todo remove this block?
+        //return true;
+
+<!-- @context_empty -->
+//this.contextmenu.add('-');
+
+<!-- @context_element -->
+
+<!-- @context_element_normal_click_function -->
+
+"[#link_orig#]":{
+        "label": "[#name#]",
+        "action": function (par) {
+            var disabledForNodes = new String("[#node_exclude#]").split(",");
+            if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
+            {
+                return;
+            }
+            [#action#]
+        }
+}
+<!-- @context_element_add_click_function -->
+
+"create":{
+    "label"	: "Создать",
+     "action": function (par) {
+            var disabledForNodes = new String("[#node_exclude#]").split(",");
+            if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
+            {
+                //console.log("disabled for node [#name#]");
+                return;
+            }
+            [#action#]
+     }
+}
+<!-- @context_element_remov_click_function -->
+"delete":{
+    "label" : "Удалить",
+    "action":function (par){
+        structTreeCurrPID = par.attr("id");
+            var disabledForNodes = new String("[#node_exclude#]").split(",");
+            if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
+            {
+                console.log("delete disabled for node [#name#]");
+                return;
+            }
+        [#action#]
+    }
+}
+<!-- @message_confirm -->
+if (par.attr("id")!="index")
+{
+    $("#popup_msg_div").html('<p>[#confirm#]?</p>');
+    $("#popup_msg_div").dialog({
+        resizable: false,
+        height:140,
+        modal: true,
+        buttons: {
+            "Yes": function() {
+                 $.post('[#link#]',{ node :  par.attr("id")}, function(data){
+                        //document.location.href = "/admin/index.php";
+                        santaUpdateRegion('west','index.php?action=get_left_menu');
+                    });
+                $(this).dialog( "close" );
+            },
+            "No": function() {
+                $(this).dialog( "close" );
+            }
+        }
+    });
+}
+
+<!-- @context_element_normal_context_action-->
+    $.post('[#link#]',{ node :  par.attr("id")}, function(data){
+        //document.location.href = "/admin/index.php";
+        santaUpdateRegion('west','index.php?action=get_left_menu');
+    });
+<!-- @context_element_add_context_action-->
+    $.post('[#link#]',{ node :  par.attr("id")}, function(data){
+        //document.location.href = "/admin/index.php";
+        santaUpdateRegion('west','index.php?action=get_left_menu');
+    });
+<!-- @context_element_remov_context_action-->
+    $.post('[#link#]',{ node :  par.attr("id")}, function(data){
+        //document.location.href = "/admin/index.php";
+        santaUpdateRegion('west','index.php?action=get_left_menu');
+    });

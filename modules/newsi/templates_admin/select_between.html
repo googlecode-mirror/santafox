@@ -1,0 +1,28 @@
+<!-- @form -->
+
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <div id="select_between_form">
+            <b>[#news_select_between_label#]</b><br>
+            <form action="%form_action%" method="post">
+           [#news_start_date#] <input type="text" name="startDate" id="startDate"><br>
+           [#news_end_date#] <input type="text" name="endDate" id="endDate"><br>
+            <input type="button" value="[#news_button_show#]" onclick="jspub_click('%form_action_sucsess%&start='+$('#startDate').val()+'&stop='+$('#endDate').val())">
+            </form>
+        </div>
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+
+
+<script type="text/javascript">
+$(function() {
+    $( "#startDate" ).datepicker({
+            dateFormat:"yy.mm.dd"
+        }
+    );
+    $( "#endDate" ).datepicker({
+            dateFormat:"yy.mm.dd"
+        }
+    );
+});
+</script>

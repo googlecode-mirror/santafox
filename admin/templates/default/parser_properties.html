@@ -1,0 +1,70 @@
+<!-- @html_modul_name -->
+%name%&nbsp;&nbsp;<font size="-2" color="#999999">(%namem%)</font>
+
+<!-- @html_main -->
+	<tr height="26">
+    	<td width="200" height="26" valign="top"><label for="ppf_%name%" style="cursor:pointer;">%caption%</label></td>
+    	<td width="30" height="26" valign="top"><input type="checkbox" id="ppf_%name%" name="properties_cb[ppf_%name%]" onClick="jspub_disabled_change('ppf_%name%', 'ppv_%name%')" %checked% %disabled% style="cursor:pointer;"/></td>
+        <td width="330" height="26" valign="top" id="lrp_%name%">%element% <small>%description%</small></td>
+    </tr>
+
+<!-- @select_html -->
+<select id="ppv_%name%" name="properties[%name%]">
+    %store_options%
+</select>
+
+<!-- @select_code -->
+jspub_disabled_change('ppf_%name%', 'ppv_%name%');
+
+<!-- @file_html -->
+<select id="ppv_%name%" name="properties[%name%]" style="width:270px;">
+    %store_options%
+</select>
+
+<!-- @file_code -->
+
+jspub_disabled_change('ppf_%name%', 'ppv_%name%');
+
+<!-- @checkbox_html -->
+<!-- <input type="hidden" id="hid_ppv_%name%" value="%checked_input%" name="properties[%name%]"/> -->
+<input  type="checkbox" id="ppv_%name%" %value% name="properties[%name%]"   />
+
+<!-- @checkbox_code -->
+jspub_disabled_change('ppf_%name%', 'ppv_%name%');
+
+
+<!-- @text_html -->
+<input id="ppv_%name%" name="properties[%name%]" value="%value%" style="width:290px;"/>
+
+<!-- @text_code -->
+jspub_disabled_change('ppf_%name%', 'ppv_%name%');
+
+
+
+<!-- @textarea_html -->
+<textarea id="ppv_%name%" name="properties[%name%]" style="width:290px;height:50px;">%value%</textarea>
+
+<!-- @textarea_code -->
+jspub_disabled_change('ppf_%name%', 'ppv_%name%');        
+
+<!-- @date_html -->
+<input type="text" style="width:150px;" name="properties[%name%]" value="%value%" id="ppv_%name%">
+<!-- @date_code -->
+$(function() {
+    $( "#ppv_%name%" ).datepicker({
+            dateFormat:"dd.mm.yy"
+    }
+   );
+});
+jspub_disabled_change('ppf_%name%', 'ppv_%name%');
+
+<!-- @page_html -->
+<input type="text" style="width:150px;" name="properties[%name%]" value="%value%" id="ppv_%name%" onClick="get_properes_page(event, 'ppv_%name%')">
+<!-- @page_code -->
+//Добавим событие на клик по тригеру для выбора страницы
+/*
+$("#ppv_%name%").click(function (e) {
+    get_properes_page(e, 'ppv_%name%');
+});
+*/
+jspub_disabled_change('ppf_%name%', 'ppv_%name%');

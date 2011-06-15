@@ -1,0 +1,32 @@
+<!-- @form -->
+<div style="width: 450px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<form action="%form_action%" method="POST" enctype="multipart/form-data" id="savevarform">
+<input type="hidden" name="prev_name_db" value="%prev_name_db%"/>
+<h3>%form_header_txt%</h3>
+<table border="0" cellpadding="3" cellspacing="3" width="420">
+    <tbody>
+        <tr>
+            <td width="150" align="right" valign="top">[#catalog_variable_edit_namefull_label#]</td>
+            <td width="270" valign="top"><input type="text" name="name_full" value="%name_full%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td width="150" align="right" valign="top">[#catalog_variable_edit_namedb_label#]</td>
+            <td width="270" valign="top"><input type="text" name="name_db" value="%name_db%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td width="150" align="right" valign="top">[#catalog_variable_edit_value_label#]</td>
+            <td width="270" valign="top"><input type="text" name="value" value="%value%" style="width: 100%;"></td>
+        </tr>
+
+        <tr>
+            <td colspan="2" align="center"><input type="button" name="submit"  value="[#catalog_variable_edit_save_label#]" onclick="jspub_form_submit('savevarform','%form_action%')"></td>
+        </tr>
+    </tbody>
+</table>
+</form>
+</div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+

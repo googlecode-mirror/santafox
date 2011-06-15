@@ -1,0 +1,65 @@
+<!-- @header -->
+%label_table%
+
+<input type="button" onclick="jspub_click('prop_edit&id=0&id_group=%groupid%&idg_control=%groupid%')" value="[#catalog_edit_property_bt_add_prop#]"/>
+
+<form action="%form_action%" method="post" id="gprops">
+<input type="hidden" name="group_id" value="%gid%">
+
+%table%
+</form>
+
+
+<!-- @label_table_group -->
+<h3>[#catalog_group_prop_list_mainlabel#] <b>"%name%"</b></h3>
+<!-- @label_table_global -->
+<h3>[#catalog_group_prop_list_mainlabel_global#]</h3>
+
+<!-- @table_header -->
+<br />
+<table class="admin_table">
+<thead>
+  <tr>
+     <th>[#catalog_group_prop_list_table_label_num#]</th>
+     <th>[#catalog_group_prop_list_table_label_name#]</th>
+     <th>[#catalog_group_prop_list_table_label_namedb#]</th>
+     <th>[#catalog_group_prop_list_table_label_global#]</th>
+     <th>[#catalog_group_prop_list_table_label_type#]</th>
+     <th>[#catalog_group_prop_list_table_label_order#]</th>
+     <th>[#catalog_prop_in_group_header#]</th>
+     <th>[#catalog_group_prop_list_table_label_actions#]</th>
+  </tr>
+</thead>
+<!-- @property -->
+<tr>
+ <td align="center">%num%</td>
+ <td>%property_name%</td>
+ <td>%property_dbname%</td>
+ <td align="center">%property_global%</td>
+ <td align="center">%property_type%</td>
+ <td align="center"><input type="text" name="porder[%property_id%]" value="%order%" size="3"></td>
+ <td align="center"> %visible_in_group_checkbox%</td>
+ <td align="center">%actions%</td>
+</tr>
+
+<!-- @visible_in_group_checkbox -->
+<input type="checkbox" name="grprop[%prop%]" %grprop_checked%>
+
+<!-- @property_is_global -->
+<img src="/admin/templates/default/images/24-em-check-gray.gif"/>
+<!-- @property_is_no_global -->
+
+<!-- @property_del_link -->
+ <a href="#" onclick="jspub_confirm('prop_delete&groupid=%groupid%&id=%property_id%&idg_control=%idg_control%','[#catalog_group_prop_list_actions_del_alert#] %property_name%?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_group_prop_list_actions_del_alert#] %property_name%?"/></a>
+<!-- @property_edit_link -->
+ <a href="#" onclick="jspub_click('prop_edit&id=%property_id%&id_group=%groupid%&idg_control=%idg_control%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#catalog_action_edit#]"/></a>
+
+
+<!-- @table_footer -->
+<tr class="admin_table_wstring">
+     <td colspan="6" align="right"><input type="submit" name="save_gprops_order" value="[#catalog_group_prop_list_table_label_change_sord#]"></td>
+     <td></td>
+</tr>
+</table>
+<br />
+<!-- @no_props -->

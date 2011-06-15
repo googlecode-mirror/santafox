@@ -1,0 +1,393 @@
+<!-- @body -->
+<script type="text/javascript" language="javascript">
+	//var arr_link_select = new Array();
+	var arr_link_content = new Array();//массив имён файлов для редактирования контента
+
+    var metkiCount = 0;//кол-во меток
+
+    // что-то вроде  [["ppf_mapsite1_visible","ppv_mapsite1_visible"],["ppf_waysite1_visible","ppv_waysite1_visible"],["ppf_menu1_visible","ppv_menu1_visible"]]
+    var modulesProps = %prop_modul_array%;
+    /*
+    *
+    * */
+
+    /* % all_modules % заменяется на что-то вроде
+[["","","Действие не выбранно"],["Карта сайта","",""],["","8","Показать карту"],["Дорога","",""],["","9","Вывести дорогу"],["","10","Вывести страницу 2-ого уровня"],["Меню","",""],["","13","Вывести верхнее меню"],["","17","Вывести левое меню"],["Основные новости","",""],["","16","Вывести архив"],["","15","Вывести ленту"],["Поиск","",""],["","35","Вывести результаты поиска"],["","34","Вывести форму поиска (для главной)"],["Обратная связь","",""],["","24","Отобразить форму"],["Основные Комментарии","",""],["","40","Комментарии по-умолчанию"],["Вопросы и Ответы","",""],["","25","Показать список вопросов-ответов"],["","26","Показать список разделов вопросов-ответов"],["Каталог товаров","",""],["","37","Вывести содержимое корзины"],["","38","Вывести стикер корзины"],["","32","Название элемента"],["","39","Отобразить форму заказа"],["","30","Список категорий"],["","31","Список товаров"],["","36","Сформировать заголовок"],["Фотогалерея","",""],["","41","Показать все фото"],["","33","Сформировать список товаров"],["Ядро","",""],["","2","Вернуть заголовок страницы"],["","1","Редактор контента"]]
+ */
+    var allModulesActions = %all_modules%;
+
+
+    /*
+    % store_templates % заменяется на что-то вроде
+  [["design/template1.html","design/template1.html"],["design/template2.html","design/template2.html"],["design/template3.html","design/template3.html"],["design/template4.html","design/template4.html"],["design/xml.html","design/xml.html"]]
+*/
+    var allTemplates = %store_templates%;
+
+
+    
+	//Отдельная функция
+	function structure_tree_click_node(url)
+	{
+		//Самое простое - заполним поля с основными данными страницами новыми значениями.
+		//Сначала надо получить эти данные
+		var url_link_main = start_interface.global_link + url +"&type=get_main_param";//index.php?action=set_left_menu&leftmenu=view&id=about2&type=get_main_param
+
+		//Загрузка данных о самой странице и свойствах модулей
+        $.get(url_link_main, function(data){
+            var comboStore=jQuery.parseJSON(data);
+            if (comboStore!=null )
+                set_propertes_main(comboStore);
+        });
+		run_update_metki(url);
+	}
+
+	function run_update_metki(url)
+	{
+		var url_link_metk = start_interface.global_link + url +"&type=get_metka";
+		//Второй, отдельный запрос, должен загрузить информацию о метках для выбранного шаблона
+        $.get(url_link_metk, function(data){
+            var comboStore=jQuery.parseJSON(data);
+            if (comboStore!=null)
+                set_metki(comboStore);
+        });
+
+	}
+	//А теперь вложенная функция, чтобы иметь доступ ко всем переменным
+	//созданым при инсталяции
+	function set_propertes_main(d)
+	{
+		//Проставляем поля формы
+		$("#fieldPageName").val(d.caption);
+		$("#fieldPageTitle").val(d.name_title);
+		$("#fieldPageURL").val(d.link_other_page);
+		$("#fieldPageID").val(d.id_curent_page);
+		$("#fieldPageOnlyAuth").val(d.only_auth);
+		$("#fieldPageTemplate").val(d.page_template);
+        if (d.template_naslednoe)
+        {
+            $('#flag_template').attr("checked","checked");
+            $('#fieldPageTemplate').attr('disabled',true);
+        }
+        else
+        {
+            $('#flag_template').removeAttr('checked');
+            $('#fieldPageTemplate').removeAttr('disabled');
+        }
+
+        if (d.page_is_main)
+            $('#flag_template').attr("disabled",true);
+        else
+            $('#flag_template').removeAttr("disabled");
+
+		//Заполняем остальные вспомогательные элементы
+		$('#main_label_name_page').html(d.caption);
+		$('#link_for_preview').attr('href',d.link_for_preview);
+
+		//проставляем свойства страницы для модулей
+		for (var i=0; i < d.page_prop.length; i++)
+		{
+            $('#'+d.page_prop[i].name).val(d.page_prop[i].value);
+            if (d.page_prop[i].naslednoe)//чекбокс наследования если надо
+            {
+
+                $('#'+d.page_prop[i].name_nasled).attr("checked","checked");
+                $('#'+d.page_prop[i].name).attr("disabled",true);
+            }
+            else
+            {
+                $('#'+d.page_prop[i].name_nasled).removeAttr('checked');
+                $('#'+d.page_prop[i].name).removeAttr("disabled");
+            }
+
+            if (d.page_is_main)//если главная - отключим чекбокс
+                $('#'+d.page_prop[i].name_nasled).attr("disabled",true);
+            else
+                $('#'+d.page_prop[i].name_nasled).removeAttr("disabled");
+		}
+	}
+
+
+	function set_metki(d)
+	{
+        $('#table_metki').html('');//очистим таблицу меток
+        var str_code = "";
+        metkiCount = d.length;
+        arr_link_content = new Array();
+        for (var i = 0; i < d.length; i++)
+        {
+            var str_content = "";
+            //str_content += '<tr id="string_metka_'+i+'" style="display: none;">';
+            str_content += '<tr id="string_metka_'+i+'">';
+            //Имя метки со скрытым инпутом, куда пишется непосредственное значение
+            str_content += '<td width="200" align="left" nowrap="nowrap">';
+            //str_content += '<input type="hidden"  id="metka_real_'+i+'" name="page_modules['+d[i].name+']" value="'+d[i].id_action+'"/>';
+            str_content += '<span id="label_text_metka_'+i+'">'+d[i].name+'</span></td>';
+            //Галочка наследования
+            //str_content += '<td width="30" align="center"><input type="checkbox" name="page_inheritance['+d[i].name+']" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');"></td>';
+            str_content += '<td width="30" align="center"><input type="checkbox" name="'+d[i].name+'" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');"></td>';
+            //Селект, который на который навешивается экстовская форма
+            str_content += '<td width="300"><select id="sel_modul_ext_'+i+'" style="width:270px;"></select></td>';
+            //str_content += '<td width="300" id="sel_modul_ext_'+i+'"></td>';
+            //Иконка редактора контента
+            str_content += '<td width="60" align="left"><img style="cursor:pointer;float:left;display:none;" width="26" height="26" id="img_edit_'+i+'" src="/admin/templates/default/images/icon_edit.gif" border="0" onclick="go_edit_content(arr_link_content['+i+'], false)" /><img style="cursor:pointer;display:none;float:left;" width="26" height="26" id="img_edit_s_'+i+'" src="/admin/templates/default/images/icon_edit_textarea.gif" border="0" onclick="go_edit_content(arr_link_content['+i+'], true)" /></td>';
+            str_content += '</tr>';
+            //Добавляем небольшими кусками, так как иначе IE глючит
+            $(str_content).appendTo('#table_metki');
+            buildMetkaActionsSelect("select#sel_modul_ext_"+i);
+
+            //при изменении селекта с действиями скроем или покажем иконки редактора контента
+            $("select#sel_modul_ext_"+i).change(function () {
+                var elID = new String(this.id).split("_").pop();
+                show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
+                show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
+            });
+
+            $("#sel_modul_ext_"+i).val(d[i].id_action);//поставим в селект выбранное значение
+
+            //если унаследовано - отключим селект и поставим чекбокс наследования
+            if (d[i].naslednoe)
+            {
+                $("#flag_metka_"+i).attr("checked","checked");
+                $("#sel_modul_ext_"+i).attr("disabled",true);
+            }
+
+            //повесим обработчик на клик по чекбоксу
+            $("#flag_metka_"+i).change(function () {
+                var elID = new String(this.id).split("_").pop();
+                show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
+                show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
+                var disAttr = $("#sel_modul_ext_"+elID).attr("disabled");
+                if (typeof  disAttr!== 'undefined' && disAttr!=false)
+                    $("#sel_modul_ext_"+elID).removeAttr("disabled");
+                else
+                    $("#sel_modul_ext_"+elID).attr("disabled",true);
+            });
+
+            show_icon_go_edit_content("sel_modul_ext_"+i,'img_edit_'+i);
+            show_icon_go_edit_content("sel_modul_ext_"+i,'img_edit_s_'+i);
+
+            //сохраняем название файла для редактирования контента
+            arr_link_content[i] = d[i].file_edit;
+        }
+
+	}
+
+    function buildMetkaActionsSelect(selectID)
+    {
+        var elem;
+        var lastOptGroup;
+        var option;
+        for (var j=0;j<allModulesActions.length;j++)
+        {
+            elem = allModulesActions[j];
+            if (!elem[0] && !elem[1]) //Действие не выбранно
+            {
+                option = $(document.createElement("option")).text(elem[2]).val("");
+                $(selectID).append(option);
+                continue;
+            }
+            if (elem[0]) //optgroup
+            {
+                lastOptGroup = $(document.createElement("optgroup")).attr('label', elem[0]);
+                $(selectID).append(lastOptGroup);
+            }
+            else
+            {
+                option = $(document.createElement("option")).text(elem[2]).val(elem[1]);
+                $(lastOptGroup).append(option);
+            }
+        }
+    }
+
+	//Сначала обрежем длину заголовков, т.к. это колонки и мы не можем делать большие названия
+	var label1 = '[#page_prop_name_page#]';    label1 = label1.ellipse(28);
+	var label2 = '[#page_prop_name_title#]';   label2 = label2.ellipse(28);
+	var label3 = '[#page_prop_name_id#]'; 	   label3 = label3.ellipse(28);
+	var label4 = '[#page_prop_link_page#]';    label4 = label4.ellipse(28);
+	var label5 = '[#page_prop_templte_page#]'; label5 = label5.ellipse(28);
+	var label6 = 'Доступна только авторизированым'; label6 = label6.ellipse(28);//@todo move to lang vars
+
+
+    //построение селекта с шаблонами и инициализация
+    var htmlSelectTemplates = '';
+    for (var j=0;j<allTemplates.length;j++)
+    {
+        var elem = allTemplates[j];
+        //alert(elem[1]);break;
+        htmlSelectTemplates+='<option value="'+elem[0]+'">'+elem[1]+'</option>';
+    }
+    $("#fieldPageTemplate").html(htmlSelectTemplates);
+    $("#fieldPageTemplate").change(function () {saveStructForm('%chnage_template%', false);});
+    //выбор страницы перехода
+    $("#fieldPageURL").click(function (e) {
+        get_properes_page(e, 'fieldPageURL');
+    });
+
+    //сохранение всего
+    $("#admin_struct_savebutton").click(function () {saveStructForm('%url_action%', true); });
+
+
+    function saveStructForm(url,isFull)
+    {
+        var postArr = {page_properties: {
+                        page_template:$("#fieldPageTemplate").val(),
+                        page_title:$("#fieldPageTitle").val(),
+                        page_name:$("#fieldPageName").val(),
+                        page_id:$("#fieldPageID").val(),
+                        page_url:$("#fieldPageURL").val()
+                       }};
+
+        //@todo замена имени ноды в дереве
+        if ($('#flag_template').attr('checked'))
+            postArr.page_properties.flag_template='on';
+        if ($('#fieldPageOnlyAuth').attr('checked'))
+            postArr.page_properties.only_auth='on';
+
+        if (isFull)
+        {
+            postArr.properties_cb = {};
+            postArr.properties = {};
+            postArr.page_inheritance = {};
+            postArr.page_modules = {};
+            var elem,elemName;
+            //свойства модулей
+            for (var j=0;j<modulesProps.length;j++)
+            {
+                elem = modulesProps[j];
+                if ($('#'+elem[0]).attr('checked'))
+                {
+                    postArr.properties_cb[elem[0]] = 'on';
+                    //properties[waysite1_visible]	true
+                }
+                else
+                {
+                    //properties[mapsite1_visible]
+                    elemName = new String(elem[1]).substr(4);
+                    postArr.properties[elemName] = $('#'+elem[1]).val();
+                }
+            }
+            //метки
+            for (j=0; j<metkiCount;j++)
+            {
+                elemName = $('#flag_metka_'+j).attr('name');
+                if ($('#flag_metka_'+j).attr('checked'))
+                {
+                    postArr.page_inheritance[elemName]='on';
+                }
+                else
+                {
+                    postArr.page_modules[elemName]=$('#sel_modul_ext_'+j).val();
+                }
+            }
+        }
+
+        $.post(url, postArr,  function(data){
+            //Обрабатываем ответ
+            var post_res=jQuery.parseJSON(data);
+            if (post_res!=null)
+            {
+                //сначала проверка на наличие ошибок
+                if (post_res.success)
+                {
+                    santaShowPopupHint("Info",post_res.info,1500);
+                    run_update_metki('%leftmenu%');//обновляем метки для нового шаблона, если всё ок
+                }
+                else
+                    santaShowPopupHint("Error", post_res.info,0);
+            }
+        });
+
+        
+    }
+    /*  str_prop_modul_code here:
+	%--str_prop_modul_code--%
+    */
+	run_update_metki('%link_show_metki%');
+</script>
+
+<div id="structure_all_form" style="display: block; width: 630px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <div>
+		<table>
+		<tr>
+		<td valign="center">
+		<h3>
+		Страница: &quot;<span id="main_label_name_page">%page_name%</span>&quot;</h3></td><td valign="center">&nbsp;&nbsp;<a target="_blank" href="%link_page_view%" id="link_for_preview"><img alt="Просмотреть страницу в новом окне" width="24" height="24" border="0" src="/admin/templates/default/images/eye.gif"/></a>
+		</td>
+		</tr>
+		</table>
+		</div>
+        <div id="form">
+            <form id="struct_form" class="x-form">
+                <fieldset>
+                    <legend>[#page_prop_label_prop#]</legend>
+
+                    <table border="0" cellpadding="0" cellspacing="0">
+                    <tbody id="table_pageprops">
+
+                    <tr>
+                        <td align="right"><label for="fieldPageName">[#page_prop_name_page#]</label></td>
+                        <td>&nbsp;</td>
+                        <td><input type="text" name="page_properties[page_name]" style="width:180px;" value="%page_name%" id="fieldPageName"></td>
+                    </tr>
+
+                    <tr>
+                        <td align="right"><label for="fieldPageTitle">[#page_prop_name_title#]</label></td>
+                        <td>&nbsp;</td>
+                        <td><input type="text" name="page_properties[page_title]" style="width:180px;" value="%page_title%" id="fieldPageTitle"></td>
+                    </tr>
+
+                    <tr>
+                        <td align="right"><label for="fieldPageID">[#page_prop_name_id#]</label></td>
+                        <td>&nbsp;</td>
+                        <td><input type="text" name="page_properties[page_id]" style="width:180px;" value="%page_id%" id="fieldPageID"></td>
+                    </tr>
+
+                    <tr>
+                        <td align="right"><label for="fieldPageURL">[#page_prop_link_page#]</label></td>
+                        <td>&nbsp;</td>
+                        <td><input type="text" name="page_properties[page_url]" style="width:180px;" value="%page_url%" id="fieldPageURL"></td>
+                    </tr>
+
+                    <tr>
+                        <td align="right"><label for="fieldPageOnlyAuth">Доступна только авторизированым</label></td>
+                        <td>&nbsp;</td>
+                        <td><input type="checkbox" name="page_properties[only_auth]" id="fieldPageOnlyAuth" %only_auth%></td>
+                    </tr>
+
+                    <tr>
+                        <td align="right">[#page_prop_templte_page#]</td>
+                        <td><input type="checkbox" onClick="jspub_disabled_change('flag_template', 'fieldPageTemplate')" name="page_properties[flag_template]" id="flag_template"></td>
+                        <td>
+                            <select name="page_properties[page_template]" id="fieldPageTemplate">
+
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                </fieldset>
+
+                <fieldset id="page_prop_modules">
+                    <legend>[#page_prop_label_prop_addon#]</legend>
+                    <table border='0' cellpadding='0' cellspacing='0'>
+                    <tbody id='table_modul_prop'>
+
+                    %str_prop_modul%
+                    </tbody>
+                    </table>
+
+                </fieldset>
+
+                <fieldset id="metki_content">
+                    <legend>[#page_prop_label_link#]</legend>
+                    <table border="0" cellpadding="0" cellspacing="0"><tbody id="table_metki"></tbody></table>
+                </fieldset>
+                <div align="center"> <input type="button" id="admin_struct_savebutton" value="[#structure_page_properties_button_save#]"></div>
+            </form>
+
+        </div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>

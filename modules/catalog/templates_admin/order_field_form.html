@@ -1,0 +1,122 @@
+<!-- @prop_type -->
+<option value="text" selected="selected">[#catalog_prop_type_text#]</option>
+<option value="number">[#catalog_prop_type_number#]</option>
+<option value="enum">[#catalog_prop_type_enum#]</option>
+<option value="string">[#catalog_prop_type_string#]</option>
+
+<!-- @label_form_edit -->
+<h3>[#catalog_edit_order_field_label_edit#]</h3>
+<!-- @label_form_add -->
+<h3>[#catalog_edit_order_field_label_add#]</h3>
+
+<!-- @header -->
+<script type="text/javascript">
+ function selectChange()
+ {
+  if ($('#stype').val()=='enum')
+  {
+  	   $('#prop_addon').html($('#enum_for_add').html());
+       $('#prop_addon').css('display','block');
+  }
+  else
+  {
+      $('#prop_addon').css('display','none');
+      $('#prop_addon').html('');
+  }
+ }
+</script>
+
+<div style="width: 450px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<form action="" method="POST" enctype="multipart/form-data" id="savepropform">
+<input type="hidden" name="id" value="%id%"/>
+<h3>%form_label%</h3>
+<table width="420">
+    <tbody>
+        <tr>
+            <td width="150" align="right">[#catalog_edit_property_name#]:<sup>*</sup></td>
+            <td><input type="text" name="name_full" value="%name_full%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td width="150" align="right">[#catalog_edit_property_namedb#]:<sup>*</sup></td>
+            <td><input type="text" name="name_db" value="%name_db%" style="width: 100%;"></td>
+        </tr>
+
+        <tr>
+            <td width="150" align="right">[#catalog_order_field_regexp_label#]:</td>
+            <td><input type="text" name="regexp" value="%regexp%" style="width: 100%;"></td>
+        </tr>
+
+        <tr>
+            <td width="150" align="right"><label for="req">[#catalog_edit_is_required_label#]:</label></td>
+            <td><input type="checkbox" name="req" id="req" %req_checked%></td>
+        </tr>
+
+
+        <tr>
+            <td width="150" align="right">[#catalog_edit_property_type#]:<sup>*</sup></td>
+            <td>
+            <select name="ptype" onChange="selectChange()" onblur="selectChange()" id="stype" %off_type%>
+            %prop_type%
+		    </select></td>
+        </tr>
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+    </tbody>
+</table>
+<div id="prop_addon" style="visibility: visible">
+%addons_param%
+</div>
+<table width="420">
+    <tbody>
+        <tr>
+            <td width="150">&nbsp;</td>
+            <td align="left"><input type="button" name="submit" value="[#catalog_edit_property_bt_save#]" onclick="jspub_form_submit('savepropform','%form_action%')"></td>
+        </tr>
+    </tbody>
+</table>
+</form>
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+
+<div id="enum_for_add" style="visibility:hidden; width:0px; height:0px;">
+<table width="420">
+    <tbody>
+      <tr>
+	<td width="150" align="right" valign="top">[#catalog_edit_property_enum_label#]:<br /><small>[#catalog_edit_property_enum_help#]</small></td>
+	<td><textarea rows="4" name="enum_values" style="width:100%"></textarea></td>
+</tr>
+    </tbody>
+</table>
+</div>
+
+<!-- @enum_vals -->
+<table width="420">
+<tbody>
+    <tr>
+        <td align="center" valign="top" colspan="2"><b>[#catalog_edit_property_enum_label#]</b></td>
+    </tr>
+	%vals%
+    <tr>
+        <td width="150" align="right" valign="top">[#catalog_edit_property_enum_val_add_label#]:</td>
+        <td><input type="text" name="enumval" value="">&nbsp;<input type="button" name="submit" value="[#catalog_edit_property_enum_val_add_bt#]" onclick="jspub_form_submit('savepropform','%form_action%')"></td>
+    </tr>
+</tbody>
+</table>
+
+
+<!-- @enum_val -->
+    <tr>
+        <td width="150" align="right" valign="top">%val_name%</td>
+        <td><a href="#" onclick="jspub_confirm('%action_del%','[#catalog_edit_property_enum_del_alert#] %val_name%?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_edit_property_enum_del_alert#]"/></a></td>
+    </tr>
+
+
+<!-- @old_el -->
+<form action="%form_action%" method="post" id="addenumform">
+<input type="hidden" name="id" value="%id%"/>
+</form>

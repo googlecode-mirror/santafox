@@ -1,0 +1,80 @@
+<!-- @header -->
+[#catalog_show_order_fields#]
+
+<input type="button" onclick="jspub_click('order_field_edit&id=0')" value="[#catalog_edit_property_bt_add_field#]"/>
+
+<form action="%form_action%" method="post" id="order_fields">
+
+%table%
+</form>
+
+<form action="%form_action_tpls%" method="post" id="order_tpls">
+<h3>[#catalog_order_templates_header#]</h3>
+<table border="0" cellpadding="3" cellspacing="3" width="420">
+<tbody>
+  <tr>
+      <td width="150" align="right" valign="top">[#catalog_order_template_basket_items_label#]</td>
+      <td width="270" valign="top"><input type="text" style="width:100%" name="basket_items_tpl" value=""></td>
+  </tr>
+  <tr>
+      <td width="150" align="right" valign="top">[#catalog_order_template_order_label#]</td>
+      <td width="270" valign="top"><input type="text" style="width:100%" name="order_form_tpl" value=""></td>
+  </tr>
+  <tr>
+   <td colspan="2">&nbsp;</td>
+  </tr>
+  <tr>
+   <td colspan="2" align="center">
+    <input type="button" name="submit" value="[#catalog_order_action_regenerate_tpls_label#]" onclick="jspub_form_submit('order_tpls','%form_action_tpls%')">
+   </td>
+  </tr>
+</tbody>
+</table>
+
+
+</form>
+
+
+<!-- @table_header -->
+<br />
+<table class="admin_table">
+<thead>
+  <tr>
+     <th>[#catalog_order_prop_list_table_label_num#]</th>
+     <th>[#catalog_order_prop_list_table_label_name#]</th>
+     <th>[#catalog_order_prop_list_table_label_namedb#]</th>
+     <th>[#catalog_order_prop_list_table_label_global#]</th>
+     <th>[#catalog_order_prop_list_table_label_type#]</th>
+     <th>[#catalog_order_prop_list_table_label_order#]</th>
+     <th>[#catalog_order_prop_list_table_label_actions#]</th>
+  </tr>
+</thead>
+<!-- @line -->
+<tr>
+ <td align="center">%num%</td>
+ <td>%name_db%</td>
+ <td>%name_full%</td>
+ <td align="center">%property_required%</td>
+ <td align="center">%property_type%</td>
+ <td align="center"><input type="text" name="porder[%id%]" value="%order%" size="3"></td>
+ <td align="center">%actions%</td>
+</tr>
+
+<!-- @property_is_required -->
+<img src="/admin/templates/default/images/24-em-check-gray.gif"/>
+<!-- @property_is_not_required -->
+
+<!-- @property_del_link -->
+ <a href="#" onclick="jspub_confirm('order_field_delete&id=%id%','[#catalog_order_prop_list_actions_del_alert#] %name_full%?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_order_prop_list_actions_del_alert#] %name_full%?"/></a>
+<!-- @property_edit_link -->
+ <a href="#" onclick="jspub_click('order_field_edit&id=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#catalog_action_edit#]"/></a>
+
+
+<!-- @table_footer -->
+<tr class="admin_table_wstring">
+     <td colspan="6" align="right"><input type="submit" name="save_order_fields_order" value="[#catalog_order_prop_list_table_label_change_sord#]"></td>
+     <td></td>
+</tr>
+</table>
+<br />
+<!-- @no_props -->

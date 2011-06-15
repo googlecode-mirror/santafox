@@ -1,0 +1,78 @@
+<!-- @data_empty -->
+<h4 class="stat_data_empty">[#statist_erorre_no_data_for_show#]</h4>
+
+<!-- @begin -->
+<script type="text/javascript">
+function stat_change_page(url, id_insert)
+{
+	if (window.XMLHttpRequest) { // Mozilla, Safari,...
+    	http_request = new XMLHttpRequest();
+        if (http_request.overrideMimeType) {
+         	// set type accordingly to anticipated content type
+            //http_request.overrideMimeType('text/xml');
+            http_request.overrideMimeType('text/html');
+         }
+      } else if (window.ActiveXObject) { // IE
+         try {
+            http_request = new ActiveXObject("Msxml2.XMLHTTP");
+         } catch (e) {
+            try {
+               http_request = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (e) {}
+         }
+      }
+
+      if (!http_request) {
+         alert('Cannot create XMLHTTP instance');
+         return false;
+      }
+
+      http_request.open('POST', url, false);
+//      http_request.open('GET', url, false);
+      http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      http_request.setRequestHeader("Connection", "close");
+      http_request.send();
+      result = http_request.responseText;
+	  Ext.get(id_insert).update(result, true);
+}
+</script>
+<br />
+<table cellspacing="1" cellpadding="6" align="center" class="admin_table" width="80%">
+
+<!-- @tab_begin -->
+    <tr>
+      <th>[#statist_words_table_label1#]</th>
+      <th>[#statist_words_table_label2#]</th>
+      <th>[#statist_words_table_label2#]</th>
+
+<!-- @tab_image -->
+	<th>[#statist_words_table_label4#]</th>
+<!-- @tab_end -->
+    </tr>
+
+<!-- @tr_begin -->
+    <tr %set_class_tr%>
+      <td align="center" style="width:70px;">%num%</td>
+      <td align="left"><A href="%link%" target="blank">%name_link%</A></td>
+      <td align="left" style="width:100px;">%count%</td>
+
+<!-- @tr_image -->
+<td align="center" style="width:300px;">%link_image%</td>
+
+
+<!-- @tr_end -->
+    </tr>
+
+<!-- @end -->
+    <tfoot>
+        <tr>
+            <td colspan="4">%pages%</td>
+        </tr>
+    </tfoot>
+</table>
+<!-- @page_active -->
+<b>%page%</b>
+<!-- @page_passive -->
+<a href="#" onclick="stat_change_page('%url%','stat_result');">%page%</a>
+<!-- @page_delimeter -->
+&nbsp;|&nbsp;

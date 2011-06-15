@@ -1,0 +1,131 @@
+<!-- @body -->
+<script>
+	//var arr_var_lang = new Array();
+    [#action_modules#]
+
+
+    var htmlSelectActions='';
+    for (var j=0;j<moduleActions.length;j++)
+    {
+        var elem = moduleActions[j];
+        htmlSelectActions+='<option value="'+elem[0]+'">'+elem[1]+'</option>';
+    }
+    $("#moduleNewActionSelect").html(htmlSelectActions);
+
+
+	%prop_modul_code%
+
+
+
+    $('#button_add_action').click(function () {
+        var val = $('#moduleNewActionSelect').val();
+        if (val)
+            show_action_edit("action_new&id_metod="+val, "[#modules_label_win_new_action#]");
+        else
+            santaShowPopupHint('[#interface_global_label_error#]','[#modules_not_select_mod_for_action#]',0);
+    });
+
+    $('#modulePropsSave').click(function(){
+
+        var postArr = $('#module_props_lang_form').serializeArray();
+        $.post('%url_action%', postArr,  function(data){
+            //Обрабатываем ответ
+            var post_res=jQuery.parseJSON(data);
+            if (post_res!=null)
+            {
+                //сначала проверка на наличие ошибок
+                if (post_res.success)
+                    santaShowPopupHint("Info",post_res.info,1500);
+                else
+                    santaShowPopupHint("Error", post_res.info,0);
+            }
+        });
+
+        return false;
+        /*
+        $(form[0].elements).each(function() {
+                var field = $(this);
+                // We're only interested in fields with a validation attribute
+                if(field.attr('validation') !== undefined) {
+                    fields.push(new Field(field));
+                }
+            });
+            */
+    });
+</script>
+%writeable%
+
+
+<div style="width:600px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <div><span style="color:#000000; font-size:16px; font-weight:bold;">[#modules_lable_info#]</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#666666; font-size:12px;">(Идентификатор: %id_modul%)</span></div>
+        <div id="form_modules">
+            <form id="module_props_lang_form">
+            <div>
+                <fieldset>
+                    <legend>[#modules_legend_name_all_lang#]</legend>
+                    [#modules_form_edit_all_name#]
+                </fieldset>
+            </div>
+            <div>
+                <fieldset>
+                    <legend>[#modules_legend_all_modul#]</legend>
+                    <table>
+                        <tbody>
+                        %str_prop_modul%
+                        </tbody>
+                    </table>
+                </fieldset>
+            </div>
+            <div id="module_actions_container" style="display:none;">
+                <fieldset>
+                    <legend>[#modules_legend_action_modul#]</legend>
+
+                    <div>
+                        <label>[#modules_label_action_new#]</label>
+                        <select id="moduleNewActionSelect"></select>
+                        <input type="button" id="button_add_action" value="Создать"> <!-- //@todo move 2 lang vars  -->
+                    </div>
+
+                    <div id="actions_list_table"></div>
+                </fieldset>
+            </div>
+            <p align="center">
+                <input type="button" value="[#modules_button_save_properties#]" id="modulePropsSave">
+            </p>
+            </form>
+
+        </div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+<!-- @names_module -->
+<label style="width:275px;">[#modules_edit_lang_name#] &quot;[#code#]&quot;</label>
+<input type="text" name="langname[%id_name%][[#code#]]" value="[#value#]" style="width:300px;">
+<br clear="all">
+
+<!-- @action_modules -->
+/*
+ что-то вроде
+    [["56","Экспорт"],["55","Отобразить форму заказа"],["53","Отобразить связанные товары"],["54","Вывести содержимое корзины"],["51","Сформировать выборку по внутреннему фильтру"],["52","Вывести стикер корзины"],["50","Сформировать название элемента"],["49","Сформировать список товаров"],["48","Показать разделы"]]
+*/
+var moduleActions = %array_exist_metod%;
+update_action_list();
+
+<!-- @str_action_begin -->
+<table border="0" cellpadding="0" cellspacing="0" width="525">
+	<tr>
+    	<td colspan="2" align="center" height="30"><b>[#modules_legend_action_exist#]</b></td>
+    </tr>
+    [#html_action#]
+
+<!-- @str_action -->
+<tr class="" onmouseover="mouse_select_element(this)" onmouseout="mouse_select_element(this,true)">
+	<td height="26"><b>%name%</b>&nbsp;&nbsp;<font size="-8" color="#666666">(%source_name%)</font><br /></td>
+    <td height="26" width="60"><img style="cursor:pointer" width="26" height="26" src="/admin/templates/default/images/icon_edit.gif" border="0" onclick="show_action_edit('action_edit&id_action=%id_action%', '[#modules_label_win_edit_action#]')" alt="[#label_alt_edit_macros#]"/>&nbsp;<img style="cursor:pointer" width="26" height="26" src="/admin/templates/default/images/icon_delet.gif" border="0" onclick="jspub_confirm('action_delet&id_action=%id_action%','[#modules_label_confirm_del_action#]');" alt="[#label_alt_delet_macros#]" /></td>
+</tr>
+
+<!-- @str_action_end -->
+</table>

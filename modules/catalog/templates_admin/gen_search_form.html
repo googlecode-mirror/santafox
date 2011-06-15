@@ -1,0 +1,103 @@
+<!-- @form -->
+<div style="width:550px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<form action="%form_action%" method="POST"  id="gensearchform">
+<input type="hidden" name="id" value="%groupid%">
+<table border="0" width="100%">
+    <tbody>
+        <tr><td colspan="2"><b>[#catalog_generate_search_form_label#] '%group_name%'</b></td></tr>
+
+<tr>
+  <td valign="top" align="right">
+    [#catalog_gen_search_outfilename_label#]
+  </td>
+  <td valign="top">
+   <input type="text" name="outfile" value=""/>
+  </td>
+</tr>
+
+<tr>
+  <td valign="top" align="right">
+    <b>[#catalog_gen_search_filtername_label#]</b>
+  </td>
+  <td valign="top">
+   <input type="text" name="filtername" value=""/>
+  </td>
+</tr>
+<tr>
+  <td valign="top" align="right">
+    <b>[#catalog_gen_search_filtertemplate_label#]</b>
+  </td>
+  <td valign="top">
+   <select name="filtertpl">%template-lines%</select>
+  </td>
+</tr>
+
+%props_lines%
+<tr>
+  <td valign="top" colspan="2" align="center">
+  <input type="submit" name="submit" value="[#catalog_generate_search_form_button_label#]">
+  </td>
+</tr>
+    </tbody>
+</table>
+</form>
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+<!-- @template-line -->
+<option value="%value%">%value%</option>
+
+<!-- @string-prop -->
+<tr>
+  <td valign="top" align="right">
+    <b>%propnamefull%</b>:
+  </td>
+  <td>
+   <input type="radio" name="prop[%propnamedb%]" value="ignore" checked>[#catalog_gen_search_form_ignore_field_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="accurate">[#catalog_gen_search_form_string_accurate_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="like">[#catalog_gen_search_form_string_like_label#]<br>
+  </td>
+</tr>
+
+<!-- @number-prop -->
+<tr>
+  <td valign="top" align="right">
+    <b>%propnamefull%</b>:
+  </td>
+  <td>
+   <input type="radio" name="prop[%propnamedb%]" value="ignore" checked>[#catalog_gen_search_form_ignore_field_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="accurate">[#catalog_gen_search_form_number_accurate_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="diapazon">[#catalog_gen_search_form_number_diapazon_label#]<br>
+  </td>
+</tr>
+
+
+<!-- @enum-prop -->
+<tr>
+  <td valign="top" align="right">
+    <b>%propnamefull%</b>:
+  </td>
+  <td>
+   <input type="radio" name="prop[%propnamedb%]" value="ignore" checked>[#catalog_gen_search_form_ignore_field_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="select">[#catalog_gen_search_form_enum_select_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="checkbox">[#catalog_gen_search_form_enum_checkboxes_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="radio">[#catalog_gen_search_form_enum_radio_label#]<br>
+  </td>
+</tr>
+
+<!-- @file-prop -->
+<tr>
+  <td valign="top" align="right">
+    <b>%propnamefull%</b>:
+  </td>
+  <td>
+   <input type="radio" name="prop[%propnamedb%]" value="ignore" checked>[#catalog_gen_search_form_ignore_field_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="select">[#catalog_gen_search_form_file_select_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="checkbox">[#catalog_gen_search_form_file_checkbox_label#]<br>
+   <input type="radio" name="prop[%propnamedb%]" value="radio">[#catalog_gen_search_form_file_radio_label#]<br>
+  </td>
+</tr>
+

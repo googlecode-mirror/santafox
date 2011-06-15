@@ -1,0 +1,43 @@
+<!-- @import_form -->
+<div style="width:80%;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<form action="%form_action%" method="POST"  id="exportcsvform">
+<table border="0" width="100%">
+    <tbody>
+    <tr><td colspan="3"><b>[#catalog_export_csv_formlabel#]</b></td></tr>
+    <tr>
+      <td align="left" colspan="2" valign="top" height="50">
+        [#catalog_export_csv_tpl_label#]:<br/>
+        <input type="text" name="template" value="%template_value%" style="width:100%;" />
+
+        [#catalog_export_filter_select_label#]:
+        <select name="filterid" id="import_filterid">
+            <option value="">[#catalog_export_filter_select_all_items#]</option>
+            %filter_items%
+        </select>
+      </td>
+      <td rowspan="3" valign="top" width="33%"><b>[#catalog_export_groups_props_label#]</b><br/>%all_props%</td>
+    </tr>
+    <tr>
+      <td width="66%" colspan="2" valign="top">
+      <input type="submit" name="submit" value="[#catalog_export_button_label#]">
+      </td>
+    </tr>
+
+    <tr>
+      <td width="66%" colspan="2" valign="top" height="100%">&nbsp;
+      </td>
+    </tr>
+
+
+
+    </tbody>
+</table>
+</form>
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+<!-- @filter_items -->
+<option value="%filterid%">%filtername%</option>

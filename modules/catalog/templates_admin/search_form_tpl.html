@@ -1,0 +1,40 @@
+<!-- @header -->
+<form method="post" action="%search_form_action%" id="searchform">
+<table class="admin_table" width="80%">
+
+<input type="hidden" name="group_id" value="%groupid%">
+<!-- @checkbox -->
+<tr><td>%prop_full_name%</td><td>%checkboxs%</td></tr>
+<!-- @checkboxs -->
+<input type="checkbox" name="%prop_db_name%[]" value="%valuekey%">%value%<br>
+
+<!-- @radio -->
+<tr><td>%prop_full_name%</td><td>%radios%</td></tr>
+<!-- @radios -->
+<input type="radio" name="%prop_db_name%" value="%valuekey%"> %value%<br>
+
+<!-- @select -->
+<tr><td>%prop_full_name%:</td><td><select name="%prop_db_name%">%selects%</select></td></tr>
+<!-- @selects -->
+<option value="%valuekey%">%value%</option>
+
+
+<!-- @diapazon -->
+<tr><td>%prop_full_name%</td><td> от %diapazons_from% до %diapazons_to%</td></tr>
+<!-- @diapazons_from -->
+<input type="text" name="%prop_db_name%_from" value="" size="5">
+<!-- @diapazons_to -->
+<input type="text" name="%prop_db_name%_to" value="" size="5">
+
+
+
+<!-- @numberinput -->
+<tr><td>%prop_full_name%:</td><td> <input type="text" name="%prop_db_name%" value="" size="5"></td></tr>
+<!-- @textinput -->
+<tr><td>%prop_full_name%: </td><td><input type="text" name="%prop_db_name%" value=""></td></tr>
+
+
+<!-- @footer -->
+<tr><td colspan="2"><input type="submit" name="search" value="Искать"></td></tr>
+</table>
+</form>

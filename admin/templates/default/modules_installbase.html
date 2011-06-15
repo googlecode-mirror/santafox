@@ -1,0 +1,31 @@
+<!-- @module_row -->
+<option value="%key%">%label%</option>
+
+<!-- @body -->
+<script>
+$("#new_module_install").click(function () {
+    var postArr = {modul_install: $("#select_modul").val()};
+    $.post('%url_action%', postArr,  function(data){
+       start_interface.main_menu_click('main_menu_modules', 'modules');
+    });
+
+});
+
+</script>
+%writeable%
+<div style="padding-right:8px; padding-left:5px; padding-top:5px; width:400px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+    	<div><h3>[#modules_install_base_header#]</h3></div>
+        <div id="form_new_modules">
+            <form action="%url_action%" method="post">
+            [#modules_install_spisok_dostupnih#]: <select name="modul_install" id="select_modul">
+                %modules_rows%
+            </select><br>
+            <input type="button" id="new_module_install" value="[#modules_link_new_base_module#]">
+            </form>
+
+        </div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>

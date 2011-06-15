@@ -1,0 +1,12 @@
+<!-- @form -->
+<form action="" method="post" id="auth_form_pfolder">
+[#auth_protect_dir_caption#]
+ <input type="text" name="pfolder" value="">
+ <input type="button" onclick="jspub_form_submit('auth_form_pfolder', '%url%');" value="[#auth_protect_dir_button#]">
+</form>
+
+<!-- @protect_success -->
+[#auth_protect_dir_success#]
+
+<!-- @protect_failed -->
+[#auth_protect_dir_failed#]

@@ -1,0 +1,108 @@
+<!-- @backup_rules_table -->
+
+<h2>[#admin_backup_rules_table_header#]</h2>
+<table class="admin_table">
+    <tr>
+        <th>[#admin_backup_rules_table_num#]</th>
+        <th>[#admin_backup_rules_table_name#]</th>
+        <th>[#admin_backup_rules_table_stringid#]</th>
+        <th>[#admin_backup_rules_table_delete#]</th>
+        <th>[#admin_backup_rules_table_edit#]</th>
+        <th>[#admin_backup_rules_table_edit_details#]</th>
+    </tr>
+%lines%
+</table>
+<br/>
+<a href="" onclick="jspub_click('backup&backup=edit_rule&id=0'); return false;">[#admin_backup_rule_add_label#]</a>
+
+<!-- @backup_rules_row -->
+<tr [#tr_class#]>
+ <td align="center">%num_order%</td>
+ <td align="center">%name%</td>
+ <td align="center">%stringid%</td>
+ <td><a href="#" onclick="jspub_confirm('backup&backup=delete_rule&id=%id%', '[#admin_backup_rule_delete_confirm#]');">[#admin_backup_table_row_delete#]</a></td>
+ <td align="center"><a href="" onclick="jspub_click('backup&backup=edit_rule&id=%id%'); return false;">[#admin_backup_rules_table_edit#]</a></td>
+ <td align="center"><a href="" onclick="jspub_click('backup&backup=edit_rule_details&id=%id%'); return false;">[#admin_backup_rules_table_edit_details#]</a></td>
+</tr>
+
+
+<!-- @backup_rule_edit -->
+
+
+<div style="width: 550px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<form action="%form_action%" method="POST" enctype="multipart/form-data" id="saveruleform">
+<input type="hidden" name="id" value="%id%"/>
+<h3>[#admin_backup_rule_edit_header#]</h3>
+<table border="0" cellpadding="3" cellspacing="3" width="420">
+    <tbody>
+        <tr>
+            <td width="150" align="right" valign="top">[#admin_backup_rule_name_label#]</td>
+            <td width="270" valign="top"><input type="text" name="name" value="%name%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_stringid_label#]</td>
+            <td valign="top"><input type="text" name="stringid" value="%stringid%" style="width: 100%;"></td>
+        </tr>
+
+
+
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_needcontent_label#]</td>
+            <td valign="top"><input type="checkbox" name="needcontent" %needcontent%></td>
+        </tr>
+
+
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_needsystem_label#]</td>
+            <td valign="top"><input type="checkbox" name="needsystem" %needsystem%></td>
+        </tr>
+
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_needtables_label#]</td>
+            <td valign="top"><input type="checkbox" name="needtables" %needtables%></td>
+        </tr>
+
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_needdesign_label#]</td>
+            <td valign="top"><input type="checkbox" name="needdesign" %needdesign%></td>
+        </tr>
+
+
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_ftp_host_label#]</td>
+            <td valign="top"><input type="text" name="ftphost" value="%ftphost%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_ftp_user_label#]</td>
+            <td valign="top"><input type="text" name="ftpuser" value="%ftpuser%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_ftp_pass_label#]</td>
+            <td valign="top"><input type="text" name="ftppass" value="%ftppass%" style="width: 100%;"></td>
+        </tr>
+
+        <tr>
+            <td align="right" valign="top">[#admin_backup_rule_ftp_dir_label#]</td>
+            <td valign="top"><input type="text" name="ftpdir" value="%ftpdir%" style="width: 100%;"></td>
+        </tr>
+
+<tr>
+<td colspan=2 align=center>
+<a href="" onclick="jspub_click('backup&backup=edit_rule_details&id=%id%'); return false;">[#admin_backup_rules_table_edit_details#]</a>
+</td>
+</tr>
+
+
+
+        <tr>
+            <td colspan="2" align="center"><input type="button" name="submit"
+		 value="[#global_prop_label_save#]" onclick="jspub_form_submit('saveruleform','%form_action%')"></td>
+        </tr>
+    </tbody>
+</table>
+</form>
+</div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>

@@ -1,0 +1,32 @@
+<!-- @begin -->
+[#faq_module_label_user_question#]
+<table width="100%" border="0" cellpadding="3" cellspacing="0" class="admin_table">
+<tr>
+<th>[#faq_list_question#]</th>
+<th>[#faq_list_partition#]</th>
+<th>[#faq_list_datetime#]</th>
+<th>[#faq_list_manage#]</th>
+</tr>
+
+<!-- @line -->
+<tr>
+    <td valign="top" align="left">
+        %user_name% <a href="mailto:%user_email%">%user_email%</a><br />
+	    %question%<br>
+	    %description%<br>
+    </td>
+    <td valign="top" align="center">
+        %partition_name%
+    </td>
+    <td valign="top" align="center">
+        %added%
+    </td>
+	<td  align="center" width="60" valign="top" nowrap="nowrap">
+        <img onclick="jspub_click('%question_edit%')" src="/admin/templates/default/images/icon_edit.gif" border="0" alt="[#faq_list_edit_element#]" title="[#faq_list_edit_element#]" style="cursor:pointer;">&nbsp;
+        <img src="/admin/templates/default/images/icon_delet.gif" alt="[#faq_list_del_element#]" border="0" title="[#faq_list_del_element#]" onclick="jspub_confirm('%action_delet_q%','[#faq_list_delete_element_alert#]')" style="cursor:pointer;"/>
+    </td>
+</tr>
+<tr class="admin_table_wstring"><td colspan="2" height="5"></td></tr>
+
+<!-- @end -->
+</table>

@@ -1,0 +1,46 @@
+<!-- @header -->
+%table%
+<a href="#" onclick="jspub_click('show_group_form&id=-1')">[#catalog_add_group_label#]</a>
+
+
+<!-- @table_header -->
+<form action="%form_action%" method="post">
+<table class="admin_table">
+    <thead>
+        <tr>
+        	<!--<th>&nbsp;</th>-->
+            <th>[#catalog_list_group_number_label#]</th>
+            <th>[#catalog_list_group_name_label#]</th>
+            <th>[#catalog_list_group_id_label#]</th>
+            <th>[#catalog_list_group_id_action#]</th>
+        </tr>
+    </thead>
+    <tbody>
+<!-- @table_body-->
+        <tr>
+            <!--<td><input type="checkbox" name="gcb[%id%]"></td>-->
+            <td align="center">%number%</td>
+            <td>%name%</td>
+            <td>%name_db%</td>
+            <td align="center">
+             <a href="#" onclick="jspub_click('show_group_form&id=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#catalog_list_group_action_edit#]"/></a>
+             <!--<a href="#" onclick="jspub_confirm('generate_admin_templ&id=%id%','[#catalog_list_group_action_create_amin_template_alert#]')">[#catalog_list_group_action_create_amin_template#]</a>&nbsp;&nbsp;-->
+             <a href="#" onclick="jspub_click('show_group_props&id=%id%')">[#catalog_list_group_action_add_prop#]</a>&nbsp;&nbsp;
+             <!-- Пока это уберём -->
+             <!--
+             <a href="#" onclick="jspub_click('show_items&group_id=%id%')">[#catalog_list_group_action_add_item#]</a>-->
+            </td>
+        </tr>
+<!-- @table_footer -->
+	<!--<tr class="admin_table_wstring"><td colspan="5">[#catalog_list_group_new_tpls_main_label#]&nbsp;<input type="submit" name="regentpls" value="[#catalog_list_group_new_tpls_items#]" alt="[#catalog_list_group_new_tpls_items_alt#]">&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="regentpls" value="[#catalog_list_group_new_tpls_group#]" alt="[#catalog_list_group_new_tpls_group_alt#]"></td></tr>-->
+</tbody>
+</table>
+</form>
+<br />
+<!--
+<form action="%form_action%" method="post">
+
+</form>
+-->
+
+<!-- @no_data -->

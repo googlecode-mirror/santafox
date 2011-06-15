@@ -1,0 +1,81 @@
+<!-- @main -->
+<script>
+    /*
+	function form_submit(a_two)
+	{
+		form_access.action = "/admin/?action=bottom_frames&action_two="+a_two;
+		form_access.submit();
+		return true;
+	}
+*/
+	//Вызывается по клику на родительском модуле
+	function change_main_modul(str_id)
+	{
+		//alert(str_id);
+
+	}
+
+	function set_checkbox(id, max_id)
+	{
+		var cbarray = {%cbarray%};
+        var arr_select;
+		if (cbarray[id].length > 0)
+			arr_select = (cbarray[id]).split(",");
+		else
+			arr_select = new Array();
+        $('#admin_groups_rights input.gradio').removeAttr('checked');
+		if (arr_select.length > 0 )
+		{
+			for (var i=0; i < arr_select.length; i++)
+			{
+                $('#ida_'+arr_select[i]).attr('checked',true);
+			}
+		}
+		return true;
+	}
+
+    $('#save_admin_group_rigths_button').click(function(){
+        var postArr = $('#form_adm_groups_access').serializeArray();
+        $.post('[#form_action#]', postArr,  function(data){
+            //Обрабатываем ответ
+            var post_res=jQuery.parseJSON(data);
+            if (post_res!=null)
+            {
+                //сначала проверка на наличие ошибок
+                if (post_res.success)
+                {
+                    santaShowPopupHint("Info",post_res.info,1500);
+                    //jspub_click('group_access');
+                }
+                else
+                    santaShowPopupHint("Error", post_res.info,0);
+            }
+        });
+    });
+</script>
+
+<form id="form_adm_groups_access" name="form_adm_groups_access" method="post" action="[#form_action#]">
+  <table class="admin_table">
+    <tr>
+      <th>[#backof_group_acess_label1#]</th>
+      <th>[#backof_group_acess_label2#]</th>
+    </tr>
+    <tr valign="top">
+      <td>[#form_select_group#]</td>
+      <td><div id="admin_groups_rights">[#form_select_access#]</div></td>
+    </tr>
+    <tr class="admin_table_wstring">
+      <td colspan="2"><input type="button" value="Сохранить" id="save_admin_group_rigths_button"></td>
+  </table>
+</form>
+
+<!-- @str_group -->
+<input id="idg_[#id#]" type="radio" name="selgriup" onclick="set_checkbox([#id#]);" value="[#id#]"/><label for="idg_[#id#]" style="cursor:hand">[#full_name#]</label><br />
+
+<!-- @str_acess -->
+<input  class="gradio"  id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#id#]">[#full_name#]</label><br />
+<!-- @@nextlevel -->
+&nbsp;&nbsp;&nbsp;<input  class="gradio"  id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#id#]">[#full_name#]</label><br />
+
+<!-- @@nextlevel -->
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input  class="gradio"  id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#id#]">[#full_name#]</label><br />

@@ -1,0 +1,58 @@
+<!-- @form -->
+<script language="javascript">
+	function start_submit()
+	{
+		formsubmit.submit();
+		//window.location = "";
+	}
+</script>
+<br/>
+<form method="POST" name="formsubmit" enctype="multipart/form-data" action="%url_form%">
+  <table border="0" cellspacing="1" cellpadding="5" class="admin_table">
+    <tr>
+      <th width="30">[#module_newssubmit_admin_table_submit_label_num#]</th>
+	  <th width="30">[#module_newssubmit_admin_table_submit_label_check#]</th>
+      <th>[#module_newssubmit_admin_table_submit_label_date_news#]</th>
+      <th width="100">[#module_newssubmit_admin_table_submit_label_label#]</th>
+      <th width="300">[#module_newssubmit_admin_table_submit_label_descrip#]</th>
+    </tr>
+    %news_for_submit%
+    <tr align="left" class="admin_table_wstring">
+      <td height="10" colspan="5"></td>
+    </tr>
+	    <tr align="left" valign="bottom" class="text">
+      <td colspan="5"><b>[#module_newssubmit_admin_table_submit_text_start#]</b></td>
+    </tr>
+    <tr align="left" valign="bottom" class="text">
+      <td colspan="5"><textarea name="start_text" rows="7" style="width:100%"></textarea></td>
+    </tr>
+	    <tr align="left" valign="bottom" class="text">
+      <td colspan="5"><b>[#module_newssubmit_admin_table_submit_text_end#]</b></td>
+    </tr>
+    <tr align="left" valign="bottom" class="text">
+      <td colspan="5"><textarea name="end_text" rows="7" style="width:100%"></textarea></td>
+    </tr>
+    <tr align="center" valign="bottom" class="text">
+      <td height="50" colspan="5" align="left">
+        <input type="submit" name="submit" value="[#module_newssubmit_admin_table_submit_bt_send#]" class="text">
+<!--        <input type="button" value="Разослать" class="text" onClick="start_submit()">-->
+      </td>
+    </tr>
+
+  </table>
+</form>
+
+<!-- @news_lenta -->
+<tr>
+	<td align="left" colspan="5">
+    	<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%name%</b>
+    </td>
+</tr>
+<!-- @news_one-->
+<tr class="admin_table_string">
+    <td align="left">%num%</td>
+    <td align="left"><input id="%section%_%num%" type="checkbox" name="news[%section%][%id%]" %check%></td>
+    <td align="left"><label for="%section%_%num%" style="cursor:point">%date%</label></td>
+    <td align="left"><label for="%section%_%num%" style="cursor:point">%header%</label></td>
+    <td align="left"><label for="%section%_%num%" style="cursor:point">%announce%</label></td>
+</tr>

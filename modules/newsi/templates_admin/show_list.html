@@ -1,0 +1,58 @@
+<!-- @table_header -->
+<form action="%form_action%" method="POST">
+<table class="admin_table">
+    <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>[#news_item_number#]</th>
+            <th><a href="#" onclick="jspub_click('%url_sort_date%')">[#news_item_date#]&nbsp;%img_sort_date%</a></th>
+            <th><a href="#" onclick="jspub_click('%url_sort_header%')">[#news_item_header#]&nbsp;%img_sort_header%</a></th>
+            <th><a href="#" onclick="jspub_click('%url_sort_available%')">[#news_item_available#]&nbsp;%img_sort_available%</a></th>
+            <th><a href="#" onclick="jspub_click('%url_sort_lenta%')">[#news_item_lenta#]&nbsp;%img_sort_lenta%</a></th>
+            <th><a href="#" onclick="jspub_click('%url_sort_rss%')">[#news_item_rss#]&nbsp;%img_sort_rss%</a></th>
+            <th><a href="#" onclick="jspub_click('%url_sort_author%')">[#news_item_author#]&nbsp;%img_sort_author%</a></th>
+            <th>[#news_item_actions#]</th>
+        </tr>
+    </thead>
+    <tbody>
+<!-- @img_sort_asc -->
+<img src="/admin/templates/default/images/12-em-up-blue.gif" />
+<!-- @img_sort_desc -->
+<img src="/admin/templates/default/images/12-em-down-blue.gif" />
+<!-- @table_body-->
+        <tr>
+            <td><input type="checkbox" name="items[%id%]" value="%id%"></td>
+            <td>%number%</td>
+            <td>%date%</td>
+            <td><a href="#" onclick="jspub_click('%action_edit%&id=%id%')">%header%</a></td>
+            <td align="center">%available%</td>
+            <td align="center">%lenta%</td>
+            <td align="center">%rss%</td>
+            <td>%author%</td>
+            <td><a href="#" onclick="jspub_click('%action_edit%&id=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#news_item_action_edit#]"/></a>&nbsp;<a href="#" onclick="jspub_confirm('%action_remove%&id=%id%', '[#news_delete_confirm#]')""><img src="/admin/templates/default/images/icon_delet.gif" alt="[#news_item_action_remove#]"/></a></td>
+        </tr>
+<!-- @table_footer -->
+    </tbody>
+<!--
+    <tfoot>
+            <th>&nbsp;</th>
+            <th>[#news_item_id#]</th>
+            <th>[#news_item_date#]</th>
+            <th>[#news_item_header#]</th>
+            <th>[#news_item_available#]</th>
+            <th>[#news_item_lenta#]</th>
+            <th>[#new_item_rss#]</th>
+            <th>[#new_item_author#]</th>
+    </tfoot>
+-->
+</table>
+<br/><p>[#news_actions_with_selected#]&nbsp;%actions%<input type="submit" name="submit" value="[#news_show_list_submit#]"/></p><br/>
+<p>%pages%</p>
+
+</form>
+<!-- @no_data -->
+Нет данных для отображения
+<!-- @on -->
+<img src="/admin/templates/default/images/24-em-check.gif" alt=""/>
+<!-- @off -->
+<!--<img src="/admin/templates/default/images/24-em-check-gray.gif" alt=""/>-->

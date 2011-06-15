@@ -1,0 +1,36 @@
+<form method="post" action="/admin/index.php?action=set_left_menu&leftmenu=show_items" id="searchform">
+<table class="admin_table" width="80%">
+
+<input type="hidden" name="group_id" value="4"><tr><td>Название: </td><td><input type="text" name="name" value=""></td></tr>
+<tr><td>Производитель:</td><td><select name="manufacturer"><option value=""></option>
+<option value="Hantarex">Hantarex</option>
+<option value="LG">LG</option>
+<option value="Panasonic">Panasonic</option>
+<option value="Sony">Sony</option>
+<option value="Logitech">Logitech</option>
+<option value="Marantz">Marantz</option>
+<option value="Philips">Philips</option>
+<option value="Nevo">Nevo</option>
+</select></td></tr>
+<tr><td>Гарантия</td><td> от <input type="text" name="Guarantee_from" value="" size="5"> до <input type="text" name="Guarantee_to" value="" size="5"></td></tr>
+<tr><td>Цвет: </td><td><input type="text" name="Guarantee1" value=""></td></tr>
+<tr><td>Цена</td><td> от <input type="text" name="price_from" value="" size="5"> до <input type="text" name="price_to" value="" size="5"></td></tr>
+<tr><td>Цветной дисплей:</td><td><select name="colour_display"><option value=""></option>
+<option value="есть">есть</option>
+<option value="нет">нет</option>
+</select></td></tr>
+<tr><td>Экран:</td><td><select name="screen"><option value=""></option>
+<option value="есть">есть</option>
+<option value="нет">нет</option>
+</select></td></tr>
+<tr><td>Экран сенсорный:</td><td><select name="screen_touch"><option value=""></option>
+<option value="есть">есть</option>
+<option value="нет">нет</option>
+</select></td></tr>
+<tr><td>Габаритные размеры: </td><td><input type="text" name="Overall_dimensions" value=""></td></tr>
+<tr><td>Вес</td><td> от <input type="text" name="Weight_from" value="" size="5"> до <input type="text" name="Weight_to" value="" size="5"></td></tr>
+<tr><td>Питание: </td><td><input type="text" name="food" value=""></td></tr>
+<tr><td>Описание: </td><td><input type="text" name="description" value=""></td></tr>
+<tr><td colspan="2"><input type="submit" name="search" value="Искать"></td></tr>
+</table>
+</form>

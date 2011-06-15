@@ -1,0 +1,32 @@
+<!-- @content -->
+<script type="text/javascript">
+		//[#script_create_panel#]
+
+$('div.lm_blockhead').live("click",(function() {
+        $(this).next().toggle();
+        return false;
+    }));
+</script>
+
+<div class="accpanel" id="left_accpanel">
+[#panels#]
+</div>
+<!-- @panel_block -->
+
+<div class="lm_blockhead" id="div_panel_[#panel_num#]">[#name_panel#]</div>
+<div id="div_panel_[#panel_num#]_content" class="leftpanel_links">[#content_panel#]</div>
+
+<!-- @lm_delimiter -->
+
+<!-- @lm_menu_passiv -->
+<div style="height: 15px; padding: 5px;"><a href="" onclick="start_interface.left_menu_click(this, '%query%'); return false;" class="left_menu" id="[#id#]">[#name#]</a></div>
+
+<!-- @lm_menu_activ -->
+<div style="height: 15px; padding: 5px;"><a href="" onclick="start_interface.left_menu_click(this, '%query%'); return false;" class="left_menu_select" id="[#id#]">[#name#]</a></div>
+  <script language="javascript">
+    //Обновим переменную яваскрипта, что бы было известно какой сейчас выделен пункт меню
+    start_interface.left_menu_element_select = $("#[#id#]");
+    //И сразу же вызовем обновление контента для этого пункта меню
+    start_interface.left_menu_click(start_interface.left_menu_element_select, "[#get_url#]");
+  </script>
+

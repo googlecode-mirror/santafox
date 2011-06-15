@@ -1,0 +1,51 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=[#set_charset#]">
+<link rel="StyleSheet" href="templates/default/css/css.css" type="text/css"/>
+</head>
+<body leftmargin="0" topmargin="0" rightmargin="0" bottommargin="0">
+<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+  <tr>
+    <td bgcolor="#FFFFFF">&nbsp;</td>
+  </tr>
+  <tr height="200">
+    <td valign="top" height="200">
+	<table height="200" border="0" align="center" cellpadding="7" cellspacing="0"  background="templates/default/images/main_fon_gradient.png" style="border-color:#98C0F4; border-width:1px; border-style:solid;">
+        <tr valign="top">
+          <td height="60" align="left" ><span class="zagol_start">[#in_register_pregloshenie#]</span> <span class="zagol_start_red">[#server#]</span></td>
+        </tr>
+        <tr valign="top" height="140">
+          <td align="left" height="140"><form method="POST" action="index.php">
+              <INPUT type="hidden" name="action" value="registration">
+              <table border="0" cellspacing="0" cellpadding="0">
+                <tr style="padding-bottom:5px; padding-left:10px;">
+                  <td align="right" valign="middle">[#start_login#]:</td>
+                  <td width="10px"></td>
+                  <td align="left" valign="middle"><input type="text" size="40" name="login"></td>
+                <tr>
+                <tr style="padding-bottom:5px; padding-left:10px;">
+                  <td align="right" valign="middle">[#start_password#]:</td>
+                  <td width="10px"></td>
+                  <td align="left" valign="middle"><input size="40" type="password" name="pwd"></td>
+                </tr>
+                <tr>
+                  <td align="right" valign="middle"></td>
+                  <td width="10px"></td>
+                  <td align="left" valign="middle">&nbsp;[#errore#]&nbsp;</td>
+                </tr>
+                <tr>
+                  <td align="right" valign="middle"></td>
+                  <td width="10px"></td>
+                  <td align="left" valign="middle"><input  type="submit" value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ОК&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"></td>
+                </tr>
+              </table>
+            </form></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr>
+    <td bgcolor="#FFFFFF">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

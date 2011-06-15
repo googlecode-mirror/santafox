@@ -1,0 +1,180 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Инсталятор SantaFox</title>
+    <style type="text/css">
+    <!--
+    .main-header {color:#FFFFFF;font:bold 16px helvetica;}
+    .style2 {color: #FF9453}
+    #north-div, #south-div{
+        height:38px;
+    }
+    #center-div{
+        min-height:300px;
+    }
+    -->
+    </style>
+
+    <script type="text/javascript" src="/admin/js/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="/admin/js/jquery-ui-1.8.7.custom.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/admin/templates/default/css/jquery-ui-1.8.7.custom.css" />
+    <script type="text/javascript">
+
+
+
+
+	var num_step_curent = 0;
+	var finish_url;
+
+
+    function show_message(content_console)
+    {
+        var str_html = $("#console_content").html();
+        if ((content_console.length <= 0) && (str_html == ""))
+            return;
+        //Теперь проверим, если есть новые сообщения
+        if (str_html.length>500)
+            str_html = str_html.substr(0,500);
+        str_html = "" + content_console + "<br>" + str_html;
+        $("#console_content").html(str_html);
+        $("#console_content").dialog({
+            resizable: true,
+            height:200,
+            width:400,
+            modal: false,
+            title: 'Статус процесса',
+            buttons: {
+                "OK": function() {
+                    $(this).dialog( "close" );
+                }
+            },
+            show: "slide",
+            hide: "slide"//"explode"
+        });
+
+    }
+
+	//Обнавляет информацию о действиях в статус баре
+	function show_message_dir(dirc, dira)
+	{
+        $('#console_content').dialog('option', 'title', 'Создано ' + dirc + ' дирректорий из '+ dira +'');
+	}
+
+	//Обнавляет информацию о действиях в статус баре
+	function show_message_files(filec, filea)
+	{
+        $('#console_content').dialog('option', 'title', 'Скопировано ' + filec + ' Kb из '+ filea +' Kb');
+	}
+
+	function show_message_hide()
+	{
+		$('#console_content').dialog("destroy");
+	}
+
+
+	function redirect_admin(url)
+	{
+        $('#btnNext').attr('disabled', 'disabled');
+        $('#btnPrev').removeAttr('disabled');
+        $('#btnAll').removeAttr('disabled');
+		finish_url = url;
+	}
+
+	function finish_install()
+	{
+		document.location = finish_url;
+	}
+
+
+	function set_step_next()
+	{
+        if (num_step_curent==0)
+        {
+            num_step_curent++;
+            show_curent_step();
+            $("#center-div").load("index.php?step="+num_step_curent);
+            return;
+        }
+        var url= '/sinstall/index.php?savestep='+num_step_curent;
+
+        var postArr = $('#sinstall_form').serializeArray();
+        $.post(url, postArr,  function(data)
+        {
+            try
+            {
+                var post_res=jQuery.parseJSON(data);
+                if (post_res.success)
+                {
+                    num_step_curent++;
+                    show_curent_step();
+                    $("#center-div").load("index.php?step="+num_step_curent);
+                    $('#btnPrev').removeAttr('disabled');
+                }
+                else
+                    alert('Ошибка: '+post_res.info);
+            }
+            catch (e)
+                {alert('Ошибка при сохранении');}
+        });
+	}
+
+	function show_curent_step()
+	{
+        var html;
+		if (num_step_curent == 0)
+			html = "Инсталяция включает <span class='style2'>5</span> шагов</span>";
+		else
+			html = "Шаг&nbsp;<span class='style2'>"+num_step_curent+"</span> из <span class='style2'>5</span>&nbsp;</span>";
+        $('#div_curent_step').html(html);
+	}
+	//В обратном шаге ничего отсылать не надо, просто подгружаем
+	//соответствующий конетнт и всё
+	function set_step_return()
+	{
+		if (num_step_curent == 0)
+			return;
+		//form = undefined;
+		if (num_step_curent > 5)
+			num_step_curent = 5;
+		num_step_curent--;
+		show_curent_step();
+		$("#center-div").load("/sinstall/index.php?step="+num_step_curent);
+		if (num_step_curent == 0)
+			$('#btnPrev').attr('disabled','disabled');
+        $('#btnNext').removeAttr('disabled');
+	}
+
+$(document).ready(function(){
+    show_curent_step();
+    $('#center-div').load("/sinstall/index.php?step=0");
+});
+</script>
+</head>
+<body>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+  <tr align="center" valign="middle">
+    <td align="center" valign="middle"><div id="layer-contener" style="width:600px; height:350px; position:relative;">
+        <div id="north-div" style="background-image: url('/sinstall/images/header.gif');background-repeat: repeat-x;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+            <tr>
+              <td class="main-header" align="left"><span style="padding-left: 15px;" id="div_curent_step"></span></td>
+              <td class="main-header" align="right"><span style="padding-right: 20px;"><img src="/sinstall/images/santa_logo.gif" width="101" height="18"/></span></td>
+            </tr>
+          </table>
+        </div>
+        <div id="center-div" align="left">center</div>
+        <div id="south-div" style="background-image: url('/sinstall/images/header.gif');background-repeat: repeat-x;">
+          <table width="100%" height="100%" border="0" cellpadding="0" cellspacing="5">
+            <tr>
+              <td>&nbsp;</td>
+              <td align="center" valign="middle" id="idbtn-prev"><input type="button" id="btnPrev" onclick="set_step_return();" value="&laquo;- Назад" disabled></td>
+              <td align="center" valign="middle" id="idbtn-next"><input type="button" id="btnNext" onclick="set_step_next();" value="Вперёд -&raquo;"></td>
+              <td align="center" valign="middle" id="idbtn-all"><input type="button" id="btnAll" onclick="finish_install();" value="Готово" disabled></td>
+            </tr>
+          </table>
+        </div>
+      </div></td>
+  </tr>
+</table>
+</body>
+</html>

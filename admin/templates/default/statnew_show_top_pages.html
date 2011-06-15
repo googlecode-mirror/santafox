@@ -1,0 +1,64 @@
+<!-- @table -->
+<script type="text/javascript">
+function stat_change_page(url, id_insert)
+{
+	if (window.XMLHttpRequest) { // Mozilla, Safari,...
+    	http_request = new XMLHttpRequest();
+        if (http_request.overrideMimeType) {
+         	// set type accordingly to anticipated content type
+            //http_request.overrideMimeType('text/xml');
+            http_request.overrideMimeType('text/html');
+         }
+      } else if (window.ActiveXObject) { // IE
+         try {
+            http_request = new ActiveXObject("Msxml2.XMLHTTP");
+         } catch (e) {
+            try {
+               http_request = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (e) {}
+         }
+      }
+
+      if (!http_request) {
+         alert('Cannot create XMLHTTP instance');
+         return false;
+      }
+
+      http_request.open('GET', url, false);
+      http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      http_request.setRequestHeader("Connection", "close");
+      http_request.send();
+      result = http_request.responseText;
+	  Ext.get(id_insert).update(result, true);
+}
+</script>
+<table class="admin_table" width="600">
+    <thead>
+        <tr>
+            <th>[#show_top_pages_order#]</th>
+            <th>[#show_top_pages_url#]</th>
+            <th>[#show_top_pages_visits#]</th>
+        </tr>
+    </thead>
+    <tbody>
+%rows%
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3">%pages%</td>
+        </tr>
+    </tfoot>
+</table>
+<!-- @row -->
+        <tr %class%>
+            <td>%order%</td>
+            <td><a href="%url%" target="_blank"><b>%label%</b>&nbsp;%url%</a></td>
+            <td>%visits%</td>
+        </tr>
+<!-- @page_active -->
+<b>%page%</b>
+<!-- @page_passive -->
+<a href="#" onclick="stat_change_page('%url%','stat_result');">%page%</a>
+<!--<a href="#" onclick="jspub_click('%url%');">%page%</a>-->
+<!-- @page_delimeter -->
+&nbsp;|&nbsp;

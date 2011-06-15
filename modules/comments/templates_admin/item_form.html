@@ -1,0 +1,128 @@
+<!-- @form -->
+<div style="width: 680px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+
+<script type="text/javascript">
+
+    $(function() {
+        $( "#date" ).datepicker({
+                dateFormat:"dd.mm.yy"
+        }
+       );
+    });
+
+    function validateTime(value) {
+        return /^[0-2]?[0-9]:[0-5]?[0-9]:[0-5]?[0-9]$/.test(value);
+    }
+
+    function validateDate(value) {
+        return /^[0-3]?[0-9]-[0-1]?[0-9]-[0-2][0-9][0-9][0-9]$/.test(value);
+    }
+
+    function submitMyForm()
+    {
+        if (validateDate($('#date').val()) && validateTime($('#time').val()))
+            return form_submit_include_content();
+        else
+        {
+            santaShowPopupHint('[#comments_error_title#]', '[#comments_error_addnew_text#]',0);
+            return false;
+        }
+    }
+
+    
+//@todo rewrite
+function syncList(){}
+syncList.prototype.sync = function()
+  {
+    for (var i=0; i < arguments.length-1; i++)	document.getElementById(arguments[i]).onchange = (function (o,id1,id2){return function()
+  {
+   o._sync(id1,id2);};})(this, arguments[i], arguments[i+1]);
+	document.getElementById(arguments[0]).onchange();
+  }
+syncList.prototype._sync = function (firstSelectId, secondSelectId)
+  {
+	var firstSelect = document.getElementById(firstSelectId);
+	var secondSelect = document.getElementById(secondSelectId);
+
+	secondSelect.length = 0;
+
+	if (firstSelect.length>0)
+	  {
+		var optionData = this.dataList[ firstSelect.options[firstSelect.selectedIndex==-1 ? 0 : firstSelect.selectedIndex].value ];
+		for (var key in optionData || null) secondSelect.options[secondSelect.length] = new Option(optionData[key], key);
+		if (firstSelect.selectedIndex == -1) setTimeout( function(){ firstSelect.options[0].selected = true;}, 1 );
+		if (secondSelect.length>0) setTimeout( function(){ secondSelect.options[0].selected = true;}, 1 );
+	  }
+	secondSelect.onchange && secondSelect.onchange();
+  };
+</script>
+<form action="%form_action%" method="POST" enctype="multipart/form-data">
+<input type="hidden" name="values[id]" value="%id%"/>
+<input type="hidden" name="values[page_sub_id]" value="%page_sub_id%"/>
+<table border="0">
+    <tbody>
+        <tr>
+            <td width="100" align="right">
+                [#comments_property_date_label#]            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td><input id="date" type="text" name="values[date]" value="%date%" size="12"></td>
+                        <td><nowrap>[#comments_property_time_label#]&nbsp;<input id="time" type="text" name="values[time]" value="%time%" size="10"></nowrap></td>
+                    </tr>
+                </table>
+            </td>
+            <td rowspan="3">
+             <div style="padding: 6px 0;"><input id="mod_comments_1" type="checkbox" name="values[available]" value="1" %available%>&nbsp;<label for="mod_comments_1">[#comments_property_available_label#]</label></div>
+            </td>
+        </tr>
+        <tr>
+            <td width="100" align="right">[#comments_property_author_label#]</td>
+            <td><input type="text" name="values[author]" value="%author%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td width="100" align="right">[#comments_property_txt_label#]</td>
+            <td><textarea name="values[txt]" style="width: 100%;" rows="4">%txt%</textarea></td>
+        </tr>
+ %rows%
+        <tr>
+            <td colspan="2" align="right"><input type="submit" name="submit" value="[#comments_submit_label#]" onclick="return submitMyForm();"></td>
+        </tr>
+    </tbody>
+</table>
+</form>
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+<!-- @select -->
+<tr>
+            <td width="100" align="right">[#comments_property_pages_label#]</td>
+            <td>
+<!-- Первый список (изначально заполнен вручную) -->
+  <select name="values[page_id]" size="4" id="List1" style="width:150px">
+  %select_page%
+  </select>
+
+<!-- Подчиненный список (изначально пуст) -->
+  <select name="values[page_sub_id]" size="4" id="List2" style="width:150px"></select>
+<script type="text/javascript">
+// Создаем новый объект связанных списков
+var syncList1 = new syncList;
+syncList1.dataList = {
+%sub_select_page%
+};
+// Включаем синхронизацию связанных списков
+syncList1.sync("List1","List2");
+</script>
+
+            </td>
+        </tr>
+<!-- @page_info -->
+<tr>
+    <td width="100" align="right">[#comments_property_edit_label#]</td>
+    <td>
+    %page_info%
+    </td>
+</tr>

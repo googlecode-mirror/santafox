@@ -1,0 +1,105 @@
+<script>
+
+    $('#edit_ini_buttonsave').click(function(){
+        var postArr = $('#edit_ini_form').serializeArray();
+        $.post('[#form_aсtion#]', postArr,  function(data){
+            //Обрабатываем ответ
+            var post_res=jQuery.parseJSON(data);
+            if (post_res!=null)
+            {
+                //сначала проверка на наличие ошибок
+                if (post_res.success)
+                    santaShowPopupHint("Info",post_res.info,1500);
+                else
+                    santaShowPopupHint("Error", post_res.info,0);
+            }
+        });
+
+        return false;
+    });
+
+</script>
+
+
+<div style="width:430px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <h3>[#global_prop_label_constant#]</h3>
+        <div id="form">
+            <form action="[#form_aсtion#]" method="post" id="edit_ini_form">
+            <fieldset>
+                <legend>[#global_prop_label_define1#]</legend>
+
+                    <label>[#global_prop_label_prefix#]</label>
+                    <input type="text" name="prefix" value="[#prefix_value#]" style="width:130px;"><br>
+                    <label>[#global_prop_label_db_host#]</label>
+                    <input type="text" name="db_host" value="[#db_host_value#]" style="width:130px;"><br>
+                    <label>[#global_prop_label_db_basename#]</label>
+                    <input type="text" name="db_basename" value="[#db_basename_value#]" style="width:130px;"><br>
+                    <label>[#global_prop_label_db_username#]</label>
+                    <input type="text" name="db_username" value="[#db_username_value#]" style="width:130px;"><br>
+                    <label>[#global_prop_label_db_password#]</label>
+                    <input type="text" name="db_username" value="[#db_username_value#]" style="width:130px;"><br>
+                    <label>[#global_prop_label_db_password#]</label>
+                    <input type="text" name="db_password" value="[#db_password_value#]" style="width:130px;"><br>
+            </fieldset>
+            <fieldset>
+                <legend>[#global_prop_label_define11#]</legend>
+                <label>[#global_prop_label_ftp_host#]</label>
+                <input type="text" name="ftp_host" value="[#ftp_host_value#]" style="width:130px;"><br>
+                <label>[#global_prop_label_ftp_login#]</label>
+                <input type="text" name="ftp_login" value="[#ftp_login_value#]" style="width:130px;"><br>
+                <label>[#global_prop_label_ftp_pass#]</label>
+                <input type="text" name="ftp_pass" value="[#ftp_pass_value#]" style="width:130px;"><br>
+            </fieldset>
+            <fieldset>
+                <legend>[#global_prop_label_define2#]</legend>
+                <label>[#global_prop_label_default_language#]</label>
+                <input type="text" name="default_language" value="[#default_language_value#]" style="width:130px;"><br>
+                <label>[#global_prop_label_default_charset#]</label>
+                <input type="text" name="default_charset" value="[#default_charset_value#]" style="width:130px;"><br>
+                <label>[#global_prop_label_id_section_default#]</label>
+                <input type="text" name="admin_section_default" value="[#admin_section_default_value#]" style="width:130px;"><br>
+                <label>[#global_prop_label_close_windows_on_save#]</label>
+                <input type="checkbox" name="close_windows_on_save" [#close_windows_on_save_value#]><br>
+                <label>[#global_prop_label_show_errore#]</label>
+                <input type="checkbox" name="show_int_errore_message" [#show_int_errore_message_value#]><br>
+            </fieldset>
+            <fieldset>
+                <legend>[#global_prop_label_define3#]</legend>
+                <label>[#global_prop_label_path_page_template#]</label>
+                <input type="text" name="path_page_template" value="[#path_page_template_value#]" style="width:130px;"><br>
+                <label>[#global_prop_label_path_page_content#]</label>
+                <input type="text" name="path_page_content" value="[#path_page_content_value#]" style="width:130px;"><br>
+
+            </fieldset>
+            <fieldset>
+                <legend>[#global_prop_label_define4#]</legend>
+                <label>[#global_prop_label_cached_page#]</label>
+                <input type="checkbox" name="cached_page" [#cached_page_value#]><br>
+                <label>[#global_prop_label_redir_www#]</label>
+                <input type="checkbox" name="redir_www" [#redir_www_value#]><br>
+                <label>[#global_prop_label_generate_statistic#]</label>
+                <input type="checkbox" name="generate_statistic" [#generate_statistic_value#]><br>
+                <label>[#global_prop_label_generate_time_creat#]</label>
+                <input type="checkbox" name="time_creat" [#time_creat_value#]><br>
+                <label>[#global_prop_label_ssl_connection#]</label>
+                <input type="checkbox" name="ssl_connection" [#ssl_connection_value#]><br>
+                <label>[#global_prop_label_email_for_errore#]</label>
+                <input type="text" name="email_for_errore" value="[#email_for_errore_value#]" style="width:130px;"><br>
+                <label>[#global_prop_webform_coding#]</label>
+                <input type="checkbox" name="webform_coding" [#webform_coding_value#]><br>
+                <label>[#global_prop_print_mysql_errors#]</label>
+                <input type="checkbox" name="print_mysql_errors" [#print_mysql_errors_value#]><br>
+                <label>[#global_prop_is_1251_templates#]</label>
+                <input type="checkbox" name="is_1251_templates" [#is_1251_templates_value#]><br>
+                <label>[#global_prop_page_for_404#]</label>
+                <input type="text" name="page_for_404" value="[#page_for_404_value#]" style="width:130px;"><br>
+
+            </fieldset>
+             <p align="center"><input type="button" value="[#global_prop_label_save#]" id="edit_ini_buttonsave"></p>
+            </form>
+        </div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>

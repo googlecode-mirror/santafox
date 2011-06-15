@@ -1,0 +1,79 @@
+<!-- @body -->
+<div style="padding-right:8px; padding-left:5px; padding-top:5px;">
+    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+        <div id="form_action">
+
+        <fieldset>
+            <form action="%url_action%" method="post" id="module_action_saveform">
+            <legend>[#action_curent_name#]</legend>
+            <table>
+                <tbody>
+                <tr>
+                    <td><label style="width:150px;">[#modules_install_label_name_action#]</label></td>
+                    <td>&nbsp;</td>
+                    <td><input type="text" name="action_name" id="action_name" value="[#action_name#]" style="width:290px;"></td>
+
+                </tr>
+                %action_param_html%
+                </tbody>
+            </table>
+            <p align="center"><input type="button" value="[#modules_button_save_properties#]" id="modules_button_save_properties"></p>
+            </form>
+        </fieldset>
+
+        </div>
+    </div></div></div>
+    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+<script>
+	var arr_actions = new Array();
+    var fieldNames = [%fieldNames%];
+	var url_for_submit = '';
+
+
+    $('#modules_button_save_properties').click(function(){
+        if ($('#action_name').val()=="")
+        {
+            santaShowPopupHint('Error','Не заполнено имя действия',0);//@todo move to lang vars
+        }
+        else
+        {
+            var postArr={action_name:$('#action_name').val()};
+            postArr.properties = {};
+            var fID, val, fieldName;
+            for (var j=0;j<fieldNames.length;j++)
+            {
+                fID = 'ppv_'+fieldNames[j];
+                //пропускаем незачеканные чекбоксы
+                if ($('#'+fID)[0].tagName=="INPUT" &&  $('#'+fID).attr('type')=="checkbox" && !$('#'+fID).attr('checked'))
+                    continue;
+                postArr.properties[fieldNames[j]]=$('#'+fID).val();
+
+            }
+            $.post('%url_action%',postArr,  function(data){
+                //Обрабатываем ответ
+                var post_res=jQuery.parseJSON(data);
+                if (post_res!=null)
+                {
+                    //сначала проверка на наличие ошибок
+                    if (post_res.success)
+                    {
+                        santaShowPopupHint("Info",post_res.info,1500);
+                        update_action_list();//обновляем действия, если всё ок
+                    }
+                    else
+                        santaShowPopupHint("Error", post_res.info,0);
+                }
+            });
+
+        }
+    });
+
+
+	%action_param_code%
+
+</script>
+
+

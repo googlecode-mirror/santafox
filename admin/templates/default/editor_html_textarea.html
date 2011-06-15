@@ -1,0 +1,29 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=[#set_charset#]" />
+<script language="Javascript" type="text/javascript" src="../components/syntax/edit_area_full.js"></script>
+<script language="Javascript" type="text/javascript">
+editAreaLoader.init({
+			id: "[#name_edit#]"
+			,start_highlight: true
+			,allow_toggle: false
+			,language: "ru"
+			,syntax: "html"
+			,toolbar: "search, go_to_line, |, undo, redo, |, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help"
+			,syntax_selection_allow: "css,html,js,php,xml"
+			,show_line_colors: true
+			,allow_resize: "no"
+		});
+	</script>
+<style type="text/css">
+            html, body{height:100%}
+            form{height:100%}
+</style>
+</head>
+<body leftmargin="0" topmargin="0" bottommargin="0" marginwidth="0" marginheight="0">
+<form method="post" action="/admin/?action=save_content&no_redactor=1">
+<textarea id="[#name_edit#]" name="[#name_edit#]" style="width:100%; height:93%;" class="mceEditor">[#edit_content#]</textarea>
+<input type="hidden" value="[#file_name#]" name="file">
+<input type="submit" name="save" value="Save">
+</form>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<form method=POST name="formuser" enctype="multipart/form-data" action="%url_form%">
+  <input type="hidden" name="id_user" value="%id_user%">
+  <table border="0" cellspacing="1" cellpadding="3"  class="admin_table">
+    <tr>
+      <th colspan="2">[#newssubmit_admin_user_control_label1#]</th>
+    </tr>
+    <tr>
+      <td width="150" height="30">[#newssubmit_admin_user_control_date_sub#]</td>
+      <td align="left"> %date%</td>
+    </tr>
+    <tr>
+      <td width="150">[#newssubmit_admin_user_control_name_user#]</td>
+      <td align="left"><input name="name" type="text" maxlength="255" size="60" value="%name%"></td>
+    </tr>
+    <tr>
+      <td width="150" height="40">[#newssubmit_admin_user_control_email_user#]</td>
+      <td align="left"><input name="mail" type="text" maxlength="255"  size="60"  value="%mail%"></td>
+    </tr>
+    <tr>
+      <td width="150" height="50"><label for="off_user">[#newssubmit_admin_user_control_user_onoff#]</label></td>
+      <td align="left"><input id="off_user" type="checkbox" name="off_user" %off_status%></td>
+    </tr>
+    <tr>
+      <td width="150" valign="top">[#newssubmit_admin_user_control_news_label#]</td>
+      <td align="left">%pages_news%</td>
+    </tr>
+    <tr class="admin_table_wstring">
+      <td width="150" height="50" valign="top"></td>
+      <td align="left"><input class="text" type="submit" value="[#newssubmit_admin_user_control_action_save#]" name="save_user">
+        &nbsp;&nbsp;
+        <input class="text" type="submit" value="[#newssubmit_admin_user_control_action_activate#]" name="activate_user" %button_activ%>
+        &nbsp;&nbsp;
+        <input class="text" type="submit" value="[#newssubmit_admin_user_control_action_delete#]" name="delete_user" %button_del%>
+        <!--            <input  class="text" type="button" value="Сохранить" onClick="set_form_action('save_user')"> &nbsp;&nbsp;&nbsp;
+            <input class="text" type="button" value="Удалить подписку" onClick="set_form_action('delete_user')">-->
+      </td>
+    </tr>
+  </table>
+</form>
+</body></html>

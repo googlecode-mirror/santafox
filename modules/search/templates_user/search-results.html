@@ -1,0 +1,58 @@
+<!--
+Шаблон результатов поиска
+
+Секции:
+@form - основной блок
+@search_form - форма поиска
+%search_text% - текст запроса
+@noresult - если ничего не найдено
+@search_results - результаты поиска
+@search_results_rows - заменяется на конкретный результат
+@pages - постраничная навигация
+
+ -->
+
+<!-- ****************************************** Шаблон результатов поиска ****************************************** -->
+
+<!-- @form -->
+%search_form%
+
+%search_results%
+
+%pages%
+
+<!-- @search_form -->
+				<h2>Результаты поиска по запросу: <span>%search_text%</span></h2>
+				<form class="search" action="%action%">
+					<div>
+						<input class="input-text" type="text" name="search" value="%search_text%" />
+						<input class="input-button" type="submit" value="" />
+					</div>
+				</form>
+
+<!-- @noresult -->
+				<h2>К сожалению, документов, содержащих слово <span>%search_text%</span> не найдено</h2>
+
+<!-- @search_results -->
+				<div class="search-results">
+					%rows%
+				</div>
+
+<!-- @search_results_rows -->
+					<p><a href="%link%" title="%title%">%title%</a><br />
+					%snipped%<br />
+					<span>%link%</span></p>
+
+<!-- @search_results_split -->
+
+<!-- @pages -->
+[%rows%]
+
+<!-- @pages_no -->
+
+<!-- @page -->
+<a href="%link%">%num%</a>
+<!-- @page_activ -->
+<b>%num%</b>
+<!-- @page_delimiter -->
+&nbsp;|&nbsp;

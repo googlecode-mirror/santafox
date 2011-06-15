@@ -1,0 +1,60 @@
+<!-- @table_header -->
+<script type="text/javascript">
+<!--
+//@todo rewrite
+function prop_select_changed(id)
+{
+	var select = document.getElementById('select_'+id);
+	var sval = select[select.selectedIndex].value;
+	if (sval == "__linked__")
+		document.getElementById('sep_div_'+id).style.display = 'block';
+	else
+		document.getElementById('sep_div_'+id).style.display = 'none';
+}
+//-->
+</script>
+
+<form action="%form_action%" method="POST" enctype="multipart/form-data" id="importcsvform">
+<table class="admin_table">
+ <thead>
+  <tr>
+   %theads%
+  </tr>
+ </thead>
+ <tbody>
+
+
+
+
+<!-- @thead -->
+<th valign="top">
+<input type="checkbox" name="%cb%">[#catalog_import_uniq_field_label#]<br>
+<select name="%prop%" id ="select_%id%" onChange="prop_select_changed('%id%')">%props%</select>
+<div id="sep_div_%id%" style="display:none;">[#catalog_import_linked_col_separator#]: <input type="text" name="separator_%id%" size=3 ></div>
+</th>
+
+<!-- @prop_option -->
+<option value="%prop_name%">%prop_name_full%</option>
+
+
+
+<!-- @tline -->
+<tr>
+ <td>
+ %cols%
+ </td>
+</tr>
+
+
+<!-- @table_footer -->
+
+  <tr  class="admin_table_wstring">
+         <td colspan="2" align="center">
+         [#catalog_import_bypass_1st_line_label#] <input type="checkbox" name="bypass_1st_line" ><br/>
+         <!-- <input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('importcsvform','/admin/index.php?action=set_left_menu&leftmenu=import_csv3')"> -->
+ 	 <input type="submit" name="submit" value="[#catalog_import_label#]">
+  </td>
+  </tr>
+   </tbody>
+</table>
+</form>

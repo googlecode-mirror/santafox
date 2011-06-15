@@ -1,0 +1,69 @@
+<!-- @import_form -->
+<div style="width: 800px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<form action="%form_action%" method="POST" enctype="multipart/form-data" id="importcsvform">
+<table border="0">
+    <tbody>
+        <tr><td colspan="3"><b>[#catalog_import_csv_formlabel#]</b></td></tr>
+
+<tr>
+  <td align="right">[#catalog_import_separator_label#]:</td>
+  <td>
+     <select name="separator">
+       <option value="tab">[#catalog_import_separator_tab#]</option>
+       <option value="semicolon">[#catalog_import_separator_semicolon#]</option>
+
+     </select>
+  </td>
+</tr>
+
+
+<tr>
+  <td align="right">[#catalog_import2group_label#]:</td>
+  <td><select name="group">%groups%</select></td>
+</tr>
+
+<tr>
+  <td align="right">[#catalog_import2cat_label#]:</td>
+  <td><select name="cat">%cats_options%</select></td>
+</tr>
+
+<tr>
+  <td align="right">[#catalog_new_import2cat_label#]:</td>
+  <td><select name="cat4new"><option value="0">[#catalog_cat_not_selected_label#]</option>%cats_options%</select></td>
+</tr>
+
+
+<tr>
+  <td align="right" valign="top"><input type="radio" name="importfrom" value="file" checked>[#catalog_import_file_label#]:</td>
+  <td><input type="file" name="importcsv"></td>
+</tr>
+
+<tr>
+  <td align="right" valign="top"><input type="radio" name="importfrom" value="textarea">[#catalog_import_textarea_label#]:</td>
+  <td><textarea name="textarea" cols="45" rows="15"></textarea></td>
+</tr>
+
+
+
+<tr>
+         <td colspan="2" align="center">
+          <!--<input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('saveitemform','/admin/index.php?action=set_left_menu&leftmenu=item_save')">-->
+ 	 <input type="submit" name="submit" value="[#catalog_import_label#]">
+</td>
+        </tr>
+    </tbody>
+</table>
+</form>
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+<!-- @group_item -->
+<option value="%group_id%">%group_name%</option>
+
+<!-- @cat_option -->
+<option value="%cat_id%">%cat_name%</option>
+<!-- @cat_shift -->
+-

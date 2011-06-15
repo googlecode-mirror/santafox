@@ -1,0 +1,110 @@
+<!-- @header -->
+<h3>[#catalog_edit_property_cat_mainlabel#]</h3>
+<br />
+<!-- @table_header -->
+<table class="admin_table">
+<thead>
+    <tr>
+	    <th>[#catalog_edit_property_cat_num_label#]</th>
+        <th>[#catalog_edit_property_cat_name_label#]</th>
+        <th>[#catalog_edit_property_cat_dbname_label#]</th>
+        <th>[#catalog_edit_property_cat_type_label#]</th>
+        <th>[#catalog_edit_property_cat_action_label#]</th>
+    </tr>
+</thead>
+<!-- @property -->
+<tr>
+	<td align="center">%num%</td>
+    <td>%property_name%</td>
+    <td>%property_dbname%</td>
+    <td valign="top">%property_type%</td>
+    <td valign="top">%actions%</td>
+</tr>
+
+<!-- @property_del_link -->
+ <a href="#" onclick="jspub_confirm('cat_prop_delete&id=%property_id%','[#catalog_edit_property_cat_action_alert_del#] %property_name%?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_edit_property_cat_action_alert_del#]"/></a>
+<!-- @property_edit_link -->
+ <a href="#" onclick="jspub_click('cat_prop_edit&id=%property_id%')"><img src="/admin/templates/default/images/icon_edit.gif"/></a>
+
+
+<!-- @table_footer -->
+</table>
+
+<!-- @no_props -->
+Нет свойств
+
+
+<!-- @add_prop_form -->
+<script type="text/javascript">
+ function selectChange()
+ {
+  if ($('#stype').val()=='enum')
+  {
+  	   $('#prop_addon').html($('#enum_for_add').html());
+       $('#prop_addon').css('display','block');
+  }
+  else
+  {
+      $('#prop_addon').css('display','none');
+      $('#prop_addon').html('');
+  }
+ }
+</script>
+<br />
+<h3>[#catalog_edit_property_cat_add_prop_label#]</h3>
+<div style="width: 450px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+<div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<form action="%form_action%" method="post" id="addpropform">
+<table width="420"><tbody>
+    <tr>
+        <td width="150" align="right">[#catalog_edit_property_cat_add_name_label#]:</td>
+        <td><input type="text" name="pname" value="" style="width:100%"></td>
+    </tr>
+    <tr>
+        <td width="150" align="right">[#catalog_edit_property_cat_add_dbname_label#]:</td>
+        <td><input type="text" name="pnamedb" value="" style="width:100%"></td>
+    </tr>
+    <tr>
+        <td width="150" align="right">[#catalog_edit_property_cat_add_type_label#]:</td>
+        <td>
+            <select name="ptype" onChange="selectChange()" id="stype">
+                <option value="text">[#catalog_prop_type_text#]</option>
+                <option value="number">[#catalog_prop_type_number#]</option>
+                <option value="enum">[#catalog_prop_type_enum#]</option>
+
+                <option value="string">[#catalog_prop_type_string#]</option>
+                <option value="file">[#catalog_prop_type_file#]</option>
+                <option value="pict">[#catalog_prop_type_pict#]</option>
+                <option value="html">[#catalog_prop_type_html#]</option>
+            </select>
+        </td>
+    </tr>
+    </tbody></table>
+<div id="prop_addon" style="visibility: visible"></div>
+<table width="420"><tbody>
+	<tr>
+		<td width="150">&nbsp;</td>
+        <td align="left"><input type="button" name="addprop" value="[#catalog_edit_property_cat_add_new_prop#]" onclick="jspub_form_submit('addpropform','/admin/index.php?action=set_left_menu&leftmenu=cat_prop_add')">
+        </td>
+    </tr>
+</tbody>
+</table>
+
+</form>
+
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+
+<div id="enum_for_add" style="visibility:hidden; width:0px; height:0px;">
+<table width="420">
+    <tbody>
+      <tr>
+	<td width="150" align="right" valign="top">[#catalog_edit_property_cat_add_enum_label#]:<br /><small>[#catalog_edit_property_cat_add_enum_help#]</small></td>
+	<td><textarea rows="4" name="values" style="width:100%"></textarea></td>
+</tr>
+    </tbody>
+</table>
+</div>
+

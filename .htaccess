@@ -1,0 +1,5 @@
+RewriteBase /
+RewriteEngine On
+
+RewriteRule   ^[a-z0-9_-]*\.html.*                     index.php
+AddDefaultCharset UTF-8

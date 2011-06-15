@@ -1,0 +1,24 @@
+<!-- @main -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+  <tr>
+    <td>
+    <td align="left" nowrap="nowrap"><span style="padding-left:15px;">[#main_menu#]</span></td>
+    <td align="right" nowrap="nowrap"><span style="padding-right:15px;"><a href="/admin/?action=exit" target="_top" class="main_menu_exit"><img src="/admin/templates/default/images/icon_off.gif" alt="[#main_exit#]" width="12" height="13" border="0">&nbsp;&nbsp;[#main_exit#]</a></span></td>
+  </tr>
+</table>
+
+
+<!-- @activ -->
+<a id="main_menu_[#id#]" class="main_menu_select" href="" onclick="start_interface.main_menu_click('main_menu_[#id#]', '[#id#]'); return false;"><img src="%link_admin%" border="0">&nbsp;[#name#]</a>
+<script language="javascript">
+	//Обновим переменную яваскрипта, что бы было известно какой сейчас выделен пункт меню
+	start_interface.main_menu_element_select = "main_menu_[#id#]";// Ext.get("main_menu_[#id#]");
+</script>
+<!-- @passiv -->
+
+<a id="main_menu_[#id#]" class="main_menu" href="" onclick="start_interface.main_menu_click('main_menu_[#id#]', '[#id#]'); return false;"><img src="%link_admin%" border="0">&nbsp;[#name#]</a>
+
+
+
+<!-- @delimiter-->
+&nbsp;<img src="/admin/templates/default/images/main_menu_delimiter.gif" width="1" height="11" />&nbsp;

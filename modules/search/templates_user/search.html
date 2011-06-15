@@ -1,0 +1,59 @@
+<!--
+Шаблон результатов поиска
+
+Секции:
+@form - основной блок
+@search_form - форма поиска
+%search_text% - текст запроса
+@noresult - если ничего не найдено
+@search_results - результаты поиска
+@search_results_rows - заменяется на конкретный результат
+@pages - постраничная навигация
+
+ -->
+
+<!-- ****************************************** Шаблон результатов поиска ****************************************** -->
+
+<!-- @form -->
+		<div id="search" class="content">
+			<p class="title">Результаты поиска по запросу: <span>%search_text%</span></p>
+%search_form%
+%search_results%
+%pages%
+		</div>
+<!-- @search_form -->
+			<form action="%action%">
+				<input class="text" type="text" name="search" value="%search_text%" />
+				<input type="image" src="design/images/search.gif" />
+				<br clear="all" />
+			</form>
+<!-- @noresult -->
+			<br clear="all" />
+			<p>
+				К сожалению, документов, содержащих слово <em>%search_text%</em> не найдено. <br />
+				Возможные причины:
+			</p>
+			<ol>
+				<li>Слово написано с ошибкой</li>
+				<li>Материал, в данный момент, отсутствует</li>
+			</ol>
+<!-- @search_results -->
+			<ul>
+%rows%
+			</ul>
+<!-- @search_results_rows -->
+				<li>
+					<a href="%link%" title="%title%">%title%</a> <br />
+					%snipped% <br />
+					<span>%link%</span>
+				</li>
+<!-- @search_results_split -->
+<!-- @pages -->
+[%rows%]
+<!-- @pages_no -->
+<!-- @page -->
+<a href="%link%">%num%</a>
+<!-- @page_activ -->
+<span>%num%</span>
+<!-- @page_delimiter -->
+&nbsp;|&nbsp;

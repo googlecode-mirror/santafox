@@ -1,0 +1,47 @@
+
+
+<form name="form_partners" id="form_partners" method="post" action="%form_url%">
+  <table border="0" cellspacing="0" cellpadding="4" class="admin_table">
+    <tr class="table_content_shapka">
+      <th>&nbsp;&nbsp;<img src="/admin/templates/default/images/statist_ico.gif" width="14" height="14">&nbsp;&nbsp;&nbsp;[#statist_partner_label_main2#]</th>
+    </tr>
+    <tr class="admin_table_string">
+      <td>[#statist_partner_text_label1#]:
+        <input name="partner" type="text" size="30" maxlength="50" style="width:215px;">
+        &nbsp;
+       <!--
+        <input type="submit" name="add_partner" value="[#statist_partner_text_label2#]" onclick="jspub_form_submit('form_partners','%form_url%')" />
+        -->
+        <input type="submit" name="add_partner" value="[#statist_partner_text_label2#]" />
+      </td>
+    </tr>
+    <tr class="admin_table_wstring"  height="10">
+      <td height="10"></td>
+    </tr>
+    <tr>
+      <td>[#statist_partner_text_label3#]:
+         <SELECT name="IDPartner_select" onChange="jspub_click('show_partner&partner_id='+this.value)" style="width:185px">
+            [%partner_list%]
+         </SELECT>
+        &nbsp;
+        <INPUT type="submit" name="del_partner" value="[#statist_partner_text_label4#]"></td>
+    </tr>
+    <tr>
+      <td>[#statist_partner_text_label5#]:
+        <input name="preg_partner" type="text" size="30" maxlength="50">
+        &nbsp;
+        <input type="submit" name="add_preg_partner" value="[#statist_partner_text_label6#]"></td>
+    </tr>
+    <tr>
+      <td> [#statist_partner_text_label7#]:<br>
+        <select name="IDPEregs" size="10" style="width:100%">
+            [%preg_partner_list%]
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td><input type="submit" name="del_preg_partner" value="[#statist_partner_text_label8#]">
+      </td>
+    </tr>
+  </table>
+</form>

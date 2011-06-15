@@ -1,0 +1,97 @@
+<!-- @form -->
+<div style="width: 760px;">
+<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
+    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
+<script type="text/javascript">
+    $(function() {
+        $( "#date" ).datepicker({
+                dateFormat:"dd.mm.yy"
+        }
+       );
+    });
+
+    function validateTime(value) {
+        return /^[0-2]?[0-9]:[0-5]?[0-9]:[0-5]?[0-9]$/.test(value);
+    }
+
+    function validateDate(value) {
+        return /^[0-3]?[0-9]-[0-1]?[0-9]-[0-2][0-9][0-9][0-9]$/.test(value);
+    }
+
+    function submitMyForm()
+    {
+        if (validateDate($('#date').val()) && validateTime($('#time').val()))
+            return form_submit_include_content();
+        else
+        {
+            santaShowPopupHint('[#news_error_title#]', '[#news_error_addnew_text#]',0);
+            return false;
+        }
+    }
+
+</script>
+<form action="%form_action%" method="POST" enctype="multipart/form-data">
+<input type="hidden" name="values[id]" value="%id%"/>
+<table border="0">
+    <tbody>
+        <tr>
+            <td width="100" align="right">
+                [#news_property_date_label#]
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td><input id="date" type="text" name="values[date]" value="%date%" size="12"></td>
+                        <td><nowrap>[#news_property_time_label#]&nbsp;<input id="time" type="text" name="values[time]" value="%time%" size="10"></nowrap></td>
+                    </tr>
+                </table>
+            </td>
+            <td rowspan="3">
+                <fieldset style="padding: 0 6; margin-left: 10; width:200;">
+                <div style="padding: 6px 0;"><input id="mod_news_1" type="checkbox" name="values[available]" value="1" %available%>&nbsp;<label for="mod_news_1">[#news_property_available_label#]</label></div>
+                <div style="padding: 6px 0;"><input id="mod_news_2" type="checkbox" name="values[lenta]" value="1" %lenta%>&nbsp;<label for="mod_news_2">[#news_property_lenta_label#]</label></div>
+                <div style="padding: 6px 0;"><input id="mod_news_3" type="checkbox" name="values[delivery]" value="1" %delivery%>&nbsp;<label for="mod_news_3">[#news_property_delivery_label#]</label></div>
+                <div style="padding: 6px 0;"><input id="mod_news_4" type="checkbox" name="values[rss]" value="1" %rss%>&nbsp;<label for="mod_news_4">[#news_property_rss_label#]</label></div>
+                </fieldset>
+            </td>
+        </tr>
+        <tr>
+            <td width="100" align="right">[#news_property_header_label#]</td>
+            <td><input type="text" name="values[header]" value="%header%" style="width: 100%;"></td>
+        </tr>
+        <tr>
+            <td width="100" align="right">[#news_property_description_short_label#]</td>
+            <td><textarea name="values[description_short]" style="width: 100%;" rows="4">%description_short%</textarea></td>
+        </tr>
+
+        <tr>
+            <td colspan="3" height="450">%description_full%</td>
+        </tr>
+        <tr>
+            <td align="right">[#news_property_author_label#]</td>
+            <td><input type="text" name="values[author]" value="%author%" style="width: 100%"></td>
+            <td rowspan="5" width="200" align="center">%image_block%</td>
+        </tr>
+        <tr>
+            <td align="right">[#news_property_source_name_label#]</td>
+            <td><input type="text" name="values[source_name]" value="%source_name%" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td align="right">[#news_property_source_url_label#]</td>
+            <td><input type="text" name="values[source_url]" value="%source_url%" style="width: 100%"></td>
+        </tr>
+        <tr>
+            <td align="right">[#news_property_image_label#]</td>
+            <td><input type="file" name="image" value="%image%" size="38"></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center"><input type="submit" name="submit" value="[#news_submit_label#]" onclick="return submitMyForm();"></td>
+        </tr>
+    </tbody>
+</table>
+</form>
+    </div></div></div>
+<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+</div>
+<!-- @image -->
+<img src="%image_url%" width="100px" height="75px" /><br/><label for="remove_image">Удалить</label><input id="remove_image" type="checkbox" name="values[remove_image]"/>

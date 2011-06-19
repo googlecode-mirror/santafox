@@ -22,17 +22,9 @@ class HtmlParser /*extends WebContentParser*/
 
     function get_links($base)
     {
-        //global $kernel;
-
         $hrefs = array();
-        if (preg_match_all("/href=\"(.+?)\"/si", $this->html, $matches))
+        if (preg_match_all("/a[\\s]+[^>]*?href[\\s]?=[\\s\"\\']+(.*?)[\"\\']+.*?>/is", $this->html, $matches))
             $hrefs = $matches[1];
-
-        if (preg_match_all("/href=\\'(.+?)\\'/si", $this->html, $matches))
-            $hrefs = array_merge($hrefs, $matches[1]);
-
-        if (preg_match_all("/href=([^\\'\"]+?)(\\s|>)/si", $this->html, $matches))
-            $hrefs = array_merge($hrefs, $matches[1]);
 
         $hrefs = array_unique($hrefs);
 

@@ -1544,7 +1544,13 @@ class kernel
             $html = $this->priv_page_textlabels_replace($html);
         }
 
-
+        if (preg_match_all("|\\%html_escape\\[(.*)\\]\\%|isU",$html, $matches, PREG_SET_ORDER))
+        {
+            foreach ($matches as $match)
+            {
+                $html= str_replace($match[0],htmlentities(strip_tags($match[1]),ENT_QUOTES,"UTF-8"),$html);
+            }
+        }
 
         print $html;
     }

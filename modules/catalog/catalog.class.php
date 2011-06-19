@@ -1946,25 +1946,21 @@ class catalog extends basemodule
 	        switch ($cp['type'])
 	        {
 	            case 'pict':
-                    //@todo большого изображения может и не быть
-	           	    if (empty($value) || !file_exists($value))
-	           		    break;
-
+                    if (empty($value) || !file_exists($value))
+                    {
+                        $block = str_replace("%".$cp['name_db']."%", $this->get_template_block($cp['name_db']."_null"), $block);
+                        break;
+                    }
 	           		//Сначала размеры большого изображения
             		$size = @getimagesize($value);
             		if ($size === false)
             		    break;
 	           		$block = str_replace('%'.$cp['name_db'].'_width%' , $size[0], $block);
 	           		$block = str_replace('%'.$cp['name_db'].'_height%', $size[1], $block);
-	           		$path_small  = "";
-	           		$path_source = "";
 	           		//кроме этого надо добавить переменные для малого и исходного изображения
-	           		if (!empty($value))
-	           		{
-	           			$path_parts  = pathinfo($value);
-	           			$path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
-	           			$path_source = $path_parts['dirname'].'/source/'.$path_parts['basename'];
-	           		}
+                    $path_parts  = pathinfo($value);
+                    $path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
+                    $path_source = $path_parts['dirname'].'/source/'.$path_parts['basename'];
 	           		$block = str_replace('%'.$cp['name_db'].'_small%', $path_small, $block);
 	           		$block = str_replace('%'.$cp['name_db'].'_source%', $path_source, $block);
 	           		break;

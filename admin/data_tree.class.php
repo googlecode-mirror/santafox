@@ -170,9 +170,9 @@ class data_tree
 	/**
 	 * Конструктр класса
 	 *
-	 * @param string $action_data Действие, используемое для загрузки дерева
 	 * @param string $root_name Имя корневой ноды
 	 * @param string $root_id ID корневой ноды
+	 * @param array $nodes ноды
 	 * @return data_tree
 	 */
 	function data_tree($root_name = "", $root_id = "", $nodes = null)
@@ -195,11 +195,11 @@ class data_tree
 	    }
 
 	    if ($root_name)
-	       $this->root_name = $root_name;
+	        $this->root_name = $root_name;
 
 	    //Именно так, так как может быть пустой строкой
 	    if ($root_id !== "")
-	       $this->root_id = $root_id;
+	        $this->root_id = $root_id;
 
     }
 
@@ -207,10 +207,9 @@ class data_tree
     /**
      * Устанвливает/снимает прямые ссылки в действиях дерева
      *
-     * При вызове данного параметра, все действия дерева должны быть указаны в виде полных
-     * ссылок
+     * При вызове данного параметра, все действия дерева должны быть указаны в виде полных ссылок
      *
-     * @param string $param
+     * @param boolean $param
      */
     function set_direct_action($param = true)
     {
@@ -232,14 +231,16 @@ class data_tree
     /**
      * Определяет имя действия, передаваемого при клике по ноде
      *
-     * Данное дейсвтие будет переданно в управляющую структуру соответсвующего
+     * Данное действие будет переданно в управляющую структуру соответсвующего
      * класса и доступно там с помощью метода $kernel->pub_section_leftmenu_get()
-     * @param string $action Имя действия
+     * @param boolean $val Имя действия
      */
+    /*
     function set_prioritet_node($val = true)
     {
         $this->prioritet_node_and_other_menu = $val;
     }
+    */
 
     /**
      * Определяет имя действия, передаваемого при клике по ноде
@@ -284,7 +285,7 @@ class data_tree
      * Включет (выключает) функцию переноса нод внутри структуры
      *
      * По умолчанию данная функция выключена
-     * @param unknown_type $value
+     * @param boolean $value
      */
     function set_drag_and_drop($value = true)
     {
@@ -309,7 +310,7 @@ class data_tree
      * С выполнением данного дейсвтия, в дереве не происходят никакие изменения
      * @param string $name Название пункта контекстного меню
      * @param string $link Линк для действия, выполняемого по клику на этот пункт меню
-     * @param string $exclude ID нод, через запятую, для которых этот пункт будет недоступен
+     * @param string|boolean $exclude ID нод, через запятую, для которых этот пункт будет недоступен
      * @param string $message_confirm Сообщение, которе должно выводиться перед тем как выполнить этот пункт меню
      */
 
@@ -331,8 +332,8 @@ class data_tree
      * происходит вызов контекстного меню
      * @param string $name Название пункта контекстного меню
      * @param string $link Линк для действия, выполняемого по клику на этот пункт меню
-     * @param string $exclude ID нод, через запятую, для которых этот пункт будет недоступен
-     * @param string $message_confirm Сообщение, которе должно выводиться перед тем как выполнить этот пункт меню
+     * @param string|boolean $exclude ID нод, через запятую, для которых этот пункт будет недоступен
+     * @param string $message_confirm Сообщение, которое должно выводиться перед тем, как выполнить этот пункт меню
      */
 
     function contextmenu_action_remove($name, $link, $exclude = false, $message_confirm = '')
@@ -380,8 +381,8 @@ class data_tree
         if (!empty($this->contextmenu))
         {
             //Соберём меню
-            //$html_elements = '';
             $i = 0;
+            $array_function = array();
             foreach ($this->contextmenu as $element)
             {
 

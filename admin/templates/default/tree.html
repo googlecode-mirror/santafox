@@ -82,12 +82,13 @@
                 if (sel_node)
                 {
                     //alert('before click_node_default');
-                    [#click_node_default#]
+                    //[#click_node_default#]
                     data.inst.select_node("#"+sel_node);
                 }
-                //И последнее - нужно обновить центрульную область контента
 
-        
+                var rootNodeID='#[#root_id#]';
+                if (data.inst.is_closed(rootNodeID) && !data.inst.is_leaf(rootNodeID))
+                    data.inst.open_node(rootNodeID,false, true); //no callback, skip animation
 
 	    }).jstree({  //сначала привязываем  loaded.jstree, select_node.jstree и только ПОТОМ создаём дерево
 

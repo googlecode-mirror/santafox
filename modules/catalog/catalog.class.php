@@ -205,9 +205,10 @@ class catalog extends basemodule
     }
 
     /**
-     * Публичный метод для отображения названия элементы
+     * Публичный метод для отображения названия элементов
      *
-     * @param string $fields_template шаблон
+     * @param string $fields_template шаблон товара
+     * @param string $category_template шаблон категории
      * @return string
      */
     public function pub_catalog_show_item_name($fields_template, $category_template)
@@ -930,11 +931,7 @@ class catalog extends basemodule
                 }
             }
         }
-
         $block = str_replace('%last_cat_block%', $last_cat_block, $block);
-
-
-
 		$block = $this->process_filters_in_template($block);
         $block = $this->process_variables_out($block);
         $block = $this->replace_current_page_url($block);
@@ -947,6 +944,7 @@ class catalog extends basemodule
      * Обрабатывает вызовы внутренних фильтров в шаблоне
      *
      * @param string $content
+     * @return string
      */
     private function process_filters_in_template($content)
     {
@@ -963,7 +961,6 @@ class catalog extends basemodule
         {//тип 2 (с параметрами) : %show_selection_NAME(param1=value1;param2=value2)%
             foreach ($matches as $match)
             {
-
             	$paramsStr = trim($match[2]);
             	//remove any %NNNN_value%
             	$paramsStr = preg_replace("/%([a-z0-9_-]+)_value%/i", "", $paramsStr);
@@ -975,7 +972,7 @@ class catalog extends basemodule
                     $paramsKV[trim($pname)] = trim($pvalue);
                 }
                 $content = str_ireplace("%show_selection_".$match[1]."(".$match[2].")%", $this->pub_catalog_show_inner_selection_results($match[1], false, $paramsKV), $content);
-          }
+            }
         }
         return $content;
     }
@@ -1189,7 +1186,7 @@ class catalog extends basemodule
      *
      * @return HTML
      */
-    private function process_basket_items_tpl($template, $basket_items, $order_fields=false)
+    private function process_basket_items_tpl($template, $basket_items, $order_fields=array())
     {
   	    global $kernel;
         if (empty($template) || !file_exists($template))
@@ -1366,6 +1363,7 @@ class catalog extends basemodule
      *
      * @param string $text
      * @param boolean $ignore_zero_price игнорировать приставку для товаров с нулевой ценой?
+     * @return HTML
      */
     private function convert_basket_sum_strings($text, $ignore_zero_price=false)
     {
@@ -1400,6 +1398,7 @@ class catalog extends basemodule
      * Обновляет кол-во товара в корзине
      *
      * @param integer $itemid ID-шник товара
+     * @param integer $newqty новое кол-во
      */
     private function update_basket_item_qty($itemid, $newqty)
     {
@@ -1408,7 +1407,7 @@ class catalog extends basemodule
         if ($newqty == 0)
         {
             $this->remove_item_from_basket($itemid);
-            return ;
+            return;
         }
         global $kernel;
         $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` '.
@@ -1434,20 +1433,13 @@ class catalog extends basemodule
 
     /**
      * Возвращает запись о заказе товара из БД по ID-шнику сессии
-     *
+     * @param string $sessionid ID-шник сессии
      * @return array
      */
     private function get_basket_order_by_sid($sessionid)
     {
         global $kernel;
-        $ret = false;
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_orders` '.
-        		 'WHERE `sessionid` = "'.mysql_real_escape_string($sessionid).'" ';
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $ret = $row;
-        mysql_free_result($result);
-        return $ret;
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_orders','`sessionid` = "'.mysql_real_escape_string($sessionid).'"',"*");
     }
 
     /**
@@ -1482,32 +1474,25 @@ class catalog extends basemodule
 
     /**
      * Возвращает запись товара в корзине по itemid
-     *
+     * @param integer $itemid ID-шник товара
      * @return array
      */
     private function get_basket_item_by_itemid($itemid)
     {
         global $kernel;
         $currOrder = $this->get_current_basket_order();
-        $ret = false;
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` '.
-        		 'WHERE `orderid` = '.$currOrder['id'].' AND `itemid`='.intval($itemid)." LIMIT 1";
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $ret = $row;
-        mysql_free_result($result);
-        return $ret;
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_items','`orderid` = '.$currOrder['id'].' AND `itemid`='.intval($itemid));
     }
 
     /**
      * Добавляет заказ в БД, все поля пустые, кроме sessionid и lastaccess
      *
+     * @param string $secret_session_id ID-шник сессии
      * @return string
      */
     private function add_basket_order($secret_session_id)
     {
         global $kernel;
-
         $query = 'REPLACE INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_orders` '.
         		 "(`sessionid`, `lastaccess`) VALUES ('".$secret_session_id."', NOW())";
         $kernel->runSQL($query);
@@ -1538,25 +1523,18 @@ class catalog extends basemodule
 
     /**
      * Возвращает массив с товарами корзины из БД
-     *
+     * @param integer $orderid IDшник заказа
      * @return array
      */
     private function get_basket_items_fromdb($orderid)
     {
         global $kernel;
-        $items = array();
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` '.
-        		 'WHERE `orderid` = '.$orderid.' ORDER BY id DESC';
-        $result = $kernel->runSQL($query);
-        while ($row = mysql_fetch_assoc($result))
-            $items[] = $row;
-        mysql_free_result($result);
-        return $items;
+        return $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_items',' `orderid` = '.$orderid.' ORDER BY id DESC');
     }
 
     /**
      * Удаляет все товары заказа из корзины
-     *
+     * @param string $sessionid IDшник сессии
      */
     private function clear_basket_items($sessionid)
     {
@@ -1769,7 +1747,6 @@ class catalog extends basemodule
         if ($limit>0)
             $query .= " LIMIT ".$offset.", ".$limit;
         $items = array();
-        //print $query;
         $result = $kernel->runSQL($query);
         if ($result)
         {
@@ -1804,12 +1781,9 @@ class catalog extends basemodule
             $block  = $this->get_template_block('row_'.$odd_even);
             if (empty($block))
                 $block  = $this->get_template_block('row');
-
             $block = str_replace("%odd_even%", $odd_even, $block);
-
             //Теперь ищем переменные, свойств и заменяем их
             $block = $this->process_item_props_out($item, $props, $block, $group);
-
             $block = str_replace("%link%", $targetPage.'.html?'.$this->frontend_param_item_id_name.'='.$item['id'], $block);
             $rows .= $block;
             $curr++;
@@ -1856,6 +1830,7 @@ class catalog extends basemodule
      * +добавляет текущую дату %date[Y-m-d H:s]% в указанном формате (функция date() )
      * +обрабатывет текст %xml_cleanup[...]% заменяя символы для валидности xmk
      * @param string $block
+     * @return string
      */
     private function process_variables_out($block)
     {
@@ -1919,11 +1894,11 @@ class catalog extends basemodule
      *
      * @param array $item товар
      * @param array $props свойства товара
-     * @param HTML $block часть шаблона для товара
+     * @param string $block часть шаблона для товара
      * @param array $group массив тов. группы, чтобы выводить название группы
-     * @return HTML
+     * @return string
      */
-	private function process_item_props_out($item, $props, $block, $group=false)
+	private function process_item_props_out($item, $props, $block, $group=array())
 	{
         global $kernel;
 	    if ($group && isset($group['name_full']))
@@ -2017,8 +1992,9 @@ class catalog extends basemodule
      * @param integer 		$limit                    товаров на страницу
      * @param integer 		$show_cats_if_empty_items выводить ли список категорий, если нет товаров?
      * @param string  		$cats_tpl                 файл шаблона для списка категорий
-     * @param integer|false $catid                    idшник категории (для прямого вызова)
-     * @param string|false  $custom_template          файл шаблона (для прямого вызова)
+     * @param string  		$multi_group_tpl          файл шаблона для разных групп
+     * @param integer|boolean $catid                    idшник категории (для прямого вызова)
+     * @param string|boolean  $custom_template          файл шаблона (для прямого вызова)
      * @return HTML
      */
     public function pub_catalog_show_items($limit, $show_cats_if_empty_items, $cats_tpl, $multi_group_tpl='', $catid=false, $custom_template=false)
@@ -2314,10 +2290,11 @@ class catalog extends basemodule
      * Публичный метод для отображения дерева категорий
      *
      * @param string  $template   имя файла шаблона
-     * @param string  $fromcat    id-шник категории, с которой строим
+     * @param integer  $fromcat    id-шник категории, с которой строим
      * @param integer $fromlevel  Уровень начала построения
      * @param integer $openlevels Кол-во раскрываемых уровней меню
      * @param integer $showlevels макс. кол-во выводимых уровней меню
+     * @param string $items_pagename страница товара
      * @return HTML
      * @access public
      */
@@ -2594,8 +2571,9 @@ class catalog extends basemodule
      * Добавляет товарную группу в БД.
      * создаёт запись в _catalog_item_groups и новую таблицу
      *
-     * @param string name имя товарной группы
-     * @return string БД-имя добавленной группы
+     * @param string $name имя товарной группы
+     * @param string $namedb БД-имя товарной группы
+     * @return integer ID добавленной группы
      */
     private function add_group($name, $namedb)
     {
@@ -2640,8 +2618,10 @@ class catalog extends basemodule
     /**
      * Сохраняет товарную группу в БД.
      *
-     * @param string name имя товарной группы
-     * @return string БД-имя добавленной группы
+     * @param integer $id id товарной группы
+     * @param string $name имя товарной группы
+     * @param string $namedb БД-имя группы
+     * @return integer id
      */
     private function save_group($id, $name, $namedb)
     {
@@ -2698,8 +2678,8 @@ class catalog extends basemodule
     /**
      * Конвертирует строку создания enum-поля в массив
      *
-     * @param string строка типа enum, например "enum('знач1','знач2','знач3')"
-     * @param boolean добавлять первое дефолтовое значение?
+     * @param string $strстрока типа enum, например "enum('знач1','знач2','знач3')"
+     * @param boolean $needDefault добавлять первое дефолтовое значение?
      * @return array массив со значениями enum
      */
     private function get_enum_prop_values($str, $needDefault=true)
@@ -2720,7 +2700,7 @@ class catalog extends basemodule
 
     /**
      * Пересоздаёт шаблоны для редактирования ВСЕХ товарных групп
-     *
+     * @param $force boolean
      * @return void
      */
     private function regenerate_all_groups_tpls($force = false)
@@ -2803,9 +2783,9 @@ class catalog extends basemodule
      * Используется при генерации шаблонво списка товаров и карточки товаров
      * @param array $template распаршенный шаблон
      * @param array $props массив со свойствами
+     * @param boolean $include_html формировать для свойства типа HTML
      * @return array
      */
-
     private function regenerate_group_tpls_only_prop($template, $props, $include_html = false)
     {
         $list_prop_addon = "\n\n";
@@ -2826,7 +2806,7 @@ class catalog extends basemodule
         $prop_names_block = '';
         foreach ($props as $prop)
         {
-            if (($prop['type'] == 'html') && (!$include_html))
+            if ($prop['type']=='html' && !$include_html)
                 continue;
             $prop_names_block .= "%".$prop['name_db']."%\n";
         }
@@ -2849,7 +2829,6 @@ class catalog extends basemodule
             $field = str_replace('%prop_name_full%'   , $prop['name_full']             ,$field);
             $field = str_replace('%prop_value%'       , '%'.$prop['name_db'].'_value%' ,$field);
             $field = str_replace('%prop%'             , '%'.$prop['name_db'].'%'       ,$field);
-            //$list_prop .= $field."\n";
             $only_values .= "<!-- @".$prop['name_db']." -->\n".$field."\n";
 
             //И ещё заменим же из в доп свойсвтах, если они там есть
@@ -3245,7 +3224,7 @@ class catalog extends basemodule
 
     /**
      * Сохраняет товары категории в БД
-     *
+     * @param integer $catid IDшник категории
      */
     private function save_category_items($catid)
     {
@@ -3320,8 +3299,8 @@ class catalog extends basemodule
     /**
      * Обработка file-upload, для свойств типа "файл"
      *
-     * @param $name string имя поля (input type='file') в html-форме
-     * @return имя сохранённого файла
+     * @param  string $file имя поля (input type='file') в html-форме
+     * @return string имя сохранённого файла
      */
     private function process_file_upload($file)
     {
@@ -3355,9 +3334,9 @@ class catalog extends basemodule
     /**
      * Обработка file-upload, для свойств типа "картинка"
      *
-     * @param $name string имя поля (input type='file') в html-форме
-     * @param $prop array Массив с параметрами свойства, в нём для картинки передаются всяки дополнения
-     * @return имя сохранённого файла
+     * @param string $file  имя поля (input type='file') в html-форме
+     * @param array $prop  Массив с параметрами свойства, в нём для картинки передаются всяки дополнения
+     * @return string имя сохранённого файла
      */
     private function process_pict_upload($file, $prop)
     {
@@ -3410,7 +3389,7 @@ class catalog extends basemodule
         }
 
 		//А теперь смотрим, нужно ли нам модифицировать исходное изображение
-		$source_res = null;
+		$source_res = 0;
         if ($prop['add_param']['source']['isset'])
         {
            $source_res  = array(
@@ -3438,7 +3417,7 @@ class catalog extends basemodule
         }
 
         //теперь параметры малого изображения
-        $thumb = null;
+        $thumb = 0;
         if ($prop['add_param']['small']['isset'])
         {
            $thumb = array(
@@ -3696,6 +3675,9 @@ class catalog extends basemodule
      * @param integer $pid id-шник свойства
      * @param string $name_full полное имя свойства
      * @param string $name_db БД-имя свойства
+     * @param string $cb_inlist
+     * @param string $sort
+     * @param string $cb_ismain
      */
     private function save_prop($pid, $name_full, $name_db, $cb_inlist, $sort, $cb_ismain)
     {
@@ -3931,7 +3913,6 @@ class catalog extends basemodule
      * Добавляет поле(свойство) в товарную группу в БД.
      * Создаёт запись в _catalog_item_props и изменяет таблицу _catalog_items_[moduleid]_[groupdbname]
      *
-     * @param string name имя свойства
      * @return string БД-имя добавленного свойства
      */
     private function add_prop_in_group()
@@ -4053,7 +4034,10 @@ class catalog extends basemodule
      * Добавляет поле(свойство) для категории.
      * Создаёт запись в _catalog_item_props и изменяет таблицу _catalog_items_[moduleid]_[groupdbname]
      *
-     * @param string name имя свойства
+     * @param string $pname имя свойства
+     * @param string $ptype тип свойства
+     * @param string $pvalues набор значений для свойства типа "набор значений"
+     * @param string $pnamedb БД-имя
      * @return string БД-имя добавленного свойства
      */
     private function add_prop_in_cat($pname, $ptype, $pvalues, $pnamedb)
@@ -4209,7 +4193,7 @@ class catalog extends basemodule
     /**
      * Возвращает свойство КАТЕГОРИИ по id-шнику
      *
-     * @param integer id  id-шник свойства
+     * @param integer $id  id-шник свойства
      * @return array
      */
     private function get_cat_prop($id)
@@ -4231,29 +4215,23 @@ class catalog extends basemodule
     /**
      * Возвращает свойство по id-шнику
      *
-     * @param integer id id-шник свойства
+     * @param integer $id id-шник свойства
      * @return array
      */
     private function get_prop($id)
     {
         global $kernel;
-        $res    = false;
-        $query  = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_item_props` WHERE `id` ='.$id.' LIMIT 1';
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $res = $row;
-
+        $res = $kernel->db_get_record_simple('_catalog_item_props','id='.$id);
         //Если свойство стипом картинка, то сразу вытащим из дополнительных парараметров
         //информацию по картинке
         if ($res['type'] == 'pict')
         {
             if (isset($res['add_param']) && !empty($res['add_param']))
-            {
                 $res['add_param'] = @unserialize($res['add_param']);
-            } else
+            else
             {
                 $res['add_param'] = array();
-                $res['add_param']['pict_path']			   = '';
+                $res['add_param']['pict_path']			      = '';
 
                 $res['add_param']['source']['isset']          = true;
                 $res['add_param']['source']['width']          = '800';
@@ -4276,29 +4254,19 @@ class catalog extends basemodule
             }
 
         }
-        mysql_free_result($result);
-
-
         return $res;
     }
 
     /**
      * Возвращает запись товара по id-шнику (только common-свойства)
      *
-     * @param integer id id-шник товара
+     * @param integer $id id-шник товара
      * @return array
      */
     private function get_item($id)
     {
         global $kernel;
-        $res    = false;
-        $query  = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` WHERE `id` ='.intval($id).' LIMIT 1';
-
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $res = $row;
-        mysql_free_result($result);
-        return $res;
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_items','`id` ="'.intval($id).'"');
     }
 
     /**
@@ -4324,15 +4292,6 @@ class catalog extends basemodule
         $itemc = $this->get_item_group_fields($item1['ext_id'], $group['name_db']);
         if ($itemc)
             $item1 = $item1 + $itemc;
-        /*
-        $query = 'SELECT *
-                  FROM `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db'].'` '.
-                 'WHERE `id`='.$item1['ext_id'].' LIMIT 1';
-
-        $result = $kernel->runSQL($query);
-
-        $row = mysql_fetch_assoc($result);
-        */
         return $item1;
     }
 
@@ -4347,14 +4306,7 @@ class catalog extends basemodule
     private function get_item_group_fields($id, $group_name)
     {
         global $kernel;
-        $ret     = false;
-        $query   = 'SELECT * '.
-                   'FROM `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group_name).'` '.
-                   'WHERE `id`='.$id.' LIMIT 1';
-        $result  = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $ret = $row;
-        return $ret;
+        return $kernel->db_get_record_simple('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group_name),'`id`='.$id);
     }
 
 
@@ -4385,26 +4337,19 @@ class catalog extends basemodule
     /**
      * Проверяет, существует ли товарная группа с указанным именем для текущего модуля
      *
-     * @param string имя товарной группы
+     * @param string $name имя товарной группы
      * @return boolean
      */
     private function is_group_exists($name)
     {
         global $kernel;
-        $query = 'SELECT name_db  FROM `'.$kernel->pub_prefix_get().'_catalog_item_groups` AS `groups` '.
-        ' WHERE `groups`.`name_db` = "'.$name.'"'.' AND `groups`.`module_id` = "'.$kernel->pub_module_id_get().'"';
-        $result = $kernel->runSQL($query);
-        $ret = false;
-        if (mysql_fetch_assoc($result))
-            $ret = true;
-        mysql_free_result($result);
-        return $ret;
+        return $kernel->db_get_record_simple('_catalog_item_groups','`name_db` = "'.$name.'"'.' AND `module_id` = "'.$kernel->pub_module_id_get().'"');
     }
 
     /**
      * Возвращает информацию о таблице из БД
      *
-     * @param string имя таблицы
+     * @param string $tname имя таблицы
      * @return array
      */
     private function get_dbtable_info($tname)
@@ -4432,16 +4377,7 @@ class catalog extends basemodule
         if (in_array($pname,$reserved))
             return true;
         global $kernel;
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props` AS `props` '.
-        ' WHERE `props`.`name_db` ="'.$pname.'" LIMIT 1';
-        $result = $kernel->runSQL($query);
-        if (mysql_fetch_assoc($result))
-        {
-            mysql_free_result($result);
-            return true;
-        }
-        else
-            return false;
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_cats_props','`name_db` ="'.$pname.'"');
     }
 
     /**
@@ -4460,18 +4396,8 @@ class catalog extends basemodule
             return true;
         elseif (in_array($pname,$reservedCustom))
             return true;
-
         global $kernel;
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_item_props` AS `props` '.
-        ' WHERE `props`.`name_db` ="'.$pname.'" AND `props`.`group_id`='.$group_id.' LIMIT 1';
-        $result = $kernel->runSQL($query);
-        if (mysql_fetch_assoc($result))
-        {
-            mysql_free_result($result);
-            return true;
-        }
-        else
-            return false;
+        return $kernel->db_get_record_simple('_catalog_item_props','`name_db` ="'.$pname.'" AND `props`.`group_id`='.$group_id);
     }
 
 
@@ -4484,12 +4410,12 @@ class catalog extends basemodule
     private function get_cat_itemids($catid)
     {
         global $kernel;
-        $query = 'SELECT `item_id` FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' ORDER BY `order`';
+        $rows= $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_item2cat','`cat_id`='.$catid.' ORDER BY `order`','item_id');
         $ret = array();
-        $result = $kernel->runSQL($query);
-        while ($row = mysql_fetch_assoc($result))
+        foreach ($rows as $row)
+        {
             $ret[] = $row['item_id'];
-        mysql_free_result($result);
+        }
         return $ret;
     }
 
@@ -4546,7 +4472,7 @@ class catalog extends basemodule
         global $kernel;
 
         $query = 'SELECT items.*, i2c.`order` FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` AS i2c '.
-		'LEFT JOIN `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items ON items.id=i2c.item_id ';
+		         ' LEFT JOIN `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items ON items.id=i2c.item_id ';
 		$query .= 'WHERE i2c.cat_id='.$catid;
 
 		if ($only_visible)
@@ -4663,6 +4589,7 @@ class catalog extends basemodule
      * @param integer $depth текущая глубина
      * @param array   $data массив с данными
      * @param integer $maxdepth максимальная глубина
+     * @param string|boolean $module_id
      * @return array
      */
     public function get_child_categories($node_id, $depth = 0, $data = array(), $maxdepth = 100, $module_id = false)
@@ -4675,17 +4602,15 @@ class catalog extends basemodule
     	    $module_id = $kernel->pub_module_id_get();
 		$sql   = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$module_id.'_cats` WHERE `parent_id` = '.$node_id." ORDER BY `order`";
 		$query = $kernel->runSQL($sql);
-		if (mysql_num_rows($query) > 0)
-		{
-		    while ($row = mysql_fetch_assoc($query))
-		    {
-                $array = $row;
-                $array['depth'] = $currdepth;
-		        $data[] = $array;
-		        $data = $this->get_child_categories($row['id'],$depth, $data, $maxdepth, $module_id);
-		    }
 
-		}
+        while ($row = mysql_fetch_assoc($query))
+        {
+            $array = $row;
+            $array['depth'] = $currdepth;
+            $data[] = $array;
+            $data = $this->get_child_categories($row['id'],$depth, $data, $maxdepth, $module_id);
+        }
+
 		mysql_free_result($query);
 		return $data;
     }
@@ -4751,7 +4676,8 @@ class catalog extends basemodule
 
     /**
      * Конвертирует тип поля для использования в БД
-     *
+     * @param string $type тип поля
+     * @param array $values значения (для enum)
      * @return string
      */
     private function convert_field_type_2_db($type, $values = null)
@@ -4783,8 +4709,8 @@ class catalog extends basemodule
 
     /**
      * Выводит список товаров в админке
-     * Сюда попадают все товары магазина. Есть возможность в форме устаноить фильтр по
-     * группе, к которой принадлежит товар
+     * Сюда попадают все товары магазина. Есть возможность в форме устаноить фильтр по группе, к которой принадлежит товар
+     * @param integer $group_id IDшник группы
      * @return string
      */
     private function show_items($group_id)
@@ -4794,9 +4720,6 @@ class catalog extends basemodule
         $offset = $this->get_offset_admin();
         $limit  = $this->get_limit_admin();
         $groups = CatalogCommons::get_groups();
-
-
-
         if (isset($_GET['search_results']))
         {
             //пока без ограничения
@@ -5362,6 +5285,7 @@ class catalog extends basemodule
      * @param boolean $only_visible только видимые?
      * @param integer $offset
      * @param integer $limit
+     * @return array
      */
     private function get_linked_items($itemid, $only_visible=false, $offset=0, $limit=0)
     {
@@ -5395,6 +5319,7 @@ class catalog extends basemodule
      *
      * @param integer $itemid
      * @param boolean $only_visible только видимые?
+     * @return integer
      */
     private function get_linked_items_count($itemid, $only_visible=false)
     {
@@ -5600,6 +5525,7 @@ class catalog extends basemodule
      * Возвращает список темплейтов в папке
      *
      * @param string $path
+     * @param boolean $hide_not_selected спрятать "не выбрано"?
      * @return array
      */
     private function get_template_file($path = 'modules/catalog/templates_user', $hide_not_selected=false)
@@ -6051,16 +5977,10 @@ class catalog extends basemodule
         return $content;
     }
 
-
-
-
     private function prepare_value4db_enum($s)
     {
         return str_replace("'","'",$s);
     }
-
-
-
 
    /**
     *	Вывод товаров категории в админке
@@ -6271,7 +6191,6 @@ class catalog extends basemodule
                     $options = $this->get_template_block('prop_enum_value');
                     $options = str_replace('%enum_value%', '', $options);
                     $options = str_replace('%enum_name%', '[#catalog_edit_category_need_select_label#]', $options);
-                    //$options = '';
                     foreach ($vals as $val)
                     {
                         $option = $this->get_template_block('prop_enum_value');
@@ -6285,7 +6204,7 @@ class catalog extends basemodule
                     $line = str_replace('%prop_enum_values%', $options, $line);
                     break;
 
-                //Текст, редактируемый редкатором контента
+                //Текст, редактируемый редактором контента
                 case 'html':
                     $editor = new edit_content(true);
                     $editor->set_edit_name($prop['name_db']);
@@ -6293,11 +6212,8 @@ class catalog extends basemodule
                     $editor->set_content($cat[$prop['name_db']]);
                     $line = str_replace('%prop_value%', $editor->create(), $line);
                     break;
-
             }
-
             $lines .= $line;
-
         }
         $content = str_replace('%props%', $lines, $content);
         $content = str_replace('%id%', $cat['id'], $content);
@@ -6389,8 +6305,6 @@ class catalog extends basemodule
 
 		if(isset($prop['add_param']))
 		    $prop['add_param'] = @unserialize($prop['add_param']);
-
-
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'category_property_form.html'));
 
         //Для определённых свойств нужно сделать дополнения
@@ -6398,10 +6312,8 @@ class catalog extends basemodule
         switch ($prop['type'])
         {
         	case 'enum':
-
 	            $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
 	            $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
-
 	            $lines = '';
 	            foreach ($vals as $val)
 	            {
@@ -6414,14 +6326,11 @@ class catalog extends basemodule
 	            $block_addparam = str_replace('%add_enum%', $kernel->pub_redirect_for_form('cat_enum_prop_add'), $block_addparam);
 	            break;
         	case 'pict':
-
         		$addons_param = $this->get_template_block('addons_pict');
-
 		        //Сначала всё, что касается исходного изображения
 		        $source_check = "";
 		        if ($prop['add_param']['source']['isset'])
 		            $source_check = ' checked="checked"';
-
 		        //Отметим тек значение по дабавлению водяного знака
 		        $_tmp_array = array("pswas0"=> "", "pswas1"=> "",  "pswas2" => "");
 		        $_tmp_array['pswas'.intval($prop['add_param']['source']['water_add'])] = ' selected="selected"';
@@ -6437,8 +6346,6 @@ class catalog extends basemodule
 		        $addons_param = str_replace('%path_source_water_path%', $prop['add_param']['source']['water_path'], $addons_param);
 		        $addons_param = str_replace('%pict_source_width%'     , $prop['add_param']['source']['width']     , $addons_param);
 		        $addons_param = str_replace('%pict_source_height%'    , $prop['add_param']['source']['height']    , $addons_param);
-
-
 
 		        //Теперь всё, что касается большого изображения
 		        $big_check = "";
@@ -6461,8 +6368,6 @@ class catalog extends basemodule
 		        $addons_param = str_replace('%pict_big_width%'     , $prop['add_param']['big']['width']     , $addons_param);
 		        $addons_param = str_replace('%pict_big_height%'    , $prop['add_param']['big']['height']    , $addons_param);
 
-
-
 		        //Теперь всё, что касается малого изображения
 		        $small_check = "";
 		        if ($prop['add_param']['small']['isset'])
@@ -6472,14 +6377,10 @@ class catalog extends basemodule
 		        $addons_param = str_replace('%pict_small_width%'     , $prop['add_param']['small']['width']     , $addons_param);
 		        $addons_param = str_replace('%pict_small_height%'    , $prop['add_param']['small']['height']    , $addons_param);
 
-
-
 		        //Общее для всех параметров
 		        $addons_param = str_replace('%pict_path%'      , $prop['add_param']['pict_path']                  , $addons_param);
 		        $addons_param = str_replace('%pict_path_start%', 'content/files/'.$kernel->pub_module_id_get().'/', $addons_param);
-
         		$block_addparam = $addons_param; //added
-
         		break;
         }
 
@@ -6503,8 +6404,10 @@ class catalog extends basemodule
     /**
     *	Форма редактирования и добавления свойства в админке
     *
-    * 	@param $id integer - id-шник свойства
-    *	@return HTML
+    * 	@param integer $id_prop - id-шник свойства
+    * 	@param integer $id_group - id-шник группы
+    * 	@param integer $id_group_control  - id-шник
+    *	@return string
     */
     private function show_prop_form($id_prop = 0 , $id_group = 0, $id_group_control = 0)
     {
@@ -6750,7 +6653,7 @@ class catalog extends basemodule
     /**
      * Возвращает настройки для построения меню категорий
      *
-     * @return unknown
+     * @return data_tree
      */
     private function create_categories_tree()
     {
@@ -6822,6 +6725,7 @@ class catalog extends basemodule
      *
      * @param integer $pid id-шник родительской категории
      * @param integer $skip сколько категорий пропустить
+     * @return integer
      */
     public function get_last_order_in_cat($pid, $skip=-1)
     {
@@ -7333,7 +7237,8 @@ class catalog extends basemodule
 
     /**
      * Отображает форму для экспорта в CSV-файл
-     *
+     * @param string $template шаблон
+     * @return string
      */
     private function show_csv_export_form($template='')
     {
@@ -7362,6 +7267,7 @@ class catalog extends basemodule
      *
      * @param string $template
      * @param integer $filterid
+     * @return string
      */
     private function make_csv_export($template,$filterid)
     {
@@ -7519,9 +7425,9 @@ class catalog extends basemodule
     /**
      * Создаёт форму поиска
      *
-     * @param string $outfile
      * @param integer $groupid
      * @param array $props
+     * @return string
      */
     private function generate_search_form($groupid, $props)
     {
@@ -7618,10 +7524,9 @@ class catalog extends basemodule
     /**
      * Генерирует запрос для внутреннего фильтра
      *
-     * @param string $name
-     * @param string $templatename
      * @param integer $groupid
      * @param array $props
+     * @return string
      */
     private function generate_inner_filter_query($groupid, $props)
     {
@@ -7708,23 +7613,20 @@ class catalog extends basemodule
 
     /**
      * Возвращает общее свойство, по которому вести сортировку
-     *
+     * @return array
      */
     private function get_common_sort_prop()
     {
         global $kernel;
-        $res    = false;
-        $query  = "SELECT `name_db`,`sorted` FROM `".$kernel->pub_prefix_get()."_catalog_item_props` WHERE `group_id`=0 AND `sorted`>0 AND module_id='".$kernel->pub_module_id_get()."' LIMIT 1";
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $res = $row;
-        return $res;
+        return $kernel->db_get_record_simple('_catalog_item_props','`group_id`=0 AND `sorted`>0 AND module_id="'.$kernel->pub_module_id_get().'"','`name_db`,`sorted`');
     }
 
     /**
      * Публичный метод для вывода списка связанных товаров
      *
      * @param string $template
+     * @param integer $limit
+     * @return string
      */
     public function pub_catalog_show_linked_items($template, $limit)
     {
@@ -7831,12 +7733,10 @@ class catalog extends basemodule
     private function get_common_main_prop()
     {
         global $kernel;
-        $res    = false;
-        $query  = 'SELECT `name_db` FROM `'.$kernel->pub_prefix_get().'_catalog_item_props` WHERE `module_id`="'.$kernel->pub_module_id_get().'" AND `group_id`=0 AND `ismain`=1 LIMIT 1';
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $res = $row['name_db'];
-        return $res;
+        $row = $kernel->db_get_record_simple('_catalog_item_props','`module_id`="'.$kernel->pub_module_id_get().'" AND `group_id`=0 AND `ismain`=1','name_db');
+        if ($row)
+            return $row['name_db'];
+        return false;
     }
 
     private function show_variables()
@@ -8219,7 +8119,7 @@ class catalog extends basemodule
                 $sorted    = intval($kernel->pub_httppost_get('sorted'));
                 $ismain    = $kernel->pub_httppost_get('ismain');
                 $this->save_prop($id, $name_full, $name_db, $inlist, $sorted, $ismain);
-                //Теперь опрделим, куда нужно вернуться
+                //Теперь опредилим, куда нужно вернуться
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
                 $id_group_control = intval($id_group_control);
                 return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]","show_group_props&id=".$id_group_control);
@@ -8780,7 +8680,6 @@ class catalog extends basemodule
         $evals[] = $enumval;
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
         $kernel->runSQL($query);
-        return;
     }
 
     /**
@@ -8809,7 +8708,7 @@ class catalog extends basemodule
         foreach ($evals as $eval)
         {
             if ($eval != $enumval)
-               $newevals[] = $eval;
+                $newevals[] = $eval;
         }
 
         $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL WHERE `'.$prop['name_db'].'`="'.$kernel->pub_str_prepare_set($enumval).'"';
@@ -8821,9 +8720,10 @@ class catalog extends basemodule
     }
 
 
-    /** Клонирует товар по переданному айдишнику
-     * @param  $id
-     * @return айдишник нового товара
+    /**
+     * Клонирует товар по переданному айдишнику
+     * @param  integer $id
+     * @return integer айдишник нового товара
      */
     private function item_clone($id)
     {
@@ -9014,9 +8914,7 @@ class catalog extends basemodule
 	    	foreach ($matches as $match)
 	    	{
                 $itemid = intval($match[1]);
-                //$catids = $this->get_item_catids($itemid);
                 $max_way = $this->get_max_catway2item($itemid, $categories);
-                //print "itemid:".$itemid.", max way:".var_export($max_way, true);
                 if (count($max_way)>0)
                     $content = str_replace($match[0], $max_way[count($max_way)-1]['id'], $content);
                 else

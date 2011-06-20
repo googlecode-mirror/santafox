@@ -68,7 +68,7 @@ $install->add_public_metod_parametrs('pub_show_form',$p);
 $p = new properties_string();
 $p->set_id('email');
 $p->set_caption('[#feedback_property_label_email#]');
-$p->set_default($_SERVER['SERVER_ADMIN']);
+$p->set_default(isset($_SERVER['SERVER_ADMIN'])?$_SERVER['SERVER_ADMIN']:'');
 $install->add_public_metod_parametrs('pub_show_form',$p);
 
 $p = new properties_select();

@@ -1714,9 +1714,15 @@ class catalog extends basemodule
         {
             $tpl = CatalogCommons::get_templates_user_prefix().$filter['template'];
             $linkParams = "";
+            if (isset($_REQUEST['filterid']))
+                $linkParams .= "filterid=".$filter_stringid."&";
         }
+        $curr_cat_id=0;
         if (empty($filter['catids']) && $filter['catids']!=0) //показываем товары из текущей - добавляем параметр с категорией
-            $linkParams .= "cid=".$this->get_current_catid(true)."&";
+        {
+            $curr_cat_id=$this->get_current_catid(true);
+            $linkParams .= "cid=".$curr_cat_id."&";
+        }
         $this->set_templates($kernel->pub_template_parse($tpl));
 
         $sql = $this->process_variables_out($filter['query']);
@@ -1816,6 +1822,24 @@ class catalog extends basemodule
         $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,intval($filter['maxpages'])), $content);
         $content = $this->process_filters_in_template($content);
         $content = $this->replace_current_page_url($content);
+        if ($curr_cat_id)
+        {
+            $cat = $this->get_category($curr_cat_id);
+            if ($cat)
+            {
+                $content = str_replace("%catid%",$cat['id'],$content);
+                $cats_props = CatalogCommons::get_cats_props();
+                foreach ($cats_props as $cprop)
+                {
+                    if (strpos($content, '%category_'.$cprop['name_db'].'%')!==false)
+                    {
+                        $content = str_replace('%category_'.$cprop['name_db'].'%', $this->get_template_block('category_'.$cprop['name_db']),$content);
+                        $content = str_replace('%category_'.$cprop['name_db'].'_value%', $cat[$cprop['name_db']], $content);
+                        $content = str_replace('%category_'.$cprop['name_db'].'_name%',  $cprop['name_full'], $content);
+                    }
+                }
+            }
+        }
         if ($need_postprocessing)
         {
             $content = $this->process_variables_out($content);

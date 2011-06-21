@@ -1,25 +1,16 @@
 <!-- @date_picker -->
 <script type="text/javascript">
-    Ext.onReady(function(){
-        DatePicker = new Ext.DatePicker({
-            allowDomMove : false
-            , cancelText : 'cancelText'
-            , constrainToViewport : true
-            , disableClass : 'x-item-disabled'
-            , format : 'y-m-d'
-            , hideMode : 'display'
-            , monthYearText : 'Choose a month (Control+Up/Down to move years)'
-            , nextText : 'Next Month (Control+Right)'
-            , prevText : 'Previous Month (Control+Left)'
-            , todayText : 'Сегодня'
-            , todayTip : '{current date} (Spacebar)'
-        });
-        DatePicker.on('select', function (){
-            var selectedDate = new Date(DatePicker.getValue());
-            jspub_click('show_list&flush=1&date='+selectedDate.format('Y-m-d'));
-        });
-        DatePicker.render('datePicker');
+    $(function() {
+        $( "#datePicker" ).datepicker({
+             dateFormat:"yy-mm-dd"
+            ,onSelect:newsDateSelected
+        }
+       );
     });
+    function newsDateSelected(dateText, inst)
+    {
+        jspub_click('show_list&flush=1&date='+dateText);
+    }
 </script>
 <div style="margin: 10;">
     <div id="datePicker"></div>

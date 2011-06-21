@@ -1,37 +1,16 @@
 <!-- @date_picker -->
 <script type="text/javascript">
-    Ext.onReady(function(){
-        DatePicker = new Ext.DatePicker({
-            allowDomMove : false
-            , cancelText : 'cancelText'
-            , constrainToViewport : true
-//            , dayNames : Array
-            , disableClass : 'x-item-disabled'
-//            , disabledDatesRE : RegExp
-//            , disabledDatesText : String
-//            , disabledDays : Array
-//            , disabledDaysText : String
-            , format : 'y-m-d'
-            , hideMode : 'display'
-//            , maxDate : Date
-//            , maxText : String
-//            , minDate : Date
-//            , minText : String
-//            , monthNames : Array
-            , monthYearText : 'Choose a month (Control+Up/Down to move years)'
-            , nextText : 'Next Month (Control+Right)'
-//            , okText : String
-            , prevText : 'Previous Month (Control+Left)'
-//            , startDay : Number
-            , todayText : 'Сегодня'
-            , todayTip : '{current date} (Spacebar)'
-        });
-        DatePicker.on('select', function (){
-            var selectedDate = new Date(DatePicker.getValue());
-            jspub_click('show_list&flush=1&date='+selectedDate.format('Y-m-d'));
-        });
-        DatePicker.render('datePicker');
+    $(function() {
+        $( "#datePicker" ).datepicker({
+             dateFormat:"yy-mm-dd"
+            ,onSelect:newsDateSelected
+        }
+       );
     });
+    function newsDateSelected(dateText, inst)
+    {
+        jspub_click('show_list&flush=1&date='+dateText);
+    }
 </script>
 <div style="margin: 10;">
     <div id="datePicker"></div>

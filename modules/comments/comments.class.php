@@ -525,7 +525,7 @@ class comments
                 break;
         }
 
-        return ((isset($content))?($content):(null));
+        return (isset($content)?$content:null);
     }
 
     function priv_items_do_action($action, $items)

@@ -2609,12 +2609,14 @@ class kernel
                     else
                         $id_page = '';
                 }
-            } while (!empty($id_page));
+                else
+                    break;
+            }
+            while (!empty($id_page));
             krsort($tmp);
-            $this->waysite_cache = array();
+            //$this->waysite_cache = array();
 
             //Сделаем в качестве ключа id страницы
-            //foreach ($tmp as $key => $val)
             foreach ($tmp as $val)
                 $this->waysite_cache[$val['id']] = $val;
 

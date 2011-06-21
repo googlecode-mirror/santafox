@@ -185,7 +185,7 @@ class install_modules
 	 * Добавляет параметры к созданому методу модуля
 	 *
 	 * @param string $name
-	 * @param object $param
+	 * @param properties_abstact $param
 	 * @access public
 	 * @return void
 	 */
@@ -313,7 +313,7 @@ class install_modules
     /**
      * Добавляет новый параметр модуля
      *
-     * @param object $param Объект одного из "типов propertie_*"
+     * @param properties_abstact $param Объект одного из "типов propertie_*"
 	 * @access public
 	 * @return void
      */
@@ -330,7 +330,7 @@ class install_modules
     }
 
     /**
-     * Возврашает массив параметров модуля для проведения интсляции
+     * Возврашает массив параметров модуля для проведения инсталяции
      *
 	 * @access public
      * @return Array
@@ -343,7 +343,7 @@ class install_modules
     /**
      * Добавляет новый параметр, прописываемый модулем к каждой странице сайта
      *
-     * @param object $param Объект одного из "типов propertie_*"
+     * @param properties_abstact $param Объект одного из "типов propertie_*"
 	 * @access public
 	 * @return void
      */
@@ -368,7 +368,7 @@ class install_modules
 	/**
 	 * Добовляет новое свойтсво к пользовтаелю сайта. Пока поддерживаются свойства только строкового значения
 	 *
-	 * @param object $param Объект типа  propertie_string
+	 * @param properties_abstact $param Объект типа  propertie_string
 	 * @param boolean $multi Если <i>TRUE</i> - то этот параметр будет прописываться каждым экземпляром дочернего модуля, в противном случае только базовым модулем
 	 * @param boolean $admin Если <i>TRUE</i> - то значит доступ к этому парметру пользователя должен иметь только администратор, в противном случае и сам пользователь имеет доступ к этому свойству
 	 * @access public

@@ -10,8 +10,6 @@
 
 class manager_modules
 {
-
-
     /**
      * Содержит массив таблиц, после инсталяции каждого экземпляра модуля
      *
@@ -67,10 +65,8 @@ class manager_modules
         $show->set_tree($tree);
     }
 
-    /**
-        @return string
-        @param
-        @desc Точка входа. Формирует интерфейс для управления и изменения настроек модулей
+    /** Точка входа. Формирует интерфейс для управления и изменения настроек модулей
+    *    @return string
     */
     function start()
     {
@@ -186,10 +182,11 @@ class manager_modules
 	 *
 	 * Возвращается ID вновь созданного дейсвтия
 	 * @param int $id_modul ID метода для действия или ID модуля
-	 * @param array $array_prop Массив со свойствами
-	 * @param array $value Массив со значениями параметров действия, вместо тех что по умолчанию
-	 * @param array $value Массив со значениями параметров действия, вместо тех что по умолчанию
-	 * @return int ID вновь созданного дейсвтия
+	 * @param mixed $array_prop Массив со свойствами
+	 * @param mixed $value Массив со значениями параметров действия, вместо тех что по умолчанию
+	 * @param mixed $type Массив со значениями параметров действия, вместо тех что по умолчанию
+	 * @param string $autoname
+	 * @return integer ID вновь созданного дейсвтия
 	 */
 	function action_create_new($id_modul, $array_prop = false, $value = false, $type = false, $autoname = '')
     {
@@ -202,7 +199,6 @@ class manager_modules
 
         //Создадаим массив с параметрами непосредственно для дейсвтия
         $array_param = array();
-        $str_param = "";
         if (!empty($serialize))
         {
         	foreach ($serialize as $val)
@@ -301,7 +297,8 @@ class manager_modules
     /**
      * Сохраняет отредактированные значения параметров действия
      *
-     * @param int $id_action Идентефикатор действия в таблице mySql
+     * @param integer $id_action Идентификатор действия в таблице
+     * @return string
      */
 	function action_save($id_action = 0)
     {
@@ -323,12 +320,11 @@ class manager_modules
 			//Теперь нужно пройтись массиву параметров, и определить что вставлено - а что нет
 			//и сформировать строку парметров для метода (если метод вообще поддерживает парметры)
 			$array_param = array();
-    		$str_param = "";
     		if (!empty($aproperties))
     		{
 				$pars = new parse_properties();
     			$pars->set_metod();
-    			foreach ($serialize as $key => $val)
+    			foreach ($serialize as $val)
     			{
     				$array_param[$val['name']] = $pars->return_normal_value($aproperties, $val);
     			}
@@ -360,7 +356,7 @@ class manager_modules
 		global $kernel;
 
 		if (empty($del_macros))
-            return false;
+            return;
 
 		//Зачитаем все соответсвия меткам, которорые прописаны у конкретных страниц,
 		//чтобы удалить оттуда ссылки на удаляемые макросы
@@ -420,7 +416,6 @@ class manager_modules
         		$query .= "WHERE id_module = '".$temp[0]."'";
         }
         $kernel->runSQL($query);
-        return true;
     }
     //************************************************************************
 
@@ -457,7 +452,7 @@ class manager_modules
         //Если этого файла не существует, то заканчиваем, так как реинстал
         //значит вызвается из обновления, и этого модуля просто нет
         if (!file_exists('modules/'.$id_modul.'/install.php'))
-            return false;
+            return;
         include_once('modules/'.$id_modul.'/install.php');
 
 
@@ -712,7 +707,8 @@ class manager_modules
     /**
     * Возвращает HTML код для редактирования параметров макроса
     *
-    * @param integer $id_string_metod
+    * @param integer $id_action
+    * @param string $id_metod
     * @return HTML
     */
     function action_edit($id_action, $id_metod = '')
@@ -765,14 +761,15 @@ class manager_modules
 
 
     /**
-    * Регестрация публичных методов модуля
+    * Регистрация публичных методов модуля
     *
-    * Производит регистрацию (в MySql таблице) всех мотодов базового модуля, из которых
+    * Производит регистрацию (в таблице БД) всех методов базового модуля, из которых
     * потом будут строиться действия.
     * Также возвращает список параметров этого модуля.
     * Возможен вызов в режиме инсталяции новых модулей и в режиме
-    * @param string $id Индентефикатор базового модуля
+    * @param string $id Индентификатор базового модуля
     * @param install_modules $install Объект дочернего класса от install_modules, описанный в install.php данного модуля.
+    * @param boolean $reinstall переинсталяция?
     * @return array
     */
 	function set_admin_metods($id, $install, $reinstall = false)
@@ -812,7 +809,7 @@ class manager_modules
 	/**
 	 * Инсталирует новый базовый модуль в системе
 	 *
-	 * @return object
+	 * @return string
 	 */
 	function modules_base_modul_install()
     {
@@ -822,7 +819,7 @@ class manager_modules
         $path = "modules/".$id_modul;
 
         if (empty($id_modul))
-            return false;
+            return '';
 
         //Подключим инсталятор
         $install = new install_modules();
@@ -911,6 +908,7 @@ class manager_modules
 				}
 			}
 		}
+        return '';
     }
 
 
@@ -921,7 +919,7 @@ class manager_modules
     * при инсталяции базового модуля, когда вместе с ним (базовым) указана сразу инсталяция дочерних
     * @param string $id_base ID базового модуля, для которого нужно сделать детей (в автоматич. режиме)
 	* @param string $new_name_id ID языковой переменной (в автоматич. режиме)
-	* @param install_modules $install
+	* @param install_modules|boolean $install
 	* @return string ID вновь созданного дочернего модуля
     */
 	function modules_children_install($id_base = '', $new_name_id = '', $install = false)
@@ -1125,7 +1123,7 @@ class manager_modules
 
     /**
      * Сохраняет отредактированные свойства модуля
-     *
+     * @return string
      */
 	function modules_properties_save()
     {
@@ -1167,7 +1165,6 @@ class manager_modules
                 continue;
             }
         }
-        error_log(var_export($array_form,true));
         $query = 'UPDATE '.$kernel->pub_prefix_get().'_modules
         	      SET serialize = "'.mysql_real_escape_string(serialize($array_form)).'"
                   WHERE (id = "'.$moduleid.'")';
@@ -1177,10 +1174,10 @@ class manager_modules
 
 
     /**
-        @return array
-        @param $id integer
-        @desc Возвращет всю информацию о выбранном модуле
-    **/
+     *  Возвращет всю информацию о выбранном модуле
+     *  @param $id integer
+     *  @return array
+    */
 	function return_info_modules($id)
     {
 		global $kernel;
@@ -1191,7 +1188,7 @@ class manager_modules
 	/**
 	 * Возвращет информацию о выбранном методе в выбранном модуле
 	 *
-	 * @param Int $type_query Определяет тип поиска нужного метода. 0 - по ID строки. 1 - по ID модуля и метода
+	 * @param integer $type_query Определяет тип поиска нужного метода. 0 - по ID строки. 1 - по ID модуля и метода
 	 * @param String $param1 ID строки в таблице или ID модуля
 	 * @param String $param2 ID метода
 	 * @return array
@@ -1212,6 +1209,7 @@ class manager_modules
      * Возвращаеммый массив содержит структуруподчиения. То есть с учётом подчинения модулей
      *
      * @param String $id ID конкретного модуля, если необходимо
+     * @return array
      */
     function get_access($id = '')
     {
@@ -1244,9 +1242,9 @@ class manager_modules
 
 
     /**
-    @return array
-    @param $id_modul
-    @desc Возвращет информацию о выбранном макроcе
+    * Возвращет информацию о выбранном макроcе
+    * @param integer $id
+    * @return array
     **/
 	function action_info_get($id)
     {
@@ -1257,24 +1255,17 @@ class manager_modules
 
     /**
     * Подготоавливает информацию для построения дерева модулей
-    *
+    * @param string $id_modul
     * @return array
-    * @access private
     */
     function modules_structure_get($id_modul)
     {
-    	global $kernel;
-
         $out = array();
         $array_modul = $this->return_modules($id_modul, true);
         if (count($array_modul)>0)
         {
         	foreach ($array_modul as $key => $val)
             {
-                //$fol = false;
-                //if ($id_modul)
-                //    $fol =true;
-
                 $out[] = array('data'     => htmlentities($val['caption'], ENT_QUOTES, 'UTF-8'),
                                //'id'       => $key,
                                 'attr'=>array("id"=>$key),
@@ -1283,9 +1274,7 @@ class manager_modules
                              );
             }
         }
-
         return $out;
-
     }
 
     function modules_structure_all_get($expanded = false)
@@ -1350,8 +1339,8 @@ class manager_modules
     /**
      * Формирует интерфейс для настройки параметров модуля
      *
-     * Выводит на экран страницу для редакатирования настроек модуля. Причем для базового модуля
-     * нам не нужны дейсвтия
+     * Выводит на экран страницу для редактирования настроек модуля. Причем для базового модуля
+     * нам не нужны действия
      * @return HTML
      */
     function show_properties_module()
@@ -1366,7 +1355,7 @@ class manager_modules
 		$html = $kernel->priv_check_access_for_content("%writeable%", $html);
 
 		//Сначала построим название модуля во всех языках
-        $id_name = substr($curent_modules['full_name'],2,-2);
+        $id_name = mb_substr($curent_modules['full_name'],2,-2);
 		$array_text = $kernel->priv_textlabel_values_get($id_name);
 
 		$arr = array();
@@ -1385,7 +1374,7 @@ class manager_modules
         $html = str_replace('%id_modul%', $kernel->pub_module_id_get(), $html);
 
         // ============================================================
-        //Теперь совойства модуля, c учётом наследования
+        //Теперь свойства модуля c учётом наследования
     	$serialize = array();
     	if (isset($curent_modules['properties']))
     		$serialize = unserialize($curent_modules['properties']);
@@ -1446,9 +1435,9 @@ class manager_modules
 
     //************************************************************************
     /**
-    @return HTML
-    @param $id_modul string
-    @desc Возвращает массив имеющихся макросов.
+    * @return HTML
+    * @param $id_modul string
+    * @desc Возвращает массив имеющихся макросов.
     **/
     //************************************************************************
 	function list_array_macros($id_modul)
@@ -1476,17 +1465,15 @@ class manager_modules
 
 
     /**
-    * Формирует HTML код со сиском существующих действий заданного модуля
+    * Формирует HTML код со списком существующих действий заданного модуля
     *
     * Сформированый код добавляется в форму со свойствами модуля
     * @param  string $id_modul ID модуля, чьи действия нужно вывести
-    * @param  HTML $template HTML шаблон одно строки действия
+    * @param  array $template HTML шаблон одно строки действия
     * @return HTML
     **/
 	function action_exist_get($id_modul, $template)
 	{
-		global $kernel;
-
         $actions = $this->list_array_macros($id_modul);
         if (empty($actions))
         	return '';
@@ -1496,7 +1483,7 @@ class manager_modules
         $array_metod = $this->return_metods_module($curent_modul['parent_id']);
 
         $html_str = '';
-        foreach ($actions  as $key => $val)
+        foreach ($actions  as $val)
         {
             $tmp = $template['str_action'];
             $tmp = str_replace("%name%",        $val['caption'],                $tmp);
@@ -1512,10 +1499,10 @@ class manager_modules
 	}
 
     /**
-        @return array
-        @param string $id_modul
-        @param Boolean $ret_id
-        @desc Возвращает массив методов заданного модуля.
+    *    @return array
+    *    @param string $id_modul
+    *    @param Boolean $ret_id
+    *    @desc Возвращает массив методов заданного модуля.
     **/
     function return_metods_module($id_modul, $ret_id = false)
     {
@@ -1541,7 +1528,7 @@ class manager_modules
     * Если параметр не задан, то возвращаются все подключённые модули,
     * при этом, если $only_base задан в true  - то будут возвращены только
     * базовые модули
-    * @param String $id_modul ID базвого модуля, для которого нужно выбрать дочерние
+    * @param string $id_modul ID базвого модуля, для которого нужно выбрать дочерние
     * @param boolean $only_base Признак того, что когда не задан ID, необходимо получить только базовые модули
     * @return array
 	*
@@ -1583,11 +1570,10 @@ class manager_modules
     }
 
     /**
-     * Возвращет массив, готовых HTML строк для каждого дочернего модуля, в которых
+     * Возвращет массив готовых HTML строк для каждого дочернего модуля, в которых
        создан код свойств страницы
      *
-     * @param Boolean $nasled
-     * @param Array $curent_properties
+     * @param Boolean $page_is_main
      * @return Array
      */
     function return_page_properties_all_modules($page_is_main)
@@ -1627,9 +1613,8 @@ class manager_modules
     }
 
     /**
-        @return array
-        @param $nasled = Boolean
-        @desc Возвращет массив, всех возможных свойств страницы, которые прописал каждый модуль
+    *    @return array
+    *    @desc Возвращет массив, всех возможных свойств страницы, которые прописал каждый модуль
     */
     function return_all_properties_page_all_modules()
     {
@@ -1655,9 +1640,9 @@ class manager_modules
 
     /**
      * Запоминает таблицы, имеющиеся в базе mySql на момент вызова
-     *
+     * @param boolean $update
      * @access private
-     * @return void
+     * @return array
      */
     function mysqltable_create_list($update = true)
     {
@@ -1684,7 +1669,6 @@ class manager_modules
      * Определяет какие таблицы создал модуль
      *
      * Работает только в процессе инсталяции
-     * @param string $id_modul Указывается ID модуля, для которого нужно узнать значение
      * @access private
      * @return array
      */
@@ -1693,7 +1677,6 @@ class manager_modules
         $tmp = $this->mysqltable_create_list(false);
         foreach ($this->mysqltable_compare as $id_table)
             unset($tmp[$id_table]);
-
         return $tmp;
     }
 
@@ -1835,7 +1818,6 @@ class manager_modules
     function priv_modules_admin_interface_count()
     {
         global $kernel;
-
     	$query = "SELECT * FROM ".$kernel->pub_prefix_get()."_modules
                   WHERE
                   (parent_id is NULL)
@@ -1852,6 +1834,5 @@ class manager_modules
         }
 		return $menus;
     }
-
 }
 ?>

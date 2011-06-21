@@ -199,10 +199,9 @@ class manager_interface
                     $html = 'Раздел помощи отсутствует<font color="#000000"> Файл помощи: '.$str_file.'</font>';
                 break;
 
-            //Выход из админи интерфейса
+            //Выход из админки интерфейса
             case 'exit':
                 $this->exit_backofice();
-                die;
                 break;
 
             case 'select_page':

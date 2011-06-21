@@ -4,8 +4,8 @@
  * Класс предназанчен для обработки классов вида properties_*
  *
  * @name parse_properties
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2011
+ * @version 2.0
  */
 class parse_properties
 {
@@ -14,7 +14,7 @@ class parse_properties
 	                                //к какому модулю относиться то, или иное свойство.
 	private $curent_metod;			//id метода, если свойства парсяться для метода модуля, или для страницы сайта
 	private $curent_page;			//id страницы сайта, чьи свойства будем выводить
-	private $for_page = false;		//Признак того, что свойства парсяться для страницы сайта
+	private $for_page = false;		//Признак того, что свойства парсятся для страницы сайта
 
 	private $nasledovanie = false;  //Признак того, что наследование должно быть включено
 
@@ -32,10 +32,9 @@ class parse_properties
 	}
 
 
-    /**
-    @return
-    @param $id_modul String, $parent String
-    @desc Устанавливает модуль, чьи парметры будем вытаскивать
+    /** Устанавливает модуль, чьи парметры будем вытаскивать
+    * @param string $id_modul
+    * @param string $parent
     **/
 	function set_modul($id_modul, $parent = "")
 	{
@@ -60,23 +59,20 @@ class parse_properties
 
 
     /**
-    @return
-    @param $id_metod String
-    @desc Устанавливает metod, чьи парметры будем вытаскивать
-    **/
+     * Устанавливает metod, чьи параметры будем вытаскивать
+     * @param String $id_metod
+     */
 	function set_metod($id_metod = "")
 	{
 		$this->curent_metod = $id_metod;
 		$this->nasledovanie = false;
-
 	}
 
-	//******************************************************************************************
-	//
 	/**
 	 * Устанавливает признак того, что парситься страница
 	 *
-	 * @param String $id_page Индентефикатор страницы, чьи свойства надо взять
+	 * @param string $id_page Идентификатор страницы, чьи свойства надо взять
+	 * @param boolean $page_main
 	 */
 	function set_page($id_page, $page_main = false)
 	{
@@ -85,12 +81,10 @@ class parse_properties
 		$this->nasledovanie = !$page_main;
 	}
 
-	//*****************************************************************************************************************
     /**
-    @return
-    @param $value array
-    @desc Устанавливает массив значений для метода get_default, в случае если работа идет с макросом
-    **/
+    * Устанавливает массив значений для метода get_default, в случае если работа идет с макросом
+    * @param array $value
+    */
 	function set_value_default($value)
 	{
 		if (is_array($value))
@@ -110,17 +104,10 @@ class parse_properties
 	{
 		global $kernel;
 
-		if ((!empty($this->curent_mudul)) && (!$this->for_page))
-		{
-			//Параметры модуля
+		if ((!empty($this->curent_mudul)) && (!$this->for_page))//Параметры модуля
 			$ret_array = $kernel->pub_modul_properties_get($name, $this->curent_mudul,true);
-			//$kernel->debug($ret_array);
-		}
-		elseif ($this->for_page)
-		{
-			//Параметры страницы (которые добавляет модуль
+		elseif ($this->for_page)//Параметры страницы, которые добавляет модуль
 			$ret_array = $kernel->pub_page_property_get($this->curent_page, $name, true);
-		}
 		else
 		{
 			//Параметры макроса
@@ -152,12 +139,12 @@ class parse_properties
 	/**
 	 * Определяет что нужно вызвать, в зависимости от типа парметра указанного свойсвта
 	 *
-	 * @param Array $in
+	 * @param array $in
 	 * @return HTML
 	 */
 	function create_html($in)
 	{
-//		$html = "";
+        $html='';
 		if (is_array($in))
 		{
 			if ($this->for_page)
@@ -404,13 +391,11 @@ class parse_properties
 	 * Возвращаемый массив содержит два значения. В первом объекты JavaSrcipt, для
 	 * создания объекта. Во втором кусок для объекта формы, создающий колонки и сами
 	 * элементы управления
-	 * @param Array $
-	 * @return JavaScript
+	 * @param array $array
+	 * @return array
 	 */
 	function html_select($array)
 	{
-		global $kernel;
-
 		// Узнаем текущие значения свойства
 		$value_default = $this->get_default($array['name']);
 		$naslednoe = ((isset($value_default['naslednoe'])) && $value_default['naslednoe']);
@@ -497,12 +482,10 @@ class parse_properties
 	 * создания объекта. Во втором кусок для объекта формы, создающий колонки и сами
 	 * элементы управления
 	 * @param Array $array
-	 * @return JavaScript
+	 * @return array
 	 */
 	function html_file($array)
 	{
-		global $kernel;
-
 		// Узнаем текущие значения свойства
 		$value_default = $this->get_default($array['name']);
 		$naslednoe = ((isset($value_default['naslednoe'])) && $value_default['naslednoe']);
@@ -571,8 +554,8 @@ class parse_properties
 	/**
 	 * Создает HTML код для свойства типа "check" (галочка)
 	 *
-	 * @param Array $in
-	 * @return HTML
+	 * @param Array $array
+	 * @return array
 	 */
 	function html_check($array)
 	{
@@ -607,8 +590,8 @@ class parse_properties
 	/**
 	 * Создает HTML код для свойства строка обыконовенная
 	 *
-	 * @param Array $in
-	 * @return HTML
+	 * @param Array $array
+	 * @return array
 	 */
 	function html_text($array)
 	{
@@ -633,8 +616,8 @@ class parse_properties
 	/**
 	 * Создает HTML код для свойства типа "дата" (поле с кнопкой выбора через календарь)
 	 *
-	 * @param Array $in
-	 * @return HTML
+	 * @param Array $array
+	 * @return array
 	 */
 	function html_data($array)
 	{
@@ -659,8 +642,8 @@ class parse_properties
     /**
      * Создает HTML код для свойства типа textarea
      *
-     * @param Array $in
-     * @return HTML
+     * @param array $array
+     * @return array
      */
     function html_textarea($array)
     {
@@ -684,8 +667,8 @@ class parse_properties
 	/**
 	 * Создает HTML код для свойства типа "страницы" (поле с кнопкой выбора через структуру сайта)
 	 *
-	 * @param Array $in
-	 * @return HTML
+	 * @param Array $array
+	 * @return array
 	 */
 	function html_page($array)
 	{
@@ -708,10 +691,9 @@ class parse_properties
 
 	/**
 	 * Возвращет HTML код для пострения структуры сайта
-	 *
-	 *Использыется в свойстве для выбора страницы сайта
+	 * Используется в свойстве для выбора страницы сайта
+     * @return string
 	 */
-
     function get_structure()
     {
         global $kernel;
@@ -755,18 +737,10 @@ class parse_properties
     }
 }
 
-
-
 /**
- * Создает свойтсва типа "файл"
- *
- * Формируется поле для возможности выбора одного из файла, находящегося в заданном каталоге
- * @name properties_file
- * @package  PublicFunction
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ *  Абстрактный класс свойства, от которого наследуются все остальные
  */
-class properties_file
+abstract class properties_abstact
 {
 
     /**
@@ -775,7 +749,7 @@ class properties_file
      * @var string
      * @access private
      */
-    private $id			= '';		// Уникальное название параметра (желательно без подчеркивания)
+    protected  $id = '';		// Уникальное название параметра (желательно без подчеркивания)
 
 	/**
 	 * Заголовок свойства
@@ -783,7 +757,7 @@ class properties_file
 	 * @var string
 	 * @access private
 	 */
-	private $caption	= '';		// Название параметра
+	protected $caption = '';		// Название параметра
 
 
 	/**
@@ -792,7 +766,7 @@ class properties_file
 	 * @var string
 	 * @access private
 	 */
-	private $description = '';
+	protected $description = '';
 
 
 	/**
@@ -802,8 +776,7 @@ class properties_file
 	 * @var string
 	 * @access private
 	 */
-	private $description_user_func = array();
-
+	protected $description_user_func = array();
 
 	/**
 	 * Тип
@@ -811,23 +784,8 @@ class properties_file
 	 * @var string
 	 * @access private
 	 */
-	private $type		= 'file';
+	protected  $type;
 
-	/**
-	 * Путь к папке с файлами
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $patch		= '/';		// путь от корня сайта, где брать файлы
-
-	/**
-	 * Маска обрабатываемых файлов
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $mask		= ''; 		// Маска допустимых файлов (расширений),
 
 	/**
 	 * Значение по умолчанию
@@ -835,15 +793,8 @@ class properties_file
 	 * @var string
 	 * @access private
 	 */
-	private $default	= '';
+	protected $default	= '';
 
-
-	/**
-	 * Прихнак того что указанный файл является шаблоном
-	 *
-	 * @var boolean
-	 */
-	//private $this_template = false;
 
 	/**
 	 * Устанваливает значение свойства по умолчанию
@@ -870,6 +821,7 @@ class properties_file
 		$this->id = $id;
 	}
 
+
 	/**
 	 * Устанавливает название свойства
 	 *
@@ -887,7 +839,7 @@ class properties_file
 	/**
 	 * Устанавливает описание свойства
 	 *
-	 * @param string $caption
+	 * @param string $description
 	 * @access public
 	 * @return void
 	 */
@@ -896,22 +848,72 @@ class properties_file
 		$this->description = $description;
 	}
 
-	/**
-	 * Устанавливает название функции (метода класса), которая вернёт
-	 * описание свойства через call_user_func
-	 *
-	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
-	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
-	 * @access public
-	 * @return void
-	 */
+
+    /**
+     * Устанавливает название функции (метода класса), которая вернёт
+     * описание свойства через call_user_func
+     * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
+     * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
+     * @param bool $param параметр (необязательно) для вызова функции
+     * @access public
+     * @return void
+     */
 	public function set_description_user_func($filepath, $name, $param=false)
 	{
 		$this->description_user_func = array('filepath'=>$filepath, 'name'=>$name, 'param'=>$param);
 	}
 
+	/**
+	 * Возвращает значения свойства в виде массива
+	 *
+	 * @return array
+	 */
+	public function get_array()
+	{
+		$param = array();
+		$param["name"]		= $this->id;
+		$param["caption"]	= $this->caption;
+		$param["type"]		= $this->type;
+		$param["default"]	= $this->default;
+        $param['description']           = $this->description;
+        $param['description_user_func'] = $this->description_user_func;
+		return $param;
+	}
+    //public abstract function create_html();
+}
 
+/**
+ * Создает свойтсва типа "файл"
+ *
+ * Формируется поле для возможности выбора одного из файла, находящегося в заданном каталоге
+ * @name properties_file
+ * @copyright ArtProm (с) 2001-2011
+ * @version 2.0
+ */
+class properties_file extends properties_abstact
+{
+
+	/**
+	 * Путь к папке с файлами
+	 *
+	 * @var string
+	 * @access private
+	 */
+	private $patch		= '/';		// путь от корня сайта, где брать файлы
+
+	/**
+	 * Маска обрабатываемых файлов
+	 *
+	 * @var string
+	 * @access private
+	 */
+	private $mask		= ''; 		// Маска допустимых файлов (расширений),
+
+
+    function __construct()
+    {
+        $this->type='file';
+    }
 	/**
 	 * Устанавливает путь к файлам
 	 *
@@ -949,76 +951,26 @@ class properties_file
 	 */
 	public function get_array()
 	{
-		$param = array();
-		$param["name"]		= $this->id;
-		$param["caption"]	= $this->caption;
-		$param["type"]		= $this->type;
+        $param = parent::get_array();
 		$param["patch"]		= $this->patch;
 		$param["mask"]		= $this->mask;
-		$param["default"]	= $this->default;
-        $param['description']           = $this->description;
-        $param['description_user_func'] = $this->description_user_func;
 		return $param;
 	}
 
 }
 
 /**
- * Создает свойтсва типа "список значений"
+ * Создает свойство типа "список значений"
  *
  * Формируется поле для выбора одного из значений, когда
  * значения выбирается из выпадающего списка
  * @name properties_select
- * @package  PublicFunction
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2011
+ * @version 2.0
  */
 
-class properties_select
+class properties_select extends properties_abstact
 {
-    /**
-     * Уникальное ID свойства (желательно без подчеркивания).
-     *
-     * @var string
-     * @access private
-     */
-    private $id			= '';
-
-	/**
-	 * Заголовок свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $caption	= '';
-
-
-	/**
-	 * Описание свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description = '';
-
-
-	/**
-	 * Название функции (метода класса), которая вернёт
-	 * Описание свойства через call_user_func
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description_user_func = array();
-
-
-	/**
-	 * Тип
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $type		= 'select';
 
 	/**
 	 * Массив выбираемых значений
@@ -1039,82 +991,10 @@ class properties_select
 	 */
 	private $data_user_func		= array();
 
-	/**
-	 * Значение по умолчанию
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $default	= '';
-
-
-	/**
-	 * Устанваливает значение свойства по умолчанию
-	 *
-	 * @param string $value
-	 * @access public
-	 * @return void
-	 */
-	function set_default($value)
-	{
-		$this->default = trim($value);
-	}
-
-
-	/**
-	 * Устанавливает id свойства
-	 *
-	 * Через это ID в дальнейшем будет идти обращение к значению данного свойства
-	 * @param string $id
-     * @access public
-	 * @return void
-	 */
-	function set_id($id)
-	{
-		$this->id = $id;
-	}
-
-	/**
-	 * Устанавливает название свойства
-	 *
-	 * По этому навзванию администратор или пользователь сайта
-	 * будет определять назанчение даннного свойства
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_caption($caption)
-	{
-		$this->caption = $caption;
-	}
-
-	/**
-	 * Устанавливает описание свойства
-	 *
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_description($description)
-	{
-		$this->description = $description;
-	}
-
-	/**
-	 * Устанавливает название функции (метода класса), которая вернёт
-	 * описание свойства через call_user_func
-	 *
-	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
-	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
-	 * @access public
-	 * @return void
-	 */
-	function set_description_user_func($filepath, $name, $param=false)
-	{
-		$this->description_user_func = array('filepath'=>$filepath, 'name'=>$name, 'param'=>$param);
-	}
-
+    function __construct()
+    {
+        $this->type='select';
+    }
 
 	/**
 	 * Устанавливает название функции (метода класса), которая вернёт
@@ -1122,7 +1002,7 @@ class properties_select
 	 *
 	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
 	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
+	 * @param mixed $param параметр (необязательно) для вызова функции
 	 * @access public
 	 * @return void
 	 */
@@ -1152,14 +1032,8 @@ class properties_select
 	 */
 	function get_array()
 	{
-		$param = array();
-		$param["name"]		= $this->id;
-		$param["caption"]	= $this->caption;
-		$param["type"]		= $this->type;
+        $param = parent::get_array();
 		$param["data"]		= $this->data;
-		$param["default"]	= $this->default;
-        $param['description']           = $this->description;
-        $param['description_user_func'] = $this->description_user_func;
         $param['data_user_func'] = $this->data_user_func;
 		return $param;
 	}
@@ -1167,361 +1041,54 @@ class properties_select
 
 
 /**
- * Создает свойтсва типа "галочка"
+ * Создает свойство типа "галочка"
  *
  * Формируется поле для возможности поставить "галочку".
  * @name properties_checkbox
- * @package  PublicFunction
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2011
+ * @version 2.0
  */
 
-class properties_checkbox
+class properties_checkbox extends properties_abstact
 {
 
-    /**
-     * Уникальное ID свойства (желательно без подчеркивания).
-     *
-     * @var string
-     * @access private
-     */
-	private $id			= '';
+    function __construct()
+    {
+        $this->type='check';
+    }
 
-	/**
-	 * Заголовок свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $caption	= '';
-
-	/**
-	 * Описание свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description = '';
-
-
-	/**
-	 * Название функции (метода класса), которая вернёт
-	 * Описание свойства через call_user_func
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description_user_func = array();
-
-
-	/**
-	 * Тип
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $type		= 'check';
-
-	/**
-	 * Значение по умолчанию
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $default	= '';
-
-
-	/**
-	 * Устанваливает значение свойства по умолчанию
-	 *
-	 * @param string $value
-	 * @access public
-	 * @return void
-	 */
-	function set_default($value)
-	{
-		$this->default = trim($value);
-	}
-
-	/**
-	 * Устанавливает id свойства
-	 *
-	 * Через это ID в дальнейшем будет идти обращение к значению данного свойства
-	 * @param string $id
-     * @access public
-	 * @return void
-	 */
-	function set_id($id)
-	{
-		$this->id = $id;
-	}
-
-	/**
-	 * Устанавливает название свойства
-	 *
-	 * По этому навзванию администратор или пользователь сайта
-	 * будет определять назанчение даннного свойства
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_caption($caption)
-	{
-		$this->caption = $caption;
-	}
-
-	/**
-	 * Устанавливает описание свойства
-	 *
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_description($description)
-	{
-		$this->description = $description;
-	}
-
-	/**
-	 * Устанавливает название функции (метода класса), которая вернёт
-	 * описание свойства через call_user_func
-	 *
-	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
-	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
-	 * @access public
-	 * @return void
-	 */
-	function set_description_user_func($filepath, $name, $param=false)
-	{
-		$this->description_user_func = array('filepath'=>$filepath, 'name'=>$name, 'param'=>$param);
-	}
-
-
-	/**
-	 * Возвращает значения свойства в виде массива
-	 *
-	 * @access private
-	 * @return array
-	 */
-	function get_array()
-	{
-		$param = array();
-		$param["name"]		= $this->id;
-		$param["caption"]	= $this->caption;
-		$param["type"]		= $this->type;
-		$param["default"]	= $this->default;
-        $param['description']           = $this->description;
-        $param['description_user_func'] = $this->description_user_func;
-		return $param;
-	}
 }
 
 /**
- * Создает свойтсва типа "страница сайта"
+ * Создает свойство типа "страница сайта"
  *
  * Формируется поле для возможности выбора страницы сайта
  * находящейся в структуре сайта
  * @name properties_pagesite
- * @package  PublicFunction
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2011
+ * @version 2.0
  */
 
-class properties_pagesite
+class properties_pagesite extends properties_abstact
 {
 
-    /**
-     * Уникальное ID свойства (желательно без подчеркивания).
-     *
-     * @var string
-     * @access private
-     */
-    private $id			= '';		// Уникальное название параметра (желательно без подчеркивания)
-
-	/**
-	 * Заголовок свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $caption	= '';		// Название параметра
-
-	/**
-	 * Описание свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description = '';
-
-
-	/**
-	 * Название функции (метода класса), которая вернёт
-	 * Описание свойства через call_user_func
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description_user_func = array();
-
-
-	/**
-	 * Тип
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $type		= 'page';
-
-	/**
-	 * Значение по умолчанию
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $default	= '';
-
-
-	/**
-	 * Устанваливает значение свойства по умолчанию
-	 *
-	 * @param string $value
-	 * @access public
-	 * @return void
-	 */
-	function set_default($value)
-	{
-		$this->default = trim($value);
-	}
-
-	/**
-	 * Устанавливает id свойства
-	 *
-	 * Через это ID в дальнейшем будет идти обращение к значению данного свойства
-	 * @param string $id
-     * @access public
-	 * @return void
-	 */
-	function set_id($id)
-	{
-		$this->id = $id;
-	}
-
-	/**
-	 * Устанавливает название свойства
-	 *
-	 * По этому навзванию администратор или пользователь сайта
-	 * будет определять назанчение даннного свойства
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_caption($caption)
-	{
-		$this->caption = $caption;
-	}
-
-	/**
-	 * Устанавливает описание свойства
-	 *
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_description($description)
-	{
-		$this->description = $description;
-	}
-
-	/**
-	 * Устанавливает название функции (метода класса), которая вернёт
-	 * описание свойства через call_user_func
-	 *
-	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
-	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
-	 * @access public
-	 * @return void
-	 */
-	function set_description_user_func($filepath, $name, $param=false)
-	{
-		$this->description_user_func = array('filepath'=>$filepath, 'name'=>$name, 'param'=>$param);
-	}
-
-
-	/**
-	 * Возвращает значения свойства в виде массива
-	 *
-	 * @access private
-	 * @return array
-	 */
-	function get_array()
-	{
-		$param = array();
-		$param["name"]		= $this->id;
-		$param["caption"]	= $this->caption;
-		$param["type"]		= $this->type;
-		$param["default"]	= $this->default;
-        $param['description']           = $this->description;
-        $param['description_user_func'] = $this->description_user_func;
-		return $param;
-	}
+    function __construct()
+    {
+        $this->type='page';
+    }
 }
 
-class properties_string
+
+/**
+ * Создает свойство типа "строка"
+ *
+ * @name properties_string
+ * @copyright ArtProm (с) 2001-2011
+ * @version 2.0
+ */
+class properties_string extends properties_abstact
 {
 
-    /**
-     * Уникальное ID свойства (желательно без подчеркивания).
-     *
-     * @var string
-     * @access private
-     */
-    private $id			= '';		// Уникальное название параметра (желательно без подчеркивания)
-
-	/**
-	 * Заголовок свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $caption	= '';
-
-
-	/**
-	 * Описание свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description = '';
-
-
-	/**
-	 * Название функции (метода класса), которая вернёт
-	 * Описание свойства через call_user_func
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description_user_func = array();
-
-	/**
-	 * Тип
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $type		= 'text';
-
-	/**
-	 * Значение по умолчанию
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $default	= '';
 
 	/**
 	 * Максимальная длинна вводимой строки
@@ -1539,71 +1106,11 @@ class properties_string
 	 */
 	private $size	    = 5;
 
-	/**
-	 * Устанваливает значение по умолчанию
-	 *
-	 * @param string $value
-	 */
-	function set_default($value)
-	{
-		$this->default = trim($value);
-	}
 
-	/**
-	 * Устанавливает id свойства
-	 *
-	 * Через это ID в дальнейшем будет идти обращение к значению данного свойства
-	 * @param string $id
-     * @access public
-	 * @return void
-	 */
-	function set_id($id)
-	{
-		$this->id = $id;
-	}
-
-	/**
-	 * Устанавливает название свойства
-	 *
-	 * По этому навзванию администратор или пользователь сайта
-	 * будет определять назанчение даннного свойства
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_caption($caption)
-	{
-		$this->caption = $caption;
-	}
-
-	/**
-	 * Устанавливает описание свойства
-	 *
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_description($description)
-	{
-		$this->description = $description;
-	}
-
-	/**
-	 * Устанавливает название функции (метода класса), которая вернёт
-	 * описание свойства через call_user_func
-	 *
-	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
-	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
-	 * @access public
-	 * @return void
-	 */
-	function set_description_user_func($filepath, $name, $param=false)
-	{
-		$this->description_user_func = array('filepath'=>$filepath, 'name'=>$name, 'param'=>$param);
-	}
-
-
+    function __construct()
+    {
+        $this->type='text';
+    }
 
 	/**
 	 * Возвращает значения свойства в виде массива
@@ -1613,306 +1120,53 @@ class properties_string
 	 */
 	function get_array()
 	{
-		$param = array();
-		$param["name"]		            = $this->id;
-		$param["caption"]	            = $this->caption;
-		$param["type"]		            = $this->type;
-		$param["default"]	            = $this->default;
-		$param["max"]	                = $this->max;
-        $param['description']           = $this->description;
-        $param['description_user_func'] = $this->description_user_func;
+        $param = parent::get_array();
+        $param["max"] = $this->max;
         if ($this->size > mb_strlen($param["default"]))
             $size = $this->size;
         else
             $size = mb_strlen($param["default"]);
-
 		$param["size"]	    = $size;
 		return $param;
 	}
 }
 
 /**
- * Создает свойтсва типа "дата"
+ * Создает свойство типа "дата"
  *
  * Формируется поле для возможности указания даты. Значение даты может быть введено как
  * в ручную, так и через форму каллендаря.
  * @name properties_date
- * @package  PublicFunction
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2011
+ * @version 2.0
  */
 
-class properties_date
+class properties_date extends properties_abstact
 {
-    /**
-     * Уникальное ID свойства (желательно без подчеркивания).
-     *
-     * @var string
-     * @access private
-     */
-	private $id			= '';
 
-	/**
-	 * Заголовок свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $caption	= '';
+    function __construct()
+    {
+        $this->type='data';
+    }
 
-	/**
-	 * Описание свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description = '';
-
-
-	/**
-	 * Название функции (метода класса), которая вернёт
-	 * Описание свойства через call_user_func
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description_user_func = array();
-
-
-	/**
-	 * Тип
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $type		= 'data';
-
-	/**
-	 * Значение по умолчанию
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $default	= '';
-
-
-	/**
-	 * Устанваливает значение свойства по умолчанию
-	 *
-	 * @param string $value
-	 * @access public
-	 * @return void
-	 */
-	function set_default($value)
-	{
-		$this->default = trim($value);
-	}
-
-	/**
-	 * Устанавливает id свойства
-	 *
-	 * Через это ID в дальнейшем будет идти обращение к значению данного свойства
-	 * @param string $id
-     * @access public
-	 * @return void
-	 */
-	function set_id($id)
-	{
-		$this->id = $id;
-	}
-
-	/**
-	 * Устанавливает название свойства
-	 *
-	 * По этому навзванию администратор или пользователь сайта
-	 * будет определять назанчение даннного свойства
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_caption($caption)
-	{
-		$this->caption = $caption;
-	}
-
-	/**
-	 * Устанавливает описание свойства
-	 *
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_description($description)
-	{
-		$this->description = $description;
-	}
-
-	/**
-	 * Устанавливает название функции (метода класса), которая вернёт
-	 * описание свойства через call_user_func
-	 *
-	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
-	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
-	 * @access public
-	 * @return void
-	 */
-	function set_description_user_func($filepath, $name, $param=false)
-	{
-		$this->description_user_func = array('filepath'=>$filepath, 'name'=>$name, 'param'=>$param);
-	}
-
-
-	/**
-	 * Возвращает значения свойства в виде массива
-	 *
-	 * @access private
-	 * @return array
-	 */
-	function get_array()
-	{
-		$param = array();
-		$param["name"]		= $this->id;
-		$param["caption"]	= $this->caption;
-		$param["type"]		= $this->type;
-		$param["default"]	= $this->default;
-        $param['description']           = $this->description;
-        $param['description_user_func'] = $this->description_user_func;
-		return $param;
-	}
 }
 
 
 
-class properties_textarea
+class properties_textarea extends properties_abstact
 {
-
-    /**
-     * Уникальное ID свойства (желательно без подчеркивания).
-     *
-     * @var string
-     * @access private
-     */
-    private $id			= '';		// Уникальное название параметра (желательно без подчеркивания)
-
 	/**
-	 * Заголовок свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $caption	= '';
-
-
-	/**
-	 * Описание свойства
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description = '';
-
-
-	/**
-	 * Название функции (метода класса), которая вернёт
-	 * Описание свойства через call_user_func
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $description_user_func = array();
-
-	/**
-	 * Тип
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $type		= 'textarea';
-
-	/**
-	 * Значение по умолчанию
-	 *
-	 * @var string
-	 * @access private
-	 */
-	private $default	= '';
-
-	/**
-	 * Максимальная длинна вводимой строки
+	 * Максимальная длина вводимой строки
 	 *
 	 * @var int
 	 * @access private
 	 */
 	private $max	    = '5000';
 
-
-	/**
-	 * Устанваливает значение по умолчанию
-	 *
-	 * @param string $value
-	 */
-	function set_default($value)
-	{
-		$this->default = trim($value);
-	}
-
-	/**
-	 * Устанавливает id свойства
-	 *
-	 * Через это ID в дальнейшем будет идти обращение к значению данного свойства
-	 * @param string $id
-     * @access public
-	 * @return void
-	 */
-	function set_id($id)
-	{
-		$this->id = $id;
-	}
-
-	/**
-	 * Устанавливает название свойства
-	 *
-	 * По этому навзванию администратор или пользователь сайта
-	 * будет определять назанчение даннного свойства
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_caption($caption)
-	{
-		$this->caption = $caption;
-	}
-
-	/**
-	 * Устанавливает описание свойства
-	 *
-	 * @param string $caption
-	 * @access public
-	 * @return void
-	 */
-	function set_description($description)
-	{
-		$this->description = $description;
-	}
-
-	/**
-	 * Устанавливает название функции (метода класса), которая вернёт
-	 * описание свойства через call_user_func
-	 *
-	 * @param string $filepath имя файла (с путём от корня) где объявлена функция или метод
-	 * @param mixed $name имя функции (строка) или массив ('имя_класса', 'имя_метода')
-	 * @param $param параметр (необязательно) для вызова функции
-	 * @access public
-	 * @return void
-	 */
-	function set_description_user_func($filepath, $name, $param=false)
-	{
-		$this->description_user_func = array('filepath'=>$filepath, 'name'=>$name, 'param'=>$param);
-	}
-
-
-
+    function __construct()
+    {
+        $this->type='textarea';
+    }
 	/**
 	 * Возвращает значения свойства в виде массива
 	 *
@@ -1921,14 +1175,8 @@ class properties_textarea
 	 */
 	function get_array()
 	{
-		$param = array();
-		$param["name"]		            = $this->id;
-		$param["caption"]	            = $this->caption;
-		$param["type"]		            = $this->type;
-		$param["default"]	            = $this->default;
-		$param["max"]	                = $this->max;
-        $param['description']           = $this->description;
-        $param['description_user_func'] = $this->description_user_func;
+        $param = parent::get_array();
+		$param["max"] = $this->max;
 		return $param;
 	}
 }

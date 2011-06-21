@@ -48,7 +48,7 @@ function jspub_confirm(dialog_action, dialog_message)
     $("#popup_msg_div").html('<p>'+dialog_message+'</p>');
     $("#popup_msg_div").dialog({
         resizable: false,
-        height:140,
+        height:180,
         modal: true,
         buttons: {
             "Yes": function() {
@@ -186,7 +186,7 @@ function jspub_form_submit(formID, url)
         }
         catch (e)
         {
-            santaShowPopupHint('Error', 'Form not submitted');
+            santaShowPopupHint('Error', 'Form not submitted:'+e,3000);
         }
 
 

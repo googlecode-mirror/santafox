@@ -3,10 +3,10 @@
 /**
  * Модуль "Обратная Связь"
  *
- * @author Александр Ильин mecommayou@gmail.com
- * @copyright ООО "АртПром" 2008©
+ * @author Александр Ильин mecommayou@gmail.com , s@nchez
+ * @copyright ООО "АртПром" 2011
  * @name feedback
- * @version 1.0 beta
+ * @version 2.0
  *
  * Модуль  обратной  связи.  Отбражает форму обратной связи (@form) и
  * осуществляет формирование и отпрвку письма менеджеру. Доступно два
@@ -85,6 +85,7 @@ class feedback
      * @param string $type Тип письма (html | text)
      * @param string $name Имя менеджера магазина
      * @param string $theme Тема письма
+     * @return string
      */
     public function pub_show_form($template, $email, $type, $name, $theme)
     {
@@ -95,7 +96,7 @@ class feedback
 
         switch ($this->get_action_value($this->get_action_name())) {
 
-            // Отобразим форму обратной связи (Дествие по умолчанию)
+            // Отобразим форму обратной связи (Действие по умолчанию)
         	default:
         	case 'form_show':
                 $file = basename($template);
@@ -108,12 +109,11 @@ class feedback
             // Обработаем данные введенные пользователем
         	case 'form_processing':
         	    $input_values = $kernel->pub_httppost_get('values');
-//        	    $kernel->debug($input_values, true);
-        	    switch ($type) {
+        	    switch ($type)
+                {
         	    	case 'html':
                         $message = $this->get_template_block('email_html');
         	    		break;
-
         	    	default:
         	    	case 'text':
                         $message = $this->get_template_block('email_text');
@@ -143,7 +143,7 @@ class feedback
         	    break;
         }
 
-        return ((isset($content))?($content):(null));
+        return isset($content)?$content:null;
     }
 
     /**
@@ -258,8 +258,8 @@ class feedback
     /**
      * Функция для построения меню для административного интерфейса
      *
-     * @param object $menu Обьект класса для управления помтроеним меню
-     * @return boolean
+     * @param pub_interface $menu Обьект класса для управления построением меню
+     * @return boolean true
      */
 	public function interface_get_menu($menu)
 	{
@@ -286,6 +286,7 @@ class feedback
 
         $ini_blank = 'modules/feedback/templates_user/blank.ini';
 
+        $content = '';
         switch ($kernel->pub_section_leftmenu_get())
         {
         	case 'edit_ini':
@@ -297,7 +298,7 @@ class feedback
 
         	case 'save_cfg':
         	    $this->save_ini_file($kernel->pub_httppost_get(), $ini_blank);
-        	    $kernel->pub_redirect_refresh_reload('edit_ini');
+                $content = $kernel->pub_json_encode(array('success'=>true,'result_message'=>'','redirect'=>'edit_ini'));
         	    break;
 
         	case 'add_cfg':
@@ -308,8 +309,7 @@ class feedback
         	       $str .= "\n[".$id_new.']';
         	       $kernel->pub_file_save($ini_blank, $str);
         	    }
-        	    $content = '';
-//        	    $kernel->pub_redirect_refresh_reload('edit_ini');
+        	    $content = $kernel->pub_json_encode(array('success'=>true,'result_message'=>'','redirect'=>'edit_ini'));
         		break;
 
         	case 'delete':
@@ -365,8 +365,18 @@ class feedback
     	$templates = $kernel->pub_template_parse('modules/feedback/templates_admin/edit_ini.html');
         $settings = parse_ini_file($filename, true);
         $lines = array();
-        $buttons = array();
 
+        $types = array(
+            'text'=>'[#feedback_field_type_blank1#]',
+            'checkbox'=>'[#feedback_field_type_blank2#]',
+            'textarea'=>'[#feedback_field_type_blank3#]'
+        );
+        $regexp_types = array(
+            'numeric'=>'[#feedback_field_regexp_blank1#]',
+            'email'=>'[#feedback_field_regexp_blank2#]',
+            'string'=>'[#feedback_field_regexp_blank3#]',
+            'text'=>'[#feedback_field_regexp_blank4#]'
+        );
         foreach ($settings as $name => $properties)
         {
             $line = $templates['line'];
@@ -378,39 +388,44 @@ class feedback
             else
                 $line = str_replace('%label%', '', $line);
 
-            //Вставка типа поля
-            if (isset($properties['type']))
-                $line = str_replace('%type_value%', $properties['type'], $line);
-            else
-                $line = str_replace('%type_value%', '', $line);
+            $type_lines = '';
+            if (!isset($properties['type']))
+                $properties['type']='';
+            foreach ($types as $tk=>$tv)
+            {
+                if ($properties['type']==$tk)
+                    $type_lines.='<option value="'.$tk.'" selected>'.$tv.'</option>';
+                else
+                    $type_lines.='<option value="'.$tk.'">'.$tv.'</option>';
+            }
+            $line = str_replace('%types%',$type_lines, $line);
+
+            $regexp_lines = '';
+            if (!isset($properties['regexp']))
+                $properties['regexp']='';
+            foreach ($regexp_types as $tk=>$tv)
+            {
+                if ($properties['regexp']==$tk)
+                    $regexp_lines.='<option value="'.$tk.'" selected>'.$tv.'</option>';
+                else
+                    $regexp_lines.='<option value="'.$tk.'">'.$tv.'</option>';
+            }
+            $line = str_replace('%regexp_types%',$regexp_lines, $line);
+
 
             //Вставка обязательности заполнения
-            //Пока поле с регуляркой будет всегда открыто, так как для правильной работы
-            //выключения этого поля по галочке надо переделать форму
             if ((isset($properties['allowBlank'])) && (intval($properties['allowBlank']) == 0))
             {
-                $line = str_replace('%allow_value%', "true", $line);
-                $line = str_replace('%regexp_disabe%', "false", $line);
+                $line = str_replace('%allow_value%', "checked", $line);
+                //$line = str_replace('%regexp_disabe%', "false", $line);
             }
             else
             {
-                $line = str_replace('%allow_value%', 'false', $line);
-                $line = str_replace('%regexp_disabe%', "false", $line);
+                $line = str_replace('%allow_value%', '', $line);
+                //$line = str_replace('%regexp_disabe%', "false", $line);
             }
 
-
-            if (isset($properties['regexp']))
-            {
-                $line = str_replace('%regexp_value%', $properties['regexp'], $line);
-            }
-            else
-            {
-                $line = str_replace('%regexp_value%', '', $line);
-            }
             $lines[] = $line;
-
-            $button = $templates['button'];
-            $buttons[] = str_replace('%legend%', $name, $button);
         }
 
 
@@ -420,11 +435,10 @@ class feedback
         $content = str_replace('%form_action_2%', $kernel->pub_redirect_for_form('add_cfg'), $content);
         $content = str_replace('%form_action_3%', $kernel->pub_redirect_for_form('add_template&filenew_name='), $content);
         $content = str_replace('%lines%', implode("\n", $lines), $content);
-        $content = str_replace('%buttons%', implode("\n", $buttons), $content);
 
-        $but_dis = "true";
-        if (count($settings) > 0)
-            $but_dis = "false";
+        $but_dis = "";
+        if (count($settings) == 0)
+            $but_dis = "disabled";
 
         $content = str_replace('%but1disabled%', $but_dis, $content);
         $content = str_replace('%but2disabled%', $but_dis, $content);
@@ -437,6 +451,7 @@ class feedback
      * По файлу настроек создаётся файл шаблона, который затем и может быть о
      * тредактирован по необходимости
      * @param string $filename Имя вновь создаваемого файла
+     * @param string $file_ini путь ini-файлу
      */
     private function priv_template_create($filename, $file_ini)
     {
@@ -484,7 +499,6 @@ class feedback
         $html_res = '';
         foreach ($settings as $id_feild => $properties)
         {
-            $line = '';
             $line = $templates_blank['blank_email_html_line'];
             $line = str_replace('%id%'     , "%".$id_feild."%"       , $line);
             $line = str_replace('%caption%', $properties['label'].":", $line);
@@ -498,7 +512,6 @@ class feedback
         $html_res = '';
         foreach ($settings as $id_feild => $properties)
         {
-            $line = '';
             $line = $templates_blank['blank_email_text_line'];
             $line = str_replace('%id%'     , "%".$id_feild."%"       , $line);
             $line = str_replace('%caption%', $properties['label'].":", $line);

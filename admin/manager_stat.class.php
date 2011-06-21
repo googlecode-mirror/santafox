@@ -7,7 +7,7 @@ class manager_stat
 
 	function manager_stat()
 	{
-		$this->form		=		"";
+		$this->form	= "";
 	}
 
 	/**
@@ -180,7 +180,7 @@ class manager_stat
     			break;
 
     		case "show_top_pages":
-    			$html_content = $html_content = $this->get_form(null, "[#statist_pages_label_main#]", "get_top_pages");
+    			$html_content = $this->get_form(null, "[#statist_pages_label_main#]", "get_top_pages");
     			break;
 
     		case "get_top_pages":
@@ -477,6 +477,7 @@ class manager_stat
         $res_array['ip'] = "";
         $res_array['iplong'] = "";
 
+        //@todo optimize sql queries
         $sql = "SELECT
                 a.referer AS referer,
                 a.referer_domain AS referer_domain,
@@ -484,8 +485,8 @@ class manager_stat
                 c.ip AS ip,
                 c.iplong AS iplong
                 FROM
-                ".PREFIX."_stat_referer a,
-                ".PREFIX."_stat_host c
+                ".$kernel->pub_prefix_get()."_stat_referer a,
+                ".$kernel->pub_prefix_get()."_stat_host c
                 WHERE
                 c.IDSess='".mysql_real_escape_string($session_id)."'
                 AND c.IDReferer = a.IDReferer
@@ -506,7 +507,7 @@ class manager_stat
                 $sql = "SELECT
                         word
                         FROM
-                        ".PREFIX."_stat_word
+                        ".$kernel->pub_prefix_get()."_stat_word
                         WHERE
                         IDWord='".mysql_real_escape_string($data['word_id'])."'
                         ";
@@ -1000,7 +1001,7 @@ class manager_stat
     }
 
     /**
-     * Выводит форму и формирует отчет по поулярынм ключевым словам, по которым
+     * Выводит форму и формирует отчет по популярным ключевым словам, по которым
      * люди приходят на сайт
      *
      * @return HTML
@@ -1047,11 +1048,11 @@ class manager_stat
             $offset = 0;
 
         $query = 'SELECT '
-        . ' COUNT(`'.PREFIX.'_stat_word`.`IDWord`) AS `cword`, '
-        . ' `'.PREFIX.'_stat_word`.`word` '
-        . ' FROM `'.PREFIX.'_stat_word` '
-        . ' WHERE `'.PREFIX.'_stat_word`.`tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy).' '.$_where
-        . ' GROUP BY `'.PREFIX.'_stat_word`.`word` '
+        . ' COUNT(`'.$kernel->pub_prefix_get().'_stat_word`.`IDWord`) AS `cword`, '
+        . ' `'.$kernel->pub_prefix_get().'_stat_word`.`word` '
+        . ' FROM `'.$kernel->pub_prefix_get().'_stat_word` '
+        . ' WHERE `'.$kernel->pub_prefix_get().'_stat_word`.`tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy).' '.$_where
+        . ' GROUP BY `'.$kernel->pub_prefix_get().'_stat_word`.`word` '
         . ' ORDER BY `cword` DESC '
         . ' LIMIT '.mysql_real_escape_string($limit).' OFFSET '.mysql_real_escape_string($offset);
 
@@ -1176,8 +1177,8 @@ class manager_stat
             $offset = 0;
 
     	$query = 'SELECT COUNT( `IDUri` ) AS `visits` , `uri` '
-        . ' FROM `'.PREFIX.'_stat_uri` '
-        . ' WHERE `'.PREFIX.'_stat_uri`.`tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy)
+        . ' FROM `'.$kernel->pub_prefix_get().'_stat_uri` '
+        . ' WHERE `tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy)
         . ' GROUP BY `uri` '
         . ' ORDER BY `visits` DESC '
         . ' LIMIT '.$limit.' OFFSET '.$offset;
@@ -1224,15 +1225,16 @@ class manager_stat
     function top_pages_total_get($date_start_dmy = null, $date_end_dmy = null)
     {
     	global $kernel;
+        //@todo use count(*) here!
     	if (is_numeric($date_start_dmy) && is_numeric($date_end_dmy))
         {
-            $query = 'SELECT * FROM `'.PREFIX.'_stat_uri` '
-            . ' WHERE `'.PREFIX.'_stat_uri`.`tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy).' '
+            $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_stat_uri` '
+            . ' WHERE `'.$kernel->pub_prefix_get().'_stat_uri`.`tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy).' '
             . ' GROUP BY `uri`';
 
     	}
         else
-    	   $query = 'SELECT * FROM `'.PREFIX.'_stat_uri` GROUP BY `uri`';
+    	   $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_stat_uri` GROUP BY `uri`';
     	$result = $kernel->runSQL($query);
     	return mysql_num_rows($result);
     }
@@ -1240,9 +1242,9 @@ class manager_stat
     function pages_build($templates, $limit, $offset, $total, $action, $params = array())
     {
         $pages     = array();
+        $aditional = array();
         if (!empty($params))
         {
-            $aditional = array();
             foreach ($params as $param => $value)
             {
                 $aditional[] = $param.'='.$value;
@@ -1271,14 +1273,15 @@ class manager_stat
     {
     	global $kernel;
         $query = 'SELECT '
-        . ' COUNT(`'.PREFIX.'_stat_word`.`IDWord`) AS `cword`, '
-        . ' `'.PREFIX.'_stat_word`.`word` '
-        . ' FROM `'.PREFIX.'_stat_word` '
-        . ' WHERE `'.PREFIX.'_stat_word`.`tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy).' '.$_where
-        . ' GROUP BY `'.PREFIX.'_stat_word`.`word` '
+        . ' COUNT(`'.$kernel->pub_prefix_get().'_stat_word`.`IDWord`) AS `cword`, '
+        . ' `'.$kernel->pub_prefix_get().'_stat_word`.`word` '
+        . ' FROM `'.$kernel->pub_prefix_get().'_stat_word` '
+        . ' WHERE `'.$kernel->pub_prefix_get().'_stat_word`.`tstc` BETWEEN '.mysql_real_escape_string($date_start_dmy).' AND '.mysql_real_escape_string($date_end_dmy).' '.$_where
+        . ' GROUP BY `'.$kernel->pub_prefix_get().'_stat_word`.`word` '
         . ' ORDER BY `cword` DESC';
     	$result = $kernel->runSQL($query);
     	$total = mysql_num_rows($result);
+        //@todo use count(*)
     	return $total;
     }
 
@@ -1680,12 +1683,12 @@ class manager_stat
 
     function date_list($start, $stop)
     {
+        $array = array();
         while ($start <= ($stop+86399))
         {
             $array[date('d-m-Y', $start)] = 0;
             $start = $start + 86400;
         }
-
         return $array;
     }
 }

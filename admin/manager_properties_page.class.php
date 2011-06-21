@@ -51,15 +51,13 @@ class properties_page
 	 * (т.е. с учетом наследования, что бы пользователь всегда видел значение текужего совйства
 	 * на конкретной странице
 	 *
-	 * @return unknown
+	 * @return array
 	 */
 	function get_properties()
     {
     	global $kernel;
 
-    	$prop = array();
 		$prop = $kernel->priv_page_properties_get($this->id_curent_page);
-		//$kernel->debug($out);
 
 		//Даже если этих свойств ещё нет у страницы, по каким либо причинам -
 		// то они сразу появяться после сохранения
@@ -78,7 +76,6 @@ class properties_page
 			unset($prop['template']);
 
         return $prop;
-
     }
 
 
@@ -331,8 +328,6 @@ class properties_page
         global $kernel;
 
         //Надо закодировать русские названия
-        $page_properties['caption']          = $page_properties['caption'];
-        $page_properties['name_title']       = $page_properties['name_title'];
         $page_properties['id_curent_page']   = $this->id_curent_page;
         $page_properties['link_for_preview'] = "/".$this->id_curent_page.".html";
         $page_properties['page_is_main']     = $this->page_is_main;
@@ -368,7 +363,7 @@ class properties_page
 
 
 
-    function page_metka($templates)
+    function page_metka()
     {
         global $kernel;
 
@@ -476,7 +471,6 @@ class properties_page
 
         $modules = new manager_modules();
         $modules_propertes = $modules->return_page_properties_all_modules($this->page_is_main);
-//$kernel->pub_add_line2file("_log.txt",var_export($modules_propertes, true));
         $type_run = $kernel->pub_httpget_get('type');
         $templates = $kernel->pub_template_parse('admin/templates/default/admin_structure.html');
 
@@ -490,7 +484,7 @@ class properties_page
             //Массив с метками страницы
             case 'get_metka':
                 //Код соединять не будем, что бы выполнять по элементно это
-                $html = $this->page_metka($templates);
+                $html = $this->page_metka();
                 break;
 
             default:
@@ -639,6 +633,7 @@ class properties_page
 
     /**
      * Получает свойства страницы из POST-а и подготавливает данные для сохранения
+     * @param array $data
      * @return Void
      */
     function save_properties($data)
@@ -683,8 +678,6 @@ class properties_page
         	$array_properties['template'] = $kernel->pub_str_prepare_set($data['page_template']);
         else
         	unset($array_properties['template']);
-error_log('data:'.var_export($data,true));
-error_log(var_export($array_properties,true));
         if ((isset($data['page_id'])) && ($this->id_curent_page != $data['page_id']) &&
         	$this->id_curent_page!="index" && //не меняем index
         	!empty($data['page_id']) &&
@@ -693,21 +686,20 @@ error_log(var_export($array_properties,true));
         	//Значит существет новый id, который нужно назначить странице, помимо этого,
         	//нужно поменять все ссылки, которые есть на этот id в mySql базе, а также
         	//имена файлов с контентом
-error_log('save1');
         	if ($kernel->priv_page_id_replace($this->id_curent_page, trim($data['page_id'])))
         		$kernel->priv_page_properties_set(trim($data['page_id']), $array_properties, $caption);
         }
         else
         {
-error_log('save2: page:'.$this->id_curent_page.", caption:".$caption);
             $kernel->priv_page_properties_set($this->id_curent_page, $array_properties, $caption);
         }
-        return true;
     }
 
 
     /**
      * Получает свойства страницы прописанные модулями из POST-а и подготавливает данные для сохранения
+     * @param array $values
+     * @param array $inheritance
      * @return Void
      */
     function save_properties_addon($values, $inheritance)
@@ -720,8 +712,6 @@ error_log('save2: page:'.$this->id_curent_page.", caption:".$caption);
         //сначала узнаем массив всех этих свойств
 		$tmp_modul = new manager_modules();
 		$all_prop = $tmp_modul->return_all_properties_page_all_modules();
-        //$kernel->debug($all_prop, true);
-
         if (!empty($all_prop))
 		{
         	foreach ($all_prop as $id_prop)
@@ -739,13 +729,10 @@ error_log('save2: page:'.$this->id_curent_page.", caption:".$caption);
     }
 
 
-    //************************************************************************
-    /**
-    @return Array
-    @param $id_str_macros Integer
-    @desc Возвращает подготовленную массив вызова заданного макроса модуля
-    */
-
+    /** Возвращает подготовленный массив вызова заданного макроса модуля
+     * @param integer $id_str_macros
+     * @return array
+     */
     function return_full_link($id_str_macros)
     {
 		global $kernel;
@@ -773,17 +760,14 @@ error_log('save2: page:'.$this->id_curent_page.", caption:".$caption);
 				$ret_str['run'] = $run;
 			}
 	    }
-		//$kernel->debug(highlight_string($ret_str));
     	return $ret_str;
     }
 
-    //************************************************************************
-    /**
-    @return none
-    @param  none
-    @desc Сохраняет параметры линков, на ссылки для страницы
+    /** Сохраняет параметры линков, на ссылки для страницы
+    *   @param  array $modules
+    *   @param  array $inheritance
     */
-    function save_link($modules, $methods, $inheritance)
+    function save_link($modules, $inheritance)
     {
     	global $kernel;
 
@@ -815,8 +799,7 @@ error_log('save2: page:'.$this->id_curent_page.", caption:".$caption);
         . ' SET serialize = "'.addslashes(serialize($serialize)).'"'
         . ' WHERE (id = "'.$this->id_curent_page.'")';
 
-		//file_put_contents('dump.txt', $query, FILE_APPEND);
-		$result = $kernel->runSQL($query);
+		$kernel->runSQL($query);
     }
 }
 ?>

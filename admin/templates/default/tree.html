@@ -159,13 +159,13 @@
         },
 <!-- @dnd_action2 -->
  .bind("move_node.jstree", function (e, data) {
-
-
+                    var index=data.rslt.cp;
                     $.post("/admin/index.php?action=set_left_menu&leftmenu=move",
-                            { node :  data.rslt.o.attr("id"), newParent:data.rslt.np.attr("id"), index:data.rslt.cp}, function(data){
-                        //document.location.href = "/admin/index.php";
-                        santaUpdateRegion('west','index.php?action=get_left_menu');
-                    });
+                           { node :  data.rslt.o.attr("id"), newParent:data.rslt.np.attr("id"), index:index},
+                           function(data){
+                               //santaUpdateRegion('west','index.php?action=get_left_menu');
+                           }
+                    );
                 /*
                 data.rslt.o.each(function (i) {
                     $.ajax({
@@ -228,7 +228,7 @@
             var disabledForNodes = new String("[#node_exclude#]").split(",");
             if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
             {
-                //console.log("disabled for node [#name#]");
+                //console.log("create disabled for this node");
                 return;
             }
             [#action#]
@@ -242,7 +242,7 @@
             var disabledForNodes = new String("[#node_exclude#]").split(",");
             if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
             {
-                console.log("delete disabled for node [#name#]");
+                //console.log("delete disabled for this node");
                 return;
             }
         [#action#]

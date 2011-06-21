@@ -267,7 +267,7 @@ class manager_structue
         	    //лишнию информация для того что бы работал ява скрипт
         	    //$kernel->debug($properties['page_inheritance'], true);
         	    //$kernel->debug($properties['page_modules'], true);
-        		$manager->save_link($properties['page_modules'], null, $properties['page_inheritance']);
+        		$manager->save_link($properties['page_modules'], $properties['page_inheritance']);
             	$saved = true;
         	}
         }
@@ -305,9 +305,9 @@ class manager_structue
         //@todo cleanup
 
         if (mysql_affected_rows() <= 0)
-        	$ret = array("success"=>false);//'{success:false, query: '.$query.'}';
+        	$ret = array("success"=>false);
         else
-            $ret = array("success"=>true);//'{success:true, query: '.$query.', my_sql_aff: '.mysql_affected_rows().'}';
+            $ret = array("success"=>true);
 
         return $kernel->pub_json_encode($ret);
     }
@@ -374,7 +374,7 @@ class manager_structue
     }
 
     /**
-     * Производит пересортировку страниц в струткуре
+     * Производит пересортировку страниц в структуре
      *
      * Вызывается после того как страница была перещена по дереву
      * @param string $node_current_id
@@ -393,10 +393,12 @@ class manager_structue
         $order = 0;
         while ($row = mysql_fetch_assoc($result))
         {
-            if ($node_current_index == $order) $order++;
+            if ($node_current_index == $order)
+                $order++;
             $query = "UPDATE `".$kernel->pub_prefix_get()."_structure` SET `order_number` = '".$order++."' WHERE `id` = '".$row['id']."' LIMIT 1 ;";
             $kernel->runSQL($query);
         }
+        mysql_free_result($result);
     }
 }
 ?>

@@ -15,8 +15,6 @@ class faq_install extends install_modules
      */
     function install()
     {
-        global $kernel;
-
     }
 
     /**
@@ -25,9 +23,6 @@ class faq_install extends install_modules
      */
     function uninstall($id_module)
     {
-        global $kernel;
-
-
     }
     /**
      * Методы вызывается, при инсталяции каждого дочернего модуля, здесь необходимо

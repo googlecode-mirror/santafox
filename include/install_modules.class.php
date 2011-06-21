@@ -118,14 +118,13 @@ class install_modules
 	/**
 	 * Вызывается при инстялции базовового модуля (один раз)
 	 *
-	 * @package string $id_module ID базового модуля
+	 * @param string $id_module ID базового модуля
+	 * @param boolean $reinstall переинсталяция?
 	 * @access private
 	 * @return void
 	 */
 	function install($id_module, $reinstall = false)
 	{
-		global $kernel;
-
 	}
 
 
@@ -139,8 +138,6 @@ class install_modules
 
 	function uninstall($id_module)
 	{
-		global $kernel;
-
 	}
 
 
@@ -150,11 +147,10 @@ class install_modules
      * объектов обеспечивается с помощью передвавемого ID модуля
      *
      * @param string $id_module ID вновь создоваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
 	function install_children($id_module, $reinstall = false)
 	{
-		global $kernel;
-
 	}
 
 
@@ -166,8 +162,6 @@ class install_modules
     */
 	function uninstall_children($id_module)
 	{
-		global $kernel;
-
 	}
 
 
@@ -266,7 +260,7 @@ class install_modules
     /**
      * Устанавливает ID базавого модуля
      *
-     * @param unknown_type $id
+     * @param string $id
 	 * @access public
 	 * @return void
      */
@@ -420,7 +414,7 @@ class install_modules
     /**
      * Включает/выключает обработку таблиц mySql при переинсталляции модуля
      *
-     * @param unknown_type $value
+     * @param boolean $value
      */
     function set_call_reinstall_mysql($value = true)
     {

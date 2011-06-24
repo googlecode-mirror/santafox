@@ -315,9 +315,6 @@ class newsi extends basemodule
             elseif (!empty($start) || !empty($stop))
                 $items = $this->pub_items_get($limit, $offset, false, $type, "", null, $start, $stop);
 
-            if ($offset > ($this->pub_news_avaiable_get()-$limit))
-                $offset = 0;
-
             if (empty($items))
                 $content = $this->get_template_block('no_data');
             else

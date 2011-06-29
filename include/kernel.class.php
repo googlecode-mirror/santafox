@@ -2824,15 +2824,13 @@ class kernel
 	 * @param string $password
 	 * @param string $email
 	 * @param stirng $name
-	 * @param boolean $unic_login Если true - то уникальность пользователя проверяется по логину, если false - то по email-у
-	 * @access public
 	 * @return int
 	 *
 	 */
-    function pub_user_add_new($login, $password, $email, $name, $unic_login = true)
+    function pub_user_add_new($login, $password, $email, $name)
     {
         $user = new manager_users();
-        return $user->user_add_new($login, $password, $email, $name, $unic_login);
+        return $user->user_add_new($login, $password, $email, $name);
     }
 
 
@@ -2938,7 +2936,7 @@ class kernel
 	 * Возвращаемый массив может иметь два вида – линейный и древовидный ( в зависимости от
 	 * передаваемого в метод параметра). Если передано true, то параметры будут сгруппированы по
 	 * модулям, их добавившим, в противном случае, всё будет представлено в линейном виде.
-	 * @param boolean $type_info Тип выходного массива
+	 * @param boolean $tree Тип выходного массива
 	 * @access public
 	 * @return array
 	 */
@@ -2955,7 +2953,7 @@ class kernel
 	 *
 	 * Если пользователь не указан - то
 	 * возвращается информация по всем имеющимся записям
-	 * @param integer $id_user ID конкретного пользователя - если необходимо.
+	 * @param mixed $id_user ID конкретного пользователя - если необходимо.
 	 * @param boolean $tree - если <i>true</i> то возвращается в виде "дерева"
 	 * @param string $orderby - поле для сортировки
 	 * @param integer $offset смещение
@@ -2985,13 +2983,14 @@ class kernel
      *
      * Дополнительные поля, это те поля, которые были прописаны модулями. Возвращается
      * просто массив доступных полей, без значений у конкретного пользователя
+     * @param string $cond
 	 * @access public
 	 * @return array
      */
-    function pub_users_fields_get()
+    function pub_users_fields_get($cond='true')
     {
         $user = new manager_users();
-        return $user->users_fields_get();
+        return $user->users_fields_get($cond);
     }
 
     /**

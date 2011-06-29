@@ -55,6 +55,7 @@ class manager_users
 
 	/**
 	 * Точка входа
+     * @return string
 	 */
 	function start()
     {
@@ -148,7 +149,7 @@ class manager_users
     /**
      * Формирует таблицу администраторов, работающих с сайтом
      *
-     * @return Void
+     * @return string
      * @access private
      *
      */
@@ -226,7 +227,7 @@ class manager_users
 
 	/**
 	 * Сохраняет сразу информацию о всех отредактированных данных
-	 *
+	 * @return array
 	 */
 	function bof_admin_save()
     {
@@ -237,9 +238,8 @@ class manager_users
 
         if (!isset($data['select_group']) || empty($data['select_group']))
             return $kernel->pub_json_encode(array("success"=>false, "info"=>"Администратор должен принадлежать хотя бы к одной группе"));//@todo use lang vars
-        //@todo use lang[]
     	if ($id_admin == 0)
-    	   return false;
+    	   return $kernel->pub_json_encode(array("success"=>false, "info"=>"No admin"));//@todo use lang vars
 
         $enabled = 0;
         if (isset($data['enabled']))
@@ -412,7 +412,7 @@ class manager_users
      * Выводится форма редактирвоания (добавления) администратора.
      * Если в качетсве логина передано пустое значение, то это форма
      * добавления.
-     * @param string $login Логин администратора при редактировании
+     * @param mixed $id ID группы
      * @return HTML
      * @access private
      */
@@ -456,7 +456,7 @@ class manager_users
 	 * Сохраняет отредактированную (или новую) группу администраторов
 	 *
 	 * @access private
-	 * @return void
+	 * @return string
 	 */
 	function bof_group_save()
 	{
@@ -465,8 +465,8 @@ class manager_users
 		$data = $kernel->pub_httppost_get();
 		$id_group = $kernel->pub_httpget_get('id');
 
-		if (!isset($id_group))
-			return;
+		if (empty($id_group))
+			return '';
 
 	    $root_admin = 0;
 		if (isset($data['root_admin']))
@@ -495,31 +495,28 @@ class manager_users
 	}
 
 
-    /**
-     * Создает в таблице пользователь FrontOffice новую запись
-     *
+  /**
+     * Создает в таблице пользователей frontoffice новую запись
+     * @param string $login
+     * @param string $password
+     * @param string $email
+     * @param string $name
+     * @return integer
      */
-    function user_add_new($login, $password, $email, $name, $unic_login = true)
+    function user_add_new($login, $password, $email, $name)
     {
     	global $kernel;
 
     	//Проверим, может такой пользователь уже существует
-    	$query = "SELECT * FROM ".$kernel->pub_prefix_get()."_user";
-
-    	if ($unic_login)
-			$query .= " WHERE login = '$login'";
-		else
-    		$query .= " WHERE email = '$email'";
-
-    	$result = $kernel->runSQL($query);
-    	if (mysql_num_rows($result) > 0)
-    	{
-    		$row = mysql_fetch_assoc($result);
+        $row = $kernel->db_get_record_simple('_user',"email = '$email' OR login = '$login'","verified");
+        if ($row)
+        {
     		if (intval($row['verified']) == 0)
     			return -1;
     		else
     			return -2;
-    	}
+        }
+
     	$curent_date = date("Y-m-d H:i:s");
 
     	$query = "INSERT INTO ".$kernel->pub_prefix_get()."_user
@@ -535,37 +532,32 @@ class manager_users
             return 0;
     }
 
-    /**
-     * Проверяет, есть ли такой юзер в базе и если есть то возвращает массив его данных,
+       /**
+     * Проверяет, есть ли такой юзер в базе и, если есть, то возвращает массив его данных,
      * в противном случае возвращает код ошибки
-     *
+     * @param string $login
+     * @param string $password
+     * @param boolean $unic_login
+     * @param integer $id_user
+     * @return mixed
      */
     function fof_user_authorization($login, $password, $unic_login = true, $id_user = 0)
     {
     	global $kernel;
 
-    	//Проверим существует-ли вообще такой пользователь
-    	$query = "SELECT *
-    			  FROM ".$kernel->pub_prefix_get()."_user
-    			  WHERE ";
+    	//Проверим существует ли вообще такой пользователь
     	if ($id_user == 0)
     	{
     		if ($unic_login)
-	    		$query .= "(login = '$login') ";
+	    		$cond= "login = '$login' ";
     		else
-    			$query .= "(email = '$login') ";
+    			$cond= "email = '$login' ";
+    		$cond.= " AND password = '$password'";
+    	}
+        else
+    		$cond = "id = '$id_user' ";
 
-    		$query .= "&& (password = '$password')";
-    	} else
-    		$query .= "(id = $id_user) ";
-
-		$result = $kernel->runSQL($query);
-
-		if (!$result)
-			return -1;
-
-
-		$res = mysql_fetch_assoc($result);
+        $res = $kernel->db_get_record_simple("_user",$cond);
 
 		if (!$res)
 			return -1;
@@ -600,6 +592,9 @@ class manager_users
 				$arr['tree']['fields'][$row['id_modul']][$row['id']]['name'] = $row['id_field'];
 				$arr['tree']['fields'][$row['id_modul']][$row['id']]['caption'] = $row['caption'];
 				$arr['tree']['fields'][$row['id_modul']][$row['id']]['value'] = '';
+				$arr['tree']['fields'][$row['id_modul']][$row['id']]['type_field'] = $row['type_field'];
+				$arr['tree']['fields'][$row['id_modul']][$row['id']]['params'] = $row['params'];
+				$arr['tree']['fields'][$row['id_modul']][$row['id']]['required'] = $row['required'];
 
 				$arr['line'][$row['id_modul'].$this->symbol_delimiter.$row['id_field']] = '';
 
@@ -607,10 +602,12 @@ class manager_users
 				$modul2[$row['id']] = $row['id_modul'].$this->symbol_delimiter.$row['id_field'];
 				$indexes[$row['id_modul'].$this->symbol_delimiter.$row['id_field']] = $row['id'];
 			}
+            mysql_free_result($result);
 		}
 
 
-		//И последний запрос, что бы узнать текщие значения полей
+
+		//И последний запрос, что бы узнать текущие значения полей
 		$query = "SELECT a.user, a.field, a.value, a.addon, b.only_admin
 				  FROM ".$kernel->pub_prefix_get()."_user_fields_value a, ".$kernel->pub_prefix_get()."_user_fields b
 				  WHERE (a.user = ".$arr['line']['id'].") AND (b.id = a.field)
@@ -626,48 +623,32 @@ class manager_users
 				$arr['tree']['fields'][$modul[$row['field']]][$row['field']]['value'] = $row['value'];
 				$arr['line'][$modul2[$row['field']]] = $row['value'];
 			}
+            mysql_free_result($result);
 		}
 		$arr['line']['indexes'] = $indexes;
-
 		return $arr;
-
     }
 
     /**
      * Возвращает массив дополнительных полей у пользователя
-     *
+     * @param string $cond условие
      * @return array
      * @access private
      */
-    function users_fields_get()
+    function users_fields_get($cond='true')
     {
         global $kernel;
-
     	$arr = array();
-		$query = "SELECT *
-    			  FROM ".$kernel->pub_prefix_get()."_user_fields
-				 ";
-
-		$result = $kernel->runSQL($query);
-
-		if ($result)
-		{
-			while ($row = mysql_fetch_assoc($result))
-			{
-				$arr[$row['id_modul']][$row['id']]['id']			= $row['id'];
-				$arr[$row['id_modul']][$row['id']]['id_field']		= $row['id_field'];
-				$arr[$row['id_modul']][$row['id']]['id_modul']		= $row['id_modul'];
-				$arr[$row['id_modul']][$row['id']]['caption']		= $row['caption'];
-				$arr[$row['id_modul']][$row['id']]['type_field']	= $row['type_field'];
-				$arr[$row['id_modul']][$row['id']]['only_admin']	= $row['only_admin'];
-				$arr[$row['id_modul']][$row['id']]['value']			= '';
-			}
-    	}
+        $rows = $kernel->db_get_list_simple('_user_fields',$cond);
+        foreach ($rows as $row)
+        {
+            $row['value']='';
+            $arr[$row['id_modul']][$row['id']]=$row;
+        }
         return $arr;
-
     }
 
-      /**
+    /**
      * Собирает массив с информацией по всем пользователям сайта
      *
      * @param integer $id_user ID конкретного пользователя - если необходимо.
@@ -677,18 +658,18 @@ class manager_users
 	 * @param integer $limit лимит
      * @return array
      */
-    function users_info_get($id_user = "", $tree = true, $orderby="`login`",$offset=null, $limit=null)
+    function users_info_get($id_user = 0, $tree = true, $orderby="`login`",$offset=null, $limit=null)
     {
     	global $kernel;
 
     	//сначала соберем массив всех дополнительных полей, прописанных модулями
-    	$arr = $this->users_fields_get();
+    	$user_fields = $this->users_fields_get();
 
 		//Теперь обратимся к зарегистрированным пользователем и подготовим выходной массив
 		$query = "SELECT *, date_format(date, '%d.%m.%y') AS fdate
     			  FROM ".$kernel->pub_prefix_get()."_user ";
 
-		if (!empty($id_user))
+		if ($id_user)
 			$query .= " WHERE (id = $id_user)";
         else
         {
@@ -713,15 +694,15 @@ class manager_users
     			$res[$id]['date'] 	  = $row['date'];
     			$res[$id]['fdate'] 	  = $row['fdate'];
     			$res[$id]['verified'] = $row['verified'];
-    			$res[$id]['enabled'] = $row['enabled'];
+    			$res[$id]['enabled']  = $row['enabled'];
     			$arr_id[] = $id;
 
     			//Обозначим поля, прописанные модулями, что бы было их видно в случае если значения ещё пустые
     			if ($tree == true)
-    				$res[$id]['fields'] = $arr;
+    				$res[$id]['fields'] = $user_fields;
     			else
     			{
-    				foreach ($arr as $key => $val)
+    				foreach ($user_fields as $key => $val)
     				{
     					foreach ($val as $inf_fields)
     					{
@@ -761,7 +742,6 @@ class manager_users
 		}
     	return $res;
     }
-
 
     function user_info_get($login, $is_login = true)
     {
@@ -883,8 +863,8 @@ class manager_users
 
             foreach ($form_data as $tkey => $tval)
             {
-                    if (empty($tval))
-                        continue;
+                    //if (empty($tval))
+                    //    continue;
 
                     if (preg_match('/^[0-9]+$/i', trim($tkey)))
                         $arr_fields[$tkey] = $tval;
@@ -912,24 +892,20 @@ class manager_users
 
 			}
 
-			//Теперь собсвтенно имея массив всех цировых ключей, запишем данные о полях
+			//Теперь, имея массив всех цифровых ключей, запишем данные о полях
 			if (!empty($arr_fields))
 			{
 				foreach ($arr_fields as $fkey => $fval)
 				{
-					   $sql = "DELETE FROM ".$kernel->pub_prefix_get()."_user_fields_value
-					   WHERE
-					   user='$key' AND
-					   field='$fkey'
-					   ";
-					   $kernel->runSQL($sql);
+		            $sql = "DELETE FROM ".$kernel->pub_prefix_get()."_user_fields_value
+					        WHERE user='$key' AND field='$fkey'";
+					$kernel->runSQL($sql);
 
-        				$query = "INSERT INTO ".$kernel->pub_prefix_get()."_user_fields_value
-        			  		(user, field, value)
-    	   	       	  		VALUES
-			 		  	    ($key, $fkey, '$fval')
-						    ";
-    				    $kernel->runSQL($query);
+        			$query = "INSERT INTO ".$kernel->pub_prefix_get()."_user_fields_value
+        			  		 (user, field, value)
+    	   	       	  		 VALUES
+			 		  	     ($key, $fkey, '$fval')";
+    				$kernel->runSQL($query);
 				}
 			}
 
@@ -993,7 +969,7 @@ class manager_users
     			  WHERE id = ".$id_user;
     	$kernel->runSQL($query);
 
-		//Пользователя удалили, теперь надо удалить значения до полей на него
+		//Пользователя удалили, теперь надо удалить значения полей на него
     	$query = "DELETE FROM ".$kernel->pub_prefix_get()."_user_fields_value
     			  WHERE user = ".$id_user;
     	$kernel->runSQL($query);
@@ -1028,6 +1004,7 @@ class manager_users
     /**
     * Удаляет выбранную группу администраторов сайта
     * @access private
+    * @param integer $id_group
     * @return Void
     */
 	function bof_group_delete($id_group)
@@ -1051,20 +1028,21 @@ class manager_users
 
 
     /**
-     * Включает администратора сайт
+     * Включает администратора сайта
      *
-     * @param integer $id ID администратора
+     * @param integer $id_user ID администратора
      * @return boolean
      */
-
     function bof_admin_enabled($id_user)
     {
     	global $kernel;
     	if (intval($id_user) < 1)
-    		return;
+    		return false;
+
     	$query = "UPDATE ".$kernel->pub_prefix_get()."_admin
         		  SET enabled = 1
         		  WHERE id = ".$id_user;
+
 		$kernel->runSQL($query);
 		$num = mysql_affected_rows();
 		if ($num == 1)
@@ -1073,28 +1051,6 @@ class manager_users
 			return false;
     }
 
-
-    /**
-     * Выключает администратора сайт
-     *
-     * @param integer $id ID администратора
-     * @return boolean
-     */
-    function bof_admin_disabled($id_user)
-    {
-    	global $kernel;
-    	if (intval($id_user) < 1)
-    		return;
-    	$query = "UPDATE ".$kernel->pub_prefix_get()."_admin
-        		  SET enabled = 0
-        		  WHERE id = ".$id_user;
-		$kernel->runSQL($query);
-		$num = mysql_affected_rows();
-		if ($num == 1)
-			return true;
-		else
-			return false;
-    }
 
 
     /**
@@ -1325,7 +1281,7 @@ class manager_users
      * Функция не совсем корректно обрабатывает права на главную страницу структуры
      * это необходимо ещё доделать
      * @access private
-     * @return void
+     * @return string
      */
     function bof_groups_save_access()
     {
@@ -1370,13 +1326,11 @@ class manager_users
 
 
     /**
-        @return string
-        @desc Формирует список юзеров и групп для включения юзера в группы
-    **/
+     * Формирует список юзеров и групп для включения юзера в группы
+     * @return string
+     */
     function generate_list_link()
     {
-		global $kernel;
-
         $user_tmp = $this->get_array_users();
 		$group_tmp = $this->get_array_groups();
         $users_in_group = $this->get_curent_group_for_users();
@@ -1423,37 +1377,37 @@ class manager_users
         return "[".join(",",$out)."]";
 	}
 
-	/**
-	 * Определяет группы, в которые входить пользователь
-	 *
-	 * Возвращает массив групп, которым принадлежить пользователь или все пользователи
-	 * если не задан конкретный
-	 * @access private
-	 * @param integer $user_id ID юзера, по кому нужна информация. если не задан  - то по всем.
-	 * @return array
-	 */
-	function get_curent_group_for_users($user_id = "")
+    /**
+     * Определяет группы, в которые входить пользователь
+     *
+     * Возвращает массив групп, которым принадлежить пользователь или все пользователи
+     * если не задан конкретный
+     * @access private
+     * @param integer $user_id ID юзера, по кому нужна информация. если не задан  - то по всем.
+     * @return array
+     */
+    function get_curent_group_for_users($user_id = 0)
     {
-    	global $kernel;
+        global $kernel;
 
-		$query = "SELECT ".$kernel->pub_prefix_get()."_admin_cross_group.id,
-						 ".$kernel->pub_prefix_get()."_admin_cross_group.user_id,
-						 ".$kernel->pub_prefix_get()."_admin_cross_group.group_id,
-						 ".$kernel->pub_prefix_get()."_admin.id,
-						 ".$kernel->pub_prefix_get()."_admin.login,
-						 ".$kernel->pub_prefix_get()."_admin_group.id,
-						 ".$kernel->pub_prefix_get()."_admin_group.full_name
+        $query = "SELECT ".$kernel->pub_prefix_get()."_admin_cross_group.id,
+                         ".$kernel->pub_prefix_get()."_admin_cross_group.user_id,
+                         ".$kernel->pub_prefix_get()."_admin_cross_group.group_id,
+                         ".$kernel->pub_prefix_get()."_admin.id,
+                         ".$kernel->pub_prefix_get()."_admin.login,
+                         ".$kernel->pub_prefix_get()."_admin_group.id,
+                         ".$kernel->pub_prefix_get()."_admin_group.full_name
 
-		 	      FROM ".$kernel->pub_prefix_get()."_admin_cross_group,
-		 	      	   ".$kernel->pub_prefix_get()."_admin,
-		 	      	   ".$kernel->pub_prefix_get()."_admin_group
+                   FROM ".$kernel->pub_prefix_get()."_admin_cross_group,
+                          ".$kernel->pub_prefix_get()."_admin,
+                          ".$kernel->pub_prefix_get()."_admin_group
 
-		 	      WHERE (".$kernel->pub_prefix_get()."_admin.id = ".$kernel->pub_prefix_get()."_admin_cross_group.user_id)
-		 	      	  and (".$kernel->pub_prefix_get()."_admin_group.id = ".$kernel->pub_prefix_get()."_admin_cross_group.group_id)
+                   WHERE (".$kernel->pub_prefix_get()."_admin.id = ".$kernel->pub_prefix_get()."_admin_cross_group.user_id)
+                         and (".$kernel->pub_prefix_get()."_admin_group.id = ".$kernel->pub_prefix_get()."_admin_cross_group.group_id)
                   ";
 
-		if (!empty($user_id))
-				$query .= " and (".$kernel->pub_prefix_get()."_admin.id = ".$user_id.") ";
+        if ($user_id)
+            $query .= " and (".$kernel->pub_prefix_get()."_admin.id = ".$user_id.") ";
 
         $result = $kernel->runSQL($query);
         $arr = array();
@@ -1463,6 +1417,7 @@ class manager_users
            $arr[$row['user_id']][$row['group_id']] = $row['full_name'];
         return $arr;
     }
+
 
 	/**
 	 * возвращает массив данных на конкретного юзера либо на всех
@@ -1496,7 +1451,7 @@ class manager_users
         return $user_tmp;
     }
 
-    /**
+       /**
     * Возвращает массив групп администраторов
     *
     * Если используется параметр, ту будет возвращена
@@ -1505,14 +1460,14 @@ class manager_users
     * @access private
     * @param integer $id ID конкретной группы
     **/
-	function get_array_groups($id = '')
+	function get_array_groups($id = 0)
     {
     	global $kernel;
 		$query = "SELECT `id`, `name`, `main_admin`, `full_name`
         	      FROM `".$kernel->pub_prefix_get()."_admin_group`
                   ";
 
-		if (!empty($id))
+		if ($id)
             $query .= " WHERE id = '".$id."'";
 
         $result = $kernel->runSQL($query);
@@ -1533,18 +1488,20 @@ class manager_users
 
             $i++;
         }
+        mysql_free_result($result);
         return $group_tmp;
     }
 
 
-    /**
+  /**
      * Возвращает массив id элементов, на которые у группы есть права
      *
      * @access private
      * @param integer $id_group ID группы
+     * @param array $group
      * @return array
      */
-    function get_all_access_for_group($id_group = '', $group = '')
+    function get_all_access_for_group($id_group = 0, $group = array())
     {
     	global $kernel;
     	$query = 'SELECT *
@@ -1693,13 +1650,21 @@ class manager_users
 
 
 	/**
-	 * Удаляет дполнительные поля, созданные при инсталяции модуля
+	 * Удаляет дополнительные поля, созданные при инсталяции модуля
 	 *
 	 * @param string $id_modul ID модуля, чьи поля будут удалены
 	 */
 	function delete_feild_for_user($id_modul)
 	{
 		global $kernel;
+
+
+        //удаление значений
+		$query = "DELETE FROM ".$kernel->pub_prefix_get()."_user_fields_value
+				  WHERE field IN (SELECT id FROM ".$kernel->pub_prefix_get()."_user_fields WHERE id_modul = '".$id_modul."')";
+		$kernel->runSQL($query);
+
+        //удаление полей
 		$query = "DELETE FROM ".$kernel->pub_prefix_get()."_user_fields
 				  WHERE (id_modul = '".$id_modul."')";
 		$kernel->runSQL($query);
@@ -1759,7 +1724,8 @@ class manager_users
 
     /**
 	 * Сохраняет группы, для конкретного пользователя сайта
-	 *
+	 * @param integer $id
+	 * @param array $data
 	 * @return array
 	 * @access private
 	 */

@@ -145,14 +145,14 @@ class manager_global_properties
     }
 
 
-    /**
-     * Возвращает в виде масива, все настройки прописаные через DEFINE в ini файле.
-     *
+     /**
+     * Возвращает в виде массива, все настройки прописаные через define в ini файле.
+     * @return array
      */
     function parse_global_ini_file()
     {
     	$content = file_get_contents('ini.php');
-   		$str_preg  = "/DEFINE.*\\((.*)\\).*;/i";
+   		$str_preg  = "/define(?:\\s*)\\((.*)\\)(?:\\s*);/iU";
 
    		$array_define = array();
     	preg_match_all($str_preg, $content, $array_define);
@@ -181,13 +181,11 @@ class manager_global_properties
             $ret['IS_1251_TEMPLATES']='false';
         if (!isset($ret['PAGE_FOR_404']))
             $ret['PAGE_FOR_404']='index';
+
     	return $ret;
     }
 
-
-
-
-    /**
+      /**
      * Сохраняет данные формы в INI файл.
      *
      */
@@ -258,18 +256,13 @@ class manager_global_properties
     	{
     		$str_ini_php = "";
     		foreach ($array_data as $key => $val)
-    			$str_ini_php .= '	DEFINE ("'.strtoupper($key).'", '.trim($val).')'.";\n\r";
-
-
-
+    			$str_ini_php .= '    define("'.strtoupper($key).'", '.trim($val).')'.";\n";
 			if (!empty($str_ini_php))
 			{
-			    $str_ini_php = "<?php \n\rmb_internal_encoding(\"UTF-8\");\n\r".$str_ini_php."\n\r ?>";
+			    $str_ini_php = "<?php\n    mb_internal_encoding(\"UTF-8\");\n".$str_ini_php."\n?>";
 			    $kernel->pub_file_save($kernel->pub_site_root_get()."/ini.php", $str_ini_php);
 			}
     	}
-
-
     }
 
 
@@ -480,7 +473,7 @@ class manager_global_properties
         }
         if ($ini_php = file_get_contents($root."/ini.php"))
         {
-            $ini_php = str_replace('DEFINE ("SANTAFOX_VERSION", "'.$version.'");', 'DEFINE ("SANTAFOX_VERSION", "'.$new_version.'");', $ini_php);
+            $ini_php = str_replace('define("SANTAFOX_VERSION", "'.$version.'");', 'define("SANTAFOX_VERSION", "'.$new_version.'");', $ini_php);
             $kernel->pub_file_save("/ini.php", $ini_php);
         }
         else

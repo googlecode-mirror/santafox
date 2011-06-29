@@ -1,56 +1,30 @@
 <?php
 	mb_internal_encoding("UTF-8");
-
-	DEFINE ("PREFIX", "[#PREFIX#]");
-
-	DEFINE ("DB_HOST", "[#DB_HOST#]");
-
-	DEFINE ("DB_BASENAME", "[#DB_BASENAME#]");
-
-	DEFINE ("DB_USERNAME", "[#DB_USERNAME#]");
-
-	DEFINE ("DB_PASSWORD", "[#DB_PASSWORD#]");
-
-	DEFINE ("FTP_HOST", "[#FTP_HOST#]");
-
-	DEFINE ("FTP_LOGIN", "[#FTP_LOGIN#]");
-
-	DEFINE ("FTP_PASS", "[#FTP_PASSWORD#]");
-
-	DEFINE ("IS_1251_TEMPLATES", [#IS_1251_TEMPLATES#]);
-
-	DEFINE ("DEFAULT_LANGUAGE", "RU");
-
-	DEFINE ("DEFAULT_CHARSET", "UTF-8");
-
-	DEFINE ("SHOW_INT_ERRORE_MESSAGE", true);
-
-	DEFINE ("PATH_PAGE_TEMPLATE", "design");
-
-	DEFINE ("PATH_PAGE_CONTENT", "content/pages");
-
-	DEFINE ("ADMIN_SECTION_DEFAULT", "structure");
-
-	DEFINE ("REDIR_WWW", false);
-
-	DEFINE ("GENERATE_STATISTIC", true);
-
-	DEFINE ("TIME_CREAT", false);
-
-	DEFINE ("CLOSE_WINDOWS_ON_SAVE", false);
-
-	DEFINE ("CACHED_PAGE", false);
-
-	DEFINE ("SSL_CONNECTION", false);
-
-	DEFINE ("EMAIL_FOR_ERRORE", "");
-
-	DEFINE ("SANTAFOX_VERSION", "3.00");
-
-	DEFINE ("WEBFORM_CODING", true);
-
-	DEFINE ("PRINT_MYSQL_ERRORS", false);
-
-	DEFINE ("PAGE_FOR_404", "index");
+	define("PREFIX", "[#PREFIX#]");
+	define("DB_HOST", "[#DB_HOST#]");
+	define("DB_BASENAME", "[#DB_BASENAME#]");
+	define("DB_USERNAME", "[#DB_USERNAME#]");
+	define("DB_PASSWORD", "[#DB_PASSWORD#]");
+	define("FTP_HOST", "[#FTP_HOST#]");
+	define("FTP_LOGIN", "[#FTP_LOGIN#]");
+	define("FTP_PASS", "[#FTP_PASSWORD#]");
+	define("IS_1251_TEMPLATES", [#IS_1251_TEMPLATES#]);
+	define("DEFAULT_LANGUAGE", "RU");
+	define("DEFAULT_CHARSET", "UTF-8");
+	define("SHOW_INT_ERRORE_MESSAGE", true);
+	define("PATH_PAGE_TEMPLATE", "design");
+	define("PATH_PAGE_CONTENT", "content/pages");
+	define("ADMIN_SECTION_DEFAULT", "structure");
+	define("REDIR_WWW", false);
+	define("GENERATE_STATISTIC", true);
+	define("TIME_CREAT", false);
+	define("CLOSE_WINDOWS_ON_SAVE", false);
+	define("CACHED_PAGE", false);
+	define("SSL_CONNECTION", false);
+	define("EMAIL_FOR_ERRORE", "");
+	define("SANTAFOX_VERSION", "3.00");
+	define("WEBFORM_CODING", true);
+	define("PRINT_MYSQL_ERRORS", false);
+	define("PAGE_FOR_404", "index");
 
 ?>

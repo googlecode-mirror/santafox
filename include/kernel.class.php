@@ -128,13 +128,7 @@ class kernel
      */
     private $include_modules;
 
-    /**
-     * Массив с днями недели, все слова маленькими буквами
-     *
-     * @var array
-     * @access private
-     */
-    private $weekdays_l = array("воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота");
+
     /**
      * Массив с днями недели, дни с заглавной буквы
      *
@@ -142,21 +136,7 @@ class kernel
      * @access private
      */
     private $weekdays_f = array("Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота");
-    /**
-     * Массив с днями недели, все слова заглавными буквами
-     *
-     * @var array
-     * @access private
-     */
-    private $weekdays_u = array("ВОСКРЕСЕНЬЕ", "ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА");
 
-    /**
-     * Названия месяцев. Все слова маленькими буквами
-     *
-     * @var array
-     * @access private
-     */
-    private $months_l = array("", "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря");
 
     /**
      * Названия месяцев. Все слова с заглавных букв
@@ -165,15 +145,8 @@ class kernel
      * @access private
      */
     private $months_f = array("", "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря");
+    //@todo использовать lang[]
 
-    /**
-     * Названия месяцев. Все слова заглавными буквами
-     *
-     * @var array
-     * @access private
-     */
-    private $months_u = array("", "ЯНВАРЯ", "ФЕВРАЛЯ", "МАРТА", "АПРЕЛЯ", "МАЯ", "ИЮНЯ", "ИЮЛЯ", "АВГУСТА", "СЕНТЯБРЯ", "ОКТЯБРЯ", "НОЯБРЯ", "ДЕКАБРЯ");
-    //@todo использовать 1 массив для месяцев и 1 для дней недели
 
     /**
      * Путь к корню сайта
@@ -649,12 +622,12 @@ class kernel
     }
 
     /**
-     * Возвращает префиск MYSQL-таблиц
+     * Возвращает префикс MySQL-таблиц
      *
      * Возвращает префикс информационной базы для доступа к таблицам MySql,
      * например, для таблицы "ap_admin" префикс будет "ap".
      * @access private
-     * @return Strung
+     * @return String
 	 */
     function pub_prefix_get()
     {
@@ -4801,24 +4774,8 @@ class kernel
         $matches = false;
         //Определим, под чем мы вообще работаем, что бы правильно отстроить пути
        	if ($this->curent_os == "winnt")
-       	{
-       		//Если это винда, то нужно поработать
-       	    //заменим все слэши на обратные
        	    $str = str_replace("/", "\\", $str);
-        	//Здесь какой-то не понятный баг из pclzip
-        	//Путь почему то приходит полный но, без буквы.
-        	//Теперь собстенно проверим, и если нет полного пути
-        	//добавим его
-        	/*
-        	$tmp = substr($root, 2);
-        	//$this->debug("tmp : ".$tmp, true);
-
-        	if (preg_match("'^".preg_quote($tmp)."'", $str, $matches))
-            	$str = substr($root, 0, 2).$str;
-			*/
-
-       	}
-        if (!preg_match("'^".preg_quote($root)."'", $str, $matches))
+        if (!preg_match("'^".preg_quote($root)."'i", $str, $matches))
             $str = $root.$str;
         return $str;
     }
@@ -4828,7 +4785,8 @@ class kernel
      *
      * @param string $path
      * @param string $new_path
-     * @param string $close_dir
+     * @param boolean $close_dir
+     * @param boolean $is_move_temp
      * @return string
      */
     function pub_file_move($path, $new_path, $close_dir = true, $is_move_temp = false)

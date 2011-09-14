@@ -449,7 +449,7 @@ class manager_stat
     function save_host($IDPartner, $IDReferer, $IDUri, $IDSearch, $IDWord, $IDSess, $ip)
     {
     	global $kernel;
-    	$iplong		=		ip2long($ip);
+        $iplong	= sprintf("%u", ip2long($ip));
     	if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_host (IDHost, IDPartner, IDReferer, IDUri, IDSearch, IDWord, IDSess, ip, iplong, tstc) VALUES (0, ".mysql_real_escape_string($IDPartner).", ".mysql_real_escape_string($IDReferer).", ".mysql_real_escape_string($IDUri).", ".mysql_real_escape_string($IDSearch).", ".mysql_real_escape_string($IDWord).", '".mysql_real_escape_string($IDSess)."', '".mysql_real_escape_string($ip)."', ".mysql_real_escape_string($iplong).", UNIX_TIMESTAMP())") )
             echo "<BR>".mysql_error()."<BR>";
     	$IDHost = mysql_insert_id();

@@ -3726,13 +3726,13 @@ class kernel
 			$file_small = $path_full_image."/tn/".$newname;
 			$file_surce = $path_full_image."/source/".$newname;
 
-
+            $im=null;
 			if ($type == ".jpg")
-				$im = ImageCreateFromJPEG($ufile);
+				$im = @ImageCreateFromJPEG($ufile);
 			elseif($type == ".gif")
-				$im = ImageCreateFromGIF($ufile);
+				$im = @ImageCreateFromGIF($ufile);
 			elseif ($type == ".png")
-				$im = ImageCreateFromPNG($ufile);
+				$im = @ImageCreateFromPNG($ufile);
 
 			if (is_resource($im))
 			{
@@ -3915,8 +3915,9 @@ class kernel
                                 $filepath = $hostname.$filepath;
                             }
                             $file_orig_name = md5($filepath);
-                            $mail->AddAttachment($filepath, $file_orig_name);
-                            $message = str_replace($filepath, $file_orig_name, $message);
+                            //$mail->AddAttachment($filepath, $file_orig_name);
+                            $mail->AddEmbeddedImage($filepath, $file_orig_name, $file_orig_name);
+                            $message = str_replace($filepath, 'cid:'.$file_orig_name, $message);
                         }
                     }
 

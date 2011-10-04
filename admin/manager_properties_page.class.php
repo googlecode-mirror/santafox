@@ -435,22 +435,27 @@ class properties_page
 		//2ой проход, уже с метками модулей
     	$link_in_page_real = $kernel->priv_page_real_link_get($link_in_page_real, $this->id_curent_page);
 
-
+        $is_root = $kernel->priv_admin_is_root();
+        $curr=0;
 		//Начнём перебирать метки и строить для каждой интерфейс
-		foreach ($curent_link as $num => $value)
+		foreach ($curent_link as $value)
 		{
+            //если не рут админ, то даже не показываем ему ***_admin метки
+            if (!$is_root && preg_match('~_admin$~',$value))
+                continue;
             $id_action = trim($link_in_page_real[$value]['id_action']);
 		    $id_page   = trim($link_in_page_real[$value]['page']);
 		    $full_name_file = '/'.$this->id_curent_page.'_'.$value.'.html';
 
 		    //Проверим наследуется это значение или нет
-            $metki[$num]['name'] = $value;
+            $metki[$curr]['name'] = $value;
             //$metki[$num]['is4module'] = false;
-            $metki[$num]['name_falg'] = "flag_metka_".$num;
-            $metki[$num]['naslednoe'] = !($id_page == trim($this->id_curent_page) || (!isset($link_in_page_real[$value]['page'])));
-            $metki[$num]['id_action'] = $id_action;
-            $metki[$num]['main_page'] = $this->page_is_main;
-            $metki[$num]['file_edit'] = $full_name_file;
+            $metki[$curr]['name_falg'] = "flag_metka_".$curr;
+            $metki[$curr]['naslednoe'] = !($id_page == trim($this->id_curent_page) || (!isset($link_in_page_real[$value]['page'])));
+            $metki[$curr]['id_action'] = $id_action;
+            $metki[$curr]['main_page'] = $this->page_is_main;
+            $metki[$curr]['file_edit'] = $full_name_file;
+            $curr++;
 		}
         return $kernel->pub_json_encode($metki);
     }
@@ -621,16 +626,6 @@ class properties_page
 
 	}
 
-	function create_string_metka_link()
-	{
-
-
-
-
-
-	}
-
-
     /**
      * Получает свойства страницы из POST-а и подготавливает данные для сохранения
      * @param array $data
@@ -646,9 +641,7 @@ class properties_page
         if ((isset($data['page_name'])) && !empty($data['page_name']))
         	$caption = $kernel->pub_str_prepare_set($data['page_name']);
         else
-        {
         	$caption = '';
-        }
 
 		// Ссылка на другую страницу
 		if ((isset($data['page_url'])) && !empty($data['page_url']))
@@ -779,7 +772,7 @@ class properties_page
         	       unset($modules[$key]);
         	}
     	}
-
+        $is_root = $kernel->priv_admin_is_root();
     	$link_array = $modules;
 
     	$serialize = array();
@@ -787,17 +780,37 @@ class properties_page
     	{
     		foreach ($link_array as $key => $val)
     		{
+                //если это не рут-админ, а метка вида ***_admin - не обрабатываем её
+                if (!$is_root && preg_match('~_admin$~',$key))
+                    continue;
     			if ((is_numeric($val)) || (empty($val)))
     				$serialize[$key] = $this->return_full_link($val);
     		}
     	}
 
+
+        if (!$is_root)
+        {//если не рут-админ, апдейт выборочный (подставляем старые значения, где их нет в готовом массиве)
+            $prev_rec = $kernel->db_get_record_simple('_structure','id="'.$this->id_curent_page.'"');
+            if (!$prev_rec)
+                return;
+            $prev_ser = unserialize($prev_rec['serialize']);
+            if (is_array($prev_ser))
+            {
+                foreach ($prev_ser as $k=>$v)
+                {
+                    if (!isset($serialize[$k]))
+                        $serialize[$k]=$v;
+                }
+            }
+        }
+
     	//Теперь можно прописать весь Сериализе сразу в таблицу, так как
-		//в нем указаны только те ссылки, которые поставлены в соответсвтие
+		//в нем указаны только те ссылки, которые поставлены в соответствие
 
 		$query = 'UPDATE '.$kernel->pub_prefix_get().'_structure '
-        . ' SET serialize = "'.addslashes(serialize($serialize)).'"'
-        . ' WHERE (id = "'.$this->id_curent_page.'")';
+        . ' SET serialize = "'.mysql_real_escape_string(serialize($serialize)).'"'
+        . ' WHERE id = "'.$this->id_curent_page.'"';
 
 		$kernel->runSQL($query);
     }

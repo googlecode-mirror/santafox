@@ -248,8 +248,8 @@ function get_properes_page(e, fieldID)
         height:400,
         width:250,
         zIndex:2000,
-        title: 'Выбор страницы',//@todo use lang vars
-        buttons:{},
+        title: 'Выбор страницы',
+        buttons: {},
         modal: true
         //,close: function() {update_action_list(); }
 

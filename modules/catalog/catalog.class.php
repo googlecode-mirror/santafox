@@ -4725,8 +4725,16 @@ class catalog extends basemodule
             //пока без ограничения
             $offset = 0;
             $limit = 10000;
-            $items = $kernel->pub_session_get("search_items");
-            $kernel->pub_session_unset("search_items");
+
+            $squery = $kernel->pub_session_get("search_items_query");
+            $kernel->pub_session_unset("search_items_query");
+
+            $result = $kernel->runSQL($squery);
+            $items=array();
+            while ($row = mysql_fetch_assoc($result))
+                $items[] = $row;
+            mysql_free_result($result);
+
             $total = count($items);
             $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_search_results_mainlabel#]");
         }
@@ -8415,12 +8423,7 @@ class catalog extends basemodule
                     $squery = "SELECT items.* FROM ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_items AS items ".
                               "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$kernel->pub_module_id_get()."_".strtolower($groups[$group_id]['name_db'])." AS ".strtolower($groups[$group_id]['name_db'])." ON items.ext_id = ".strtolower($groups[$group_id]['name_db']).".id ".
                     		  "WHERE items.`group_id`=".$group_id." AND (".$squery.")";
-                    $items = array();
-                    $result = $kernel->runSQL($squery);
-                    while ($row = mysql_fetch_assoc($result))
-                        $items[] = $row;
-                    mysql_free_result($result);
-                    $kernel->pub_session_set("search_items",$items);
+                    $kernel->pub_session_set("search_items_query",$squery);
                     $kernel->pub_redirect_refresh_reload('show_items&search_results=1&group_id='.$group_id);
                 }
                 return $this->show_items($group_id);

@@ -168,7 +168,12 @@ abstract class BaseModule
                 $page = $this->get_template_block('page_passive');
             else
                 $page = $this->get_template_block('page_active');
-            $page = str_replace('%'.$linkLabelName.'%', $q.$currOffset, $page);
+
+            $link = $q.$currOffset;
+            if ($currOffset==0)//для первой страницы уберём &offset=0
+                $link = preg_replace('~&offset=0$~','',$link);
+            $page = str_replace('%'.$linkLabelName.'%', $link, $page);
+
             $page = str_replace('%page%', $p, $page);
             $pages[] = $page;
         }

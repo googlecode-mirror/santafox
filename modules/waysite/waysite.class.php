@@ -76,7 +76,7 @@ class waysite
 			//Возьмем свойство видимости из свойств страницы
 			$arr = $kernel->pub_page_property_get($key,'visible');
 			$visible = true;
-			if (($arr['isset']) && ($arr['value'] == "false"))
+			if ($arr['isset'] && ($arr['value'] == "false"))
 				$visible = false;
 
 			//Выводим, если позволяет свойство
@@ -88,7 +88,10 @@ class waysite
 					$tmpl = $this->template_array['link'];
 
 				$tmpl = str_replace("%text%", htmlspecialchars($way_item['caption']), $tmpl);
-				$tmpl = str_replace("%link%", $key.".html", $tmpl);
+                if ($key=="index")
+				    $tmpl = str_replace("%link%", "/", $tmpl);
+                else
+				    $tmpl = str_replace("%link%", $key.".html", $tmpl);
 
 				$way_arr[] = $tmpl;
 			}

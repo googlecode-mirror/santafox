@@ -154,9 +154,9 @@ $.widget("ui.selectmenu", {
 		
 		//original selectmenu width
 		var selectWidth = this.element.width();		
-		//set menu button width
-		this.newelement.width( (o.width) ? o.width : selectWidth);
-				
+		//set menu button width косячит
+		//this.newelement.width( (o.width) ? o.width : selectWidth);
+			
 		//hide original selectmenu element
 		this.element.hide();		
 				
@@ -348,6 +348,8 @@ $.widget("ui.selectmenu", {
 		} else { 
 			this.list.width( (o.menuWidth) ? o.menuWidth : ((o.width) ? o.width - o.handleWidth : selectWidth - o.handleWidth)); 
 		}	
+
+
 		
 		// calculate default max height
 		if (o.maxHeight) {

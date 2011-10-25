@@ -12,7 +12,7 @@
     * */
 
     /* % all_modules % заменяется на что-то вроде
-[["","","Действие не выбранно"],["Карта сайта","",""],["","8","Показать карту"],["Дорога","",""],["","9","Вывести дорогу"],["","10","Вывести страницу 2-ого уровня"],["Меню","",""],["","13","Вывести верхнее меню"],["","17","Вывести левое меню"],["Основные новости","",""],["","16","Вывести архив"],["","15","Вывести ленту"],["Поиск","",""],["","35","Вывести результаты поиска"],["","34","Вывести форму поиска (для главной)"],["Обратная связь","",""],["","24","Отобразить форму"],["Основные Комментарии","",""],["","40","Комментарии по-умолчанию"],["Вопросы и Ответы","",""],["","25","Показать список вопросов-ответов"],["","26","Показать список разделов вопросов-ответов"],["Каталог товаров","",""],["","37","Вывести содержимое корзины"],["","38","Вывести стикер корзины"],["","32","Название элемента"],["","39","Отобразить форму заказа"],["","30","Список категорий"],["","31","Список товаров"],["","36","Сформировать заголовок"],["Фотогалерея","",""],["","41","Показать все фото"],["","33","Сформировать список товаров"],["Ядро","",""],["","2","Вернуть заголовок страницы"],["","1","Редактор контента"]]
+[["","","Действие не выбрано"],["Карта сайта","",""],["","8","Показать карту"],["Дорога","",""],["","9","Вывести дорогу"],["","10","Вывести страницу 2-ого уровня"],["Меню","",""],["","13","Вывести верхнее меню"],["","17","Вывести левое меню"],["Основные новости","",""],["","16","Вывести архив"],["","15","Вывести ленту"],["Поиск","",""],["","35","Вывести результаты поиска"],["","34","Вывести форму поиска (для главной)"],["Обратная связь","",""],["","24","Отобразить форму"],["Основные Комментарии","",""],["","40","Комментарии по-умолчанию"],["Вопросы и Ответы","",""],["","25","Показать список вопросов-ответов"],["","26","Показать список разделов вопросов-ответов"],["Каталог товаров","",""],["","37","Вывести содержимое корзины"],["","38","Вывести стикер корзины"],["","32","Название элемента"],["","39","Отобразить форму заказа"],["","30","Список категорий"],["","31","Список товаров"],["","36","Сформировать заголовок"],["Фотогалерея","",""],["","41","Показать все фото"],["","33","Сформировать список товаров"],["Ядро","",""],["","2","Вернуть заголовок страницы"],["","1","Редактор контента"]]
  */
     var allModulesActions = %all_modules%;
 
@@ -116,20 +116,15 @@
         for (var i = 0; i < d.length; i++)
         {
             var str_content = "";
-            //str_content += '<tr id="string_metka_'+i+'" style="display: none;">';
-            str_content += '<tr id="string_metka_'+i+'">';
+            str_content += '<tr>';
             //Имя метки со скрытым инпутом, куда пишется непосредственное значение
-            str_content += '<td width="200" align="left" nowrap="nowrap">';
-            //str_content += '<input type="hidden"  id="metka_real_'+i+'" name="page_modules['+d[i].name+']" value="'+d[i].id_action+'"/>';
-            str_content += '<span id="label_text_metka_'+i+'">'+d[i].name+'</span></td>';
+            str_content += '<td class="name">';
+            str_content += '<label for="flag_metka_'+i+'">'+d[i].name+'</label></td>';
             //Галочка наследования
-            //str_content += '<td width="30" align="center"><input type="checkbox" name="page_inheritance['+d[i].name+']" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');"></td>';
-            str_content += '<td width="30" align="center"><input type="checkbox" name="'+d[i].name+'" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');"></td>';
+            str_content += '<td class="check"><input type="checkbox" name="'+d[i].name+'" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');"></td>';
             //Селект, который на который навешивается экстовская форма
-            str_content += '<td width="300"><select id="sel_modul_ext_'+i+'" style="width:270px;"></select></td>';
-            //str_content += '<td width="300" id="sel_modul_ext_'+i+'"></td>';
-            //Иконка редактора контента
-            str_content += '<td width="60" align="left"><img style="cursor:pointer;float:left;display:none;" width="26" height="26" id="img_edit_'+i+'" src="/admin/templates/default/images/icon_edit.gif" border="0" onclick="go_edit_content(arr_link_content['+i+'], false)" /><img style="cursor:pointer;display:none;float:left;" width="26" height="26" id="img_edit_s_'+i+'" src="/admin/templates/default/images/icon_edit_textarea.gif" border="0" onclick="go_edit_content(arr_link_content['+i+'], true)" /></td>';
+            str_content += '<td class="value"><select id="sel_modul_ext_'+i+'"></select></td>';
+            str_content +='<td><span style="height: 26px; display: block;"><img class="edit_icon" id="img_edit_'+i+'" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content['+i+'], false)" /><img class="edit_icon"  id="img_edit_s_'+i+'" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content['+i+'], true)" /></span></td>';
             str_content += '</tr>';
             //Добавляем небольшими кусками, так как иначе IE глючит
             $(str_content).appendTo('#table_metki');
@@ -219,7 +214,7 @@
     $("#fieldPageTemplate").html(htmlSelectTemplates);
     $("#fieldPageTemplate").change(function () {saveStructForm('%chnage_template%', false);});
     //выбор страницы перехода
-    $("#fieldPageURL").click(function (e) {
+    $("#opentree").click(function (e) {
         get_properes_page(e, 'fieldPageURL');
     });
 
@@ -305,89 +300,107 @@
 	run_update_metki('%link_show_metki%');
 </script>
 
-<div id="structure_all_form" style="display: block; width: 630px;">
-    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-        <div>
-		<table>
-		<tr>
-		<td valign="center">
-		<h3>
-		Страница: &quot;<span id="main_label_name_page">%page_name%</span>&quot;</h3></td><td valign="center">&nbsp;&nbsp;<a target="_blank" href="%link_page_view%" id="link_for_preview"><img alt="Просмотреть страницу в новом окне" width="24" height="24" border="0" src="/admin/templates/default/images/eye.gif"/></a>
-		</td>
-		</tr>
-		</table>
-		</div>
+<div id="structure_all_form">
+		<h3>Страница: &quot;<a target="_blank" href="%link_page_view%" title="Откроется в новом окне">%page_name%</a>&quot;</h3>
         <div id="form">
-            <form id="struct_form" class="x-form">
-                <fieldset>
+            <form id="struct_form">
+                <fieldset title="[#page_prop_label_prop#]">
                     <legend>[#page_prop_label_prop#]</legend>
-
                     <table border="0" cellpadding="0" cellspacing="0">
-                    <tbody id="table_pageprops">
-
-                    <tr>
-                        <td align="right"><label for="fieldPageName">[#page_prop_name_page#]</label></td>
-                        <td>&nbsp;</td>
-                        <td><input type="text" name="page_properties[page_name]" style="width:180px;" value="%page_name%" id="fieldPageName"></td>
-                    </tr>
-
-                    <tr>
-                        <td align="right"><label for="fieldPageTitle">[#page_prop_name_title#]</label></td>
-                        <td>&nbsp;</td>
-                        <td><input type="text" name="page_properties[page_title]" style="width:180px;" value="%page_title%" id="fieldPageTitle"></td>
-                    </tr>
-
-                    <tr>
-                        <td align="right"><label for="fieldPageID">[#page_prop_name_id#]</label></td>
-                        <td>&nbsp;</td>
-                        <td><input type="text" name="page_properties[page_id]" style="width:180px;" value="%page_id%" id="fieldPageID"></td>
-                    </tr>
-
-                    <tr>
-                        <td align="right"><label for="fieldPageURL">[#page_prop_link_page#]</label></td>
-                        <td>&nbsp;</td>
-                        <td><input type="text" name="page_properties[page_url]" style="width:180px;" value="%page_url%" id="fieldPageURL"></td>
-                    </tr>
-
-                    <tr>
-                        <td align="right"><label for="fieldPageOnlyAuth">Доступна только авторизированым</label></td>
-                        <td>&nbsp;</td>
-                        <td><input type="checkbox" name="page_properties[only_auth]" id="fieldPageOnlyAuth" %only_auth%></td>
-                    </tr>
-
-                    <tr>
-                        <td align="right">[#page_prop_templte_page#]</td>
-                        <td><input type="checkbox" onClick="jspub_disabled_change('flag_template', 'fieldPageTemplate')" name="page_properties[flag_template]" id="flag_template"></td>
-                        <td>
-                            <select name="page_properties[page_template]" id="fieldPageTemplate">
-
-                            </select>
-                        </td>
-                    </tr>
-                    </tbody>
+	                    <tbody>
+	                    	
+		                    <tr>
+		                        <td class="name">
+		                        	<label for="fieldPageName">[#page_prop_name_page#]</label>
+		                        </td>
+		                        <td class="check"></td>
+		                        <td class="value">
+		                        	<input type="text" name="page_properties[page_name]" value="%page_name%" id="fieldPageName">
+		                        </td>
+		                        <td></td>
+		                    </tr>
+		
+		                    <tr>
+		                        <td class="name">
+		                        	<label for="fieldPageTitle">[#page_prop_name_title#]</label>
+		                        </td>
+		                        <td class="check"></td>
+		                        <td class="value">
+		                        	<input type="text" name="page_properties[page_title]" value="%page_title%" id="fieldPageTitle">
+		                        </td>
+		                    </tr>
+		
+		                    <tr>
+		                        <td class="name">
+		                        	<label for="fieldPageID">[#page_prop_name_id#]</label>
+		                        </td>
+		                        <td class="check"></td>
+		                        <td class="value">
+		                        	<input type="text" name="page_properties[page_id]" value="%page_id%" id="fieldPageID">
+		                        </td>
+		                        <td></td>
+		                    </tr>
+		
+		                    <tr>
+		                        <td class="name">
+		                        	<label for="fieldPageURL">[#page_prop_link_page#]</label>
+		                        </td>
+		                        <td class="check"></td>
+		                        <td class="value">
+		                        	<input type="text" name="page_properties[page_url]" value="%page_url%" id="fieldPageURL">
+		                        </td>
+		                        <td><span class="ui-icon ui-icon-folder-open" style="cursor: pointer;" id="opentree"></span></td>
+		                    </tr>
+		
+		                    <tr>
+		                        <td class="name">
+		                        	<label for="fieldPageOnlyAuth">Только авторизированым</label>
+		                        </td>
+		                        <td class="check">
+		                        	<input type="checkbox" name="page_properties[only_auth]" id="fieldPageOnlyAuth" %only_auth%>
+		                        </td>
+		                        <td class="value">
+		                        	Если отмечен, доступен только авторизованным
+		                        </td>
+		                        <td></td>
+		                    </tr>
+		
+		                    <tr>
+		                        <td class="name">
+		                        	<label for="flag_template">[#page_prop_templte_page#]</label>
+		                        </td>
+		                        <td class="check">
+		                        	<input type="checkbox" onClick="jspub_disabled_change('flag_template', 'fieldPageTemplate')" name="page_properties[flag_template]" id="flag_template">
+		                        </td>
+		                        <td class="value">
+		                            <select name="page_properties[page_template]" id="fieldPageTemplate"></select>
+		                        </td>
+		                        <td></td>
+		                    </tr>
+	                    </tbody>
                     </table>
                 </fieldset>
 
-                <fieldset id="page_prop_modules">
+                <fieldset id="page_prop_modules" title="[#page_prop_label_prop_addon#]">
                     <legend>[#page_prop_label_prop_addon#]</legend>
                     <table border='0' cellpadding='0' cellspacing='0'>
-                    <tbody id='table_modul_prop'>
-
-                    %str_prop_modul%
-                    </tbody>
+	                    <tbody id='table_modul_prop'>
+	                    	%str_prop_modul%
+	                    </tbody>
                     </table>
-
                 </fieldset>
 
-                <fieldset id="metki_content">
+                <fieldset id="metki_content" title="[#page_prop_label_link#]">
                     <legend>[#page_prop_label_link#]</legend>
-                    <table border="0" cellpadding="0" cellspacing="0"><tbody id="table_metki"></tbody></table>
+                    <table border="0" cellpadding="0" cellspacing="0">
+                    	<tbody id="table_metki">
+                    	</tbody>
+                    </table>
                 </fieldset>
-                <div align="center"> <input type="button" id="admin_struct_savebutton" value="[#structure_page_properties_button_save#]"></div>
+                
+                <div>
+                	<input type="button" id="admin_struct_savebutton" value="[#structure_page_properties_button_save#]">
+                </div>
             </form>
-
         </div>
-    </div></div></div>
-    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
 </div>

@@ -21,6 +21,7 @@ var config =
                ImageBrowserWindowHeight:440,
                FlashBrowserWindowHeight:440,
                LinkUpload:false,
+               FullScreen: true,
                ImageUpload:false,
                FlashUpload:false,
                language:'ru',
@@ -46,19 +47,12 @@ var config =
 });
 
 </script>
-<style type="text/css">
-html, body{height:100%}
-form, textarea{height:100%}
-</style>
 </head>
 
-<body leftmargin="0" topmargin="0" bottommargin="0" marginwidth="0" marginheight="0">
-
+<body>
 <form method="post" action="/admin/?action=save_content">
-<textarea id="[#name_edit#]" name="[#name_edit#]" style="width:100%; height:100%;">[#edit_content#]</textarea>
+<textarea id="[#name_edit#]" name="[#name_edit#]">[#edit_content#]</textarea>
 <input type="hidden" value="[#file_name#]" name="file">
 </form>
-
-
 </body>
 </html>

@@ -237,8 +237,8 @@ class frontoffice_manager
 		$array_link = $kernel->priv_page_real_link_get($array_link, $section_id, true);
         // Создаем массив с приоритетами выполнения модулей
         $priority_array = array();
-        // Ядру - чуть меньше чем всем остальным
-        $priority_array['kernel'] = 99;
+        // Ядру - самый низкий приоритет
+        $priority_array['kernel'] = 1;
 
         // Устанавливаем приоритеты для модулей
         $modules=$kernel->db_get_list_simple("_modules","parent_id IS NOT NULL","id,parent_id");

@@ -511,14 +511,13 @@ class frontoffice_manager
     private function priv_test_direct_run_metod()
     {
         global $kernel;
-
         //Определим, есть ли вообще прямой вызов
-        $id_modul = mysql_real_escape_string($kernel->pub_httpget_get('da_modul'));
-        $id_metod = mysql_real_escape_string($kernel->pub_httpget_get('da_metod'));
+        $id_modul = $kernel->pub_httpget_get('da_modul');
+        $id_metod = $kernel->pub_httpget_get('da_metod');
         if ((empty($id_modul)) || (empty($id_metod)))
         {
-            $id_modul = mysql_real_escape_string($kernel->pub_httppost_get('da_modul'));
-            $id_metod = mysql_real_escape_string($kernel->pub_httppost_get('da_metod'));
+            $id_modul = $kernel->pub_httppost_get('da_modul');
+            $id_metod = $kernel->pub_httppost_get('da_metod');
         }
 
         if ((empty($id_modul)) || (empty($id_metod)))

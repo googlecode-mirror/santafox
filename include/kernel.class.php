@@ -1188,16 +1188,11 @@ class kernel
     function priv_da_metod_get($id_modul = '')
     {
         if (empty($id_modul))
-        {
             $id_modul = $this->pub_module_id_get(true);
-            $id_modul = $id_modul['id'];
-        }
         if (empty($id_modul))
             return false;
-
         if (!isset($this->open_metod[$id_modul]))
             return false;
-
         return $this->open_metod[$id_modul];
     }
 
@@ -1240,11 +1235,8 @@ class kernel
     {
         //По умолчанию выставляем для текущего модуля
         $id_modul = $this->pub_module_id_get(true);
-        $id_modul = $id_modul['id'];
-
         if (empty($id_metod) || empty($id_modul))
             return false;
-
         //Добавим этот метод в разрешённые
         $this->open_metod[$id_modul][$id_metod] = $run_and_stop;
         return true;

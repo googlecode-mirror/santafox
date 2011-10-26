@@ -105,6 +105,25 @@ body {
 	overflow: auto;
 	background: #ffffff;
 }
+#content .admin_table {
+	width: 90%;
+}
+#content .admin_table th {
+	background: #23427C;
+	color: #fff;
+	padding: 4px 0;
+	border: 1px solid #000;
+}
+#content .admin_table td {
+	padding: 2px 6px 4px;
+	background: #ddd;
+	border: 1px solid #000;
+}
+#content .admin_table .admin_table_wstring td {
+	background: #fff;
+	border: none;
+	padding: 10px 0 0;
+}
 
 #structure_all_form {
 	width: 600px; 

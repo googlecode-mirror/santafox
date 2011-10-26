@@ -433,9 +433,3 @@ jQuery(function($){
 	$.datepicker.setDefaults($.datepicker.regional['ru']);
 });
 
-function resizeble() {
-	var content_height = $.browser.opera? window.innerHeight : $(window).height();
-	content_height -= 120;
-	$('#west').height(content_height);
-
-}

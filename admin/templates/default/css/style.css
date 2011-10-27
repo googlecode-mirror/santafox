@@ -74,7 +74,6 @@ body {
     padding: 0 0 20px;
     float: left;
     overflow: auto;
-	border-right: 2px solid #A9BFD3;
 }
 #left_accpanel {
 	width: 100%;
@@ -107,6 +106,7 @@ body {
 }
 #content .admin_table {
 	width: 90%;
+	margin: 10px 0;
 }
 #content .admin_table th {
 	background: #23427C;
@@ -116,7 +116,6 @@ body {
 }
 #content .admin_table td {
 	padding: 2px 6px 4px;
-	background: #ddd;
 	border: 1px solid #000;
 }
 #content .admin_table .admin_table_wstring td {

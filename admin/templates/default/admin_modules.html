@@ -83,8 +83,8 @@
                 <fieldset>
                     <legend>[#modules_legend_action_modul#]</legend>
 
-                    <div>
-                        <label>[#modules_label_action_new#]</label>
+                    <div style="padding: 0 0 10px;">
+                        <label style="padding: 0 4px 0 0;">[#modules_label_action_new#]</label>
                         <select id="moduleNewActionSelect"></select>
                         <input type="button" id="button_add_action" value="Создать"> <!-- //@todo move 2 lang vars  -->
                     </div>
@@ -101,9 +101,11 @@
 </div>
 
 <!-- @names_module -->
-<label style="width:275px;">[#modules_edit_lang_name#] &quot;[#code#]&quot;</label>
-<input type="text" name="langname[%id_name%][[#code#]]" value="[#value#]" style="width:300px;">
-<br clear="all">
+<div style=" vertical-align: top; padding: 0 0 10px">
+<label style="display: inline-block; width: 140px;">[#modules_edit_lang_name#] &quot;[#code#]&quot;</label>
+<input style="display: inline-block;" type="text" name="langname[%id_name%][[#code#]]" value="[#value#]">
+</div>
+
 
 <!-- @action_modules -->
 /*

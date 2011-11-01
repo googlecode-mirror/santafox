@@ -116,9 +116,9 @@ DROP TABLE IF EXISTS `%PREFIX%_catalog_visible_gprops`;
 
 DROP TABLE IF EXISTS `%PREFIX%_comments`;
 
-DROP TABLE IF EXISTS `%PREFIX%_faq_content`;
+DROP TABLE IF EXISTS `%PREFIX%_faq1_content`;
 
-DROP TABLE IF EXISTS `%PREFIX%_faq_partitions`;
+DROP TABLE IF EXISTS `%PREFIX%_faq1_partitions`;
 
 INSERT INTO `%PREFIX%_modules` VALUES ('kernel',NULL,'[#structure_label_kernelaction#]','0','a:0:{}','a:0:{}','a:2:{s:11:\"kernel_stat\";s:30:\"[#top_menu_items4_main_admin#]\";s:14:\"kernel_content\";s:31:\"[#structure_label_editcontent#]\";}','a:0:{}','a:0:{}');
 

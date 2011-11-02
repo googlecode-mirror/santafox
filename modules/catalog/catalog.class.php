@@ -7639,8 +7639,8 @@ class catalog extends basemodule
     public function pub_catalog_show_linked_items($template, $limit)
     {
         global $kernel;
-        $itemid = $kernel->pub_httpget_get($this->frontend_param_item_id_name);
-        if (empty($itemid))
+        $itemid = intval($kernel->pub_httpget_get($this->frontend_param_item_id_name));
+        if ($itemid<1)
             return "";//если нет параметра - айдишника товара, нам нечего выводить
 
         $this->set_templates($kernel->pub_template_parse($template));

@@ -92,6 +92,7 @@ body {
     background: -o-linear-gradient(#eef5fd, #c9defa);
     background: linear-gradient(#eef5fd, #c9defa);
     -pie-background: linear-gradient(top, #eef5fd, #c9defa);
+    cursor: pointer;
     behavior: url(/admin/js/PIE.htc);
 }
 #left_accpanel div.left_content {

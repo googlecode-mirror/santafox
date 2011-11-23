@@ -38,15 +38,6 @@
     float:left;
     min-width:100px;
 }
-/*заголовок блока в левом меню*/
-div.lm_blockhead{
-    text-decoration:underline;
-    cursor:pointer;
-    width:100%;
-    height:20px;
-    font-weight:bold;
-    background-color:#7ba0cd;
-}
 
 img,body,html{
     border: 0 none;

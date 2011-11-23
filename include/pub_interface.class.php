@@ -34,18 +34,6 @@ class pub_interface
     var $help_visible = true;
     var $tree;
 
-
-    /**
-     * Конструктор класса
-     *
-     * @return pub_interface
-     */
-    function pub_interface()
-    {
-        global $kernel;
-
-    }
-
     /**
      * Формирует массив для меню с установленными модулями имеющими административный интерфейс
      *
@@ -151,12 +139,12 @@ class pub_interface
 
 	                $vareables_name[] = "this.mod_".$module_id;
 	                break;
+                default:
+                    $menu='';
+                    break;
 			}
 			$menus[] = $menu;
 		}
-
-		//$html = '';
-
 		$html = $template['content'];
 		$html = str_replace('%variables_name%'  , join(",\n",$vareables_name), $html);
 		$html = str_replace('%variables_curent%', $var_is_curent             , $html);
@@ -179,7 +167,7 @@ class pub_interface
                                                         'content' => $tree->get_tree()
                                                         );
 
-        //Зарегестрируем здесь же, все действия кликов по ноде
+        //Зарегистрируем здесь же, все действия кликов по ноде
         $this->node_click[$tree->get_action_click_node()] = 1;
 
     }
@@ -254,9 +242,11 @@ class pub_interface
 
     function set_menu($name = '', $id = '', $array = null)
     {
-        if (is_array($array)) {
-            $query = array();
-        	foreach ($array as $param => $value) {
+        $query = array();
+        if (is_array($array))
+        {
+        	foreach ($array as $param => $value)
+            {
         		$query[] = $param.'='.$value;
         	}
         }
@@ -282,9 +272,9 @@ class pub_interface
      * Проверяет правильность текущего пункта левого меню
      *
      * Вызывается перед выводом контента всей секции. В случае, если текущем
-     * пунктом меню является один из пунктов, которого реалньо нет в меню
+     * пунктом меню является один из пунктов, которого реально нет в меню
      * то он заменяется на пункт меню по умолчанию. Администратор может
-     * покинуть секцию находясья в каком-то процессе, и возврат к этому процессу
+     * покинуть секцию находясь в каком-то процессе, и возврат к этому процессу
      * в таком виде, может привести к нежелательным действиям.
      * @access private
      * @return void
@@ -293,13 +283,7 @@ class pub_interface
     function check_left_element()
     {
         global $kernel;
-
         $curent = $kernel->pub_section_leftmenu_get();
-
-//        if ((empty($curent)) && (!empty($this->menu_default)))
-//            $kernel->priv_section_leftmenu_set($this->menu_default, true);
-        //$kernel->debug($curent, true);
-
         if ((!isset($this->menu_line[$curent])) && (!isset($this->node_click[$curent])))
         {
             if (!empty($this->menu_default))
@@ -312,7 +296,8 @@ class pub_interface
      * Строит массив блоков меню по по массиву $this->menu
      *
      * В качестве значений массива - непосредственный HTML код, который
-     * должн быть вставлен в соответствующий блок меню
+     * должен быть вставлен в соответствующий блок меню
+     * @param string template
      * @return array
      */
     function get_menu($template)
@@ -394,12 +379,14 @@ class pub_interface
 		$next_get = array();
 		$tmp = $kernel->pub_httpget_get();
 		if (isset($tmp['action']))
-		  unset($tmp['action']);
+		    unset($tmp['action']);
 
 		if (is_array($tmp))
 		{
 		    foreach ($tmp as $get_name => $get_value)
+            {
 		        $next_get[] = $get_name."=".$get_value;
+            }
 		    $next_get = join("&", $next_get);
 		}
 		$html = str_replace("[#get_url#]", $next_get, $html);

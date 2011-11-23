@@ -1,16 +1,15 @@
 <!-- @content -->
-<script type="text/javascript">
-		//[#script_create_panel#]
-
-$('div.lm_blockhead').live("click",(function() {
-        $(this).next().toggle();
-        return false;
-    }));
-</script>
-
 <div id="left_accpanel">
 [#panels#]
 </div>
+<script type="text/javascript">
+$(function() {
+    $('#left_accpanel h3').click(function() {
+   		$(this).next().toggle('slow');
+   		return false;
+   	});
+});
+</script>
 <!-- @panel_block -->
 <h3 class="left_content">[#name_panel#]</h3>
 <div class="left_content">[#content_panel#]</div>

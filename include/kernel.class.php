@@ -1424,8 +1424,9 @@ class kernel
      * на экран пользователя
      * @param string $html
      * @param boolean $for_edit Если true - то значит это вывод в редактор котнента и не нужно делать ряд вещей
+     * @param boolean $js_encode
      * @access private
-     * @return void
+     * @return string
      */
     function priv_output($html = "", $for_edit = false, $js_encode=false)
     {
@@ -1486,8 +1487,8 @@ class kernel
                     $html = str_replace($match[0], $repl, $html);
                 }
             }
-            //если требуется, HTTP-запрос и не в админке, то добавим index_stat.php
-            if (defined("GENERATE_STATISTIC") && GENERATE_STATISTIC && isset($_SERVER['HTTP_HOST']) && !$is_xml_data && !preg_match("/^\\/admin\\//",$_SERVER['REQUEST_URI']))
+            //если требуется, HTTP-запрос и не-ajax запрос и не в админке, то добавим stat.php
+            if (defined("GENERATE_STATISTIC") && GENERATE_STATISTIC && isset($_SERVER['HTTP_HOST']) && !$this->pub_is_ajax_request() && !$is_xml_data && !preg_match("/^\\/admin\\//",$_SERVER['REQUEST_URI']))
             {
                 //если нашли </body>, то перед ним
                 if (mb_strpos($html, "</BODY>")!==false)
@@ -1518,6 +1519,18 @@ class kernel
         }
 
         print $html;
+    }
+
+    /**
+     * Определяет, является ли текущий запрос ajax-запросом
+     * @return bool
+     */
+    public function pub_is_ajax_request()
+    {
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest')
+            return true;
+        else
+            return false;
     }
 
 

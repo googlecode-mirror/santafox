@@ -630,7 +630,7 @@ class catalog extends basemodule
      * @param integer $group_id id-щник тов. группы для импорта
      * @param file   $file tmp-имя uploaded-файла
      * @param string $separator разделитель
-     * @return HTML
+     * @return string
      */
     private function show_import_csv_table($group_id, $file, $separator)
     {
@@ -763,7 +763,7 @@ class catalog extends basemodule
 	/**
      * Показывает форму импорта из CSV-файла в админке
      *
-     * @return HTML
+     * @return string
      */
     private function show_import_csv_form()
     {
@@ -835,7 +835,7 @@ class catalog extends basemodule
      * Отображает полную информацию о товаре
      *
      * @param integer $itemid id-шник товара
-     * @return HTML
+     * @return string
      */
     public function pub_catalog_show_item_details($itemid)
     {
@@ -1037,7 +1037,7 @@ class catalog extends basemodule
      * @param $user_mail_tpl string шаблон письма пользователю
      * @param $user_mail_subj string тема письма пользователю
      *
-     * @return HTML
+     * @return string
      */
     public function pub_catalog_show_basket_order_form($template, $manager_mail_tpl, $manager_mail_subj, $manager_email, $user_mail_tpl, $user_mail_subj)
     {
@@ -1184,7 +1184,7 @@ class catalog extends basemodule
      * @param array $basket_items товары корзины
      * @param array $order_fields набор заполненных полей key=>value для заказа
      *
-     * @return HTML
+     * @return string
      */
     private function process_basket_items_tpl($template, $basket_items, $order_fields=array())
     {
@@ -1295,7 +1295,7 @@ class catalog extends basemodule
      *
      * @param $template string шаблон
      *
-     * @return HTML
+     * @return string
      */
     public function pub_catalog_show_basket_items($template)
     {
@@ -1309,7 +1309,7 @@ class catalog extends basemodule
      * @param string $empty_tpl шаблон для пустой корзины
      * @param string $not_empty_tpl шаблон для корзины с товарами
      *
-     * @return HTML
+     * @return string
      */
     public function pub_catalog_show_basket_label($empty_tpl, $not_empty_tpl)
     {
@@ -1363,7 +1363,7 @@ class catalog extends basemodule
      *
      * @param string $text
      * @param boolean $ignore_zero_price игнорировать приставку для товаров с нулевой ценой?
-     * @return HTML
+     * @return string
      */
     private function convert_basket_sum_strings($text, $ignore_zero_price=false)
     {
@@ -1609,7 +1609,7 @@ class catalog extends basemodule
                             $avalues = array();
                             foreach ($_REQUEST[$param] as $aparam)
                             {
-                                $linkParams.=$param."[]=".$aparam."&";
+                                $linkParams.=$param."[]=".urlencode($aparam)."&";
                                 $avalues[] = "'".$kernel->pub_str_prepare_set($aparam)."'";
                             }
                             $value = implode(",", $avalues);
@@ -1617,13 +1617,13 @@ class catalog extends basemodule
                     }
                     else
                     {
-                        $linkParams.=$param."=".$_REQUEST[$param]."&";
+                        $linkParams.=$param."=".urlencode($_REQUEST[$param])."&";
                         $value = $kernel->pub_str_prepare_set($_REQUEST[$param]);
                     }
                 }
                 elseif ($is_in_params)
                 {
-                    $linkParams.=$param."=".$params[$param]."&";
+                    $linkParams.=$param."=".urlencode($params[$param])."&";
                     $pval = $params[$param];
                     $firstChar = mb_substr($pval,0,1);
                     $lastChar = mb_substr($pval,-1);
@@ -1665,7 +1665,7 @@ class catalog extends basemodule
      * @param boolean  $use_group_template   использовать шаблон тов. группы?
      * @param array  $params массив параметров
      * @param boolean  $need_postprocessing очищать оставшиеся метки  и выводить переменные?
-     * @return HTML
+     * @return string
      */
     public function pub_catalog_show_inner_selection_results($filter_stringid, $use_group_template=false, $params=array(), $need_postprocessing=true)
     {
@@ -1995,7 +1995,7 @@ class catalog extends basemodule
      * @param string  		$multi_group_tpl          файл шаблона для разных групп
      * @param integer|boolean $catid                    idшник категории (для прямого вызова)
      * @param string|boolean  $custom_template          файл шаблона (для прямого вызова)
-     * @return HTML
+     * @return string
      */
     public function pub_catalog_show_items($limit, $show_cats_if_empty_items, $cats_tpl, $multi_group_tpl='', $catid=false, $custom_template=false)
     {
@@ -2295,7 +2295,7 @@ class catalog extends basemodule
      * @param integer $openlevels Кол-во раскрываемых уровней меню
      * @param integer $showlevels макс. кол-во выводимых уровней меню
      * @param string $items_pagename страница товара
-     * @return HTML
+     * @return string
      * @access public
      */
     public function pub_catalog_show_cats($template, $fromcat = 0, $fromlevel = 1, $openlevels = 1, $showlevels = 1, $items_pagename='')
@@ -2715,8 +2715,7 @@ class catalog extends basemodule
      *
      * Шаблон создаётся для заданной товарной группы. Потом он может быть
      * отредактированны админом так, как ему надо
-     * @param unknown_type $groupid
-     * @return unknown
+     * @param integer $groupid
      */
     /*
     function regenerate_admin_template($groupid)
@@ -4941,7 +4940,7 @@ class catalog extends basemodule
     /**
      * Выводит список внутренних фильтров в админке
      *
-     * @return HTML
+     * @return string
      * /
      */
     private function show_inner_filters()
@@ -4990,7 +4989,7 @@ class catalog extends basemodule
     /**
      * Выводит список товарных групп в админке
      *
-     * @return HTML
+     * @return string
      * /
      */
     private function show_groups()
@@ -5033,7 +5032,7 @@ class catalog extends basemodule
     *   @param integer $id       - idшник товара
     *   @param integer $group_id - idшник шруппы, если идёт добавление нового товара
     *   @param integer $id_cat   - При ID = 0, сюда может передаваться ID категории, в которой создаётся товар
-    *	@return HTML
+    *	@return string
     */
     private function show_item_form($id = 0, $group_id = 0, $id_cat = 0)
     {
@@ -5350,7 +5349,7 @@ class catalog extends basemodule
     /**
     *	Выводит свойства категорий в админке
     *
-    *	@return HTML
+    *	@return string
     */
     private function show_cat_props()
     {
@@ -5422,7 +5421,7 @@ class catalog extends basemodule
     *   в вывод попадают все свойства товарной группы, как общие так и не общие
     *
     * 	@param $id integer - idшник товарной группы (= 0 для общих свойств)
-    *	@return HTML
+    *	@return string
     */
     private function show_group_props($id)
     {
@@ -5739,7 +5738,7 @@ class catalog extends basemodule
     *	Форма редактирования внутреннего фильтра в админке
     *
     * 	@param $id integer - idшник внутреннего фильтра ( -1 == добавление)
-    *	@return HTML
+    *	@return string
     */
     private function show_inner_filter_form($id)
     {
@@ -5893,7 +5892,7 @@ class catalog extends basemodule
     *	Форма редактирования товарной группы в админке
     *
     * 	@param $id integer - idшник товарной группы (0 : общие свойства, -1 : добавление)
-    *	@return HTML
+    *	@return string
     */
     private function show_group_form($id)
     {
@@ -5993,7 +5992,7 @@ class catalog extends basemodule
    /**
     *	Вывод товаров категории в админке
     *
-    *	@return HTML
+    *	@return string
     */
     private function show_category_items()
     {
@@ -6131,7 +6130,7 @@ class catalog extends basemodule
     *	Форма редактирования категории в админке
     *
     * 	@param $id integer - id-шник категории
-    *	@return HTML
+    *	@return string
     */
     private function show_category_form($id)
     {
@@ -6304,7 +6303,7 @@ class catalog extends basemodule
     *	Форма редактирования свойства КАТЕГОРИИ в админке
     *
     * 	@param $id integer - id-шник свойства
-    *	@return HTML
+    *	@return string
     */
     private function show_cat_prop_form($id)
     {
@@ -6757,7 +6756,7 @@ class catalog extends basemodule
      * Тестирование фильтра из админкеи
      *
      * @param integer $id  ID-шник фильтра
-     * @return HTML
+     * @return string
      */
     private function test_filter($id)
     {
@@ -6776,7 +6775,7 @@ class catalog extends basemodule
     /**
      * Отображает поля корзины (заказа)
      *
-     * @return HTML
+     * @return string
      */
     private function show_order_fields()
     {
@@ -6837,7 +6836,7 @@ class catalog extends basemodule
     *   корзины (заказа) в админке
     *
     * 	@param $id integer - id-шник поля
-    *	@return HTML
+    *	@return string
     */
     private function show_order_field_form($id)
     {
@@ -7736,7 +7735,7 @@ class catalog extends basemodule
     /**
      * Возвращает "основное" общее свойство
      *
-     * @return string|false
+     * @return string|boolean
      */
     private function get_common_main_prop()
     {
@@ -8832,7 +8831,7 @@ class catalog extends basemodule
      * @param string  $tpl   шаблон
      * @param string  $filterid   строковый ID-шник внутреннего фильтра
 
-     * @return HTML
+     * @return string
      */
     public function pub_catalog_show_export($tpl, $filterid)
     {

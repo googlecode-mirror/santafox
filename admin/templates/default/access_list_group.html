@@ -1,11 +1,19 @@
 <!-- @main -->
-<table border="0" cellspacing="1" cellpadding="5" class="admin_table">
+<script type="text/javascript">
+ $('input:button').button();
+</script>  <!-- @todo use lang[] -->
+<span class="content_header">Администраторы &rarr; <span class="black">Управление группами</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+  <h3>Список групп администраторов</h3>
+   <table>
 <tr>
-  <th width="30">№</th>
-  <th width="200">[#backof_groups_edit_label1#]</th>
-  <th width="200">[#backof_groups_edit_label2#]</th>
-  <th width="50">[#backof_groups_edit_label3#]</th>
-  <th>[#backof_groups_edit_label4#]</th>
+     <th class="first">№</th>
+     <th>[#backof_groups_edit_label1#]</th>
+     <th>[#backof_groups_edit_label2#]</th>
+     <th>[#backof_groups_edit_label3#]</th>
+     <th class="last">[#backof_groups_edit_label4#]</th>
 </tr>
 [#str_content#]
 <tr class="admin_table_wstring">
@@ -15,12 +23,18 @@
 </tr>
 </table>
 
+   <fieldset class="page_submit_field">
+    <input type="button" value="[#backof_groups_button_add#]" onclick="jspub_click('edit_group&newadmin=yes');">
+   </fieldset>
+  </div>
+ </div>
+</div>
 
 <!-- @string -->
 <tr [#tr_class#]>
-      <td width="30" align="center">[#num#]</td>
-      <td width="200"><a href="" onclick="jspub_click('edit_group&id=[#id#]'); return false;">[#name#]</a></td>
-      <td width="200">[#full_name#]</td>
-      <td width="50" align="center"><input type="checkbox" disabled="disabled" [#root_admin#]/></td>
-      <td align="center" valign="baseline"><img src="/admin/templates/default/images/icon_delet.gif" width="26" height="26" onclick="jspub_confirm('del_group&delid=[#id#]','[#alert_del#]');" style="cursor:pointer;"/></td>
+ <td>[#num#]</td>
+ <td><a href="javascript:;" onclick="jspub_click('edit_group&id=[#id#]'); return false;">[#name#]</a></td>
+ <td>[#full_name#]</td>
+ <td><input style="float:none; margin-top:5px;" type="checkbox" disabled="disabled" [#root_admin#]/></td>
+ <td><img src="/admin/templates/default/images/icon_delet.gif" width="26" height="26" onclick="jspub_confirm('del_group&delid=[#id#]','[#alert_del#]');" style="cursor:pointer;"/></td>
 </tr>

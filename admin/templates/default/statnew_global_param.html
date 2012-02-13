@@ -1,40 +1,69 @@
 <!-- @begin -->
-<div id="structure_all_form">
-  		<h3 style="margin-bottom:5px;" align="center">%name_otchet%</h3>
-        <div id="form_stat">
-
-            <form id="admin_stat_form">
-                С <!-- //@todo use lang vars -->
-                <input type="text" name="date_start" id="date_start" value="[#date_start_value#]" style="width:100px;">
-                <script type="text/javascript">
+<script type="text/javascript">
                     $( "#date_start" ).datepicker({
                             dateFormat:'dd-mm-yy'
                     });
-                </script>
-                <br>
-                По <!-- //@todo use lang vars -->
-                <input type="text" name="date_end" id="date_end" value="[#date_end_value#]" style="width:100px;">
-                <script type="text/javascript">
+
                     $( "#date_end" ).datepicker({
                             dateFormat:'dd-mm-yy'
                     });
-                </script>
-                <br>
+
+ $( "input:button").button();
+
+$('#content select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+});
+</script>
+<span class="content_header">Статистика &rarr; <span class="black">Отчёты</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+  <h3>%name_otchet%</h3>
+
+  <form id="admin_stat_form">
+  <fieldset>
+   <label for="date_start">С</label><!-- // @todo use lang vars -->
+   <input type="text" name="date_start" id="date_start" value="[#date_start_value#]" style="width:150px;">
+  </fieldset>
+
+  <fieldset>
+   <label for="date_end">По</label><!-- // @todo use lang vars -->
+   <input type="text" name="date_end" id="date_end" value="[#date_end_value#]" style="width:150px;">
+  </fieldset>
+
+  <fieldset>
                 [#select_diapazon#]
+  </fieldset>
+
+  <fieldset>
                 [#select_partners#]
+  </fieldset>
+
+  <fieldset>
                 [#dop_fields#]
-                <p align="center"><input type="button" value="[#statist_all_button_show#]" onclick="admin_form_submit('%link_form%','stat_result','admin_stat_form');"></p>
+  </fieldset>
+
+  <fieldset class="page_submit_field">
+   <input type="button" value="[#statist_all_button_show#]" onclick="admin_form_submit('%link_form%','stat_result','admin_stat_form');">
+  </fieldset>
             </form>
+
+  <div id="stat_result"></div>
+
 		</div>
 </div>
-<div id="stat_result" style="padding-top:10px;"></div>
+</div>
 
 <!-- @diapazon_block -->
-   [#statist_all_label_date#]
+   <fieldset>
+   <label for="stat_pre_date">[#statist_all_label_date#]</label>
     <select name="pre_date" id="stat_pre_date">
-        <option value="">[#statist_all_label_date_default#]</option>
+     <optgroup label="[#statist_all_label_date_default#]">
         [#diapazon_list#]
+     </optgroup>
     </select>
+   </fieldset>
     <script type="text/javascript">
     $('#stat_pre_date').change(function(){
         var sval = $(this).val();
@@ -51,39 +80,46 @@
         }
     });
     </script>
-    <br>
 <!-- @diapazon_line -->
 <option value="%key%">%val%</option>
 
 <!-- @set_partner_line -->
 <option value="%key%">%val%</option>
 <!-- @set_partner -->
-   [#statist_all_label_partnets#]
-    <select name="partners">
-        <option value="">[#statist_all_label_partnets_default#]</option>
+   <fieldset>
+   <label for="partners">[#statist_all_label_partnets#]</label>
+    <select id="partners" name="partners">
+        <optgroup label="[#statist_all_label_partnets_default#]">
         [#partner_list#]
+        </optgroup>
+
     </select>
-    <br>
+    </fieldset>
 
 
 <!-- @begin_result -->
 <div style="padding-top: 10px;">
-<TABLE width="100%" height="4" heborder="0" cellspacing="0" cellpadding="0" class="admin_table">
-  <TR>
-    <TH></TH>
-  </TR>
-</TABLE>
-<TABLE width="300" height="20" class="admin_table">
-  <TR>
-    <TH align="left"><img src='/admin/templates/default/images/statist_ico.gif' width='14' height='14'>&nbsp;&nbsp;&nbsp;[#statist_all_label_result#]</TH>
-  </TR>
-</TABLE>
+<table>
+  <tr>
+    <th class="first last"></th>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th class="first last"><img src='/admin/templates/default/images/statist_ico.gif' width='14' height='14'>&nbsp;&nbsp;&nbsp;[#statist_all_label_result#]</th>
+  </tr>
+</table>
 </div>
 
 <!-- @host -->
-<input type="checkbox" name="f_people" [#checked_f_people#]>[#statist_host_show_only_people#]<br>
+<fieldset>
+ <label for="f_people">[#statist_host_show_only_people#]</label>
+ <input type="checkbox" id="f_people" name="f_people" [#checked_f_people#]>
+</fieldset>
 
 
 <!-- @word -->
-<input type="checkbox" name="show_diagram" [#checked_diagram#]>[#statist_words_show_images#]<br>
-
+<fieldset>
+ <label for="show_diagram">[#statist_words_show_images#]</label>
+ <input type="checkbox" id="show_diagram" name="show_diagram" [#checked_diagram#]>
+</fieldset>

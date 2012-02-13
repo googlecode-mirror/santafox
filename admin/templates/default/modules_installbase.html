@@ -3,24 +3,39 @@
 
 <!-- @body -->
 <script>
+$("input:button").button();
+
+$('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+});
+
 $("#new_module_install").click(function () {
     var postArr = {modul_install: $("#select_modul").val()};
     $.post('%url_action%', postArr,  function(data){
        start_interface.main_menu_click('main_menu_modules', 'modules');
     });
-
 });
-
 </script>
 %writeable%
-<div id="structure_all_form">
-    	<div><h3>[#modules_install_base_header#]</h3></div>
-        <div id="form_new_modules">
+<span class="content_header">Модули &rarr; <span class="black">Инсталляция модулей</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+  <h3>[#modules_install_base_header#]</h3>
+
             <form action="%url_action%" method="post">
-            [#modules_install_spisok_dostupnih#]: <select name="modul_install" id="select_modul">
+  <fieldset>
+   <label for="select_modul">[#modules_install_spisok_dostupnih#]:</label>
+   <select name="modul_install" id="select_modul">
                 %modules_rows%
-            </select><br>
+   </select>
+  </fieldset>
+
+  <fieldset class="page_submit_field">
             <input type="button" id="new_module_install" value="[#modules_link_new_base_module#]">
+  </fieldset>
             </form>
         </div>
+</div>
 </div>

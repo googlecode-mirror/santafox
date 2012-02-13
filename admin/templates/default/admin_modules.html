@@ -1,5 +1,5 @@
 <!-- @body -->
-<script>
+<script type="text/javascript">
 	//var arr_var_lang = new Array();
     [#action_modules#]
 
@@ -52,26 +52,43 @@
             });
             */
     });
+
+    //tabs
+   $('#page_tabs').parent().tabs();
+   // button ui
+   $("input:button").button();
+   // select
+   $('#content_container select').selectmenu({
+      style:'dropdown',
+      maxHeight: 200
+   });
 </script>
 %writeable%
-<div id="loading-mask" style="position: absolute"></div>
+<!--div id="loading-mask" style="position: absolute"></div-->
 <!--div id="loading" class="loading">
     <div class="loading-indicator">&#160;Loading...</div>
 </div-->
+<!-- @todo use lang[] -->
+<span class="content_header">Модули &rarr; <span class="black">[#modules_lable_info#]</span> <span style="font-size:11px; font-weight:normal; color:#666;">(Идентификатор: %id_modul%)</span></span>
+<div id="page_container">
+ <div id="content_container">
 
-<div id="structure_all_form">
-        <div><span style="color:#000000; font-size:16px; font-weight:bold;">[#modules_lable_info#]</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#666666; font-size:12px;">(Идентификатор: %id_modul%)</span></div>
-        <div id="form_modules">
+ <div id="page_tabs">
+  <ul>
+   <li><a href="#mod_all_lang_name">[#modules_legend_name_all_lang#]</a></li>
+   <li><a href="#mod_props">[#modules_legend_all_modul#]</a></li>
+   <li><a href="#mod_action_list">[#modules_legend_action_modul#]</a></li>
+  </ul>
+ </div>
+
             <form id="module_props_lang_form">
-            <div>
-                <fieldset>
-                    <legend>[#modules_legend_name_all_lang#]</legend>
+
+ <div id="mod_all_lang_name" class="content">
                     [#modules_form_edit_all_name#]
                 </fieldset>
             </div>
-            <div>
-                <fieldset>
-                    <legend>[#modules_legend_all_modul#]</legend>
+
+ <div id="mod_props" class="content">
                     <table>
                         <tbody>
                         %str_prop_modul%
@@ -79,32 +96,34 @@
                     </table>
                 </fieldset>
             </div>
-            <div id="module_actions_container" style="display:none;">
-                <fieldset>
-                    <legend>[#modules_legend_action_modul#]</legend>
 
-                    <div style="padding: 0 0 10px;">
-                        <label style="padding: 0 4px 0 0;">[#modules_label_action_new#]</label>
-                        <select id="moduleNewActionSelect"></select>
-                        <input type="button" id="button_add_action" value="Создать"> <!-- //@todo move 2 lang vars  -->
+ <div id="mod_action_list" class="content">
+  <div id="module_actions_container" style="padding:none; display:none;">
+                <fieldset>
+     <label style="width:170px;">[#modules_label_action_new#]</label>
+     <select id="moduleNewActionSelect" style="width:350px;">
+
+     </select>
+     <input type="button" style="margin-left:15px;" id="button_add_action" value="Создать"> <!-- // @todo move 2 lang vars  -->
                     </div>
 
                     <div id="actions_list_table"></div>
-                </fieldset>
-            </div>
-            <p align="center">
-                <input type="button" value="[#modules_button_save_properties#]" id="modulePropsSave">
-            </p>
+  </div>
+
+  <fieldset class="page_submit_field">
+   <input type="button" value="[#modules_button_save_properties#]" id="modulePropsSave">
+    </fieldset>
+    </div>
             </form>
 
         </div>
 </div>
 
 <!-- @names_module -->
-<div style=" vertical-align: top; padding: 0 0 10px">
-<label style="display: inline-block; width: 140px;">[#modules_edit_lang_name#] &quot;[#code#]&quot;</label>
-<input style="display: inline-block;" type="text" name="langname[%id_name%][[#code#]]" value="[#value#]">
-</div>
+<fieldset>
+ <label for="langname_%id%_[#code#]">[#modules_edit_lang_name#] &quot;[#code#]&quot;</label>
+ <input type="text" id="langname_%id%_[#code#]" name="langname[%id_name%][[#code#]]" value="[#value#]">
+</fieldset>
 
 
 <!-- @action_modules -->
@@ -116,15 +135,15 @@ var moduleActions = %array_exist_metod%;
 update_action_list();
 
 <!-- @str_action_begin -->
-<table border="0" cellpadding="0" cellspacing="0" width="525">
+<table >
 	<tr>
-    	<td colspan="2" align="center" height="30"><b>[#modules_legend_action_exist#]</b></td>
+  <th colspan="2" align="center" height="30" class="first last"><b>[#modules_legend_action_exist#]</b></td>
     </tr>
     [#html_action#]
 
 <!-- @str_action -->
-<tr class="" onmouseover="mouse_select_element(this)" onmouseout="mouse_select_element(this,true)">
-	<td height="26"><b>%name%</b>&nbsp;&nbsp;<font size="-8" color="#666666">(%source_name%)</font><br /></td>
+<tr onmouseover="mouse_select_element(this)" onmouseout="mouse_select_element(this,true)">
+	<td style="text-align:left;" height="26"><b>%name%</b>&nbsp;&nbsp;<font size="-8" color="#666666">(%source_name%)</font><br /></td>
     <td height="26" width="60"><img style="cursor:pointer" width="26" height="26" src="/admin/templates/default/images/icon_edit.gif" border="0" onclick="show_action_edit('action_edit&id_action=%id_action%', '[#modules_label_win_edit_action#]')" alt="[#label_alt_edit_macros#]"/>&nbsp;<img style="cursor:pointer" width="26" height="26" src="/admin/templates/default/images/icon_delet.gif" border="0" onclick="jspub_confirm('action_delet&id_action=%id_action%','[#modules_label_confirm_del_action#]');" alt="[#label_alt_delet_macros#]" /></td>
 </tr>
 

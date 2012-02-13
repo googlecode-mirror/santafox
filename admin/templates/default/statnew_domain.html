@@ -1,31 +1,41 @@
 <!-- @begin -->
-<div id="structure_all_form">
-        <h3 style="margin-bottom:5px;" align="center">[#statist_domain_label_main2#]</h3>
-        <div id="form_stat">
+<script type="text/javascript">
+ $( "input:button").button();
+</script>
+<span class="content_header">Статистика &rarr; <span class="black">Настройки</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+  <h3>[#statist_domain_label_main2#]</h3>
             <form id="stat_newdomain_form">
+   <fieldset>
+    <label for="domain">[#statist_domain_text_label1#]</label>
+    <input type="text" name="domain" id="domain" value="">
+   </fieldset>
 
-                [#statist_domain_text_label1#]<input name="domain" value="" style="width:175px;">
-                <br>
-                <!-- //@todo use lang vars -->
-                <input type="button" value="Сохранить" onclick="jspub_form_submit('stat_newdomain_form','%link_form%');">
+   <fieldset class="page_submit_field">
+    <input type="button" value="Сохранить" onclick="jspub_form_submit('stat_newdomain_form','%link_form%');"><!-- // @todo use lang vars -->
+   </fieldset>
             </form>
+
+  <div id="list_exist_domain">[#table_list#]</div>
+  <div id="stat_result"></div>
 
         </div>
 </div>
-<div id="list_exist_domain" style="padding-top:10px; padding-left:30px;">[#table_list#]</div>
-<div id="stat_result" style="padding-top:10px;"></div>
+</div>
 
 <!-- @one_damain -->
 <tr>
-  <td>&nbsp;&nbsp;&nbsp;[#name#]&nbsp;&nbsp;&nbsp;</td>
-  <td align="center" valign="baseline"><img src="/admin/templates/default/images/icon_delet.gif" onclick="jspub_confirm('del_domain&delid=[#id#]','[#alert_del#]');" style="cursor:pointer;"/></td>
+  <td>[#name#]</td>
+  <td valign="baseline"><img src="/admin/templates/default/images/icon_delet.gif" onclick="jspub_confirm('del_domain&delid=[#id#]','[#alert_del#]');" style="cursor:pointer;"/></td>
 </tr>
 
 <!-- @table_damain -->
-  <table class="admin_table">
+  <table>
     <tr>
-      <th>Доменн</th>
-      <th>Действие</th>
+      <th class="first">Доменн</th>
+      <th class="last">Действие</th>
     </tr>
 
     [#domain_list#]

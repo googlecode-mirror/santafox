@@ -2,12 +2,11 @@
 %name%<br/><small>(%namem%)</small>
 
 <!-- @html_main -->
-	<tr>
-    	<td class="name"><label for="ppf_%name%" style="cursor:pointer;">%caption%</label></td>
-    	<td class="check"><input type="checkbox" id="ppf_%name%" name="properties_cb[ppf_%name%]" onClick="jspub_disabled_change('ppf_%name%', 'ppv_%name%')" %checked% %disabled% style="cursor:pointer;"/></td>
-        <td class="value" id="lrp_%name%">%element% <small>%description%</small></td>
-        <td></td>
-    </tr>
+	<fieldset>
+    <label for="ppf_%name%">%caption%</label>
+    <input type="checkbox" class="checkBox" id="ppf_%name%" name="properties_cb[ppf_%name%]" onClick="jspub_disabled_change('ppf_%name%', 'ppv_%name%')" %checked% %disabled%>
+    <div class="value" id="lrp_%name%">%element% <div class="clear">%description%</div></div>
+   </fieldset>
 
 <!-- @select_html -->
 <select id="ppv_%name%" name="properties[%name%]">
@@ -26,14 +25,14 @@ jspub_disabled_change('ppf_%name%', 'ppv_%name%');
 jspub_disabled_change('ppf_%name%', 'ppv_%name%');
 
 <!-- @checkbox_html -->
-<input  type="checkbox" id="ppv_%name%" %value% name="properties[%name%]"   />
+<input  type="checkBox" class="inputCheckbox" id="ppv_%name%" %value% name="properties[%name%]"   />
 
 <!-- @checkbox_code -->
 jspub_disabled_change('ppf_%name%', 'ppv_%name%');
 
 
 <!-- @text_html -->
-<input id="ppv_%name%" name="properties[%name%]" value="%value%" style="width:290px;"/>
+<input id="ppv_%name%" class="textInput" name="properties[%name%]" value="%value%" style="width:290px;"/>
 
 <!-- @text_code -->
 jspub_disabled_change('ppf_%name%', 'ppv_%name%');
@@ -45,18 +44,17 @@ jspub_disabled_change('ppf_%name%', 'ppv_%name%');
 jspub_disabled_change('ppf_%name%', 'ppv_%name%');        
 
 <!-- @date_html -->
-<input type="text" style="width:150px;" name="properties[%name%]" value="%value%" id="ppv_%name%">
+<input type="text" class="textInput" style="width:150px;" name="properties[%name%]" value="%value%" id="ppv_%name%">
 <!-- @date_code -->
 $(function() {
     $( "#ppv_%name%" ).datepicker({
             dateFormat:"dd.mm.yy"
-    }
-   );
+});
 });
 jspub_disabled_change('ppf_%name%', 'ppv_%name%');
 
 <!-- @page_html -->
-<input type="text" style="width:150px;" name="properties[%name%]" value="%value%" id="ppv_%name%" onClick="get_properes_page(event, 'ppv_%name%')">
+<input type="text" class="textInput" style="width:150px;" name="properties[%name%]" value="%value%" id="ppv_%name%" onClick="get_properes_page(event, 'ppv_%name%')">
 <!-- @page_code -->
 //Добавим событие на клик по тригеру для выбора страницы
 /*

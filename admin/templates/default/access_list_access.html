@@ -7,6 +7,8 @@
 		form_access.submit();
 		return true;
 	}
+
+
 */
 	//Вызывается по клику на родительском модуле
 	function change_main_modul(str_id)
@@ -52,30 +54,51 @@
             }
         });
     });
-</script>
 
-<form id="form_adm_groups_access" name="form_adm_groups_access" method="post" action="[#form_action#]">
-  <table class="admin_table">
-    <tr>
-      <th>[#backof_group_acess_label1#]</th>
-      <th>[#backof_group_acess_label2#]</th>
-    </tr>
-    <tr valign="top">
-      <td>[#form_select_group#]</td>
-      <td><div id="admin_groups_rights">[#form_select_access#]</div></td>
-    </tr>
-    <tr class="admin_table_wstring">
-      <td colspan="2"><input type="button" value="Сохранить" id="save_admin_group_rigths_button"></td>
-  </table>
+     $("input:submit").button();
+
+     $('#adm_group li').click(function(){
+      $('#adm_group li').removeClass('active');
+      $(this).addClass('active');
+      $('.right h3, .right ul').fadeIn();
+     });
+
+</script> <!-- @todo use lang[] -->
+<span class="content_header">Администраторы &rarr; <span class="black">Управление правами групп</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+  <form id="form_adm_groups_access" name="form_adm_groups_access" method="post" action="[#form_action#]">
+
+  <div class="left" style="padding:5px 0;">
+   <h3>[#backof_group_acess_label1#]</h3>
+   <ul id="adm_group" class="access_tree">
+    [#form_select_group#]
+   </ul>
+  </div>
+
+  <div class="right" style="padding:5px 0;">
+   <h3 style="display:none;">[#backof_group_acess_label2#]</h3>
+   <ul class="access_tree" style="display:none;">
+    [#form_select_access#]
+   </ul>
+  </div>
+
+  <fieldset class="page_submit_field">
+   <input type="submit" value="Сохранить" id="save_admin_group_rigths_button">
+  </fieldset>
+
 </form>
+  </div>
+ </div>
+</div>
 
 <!-- @str_group -->
-<input id="idg_[#id#]" type="radio" name="selgriup" onclick="set_checkbox([#id#]);" value="[#id#]"/><label for="idg_[#id#]" style="cursor:hand">[#full_name#]</label><br />
+<li class="parent"><input id="idg_[#id#]" type="radio" name="selgriup" onclick="set_checkbox([#id#]);" value="[#id#]"/><label for="idg_[#id#]">[#full_name#]</label><br class="clear"></li>
 
 <!-- @str_acess -->
-<input  class="gradio"  id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#id#]">[#full_name#]</label><br />
+<li><input class="gradio" id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#num#]">[#full_name#]</label><br class="clear"></li>
 <!-- @@nextlevel -->
-&nbsp;&nbsp;&nbsp;<input  class="gradio"  id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#id#]">[#full_name#]</label><br />
-
+<li class="child"><input class="gradio" id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#num#]">[#full_name#]</label><br class="clear"></li>
 <!-- @@nextlevel -->
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input  class="gradio"  id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#id#]">[#full_name#]</label><br />
+<li><input class="gradio" id="ida_[#num#]" type="checkbox" name="access[#name_obj#]" onclick="" value="[#id#]" /><label for="ida_[#num#]">[#full_name#]</label><br class="clear"></li>

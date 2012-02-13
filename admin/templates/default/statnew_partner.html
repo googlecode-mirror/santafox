@@ -1,47 +1,48 @@
+<script type="text/javascript">
+ $( "input:submit").button();
 
+ $('#IDPartner_select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+});
+</script>
+<span class="content_header">Статистика &rarr; <span class="black">Настройки</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+
+ <h3><img src="/admin/templates/default/images/statist_ico.gif" width="14" height="14">&nbsp;&nbsp;[#statist_partner_label_main2#]</h3>
 
 <form name="form_partners" id="form_partners" method="post" action="%form_url%">
-  <table border="0" cellspacing="0" cellpadding="4" class="admin_table">
-    <tr class="table_content_shapka">
-      <th>&nbsp;&nbsp;<img src="/admin/templates/default/images/statist_ico.gif" width="14" height="14">&nbsp;&nbsp;&nbsp;[#statist_partner_label_main2#]</th>
-    </tr>
-    <tr class="admin_table_string">
-      <td>[#statist_partner_text_label1#]:
-        <input name="partner" type="text" size="30" maxlength="50" style="width:215px;">
-        &nbsp;
-       <!--
-        <input type="submit" name="add_partner" value="[#statist_partner_text_label2#]" onclick="jspub_form_submit('form_partners','%form_url%')" />
-        -->
-        <input type="submit" name="add_partner" value="[#statist_partner_text_label2#]" />
-      </td>
-    </tr>
-    <tr class="admin_table_wstring"  height="10">
-      <td height="10"></td>
-    </tr>
-    <tr>
-      <td>[#statist_partner_text_label3#]:
-         <SELECT name="IDPartner_select" onChange="jspub_click('show_partner&partner_id='+this.value)" style="width:185px">
+  <fieldset>
+   <label for="partner">[#statist_partner_text_label1#]:</label>
+   <input type="text" id="partner" name="partner" maxlength="50" value="">
+   <!-- <input type="submit" name="add_partner" value="[#statist_partner_text_label2#]" onclick="jspub_form_submit('form_partners','%form_url%')" > -->
+   <input type="submit" style="margin-left:15px;" name="add_partner" value="[#statist_partner_text_label2#]">
+  </fieldset>
+
+  <fieldset>
+   <label for="IDPartner_select">[#statist_partner_text_label3#]:</label>
+   <select name="IDPartner_select" id="IDPartner_select" style="width:282px;" onChange="jspub_click('show_partner&partner_id='+this.value)">
             [%partner_list%]
-         </SELECT>
-        &nbsp;
-        <INPUT type="submit" name="del_partner" value="[#statist_partner_text_label4#]"></td>
-    </tr>
-    <tr>
-      <td>[#statist_partner_text_label5#]:
-        <input name="preg_partner" type="text" size="30" maxlength="50">
-        &nbsp;
-        <input type="submit" name="add_preg_partner" value="[#statist_partner_text_label6#]"></td>
-    </tr>
-    <tr>
-      <td> [#statist_partner_text_label7#]:<br>
-        <select name="IDPEregs" size="10" style="width:100%">
+   </select>
+   <input type="submit" style="margin-left:15px;" name="del_partner" value="[#statist_partner_text_label4#]">
+  </fieldset>
+
+  <fieldset>
+   <label for="preg_partner">[#statist_partner_text_label5#]:</label>
+   <input type="text" id="preg_partner" name="preg_partner" maxlength="50">
+   <input type="submit" style="margin-left:15px;" name="add_preg_partner" value="[#statist_partner_text_label6#]">
+  </fieldset>
+
+  <fieldset>
+   <label style="clear:both;" for="IDPEregs">[#statist_partner_text_label7#]:</label>
+   <select id="IDPEregs" class="multiple" name="IDPEregs" multiple="multiple" style="width:284px; height:auto;">
             [%preg_partner_list%]
         </select>
-      </td>
-    </tr>
-    <tr>
-      <td><input type="submit" name="del_preg_partner" value="[#statist_partner_text_label8#]">
-      </td>
-    </tr>
-  </table>
+   <span class="page_submit_field block clear"><input type="submit" name="del_preg_partner" style="margin-left:15px;" value="[#statist_partner_text_label8#]"></span>
+  </fieldset>
 </form>
+ </div>
+</div>
+</div>

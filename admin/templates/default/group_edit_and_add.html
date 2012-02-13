@@ -1,5 +1,6 @@
 <!-- @main -->
 <script language="javascript">
+$('input:button').button();
 
 $('#admin_group_savebutton').click(function(){
         var postArr = $('#admin_form_group_edit').serializeArray();
@@ -19,22 +20,33 @@ $('#admin_group_savebutton').click(function(){
             }
         });
 });
-
 </script>
+<span class="content_header">Администраторы &rarr; <span class="black">Управление группами</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+  <h3>[#backof_group_edit_label1#] <span class="highlight">[#name#]</span></h3>
 
-<div id="structure_all_form">
-        <h3 style="margin-bottom:5px;">[#backof_group_edit_label1#] <span class="select_text">[#name#]</span></h3>
-        <div id="form_admin">
+  <form id="admin_form_group_edit">
+  <fieldset>
+   <label for="name">[#backof_group_edit_field1#]</label>
+   <input type="text" id="name" name="name" value="[#name#]">
+  </fieldset>
 
-            <form id="admin_form_group_edit">
-                <label>[#backof_group_edit_field1#]</label>
-                <input type="text" name="name" value="[#name#]" style="width:250px;"><br>
-                <label>[#backof_group_edit_field2#]</label>
-                <input type="text" name="full_name" value="[#full_name#]" style="width:250px;"><br>
-                <input type="checkbox" name="root_admin" [#root_admin_checked#]>[#backof_group_edit_field3#]
-                <p align="center">
+  <fieldset>
+   <label for="full_name">[#backof_group_edit_field2#]</label>
+   <input type="text" id="full_name" name="full_name" value="[#full_name#]">
+  </fieldset>
+
+  <fieldset>
+   <label for="root_admin">[#backof_group_edit_field3#]</label><input type="checkbox" id="root_admin" name="root_admin" [#root_admin_checked#]>
+  </fieldset>
+
+  <fieldset class="page_submit_field">
                     <input type="button" value="[#admin_backof_global_save#]" id="admin_group_savebutton">
-                </p>
+  </fieldset>
             </form>
+
+  </div>
 		</div>
 </div>

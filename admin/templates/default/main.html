@@ -1,25 +1,37 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
 	<head>
-		<title>Админка</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<script type="text/javascript" src="/admin/js/jquery-1.4.4.min.js"></script>
-		<script type="text/javascript" src="/admin/js/jquery-ui-1.8.7.custom.min.js"></script>
-		<script type="text/javascript" src="/admin/js/jquery.ui.selectmenu.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Административный Интерфейс 3.0</title>
+
+<!-- all css -->
+<link href="/admin/templates/default/css/style.css" rel="stylesheet" type="text/css">
+<link href="/admin/templates/default/css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css" />
+<link href="/admin/templates/default/css/layout-default-latest.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="/admin/templates/default/css/fg.menu.css" rel="stylesheet" type="text/css" media="screen" />
+
+<!-- tree classic theme style -->
+<link href="/admin/js/themes/classic/style.css" rel="stylesheet" type="text/css" media="screen" />
+
+<!-- all js -->
+<script type="text/javascript" src="/admin/js/jquery-1.7.1.min.js"></script>
+<!-- ui js -->
+<script type="text/javascript" src="/admin/js/jquery-ui-1.8.17.custom.min.js"></script>
+<!-- layout js -->
+<script type="text/javascript" src="/admin/js/jquery.layout-latest-rc.js"></script>
+<!-- tree js -->
 		<script type="text/javascript" src="/admin/js/jquery.jstree.js"></script>
-		<!--link rel="stylesheet" type="text/css" href="/admin/templates/default/css/css.css" /-->
-		<link rel="stylesheet" type="text/css" href="/admin/templates/default/css/normalize.css" media="all" />
-		<link rel="stylesheet" type="text/css" href="/admin/templates/default/css/jquery-ui-1.8.7.custom.css" />
-		<link rel="stylesheet" type="text/css" href="/admin/templates/default/css/style.css" media="all" />
-		<!-- для редактора контента-->
+
+<!-- content editors js -->
 		<script type="text/javascript" src="/components/html_editor/ckeditor.js"></script>
-		<script type="text/javascript" src="/components/html_editor/adapters/jquery.js"></script>
-		<script type="text/javascript" src="/components/syntax/edit_area_full.js" language="Javascript" ></script>
+<script type="text/javascript" src="/components/syntax/edit_area_full.js"></script>
+
+<!-- navigation plugins ui js -->
+<script type="text/javascript" src="/admin/js/jquery.ui.selectmenu.js"></script>
+<script type="text/javascript" src="/admin/js/jquery.ui.modmenu.js"></script>
+
 		<script type="text/javascript" src="/admin/js/main_interface.js"></script>
-	</head>
-	<body>
-		<!-- Ещё подгружаем скрипт, в котором все настройки всего оконного интерфейса -->
+
 		<script type="text/javascript">
 						var message_debug = new Array();
 			var helpContent = "";
@@ -174,7 +186,7 @@
 			resizable: true,
 			height:400,
 			width:600,
-			modal: false,
+			modal: true,
 			//title: header,
 			buttons: {
 			"OK": function() {
@@ -236,7 +248,7 @@
 			modsHtml+="<\/select>";
 			}
 			$('#modules_toolbar').html(modsHtml);
-			$('#modules_toolbar select.modselect').selectmenu();
+			$('#modules_toolbar select.modselect').modmenu();
 
 			$('select.modselect').bind("click", function(e){
 			alert('click1 ');
@@ -273,6 +285,7 @@
 
 			$(function() {
 			start_interface.init();
+
 			$('#help_block').bind('click',function(){
 			//$('help_content').css('position','absolute').css('left',0).css('top',100).css('width',200).css('display','block');
 			santaShowPopupHint('Help',helpContent,0);
@@ -295,7 +308,7 @@
 			time_wr+=((time_sec<10)?"0":"")+time_sec;
 			time_wr=""+time.getDate()+" "+name_month[time.getMonth()]+" "+time.getFullYear()+" г. "+time_wr;
 
-			$('#curent_time').html(time_wr);
+			$('#todayIs').html(time_wr);
 			//Заодно проверим, нужно ли показывать дебаг
 			var str_html = $("#debug_content").html();
 			if ((message_debug.length > 0) || (str_html != ""))
@@ -305,45 +318,110 @@
 			else
 			$("#link_for_debug").css("color", "#CCCCCC").css("cursor","");
 			setTimeout('fulltime()',500)
-			}</script>
-		<!-- Верхний блог с шапкой и главным меню -->
-		<div id="north">
-			<div class="logo">
-				<div class="copy">
-					Santafox <sup>&trade;</sup>
+			}
+</script>
+
+<script type="text/javascript">
+   var mainLayout;
+   $(function() {
+      // mainLayout
+      mainLayout = $('#mainLayout').layout({
+         north: {
+            spacing_open: 0,
+            spacing_closed: 0,
+            closable: false,
+            resizable: false
+         },
+         west: {
+            minSize: 265,
+            maxSize: 350,
+            spacing_open: 5,
+            spacing_closed: 5,
+            resizerCursor: 'col-resize'
+         },
+         center: {
+            // minSize: 500,
+            closable: false,
+            resizable: false
+         }
+      });
+
+
+     // показываем, прячем блок модулей..
+     $('#mod_box_sbtn').toggle(function(){
+        mainLayout.allowOverflow('north');
+        $(this).addClass('mod_box_sbtn_active');
+        // $('#modules_toolbar').css({'overflow':'visible', 'background':'#ededed', 'marginLeft':'-263px', 'height':'auto', 'paddingBottom':'3px'});
+        $('#modules_toolbar').animate({'overflow':'visible', 'backgroundColor':'#ededed', 'marginLeft':'-269px'}, "slow", function(){
+          $(this).css({'height':'auto', 'min-height':'31px'});
+        });
+        // $('#modules_toolbar').addClass('mod_toolbar_opened');
+	  },
+	  function (){
+        $(this).removeClass('mod_box_sbtn_active');
+        mainLayout.resetOverflow('north');
+        // $('#modules_toolbar').css({'overflow':'hidden','height':'28px', 'background':'none', 'minHeight':'28px', 'paddingBottom':'0px'});
+        $('#modules_toolbar').animate({'overflow':'hidden','height':'31px', 'background':'none', 'marginLeft':'0px'});
+        // $('#modules_toolbar').removeClass('mod_toolbar_opened');
+     });
+
+   });
+</script>
+</head>
+
+<body>
+<div id="mainContainer">
+
+ <div class="mcLayer">
+  <span class="csite"><a href="http://www.[#server#]" target="_blank">[#server#]</a> &mdash; редактируемый сайт</span>
+  <span id="todayIs" class="today"></span>
+  <span class="santafox"><a href="#" target="_blank">Santafox</a></span>
 				</div>
-				[#server#] <small>редактируемый сайт</small>
+
+ <!-- mainLayout -->
+ <div id="mainLayout">
+  <!-- NORTH PANEL -->
+  <div class="ui-layout-north">
+   <div class="north-top">
+   [#main_menu#]
 			</div>
-			[#main_menu#]
+
+   <div class="north-bottom">
+    <span class="curr_a_sname">&ndash; Структура</span>
+
+    <div id="mod_block">
 			<div id="modules_toolbar"></div>
+      <a href="#" id="mod_box_sbtn" class="mod_box_sbtn"></a>
+      <div class="clear"></div>
 		</div>
-		<!-- Контент -->
-		<div id="current_content">
-			<div id="west"></div>
-			<div id="content"></div>
+
+    <div class="clear"></div>
 		</div>
-		<br clear="all"/>
-		<!-- Нижний блок с постоянной информационной строкой -->
-		<div id="south">
-			<ul>
-				<li class="admin">
-					Активных администраторов: <a href="#" onClick="start_interface.main_menu_click(this, 'polzovateli');">%admins_count%</a>
-				</li>
-				<li class="debug">
-					<span id="link_for_debug" onClick = "start_interface.show_debug_info(this)">Дебаг</span>
-				</li>
-				<li class="version">
-					Версия: [#curent_version#] [#version_update#]
-				</li>
-				<li class="time">
-					<div id="curent_time"></div>
-				</li>
-			</ul>
 		</div>
+
+  <!-- WEST PANEL -->
+  <div id="west" class="ui-layout-west"></div>
+  <!-- end of west panel -->
+
+  <!-- CENTER PANEL -->
+  <div class="ui-layout-center">
+    <div id="content" class="middle_content"></div>
+  </div><!-- end of center panel -->
+
+ </div>
+ <!-- end of mainLayout -->
+
+ <div class="mcLayer">
+  <span class="active_admin">Активных администраторов: <a href="javascript:;" onClick="start_interface.main_menu_click(this, 'polzovateli');">%admins_count%</a></span>
+  <span class="debug"><a href="javascript:;" onClick ="start_interface.show_debug_info(this)">DEBUG</a></span>
+  <span class="update">CMS ver. [#curent_version#] [#version_update#]</span>
+ </div>
+
 		<!-- Контейнер для дебаг информации -->
 		<div id="debug_content" style="display:none;">
 			[#debug_content#]
 		</div>
+
 		<!-- Контейнер для консоли (например при индексировании сайта) -->
 		<div id="console_content"  style="display:none;"></div>
 		<!-- Слой для контента каких-то всплывающих окон -->
@@ -352,5 +430,6 @@
 		<div id="popup_msg_div" style="display:none;" title=""></div>
 		<!-- Слой для контента для выбора страницы сайта -->
 		<div id="popup_sitemap_div"  style="display:none;" title=""></div>
+</div>
 	</body>
 </html>

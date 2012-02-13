@@ -1,6 +1,6 @@
 <!-- @body -->
 <script type="text/javascript" language="javascript">
-	//var arr_link_select = new Array();
+	var arr_link_select = new Array();
 	var arr_link_content = new Array();//массив имён файлов для редактирования контента
 
     var metkiCount = 0;//кол-во меток
@@ -116,18 +116,19 @@
         for (var i = 0; i < d.length; i++)
         {
             var str_content = "";
-            str_content += '<tr>';
+            str_content += '<fieldset>';
             //Имя метки со скрытым инпутом, куда пишется непосредственное значение
-            str_content += '<td class="name">';
-            str_content += '<label for="flag_metka_'+i+'">'+d[i].name+'</label></td>';
+            //str_content += '<td class="name">';
+            str_content += '<label for="flag_metka_'+i+'">'+d[i].name+'</label>';
             //Галочка наследования
-            str_content += '<td class="check"><input type="checkbox" name="'+d[i].name+'" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');"></td>';
+            str_content += '<input type="checkbox" name="'+d[i].name+'" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');">';
             //Селект, который на который навешивается экстовская форма
-            str_content += '<td class="value"><select id="sel_modul_ext_'+i+'"></select></td>';
-            str_content +='<td><span style="height: 26px; display: block;"><img class="edit_icon" id="img_edit_'+i+'" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content['+i+'], false)" /><img class="edit_icon"  id="img_edit_s_'+i+'" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content['+i+'], true)" /></span></td>';
-            str_content += '</tr>';
+            str_content += '<select id="sel_modul_ext_'+i+'"></select>';
+            str_content +='<span style="height: 26px; display: block;"><img class="edit_icon" id="img_edit_'+i+'" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content['+i+'], false)" /><img class="edit_icon"  id="img_edit_s_'+i+'" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content['+i+'], true)" /></span>';
+            str_content += '</fieldset>';
             //Добавляем небольшими кусками, так как иначе IE глючит
             $(str_content).appendTo('#table_metki');
+
             buildMetkaActionsSelect("select#sel_modul_ext_"+i);
 
             //при изменении селекта с действиями скроем или покажем иконки редактора контента
@@ -163,6 +164,11 @@
 
             //сохраняем название файла для редактирования контента
             arr_link_content[i] = d[i].file_edit;
+
+            $('#table_metki select').selectmenu({
+               style:'dropdown',
+               maxHeight: 200
+            });
         }
 
 	}
@@ -298,109 +304,82 @@
 	%--str_prop_modul_code--%
     */
 	run_update_metki('%link_show_metki%');
+
+
 </script>
-
-<div id="structure_all_form">
-		<h3>Страница: &quot;<a target="_blank" href="%link_page_view%" title="Откроется в новом окне">%page_name%</a>&quot;</h3>
-        <div id="form">
-            <form id="struct_form">
-                <fieldset title="[#page_prop_label_prop#]">
-                    <legend>[#page_prop_label_prop#]</legend>
-                    <table border="0" cellpadding="0" cellspacing="0">
-	                    <tbody>
-	                    	
-		                    <tr>
-		                        <td class="name">
-		                        	<label for="fieldPageName">[#page_prop_name_page#]</label>
-		                        </td>
-		                        <td class="check"></td>
-		                        <td class="value">
-		                        	<input type="text" name="page_properties[page_name]" value="%page_name%" id="fieldPageName">
-		                        </td>
-		                        <td></td>
-		                    </tr>
-		
-		                    <tr>
-		                        <td class="name">
-		                        	<label for="fieldPageTitle">[#page_prop_name_title#]</label>
-		                        </td>
-		                        <td class="check"></td>
-		                        <td class="value">
-		                        	<input type="text" name="page_properties[page_title]" value="%page_title%" id="fieldPageTitle">
-		                        </td>
-		                    </tr>
-		
-		                    <tr>
-		                        <td class="name">
-		                        	<label for="fieldPageID">[#page_prop_name_id#]</label>
-		                        </td>
-		                        <td class="check"></td>
-		                        <td class="value">
-		                        	<input type="text" name="page_properties[page_id]" value="%page_id%" id="fieldPageID">
-		                        </td>
-		                        <td></td>
-		                    </tr>
-		
-		                    <tr>
-		                        <td class="name">
-		                        	<label for="fieldPageURL">[#page_prop_link_page#]</label>
-		                        </td>
-		                        <td class="check"></td>
-		                        <td class="value">
-		                        	<input type="text" name="page_properties[page_url]" value="%page_url%" id="fieldPageURL">
-		                        </td>
-		                        <td><span class="ui-icon ui-icon-folder-open" style="cursor: pointer;" id="opentree"></span></td>
-		                    </tr>
-		
-		                    <tr>
-		                        <td class="name">
-		                        	<label for="fieldPageOnlyAuth">Только авторизированым</label>
-		                        </td>
-		                        <td class="check">
-		                        	<input type="checkbox" name="page_properties[only_auth]" id="fieldPageOnlyAuth" %only_auth%>
-		                        </td>
-		                        <td class="value">
-		                        	Если отмечен, доступен только авторизованным
-		                        </td>
-		                        <td></td>
-		                    </tr>
-		
-		                    <tr>
-		                        <td class="name">
-		                        	<label for="flag_template">[#page_prop_templte_page#]</label>
-		                        </td>
-		                        <td class="check">
-		                        	<input type="checkbox" onClick="jspub_disabled_change('flag_template', 'fieldPageTemplate')" name="page_properties[flag_template]" id="flag_template">
-		                        </td>
-		                        <td class="value">
-		                            <select name="page_properties[page_template]" id="fieldPageTemplate"></select>
-		                        </td>
-		                        <td></td>
-		                    </tr>
-	                    </tbody>
-                    </table>
-                </fieldset>
-
-                <fieldset id="page_prop_modules" title="[#page_prop_label_prop_addon#]">
-                    <legend>[#page_prop_label_prop_addon#]</legend>
-                    <table border='0' cellpadding='0' cellspacing='0'>
-	                    <tbody id='table_modul_prop'>
-	                    	%str_prop_modul%
-	                    </tbody>
-                    </table>
-                </fieldset>
-
-                <fieldset id="metki_content" title="[#page_prop_label_link#]">
-                    <legend>[#page_prop_label_link#]</legend>
-                    <table border="0" cellpadding="0" cellspacing="0">
-                    	<tbody id="table_metki">
-                    	</tbody>
-                    </table>
-                </fieldset>
-                
-                <div>
-                	<input type="button" id="admin_struct_savebutton" value="[#structure_page_properties_button_save#]">
-                </div>
-            </form>
-        </div>
+<!-- page name -->
+<span class="content_header">Страница: <span class="black">"<a href="%link_page_view%" class="link2page" target="_blank" title="Откроется в новом окне">%page_name%</a>"</span></span>
+<!-- page container -->
+<div id="page_container">
+<div id="content_container">
+<!-- page tabs -->
+<div id="page_tabs">
+ <ul>
+  <li><a href="#page_prop_label_prop">[#page_prop_label_prop#]</a></li>
+  <li><a href="#page_prop_modules">[#page_prop_label_prop_addon#]</a></li>
+  <li><a href="#table_metki">[#page_prop_label_link#]</a></li>
+ </ul>
 </div>
+
+            <form id="struct_form">
+
+ <div id="page_prop_label_prop" class="content">
+  <fieldset>
+		                        	<label for="fieldPageName">[#page_prop_name_page#]</label>
+		                        	<input type="text" name="page_properties[page_name]" value="%page_name%" id="fieldPageName">
+  </fieldset>
+		
+  <fieldset>
+		                        	<label for="fieldPageTitle">[#page_prop_name_title#]</label>
+		                        	<input type="text" name="page_properties[page_title]" value="%page_title%" id="fieldPageTitle">
+  </fieldset>
+		
+  <fieldset>
+		                        	<label for="fieldPageID">[#page_prop_name_id#]</label>
+		                        	<input type="text" name="page_properties[page_id]" value="%page_id%" id="fieldPageID">
+  </fieldset>
+		
+  <fieldset>
+		                        	<label for="fieldPageURL">[#page_prop_link_page#]</label>
+		                        	<input type="text" name="page_properties[page_url]" value="%page_url%" id="fieldPageURL">
+   <span class="ui-icon ui-icon-folder-open" style="cursor: pointer;" id="opentree"></span>
+  </fieldset>
+		
+  <fieldset>
+		                        	<label for="fieldPageOnlyAuth">Только авторизированым</label>
+		                        	<input type="checkbox" name="page_properties[only_auth]" id="fieldPageOnlyAuth" %only_auth%>
+		                        	Если отмечен, доступен только авторизованным
+  </fieldset>
+		
+  <fieldset>
+		                        	<label for="flag_template">[#page_prop_templte_page#]</label>
+		                        	<input type="checkbox" onClick="jspub_disabled_change('flag_template', 'fieldPageTemplate')" name="page_properties[flag_template]" id="flag_template">
+   <select name="page_properties[page_template]" style="width:300px;" id="fieldPageTemplate"></select>
+                </fieldset>
+  </div>
+
+  <div id="page_prop_modules" class="content">
+	                    	%str_prop_modul%
+  </div>
+
+  <!-- метки  -->
+  <div id="table_metki" class="content"></div>
+
+
+  <fieldset class="page_submit_field">
+   <input type="submit" id="admin_struct_savebutton" class="submit_btn" value="[#structure_page_properties_button_save#]"/>
+                </fieldset>
+ </form>
+
+</div><!-- end of content container -->
+</div><!-- end of page container -->
+
+<script type="text/javascript">
+$( "input:submit,").button();
+$('#page_tabs').parent().tabs();
+
+$('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+});
+</script>

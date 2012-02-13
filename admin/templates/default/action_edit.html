@@ -1,29 +1,31 @@
 <!-- @body -->
-<div id="structure_all_form">
-        <div id="form_action">
+<div id="mod_action_edit" style="width:100%; margin:0 auto; padding:0;">
+ <h3>[#action_curent_name#]</h3>
+ <form action="%url_action%" method="post" id="module_action_saveform">
+  <fieldset>
+   <label for="action_name">[#modules_install_label_name_action#]</label>
+   <input type="text" name="action_name" id="action_name" value="[#action_name#]">
+  </fieldset>
 
         <fieldset>
-            <form action="%url_action%" method="post" id="module_action_saveform">
-            <legend>[#action_curent_name#]</legend>
-            <table>
-                <tbody>
-                <tr>
-                    <td><label style="width:150px;">[#modules_install_label_name_action#]</label></td>
-                    <td>&nbsp;</td>
-                    <td><input type="text" name="action_name" id="action_name" value="[#action_name#]" style="width:290px;"></td>
-
-                </tr>
-                %action_param_html%
-                </tbody>
-            </table>
-            <p align="center"><input type="button" value="[#modules_button_save_properties#]" id="modules_button_save_properties"></p>
-            </form>
+            %action_param_html%
         </fieldset>
 
+  <fieldset class="page_submit_field">
+   <input type="button" value="[#modules_button_save_properties#]" id="modules_button_save_properties">
+  </fieldset>
+  </form>
         </div>
-</div>
+
 
 <script>
+   $("input:button").button();
+
+   $('#mod_action_edit select').selectmenu({
+      style:'dropdown',
+      maxHeight: 200
+   });
+
 	var arr_actions = new Array();
     var fieldNames = [%fieldNames%];
 	var url_for_submit = '';

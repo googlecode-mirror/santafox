@@ -13,6 +13,8 @@ function show_action_edit(strlink, name)
         title:name,
         buttons:{},
         modal: true,
+        show: "scale",
+        hide: "scale",
         close: function() {update_action_list(); }
 
     });
@@ -23,6 +25,7 @@ function santaUpdateRegion(regid, loadFrom)
     //на всякий случай скроем всякие всплывающие окна
     $('#popup_msg_div').css('display','none');
     $('#popup_div').css('display','none');
+    $("#"+regid).html('<span id="contentLoading">Loading, Please wait..</span>'); // @todo use lang[]
     $("#"+regid).load(loadFrom, function(response, status, xhr) {
           if (status == "error")
           {
@@ -211,8 +214,8 @@ function santaShowPopupHint(header, text,timeout)
                 $(this).dialog( "close" );
             }
         },
-        show: "slide",
-	    hide: "slide"//"explode"
+        show: "scale",
+	    hide: "scale"//"explode"
     });
     //autoclose
     if (timeout!=0)

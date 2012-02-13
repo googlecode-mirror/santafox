@@ -1,122 +1,156 @@
 <!-- @main -->
-<h2>[#admin_backup_details_header_name#] `%name%`</h2>
-<table>
-<tr>
-<td colspan="3">
+<span class="content_header">Глобальные настройки &rarr; <span class="black">[#admin_backup_details_header_name#] "%name%"</span></span>
+<div id="page_container">
+  <div id="content_container">
+
+   <div id="page_tabs">
+    <ul>
+    <li><a href="#cms_componets_save">[#admin_save_components_legend#]</a></li>
+    <li><a href="#ignored_tables">[#admin_backup_it_header#]</a></li>
+    <li><a href="#ignored_exts">[#admin_backup_ext_header#]</a></li>
+    <li><a href="#ignored_paths">[#admin_backup_ignored_paths_header#]</a></li>
+   </ul>
+   </div>
+
+  <div id="cms_componets_save" class="content" style="width:650px;">
 <form method="post" action="%form_action%" id="startbackupform">
 <input type="hidden" name="ruleid" value="%ruleid%">
-<table border="0" cellpadding="3" cellspacing="1" class="admin_table">
-<tr>
-	<th colspan="2">[#admin_save_components_legend#]</th>
-</tr>
-<tr>
- <td><input type="checkbox" id="needcontent" name="needcontent" value="1" %needcontent_checked%><label for="needcontent" class="text" style="cursor:HAND">&nbsp;[#admin_save_components_save_content#]</label></td>
- <td rowspan="4">[#admin_backup_backup_comment_label#]<br/><textarea name="description" cols="30" rows="7"></textarea></td>
-</tr>
-<tr>
-<td><input type="checkbox" id="needsystem" name="needsystem" value="1" %needsystem_checked%><label for="needsystem" class="text" style="cursor:HAND">&nbsp;[#admin_save_components_save_system#]</label></td>
-</tr>
-<tr>
-<td><input type="checkbox" id="needtables" name="needtables" value="1" %needtables_checked%><label for="needtables" class="text" style="cursor:HAND">&nbsp;[#admin_save_components_save_mysql#]</label></td>
-</tr>
-<tr>
-<td><input type="checkbox" id="needdesign" name="needdesign" value="1" %needdesign_checked%><label for="needdesign" class="text" style="cursor:HAND">&nbsp;[#admin_save_components_save_design#]</label></td>
-</tr>
 
+  <div class="left">
+   <fieldset>
+    <input type="checkbox" id="needcontent" name="needcontent" value="1" %needcontent_checked%><label for="needcontent" class="text">[#admin_save_components_save_content#]</label>
+   </fieldset>
 
-<tr class="admin_table_wstring"><td colspan="2" align="right">
+   <fieldset>
+    <input type="checkbox" id="needsystem" name="needsystem" value="1" %needsystem_checked%><label for="needsystem" class="text">[#admin_save_components_save_system#]</label>
+   </fieldset>
 
-<input type="button" name="submit"
-		 value="[#admin_save_components_start#]" onclick="jspub_form_submit('startbackupform','%form_action%')">
+   <fieldset>
+    <input type="checkbox" id="needtables" name="needtables" value="1" %needtables_checked%><label for="needtables" class="text">[#admin_save_components_save_mysql#]</label>
+   </fieldset>
 
-</td></tr>
-</table>
+   <fieldset>
+    <input type="checkbox" id="needdesign" name="needdesign" value="1" %needdesign_checked%><label for="needdesign" class="text" style="cursor:HAND">[#admin_save_components_save_design#]</label>
+   </fieldset>
+  </div>
+
+  <div class="right">
+   <fieldset>
+    <label for="description">[#admin_backup_backup_comment_label#]</label><br>
+    <textarea class="clear" name="description" id="description" cols="40" rows="7"></textarea>
+   </fieldset>
+  </div>
+
+  <div class="clear"></div>
+
+  <fieldset class="page_submit_field">
+   <input type="submit" name="submit" value="[#admin_save_components_start#]" onclick="jspub_form_submit('startbackupform','%form_action%')">
+  </fieldset>
 </form>
-</td>
-</tr>
-<tr>
-<td width="33%" valign="top">
+  </div>
+
+   <div id="ignored_tables" class="content">
 %ignored_tables%
-<br/>
-</td>
-<td width="33%" valign="top">
+   </div>
+
+   <div id="ignored_exts" class="content">
 %ignored_exts%
-</td>
-<td width="33%" valign="top">
+   </div>
+
+
+   <div id="ignored_paths" class="content">
 %ignored_paths%
-</td>
-</tr>
-</table>
+   </div>
+
+ </div><!-- end of content_container -->
+</div><!-- end of page_container -->
+  <script type="text/javascript">
+   $('#page_tabs').parent().tabs();
+   $( "input:submit").button();
+  </script>
 
 <!-- @ignored_paths_table -->
-<h2>[#admin_backup_ignored_paths_header#]</h2>
-<table class="admin_table">
+<table>
     <tr>
-        <th>[#admin_backup_table_num#]</th>
+  <th class="first">[#admin_backup_table_num#]</th>
         <th>[#admin_backup_ip_table_header#]</th>
-        <th>[#admin_backup_ip_table_delete#]</th>
+  <th class="last">[#admin_backup_ip_table_delete#]</th>
     </tr>
 %lines%
 </table>
-<form action="%form_action_add%" method="POST">
+
+<form action="%form_action_add%" method="post">
 <input type="hidden" name="ruleid" value="%ruleid%">
-<h2>[#admin_backup_ip_add_action_label#]</h2>
+ <span class="bold">[#admin_backup_ip_add_action_label#]</span>
+ <fieldset>
 <input type="text" name="path">
-<input type="submit" value="[#admin_backup_ip_add_button_label#]">
+  <input type="submit" style="margin-left:5px;" value="[#admin_backup_ip_add_button_label#]">
+ </fieldset>
 </form>
 
 <!-- @ignored_paths_table_row -->
 <tr [#tr_class#]>
- <td align="center">%num_order%</td>
- <td align="center">%path%</td>
- <td><a href="#" onclick="jspub_confirm('backup&backup=delete_ignored_path&ruleid=%ruleid%&path=%path_escaped%', '[#admin_backup_ip_delete_confirm#]');">[#admin_backup_table_row_delete#]</a></td>
+ <td>%num_order%</td>
+ <td>%path%</td>
+ <td><a href="" onclick="jspub_confirm('backup&backup=delete_ignored_path&ruleid=%ruleid%&path=%path_escaped%', '[#admin_backup_ip_delete_confirm#]');">[#admin_backup_table_row_delete#]</a></td>
 </tr>
 
 
 
 <!-- @ignored_ext_table -->
-<h2>[#admin_backup_ext_header#]</h2>
-<table class="admin_table">
+<table>
     <tr>
-        <th>[#admin_backup_table_num#]</th>
+  <th class="first">[#admin_backup_table_num#]</th>
         <th>[#admin_backup_ext_name#]</th>
-        <th>[#admin_backup_it_delete#]</th>
+  <th class="last">[#admin_backup_it_delete#]</th>
     </tr>
 %lines%
 </table>
-<form action="%form_action_add%" method="POST">
+
+<form action="%form_action_add%" method="post">
 <input type="hidden" name="ruleid" value="%ruleid%">
-<h2>[#admin_backup_ext_add_action_label#]</h2>
+ <span class="bold">[#admin_backup_ext_add_action_label#]</span>
+ <fieldset>
 <input type="text" name="ext">
-<input type="submit" value="[#admin_backup_ext_add_button_label#]">
+  <input type="submit" style="margin-left:5px;" value="[#admin_backup_ext_add_button_label#]">
+ </fieldset>
 </form>
 
 <!-- @ignored_ext_table_row -->
 <tr [#tr_class#]>
- <td align="center">%num_order%</td>
- <td align="center">%ext%</td>
+ <td>%num_order%</td>
+ <td>%ext%</td>
  <td><a href="#" onclick="jspub_confirm('backup&backup=delete_ext&ruleid=%ruleid%&ext=%ext_escaped%', '[#admin_backup_ext_delete_confirm#]');">[#admin_backup_table_row_delete#]</a></td>
 </tr>
 
 
 <!-- @ignored_table -->
-<h2>[#admin_backup_it_header#]</h2>
-<table class="admin_table">
+<div class="left">
+<table>
     <tr>
-        <th>[#admin_backup_table_num#]</th>
+  <th class="first">[#admin_backup_table_num#]</th>
         <th>[#admin_backup_it_tname#]</th>
-        <th>[#admin_backup_it_delete#]</th>
+  <th class="last">[#admin_backup_it_delete#]</th>
     </tr>
 %lines%
 </table>
-<form action="%form_action_add%" method="POST">
+</div>
+
+<div class="right">
+ <form action="%form_action_add%" method="post">
 <input type="hidden" name="ruleid" value="%ruleid%">
-<h2>[#admin_backup_it_add_action_label#]</h2>
-<select name="tn[]" multiple="multiple" size="8">%select_options%</select>
+ <span class="bold"> [#admin_backup_it_add_action_label#]</span>
+ <fieldset>
+  <select name="tn[]" style="height:auto;" multiple="multiple" size="8">%select_options%</select>
+ </fieldset>
+ <fieldset>
 <input type="submit" value="[#admin_backup_it_add_button_label#]">
+ </fieldset>
 </form>
+</div>
+<div class="clear"></div>
 <!-- @ignored_tables_add_option -->
-<option value="%tablename%">%tablename%</option>
+<option style="height:auto;" value="%tablename%">%tablename%</option>
 
 <!-- @ignored_table_row -->
 <tr [#tr_class#]>

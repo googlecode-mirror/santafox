@@ -1,62 +1,29 @@
 <!-- @body -->
-<div id="structure_all_form">
-        <div id="info">
-        <fieldset >
-			<legend id="ext-gen189">Информация о сервере</legend>
-                <table border="0" cellpadding="6" cellspacing="10">
-                  <tr>
-                    <td width="230" align="right" valign="middle">Версия сервера:</td>
-                    <td align="left" valign="middle">[#SERVER_SOFTWARE#]</td>
-                  </tr>
-                  <tr>
-                    <td width="230" align="right" valign="middle">IP адрес сервера:</td>
-                    <td align="left" valign="middle">[#SERVER_ADDR#]</td>
-                  </tr>
-                  <tr>
-                    <td width="230" align="right" valign="middle">Ваш IP адрес:</td>
-                    <td align="left" valign="middle">[#REMOTE_ADDR#]</td>
-                  </tr>
-                </table>
-        </fieldset>
-        <br>
-        <fieldset >
-			<legend id="ext-gen189">Особенности работы</legend>
-                <table border="0" cellpadding="6" cellspacing="10">
-                  <tr>
-                    <td width="230" align="right" valign="middle">Изменения всех прав скриптом </td>
-                    <td align="left" valign="middle">[#SERVER_CAN_CHMOD_SCRIPT#]</td>
-                  </tr>
-                  <tr>
-                    <td width="230" align="right" valign="middle">Доступ к файлам по FTP</td>
-                    <td align="left" valign="middle">[#SERVER_CAN_FTP_CONNECT#]</td>
-                  </tr>
-                  <tr>
-                    <td width="230" align="right" valign="middle">Ваш IP адрес:</td>
-                    <td align="left" valign="middle">[#REMOTE_ADDR#]</td>
-                  </tr>
-                </table>
-        </fieldset>
-        <br>
-		<fieldset>
-        <legend class="text">Версия CMS</legend>
-        <table border="0" cellpadding="6" cellspacing="10">
-          <tr>
-            <td width="230" align="right" valign="middle">Ядро</td>
-            <td align="left" valign="middle">[#version_kernel#]</td>
-          </tr>
-          <tr>
-            <td width="230" align="right" valign="middle">Наличие обновлений:</td>
-            <td align="left" valign="middle">[#new_version_info#]</td>
-          </tr>
-<!--          <tr>
-            <td width="230" align="right" valign="middle">Административный интерфейс</td>
-            <td align="left" valign="middle">[#version_gui#]</td>
-          </tr>
-          <tr>
-            <td width="230" align="right" valign="middle">Версия редактора</td>
-            <td align="left" valign="middle">[#version_content_editor#]</td>
-          </tr>-->
-        </table>
-        </fieldset>
+<span class="content_header">Глобальные настройки &rarr; <span class="black">Информация о системе</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ <h3>Информация о сервере</h3>
+ <ul>
+  <li>Версия сервера: [#SERVER_SOFTWARE#]</li>
+  <li>IP адрес сервера: [#SERVER_ADDR#]</li>
+  <li>Ваш IP адрес: [#REMOTE_ADDR#]</li>
+ </ul>
+
+ <h3>Особенности работы</h3>
+ <ul>
+  <li>Изменения всех прав скриптом: [#SERVER_CAN_CHMOD_SCRIPT#]</li>
+  <li>Доступ к файлам по FTP: [#SERVER_CAN_FTP_CONNECT#]</li>
+  <li>Ваш IP адрес: [#REMOTE_ADDR#]</li>
+ </ul>
+
+ <h3>Версия CMS</h3>
+ <ul>
+  <li>Ядро: [#version_kernel#]</li>
+  <li>Наличие обновлений: [#new_version_info#]</li>
+  <!--li>Административный интерфейс: [#version_gui#]</li>
+  <li>Версия редактора: [#version_content_editor#]</li-->
+ </ul>
+ </div>
         </div>
 </div>

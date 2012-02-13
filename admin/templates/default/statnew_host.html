@@ -1,32 +1,28 @@
 <!-- @data_empty -->
-<h4 class="stat_data_empty">[#statist_erorre_no_data_for_show#]</h4>
+<h3>[#statist_erorre_no_data_for_show#]</h3>
 
 <!-- @begin -->
-<div align="center">
-<br />
 
 <!-- @image -->
 %link_image%
 <!--<img src="%link_image%" border="0"/><br />-->
 
 <!-- @table_begin -->
-<table cellpadding="10" cellspacing="2" class="admin_table">
+<table>
     <tr>
-      <th>[#statist_host_table_label1#]</th>
+      <th class="first">[#statist_host_table_label1#]</th>
       <th>[#statist_host_table_label2#]</th>
-      <th>[#statist_host_table_label3#]</th>
+      <th class="last">[#statist_host_table_label3#]</th>
     </tr>
 
 <!-- @table_tr -->
     <tr %set_class_tr%>
       <td>%date%</td>
-      <td align="right">%host%</td>
-      <td align="right">%hit%</td>
+      <td>%host%</td>
+      <td>%hit%</td>
     </tr>
-
-
 <!-- @table_end -->
-  </TABLE>
+  </table>
 
 <!-- @end -->
 </div>

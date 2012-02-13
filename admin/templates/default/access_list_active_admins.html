@@ -1,18 +1,25 @@
-<!-- @main -->
-<table class="admin_table">
+<!-- @main -->  <!-- @todo use lang[] -->
+<span class="content_header">Администраторы &rarr; <span class="black">Список работающих администраторов</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+  <h3>Список Online Администраторов</h3>
+   <table>
   <tr>
-    <th>[#backof_user_table_head1#]</th>
+       <th class="first">[#backof_user_table_head1#]</th>
     <th>[#backof_user_table_head2#]</th>
     <th>[#backof_user_table_head3#]</th>
     <th>[#backof_user_table_head4#]</th>
     <th>[#backof_user_table_head5#]</th>
     <th>[#backof_user_table_head6#]</th>
     <th>[#backof_user_table_head7#]</th>
-    <th>[#backof_user_table_head8#]</th>
+       <th class="last">[#backof_user_table_head8#]</th>
   </tr>
   [#backof_user_table_lines#]
 </table>
-
+  </div>
+ </div>
+</div>
 <!-- @string -->
 <tr [#tr_class#]>
 	<td>[#login#]</td>
@@ -23,6 +30,5 @@
 	<td>[#time#]</td>
 	<td>[#ip#]</td>
 	<td>[#host#]</td>
-	<td align="center"><input type="checkbox" [#root#] disabled="disabled"/></td>
-
+	<td align="center"><input type="checkbox" style="float:none;" [#root#] disabled="disabled"/></td>
 </tr>

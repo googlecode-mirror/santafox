@@ -1,10 +1,19 @@
 <!-- @main -->
 %backup_table%
 %uploaded_files%
-<form method="POST" action="%form_action%" enctype="multipart/form-data">
-<input type="file" name="backup_file"/>&nbsp;
-<input type="submit" name="upload_backup" value="[#admin_backup_button_upload_file#]" />
+
+ <form method="post" action="%form_action%" enctype="multipart/form-data">
+  <fieldset>
+   <input type="file" class="file" name="backup_file">
+   <input type="submit" name="upload_backup" value="[#admin_backup_button_upload_file#]">
+  </fieldset>
 </form>
+ </div>
+ </div>
+</div>
+ <script type="text/javascript">
+ $("input:submit").button();
+ </script>
 
 <!--  @backup_made_header -->
 [#admin_backup_backup_made_table_header#]
@@ -13,23 +22,23 @@
 
 
 <!-- @backup_table -->
-<h2>%header%</h2>
-<table class="admin_table">
+<h3>%header%</h3>
+<table>
     <tr>
-        <th>[#admin_backup_table_num#]</th>
+  <th class="first">[#admin_backup_table_num#]</th>
         <th>[#admin_backup_table_file#]</th>
         <th>[#admin_backup_table_date#]</th>
         <th>[#admin_backup_table_restore#]</th>
         <th>[#admin_backup_table_delete#]</th>
         <th>[#admin_backup_table_content#]</th>
-        <th>[#admin_backup_table_desc#]</th>
+  <th class="last">[#admin_backup_table_desc#]</th>
     </tr>
 %lines%
 </table>
-<br /><br />
+<br><br>
 <!-- @backup_table_row -->
     <tr [#tr_class#]>
-        <td align="center">%num_order%</td>
+        <td>%num_order%</td>
         <td><a href="%real_filename%" target="_top">%filename%</a></td>
 <!--        <td><a href="index.php?backup=dwld&id=%id%">%filename%</a></td>-->
         <td>%date%</td>

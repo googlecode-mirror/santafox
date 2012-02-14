@@ -367,7 +367,7 @@
 
 
   <fieldset class="page_submit_field">
-   <input type="submit" id="admin_struct_savebutton" class="submit_btn" value="[#structure_page_properties_button_save#]"/>
+   <input type="button" id="admin_struct_savebutton" class="submit_btn" value="[#structure_page_properties_button_save#]"/>
                 </fieldset>
  </form>
 
@@ -375,7 +375,7 @@
 </div><!-- end of page container -->
 
 <script type="text/javascript">
-$( "input:submit,").button();
+$( "input:button").button();
 $('#page_tabs').parent().tabs();
 
 $('#content_container select').selectmenu({

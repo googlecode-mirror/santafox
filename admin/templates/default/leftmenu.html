@@ -21,7 +21,7 @@
 </script>
 <!-- @panel_block -->
 <div>
- <span><a href="javascript:;">[#name_panel#]</a></span>
+ <span><a href="">[#name_panel#]</a></span>
  <div>
  [#content_panel#]
  </div>
@@ -32,10 +32,10 @@
 
 <!-- @lm_menu_activ -->
 <a href="" onclick="start_interface.left_menu_click(this, '%query%'); return false;" class="left_menu_select" id="[#id#]">[#name#]</a>
-  <script language="javascript">
-    //Обновим переменную яваскрипта, что бы было известно какой сейчас выделен пункт меню
+  <script type="text/javascript">
+    // Обновим переменную яваскрипта, что бы было известно какой сейчас выделен пункт меню
     start_interface.left_menu_element_select = $("#[#id#]");
-    //И сразу же вызовем обновление контента для этого пункта меню
+    // И сразу же вызовем обновление контента для этого пункта меню
     start_interface.left_menu_click(start_interface.left_menu_element_select, "[#get_url#]");
   </script>
 

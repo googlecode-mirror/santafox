@@ -253,11 +253,15 @@ table {
 	border-radius: 4px;
 }
 
-table a { color:#000; text-decoration:none; }
-table a:hover { color:#00ADDB; text-decoration:underline; }
+td a { color:#000; text-decoration:none; }
+td a:hover { color:#00ADDB; text-decoration:underline; }
+
+th a.sort { color:#fff; text-decoration:underline; }
+th a.sort:hover { color:#fff; text-decoration:none; }
 
 table th.first { border-top-left-radius:5px; }
 table th.last { border-top-right-radius:6px; }
+
 
 table th {
 	background:#00ADDB;

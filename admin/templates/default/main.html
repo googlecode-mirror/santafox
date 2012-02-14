@@ -121,7 +121,7 @@
 			this.left_menu_element_select = el;
 
 			//Теперь необходимо обновить контент центральной части
-			santaUpdateRegion('content', this.global_link + el.id + '&' + query);
+			santaUpdateRegion('content', this.global_link + $(el).attr('id') + '&' + query);
 			//и загрузить помощь
 			$.get("index.php?action=get_help_content",function(data){
 			helpContent=data;
@@ -290,7 +290,7 @@
 			santaShowPopupHint('Help',helpContent,0);
 			});
 			});
-							
+
 			//Функция для обновления текущего времени на сайте и проверки необходимости отображения окна с дебагом
 			function fulltime()
 			{

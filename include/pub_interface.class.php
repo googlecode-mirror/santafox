@@ -7,15 +7,7 @@ class pub_interface
      * @access public
      * @var array
      */
-    var $template;
-
-    /**
-     * Контент
-     *
-     * @access public
-     * @var HTML
-     */
-    //var $content;
+    public $template;
 
     /**
      * Массив, содержащий шаблон
@@ -23,16 +15,18 @@ class pub_interface
      * @access public
      * @var array
      */
-    var $menu      = array(); //Меню левой части интерфейса, разбитое по блокам, для потсроения
-    var $menu_line = array(); //То же самое что и $menu но без разбивки по блокам, что бы осуществлять проверку
-    var $node_click = array(); //Альтернатива возможных дейсвтий, вызываемых при клике по ноде
+    public $menu      = array(); //Меню левой части интерфейса, разбитое по блокам, для потсроения
+    public $menu_line = array(); //То же самое что и $menu но без разбивки по блокам, что бы осуществлять проверку
+    public $node_click = array(); //Альтернатива возможных действий, вызываемых при клике по ноде
     //var $menu_global_link = 'index.php?action=set_two_menu&leftmenu=';
-    var $menu_default = '';
-    var $menu_block_curent = '';
-    var $menu_block_empty = 'empty';
-    var $menu_visible = true;
-    var $help_visible = true;
-    var $tree;
+    public $menu_default = '';
+    public $menu_block_curent = '';
+    public $menu_block_empty = 'empty';
+    public $menu_visible = true;
+    public $help_visible = true;
+    public $tree;
+
+    private $hasActive=false;
 
     /**
      * Формирует массив для меню с установленными модулями имеющими административный интерфейс
@@ -175,7 +169,7 @@ class pub_interface
 	/**
 	 * Добавляет к текущему блоку произвольный контент.
 	 *
-	 * @param HTML $content
+	 * @param string $content
 	 */
     function set_menu_plain($content)
     {
@@ -297,10 +291,10 @@ class pub_interface
      *
      * В качестве значений массива - непосредственный HTML код, который
      * должен быть вставлен в соответствующий блок меню
-     * @param string template
+     * @param string $template
      * @return array
      */
-    function get_menu($template)
+    private function get_menu($template)
     {
         global $kernel;
 
@@ -315,8 +309,11 @@ class pub_interface
                 switch ($elem['type']) {
                     //Обычный элемент меню
                 	case 'menu':
-                        if ($id == $kernel->pub_section_leftmenu_get())
+                        if (!$this->hasActive && $id == $kernel->pub_section_leftmenu_get())
+                        {
                             $one_html = $template["lm_menu_activ"];
+                            $this->hasActive=true;
+                        }
                         else
                             $one_html = $template["lm_menu_passiv"];
 
@@ -345,7 +342,7 @@ class pub_interface
 	 * Создаёт объекты кода, для пострения меню. Построение меню ведеётся по данным массива
 	 * $this->menu который заполняется соответсвующими классми разных частей
 	 * административного интерфейса
-	 * @return HTML
+	 * @return string
 	 */
 
     function left_menu_construct()
@@ -358,6 +355,7 @@ class pub_interface
         if (!empty($this->menu))
         {
             $i = 0;
+            $this->hasActive=false;
             foreach ($this->get_menu($template) as $name_block => $block_content)
             {
                 //Код скрипта для панели

@@ -27,6 +27,7 @@ class pub_interface
     public $tree;
 
     private $hasActive=false;
+    private $activeBlockNum=0;
 
     /**
      * Формирует массив для меню с установленными модулями имеющими административный интерфейс
@@ -299,6 +300,7 @@ class pub_interface
         global $kernel;
 
         $array_block = array();
+        $num=0;
         foreach ($this->menu as $name_block => $val)
         {
             //Сначала соберём тот контент, который должен находиться в этом блоке
@@ -313,6 +315,7 @@ class pub_interface
                         {
                             $one_html = $template["lm_menu_activ"];
                             $this->hasActive=true;
+                            $this->activeBlockNum=$num;
                         }
                         else
                             $one_html = $template["lm_menu_passiv"];
@@ -331,6 +334,7 @@ class pub_interface
 
             $html = join($template['lm_delimiter'], $array_menu);
             $array_block[$name_block] = $html;
+            $num++;
         }
         return $array_block;
     }
@@ -388,6 +392,7 @@ class pub_interface
 		    $next_get = join("&", $next_get);
 		}
 		$html = str_replace("[#get_url#]", $next_get, $html);
+		$html = str_replace("[#active_block_num#]", $this->activeBlockNum, $html);
         return $html;
     }
 

@@ -5,19 +5,20 @@
 </div>
 </div>
 <script type="text/javascript">
-// accordion
-      var icons = {
-			header: "ui-icon-carat-1-s",
-			headerSelected: "ui-icon-carat-1-e"
-		};
+    // accordion
+    var icons = {
+        header:"ui-icon-carat-1-s",
+        headerSelected:"ui-icon-carat-1-e"
+    };
 
-      $("#accordion").accordion({
-         icons: icons,
-         header: "span",
-         ccollapsible: false,
-         autoHeight: false,
-         fillSpace: false
-   	});
+    $("#accordion").accordion({
+        icons:icons,
+        header:"span",
+        ccollapsible:false,
+        autoHeight:false,
+        fillSpace:false
+    });
+    $("#accordion").accordion('activate',"[#active_block_num#]");
 </script>
 <!-- @panel_block -->
 <div>

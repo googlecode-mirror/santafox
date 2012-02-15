@@ -1,8 +1,7 @@
 <!-- @date_picker -->
 <script type="text/javascript">
-
     $(function() {
-        $( "#datePicker" ).datepicker({
+        $("#datePicker").datepicker({
              dateFormat:"yy.mm.dd"
             ,onSelect:newsDateSelected
         }
@@ -13,6 +12,4 @@
         jspub_click('show_list&flush=1&date='+dateText);
     }
 </script>
-<div style="margin: 10px;">
-    <div id="datePicker"></div>
-</div>
+<div id="datePicker"></div>

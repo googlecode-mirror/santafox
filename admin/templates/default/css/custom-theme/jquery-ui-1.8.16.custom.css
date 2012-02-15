@@ -494,8 +494,8 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  *
  * http://docs.jquery.com/UI/Tabs#theming
  */
-.ui-tabs { position: fixed; padding: .2.3em; background:#fff; zoom: 1; border:none; border-radius:4px; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
-.ui-tabs .ui-tabs-nav { width:100%; margin: 0; padding:.2em .2em 0; position:fixed; border-bottom:1px solid #ccc; padding-top:4px; border-radius:0; }
+.ui-tabs { position: relative; padding: .2.3em; background:#fff; zoom: 1; border:none; border-radius:4px; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+.ui-tabs .ui-tabs-nav { width:100%; margin: 0; padding:.2em .2em 0; position:absolute; border-bottom:1px solid #ccc; padding-top:4px; border-radius:0; }
 .ui-tabs-nav { background:#ededed url('images/tabs-bg.gif') repeat-x top left; padding-top:50px; }
 .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; background:#ddd; top: 2px; border:none; border:1px solid #ddd; margin: 5px .4em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
 .ui-tabs .ui-tabs-nav li a { float: left; padding: .6em 1em; text-decoration: none; }
@@ -515,7 +515,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  * http://docs.jquery.com/UI/Datepicker#theming
  */
 #ui-datepicker-div { display:none; }
-.ui-datepicker { width: 17em; margin:0 auto; padding: .2em .2em 0; display: block; background:#fff; border-color:#ccc; }
+.ui-datepicker { width: 17em; margin:0 auto; padding: .2em .2em 0; display: block; background:#fff; border-color:#ccc; -webkit-box-shadow: #b2b2b2 0px 0px 5px; -moz-box-shadow: #b2b2b2 0px 0px 5px; box-shadow: #b2b2b2 0px 0px 5px; }
 .ui-datepicker .ui-datepicker-header { position:relative; padding:.2em 0; background:#fff; color:#2595c9; }
 .ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next { position:absolute; top: 2px; width: 1.8em; height: 1.8em; }
 .ui-datepicker .ui-datepicker-prev-hover, .ui-datepicker .ui-datepicker-next-hover { top: 1px; }
@@ -529,9 +529,10 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-datepicker select.ui-datepicker-month-year {width: 100%;}
 .ui-datepicker select.ui-datepicker-month, 
 .ui-datepicker select.ui-datepicker-year { width: 49%;}
-.ui-datepicker table {width: 100%; font-size: .9em; border-collapse: collapse; margin:0 0 .4em; }
-.ui-datepicker th { padding: .7em .3em; text-align: center; font-weight: bold; border: 0;  }
-.ui-datepicker td { border: 0; padding: 1px; }
+.ui-datepicker table {width: 100%; background:#fff; font-size: .9em; border-collapse: collapse; margin:0 0 .4em; border-radius:4px; }
+.ui-datepicker th { padding: .5em .3em; text-align: center; font-weight: bold; border: 0;  }
+.ui-datepicker td { border: 0; background:#fff; padding: 1px; }
+.ui-datepicker td:hover { border: 0; background:#fff; padding: 1px; }
 .ui-datepicker td span, .ui-datepicker td a { display: block; padding: .2em; text-align: right; text-decoration: none; }
 .ui-datepicker .ui-datepicker-buttonpane { background-image: none; margin: .7em 0 0 0; padding:0 .2em; border-left: 0; border-right: 0; border-bottom: 0; }
 .ui-datepicker .ui-datepicker-buttonpane button { float: right; margin: .5em .2em .4em; cursor: pointer; padding: .2em .6em .3em .6em; width:auto; overflow:visible; }

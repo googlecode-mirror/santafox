@@ -616,7 +616,9 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_export_csv_tpl_label',NULL
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_export_csv_formlabel',NULL,'Экспортировать в CSV');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_showsql_label',NULL,'Показать сгенерированный SQL-запрос');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_items_search_link_label',NULL,'Поиск');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_export_csv_menuitem',NULL,'Экспорт');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_export_csv_menuitem',NULL,'Экспорт в CSV');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_export_csv_menuitem',NULL,'Экспорт в CSV');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_export_csv_menuitem',NULL,'Экспорт в CSV');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_gen_search_filtertemplate_label',NULL,'Шаблон вывода для создаваемого фильтра');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_gen_search_filtername_label',NULL,'Название для создаваемого фильтра');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_gen_search_outfilename_label',NULL,'<b>Имя файла для сгенерированного шаблона</b><br/><small>будет помещён в /modules/catalog/templates_user/</small>');
@@ -2034,7 +2036,112 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_delete_confirm',NULL,'В�
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_show_export',NULL,'Экспорт');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_filter_all_groups',NULL,'Все группы (общие свойства)');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','auth_users_list_label8',NULL,'Зарегистрирован');
-
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_export_filter_select_label',NULL,'Внутренний фильтр');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_export_filter_select_all_items',NULL,'-без фильтра (все товары)-');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','global_prop_page_for_404',NULL,'Идентификатор страницы, на которую делать редирект при 404 ошибке');
+
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_menu_label_import_export',NULL,'Импорт-экспорт');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_menu_label_import_export',NULL,'Импорт-экспорт');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_menu_label_import_export',NULL,'Import-export');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_menu_label_import_commerceml',NULL,'Импорт из CommerceML');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_menu_label_import_commerceml',NULL,'Импорт из CommerceML');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_menu_label_import_commerceml',NULL,'Import from CommerceML');
+
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_type',NULL,'Тип импорта');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_type',NULL,'Тип импорта');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_type',NULL,'Тип импорта');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_type_import',NULL,'Сведения о товарах (import.xml)');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_type_import',NULL,'Сведения о товарах (import.xml)');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_type_import',NULL,'Сведения о товарах (import.xml)');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_type_offers',NULL,'Только цены (offers.xml)');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_type_offers',NULL,'Только цены (offers.xml)');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_type_offers',NULL,'Только цены (offers.xml)');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_do_import',NULL,'Импортировать');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_do_import',NULL,'Импортировать');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_do_import',NULL,'Импортировать');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_xmlfile',NULL,'Файл');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_xmlfile',NULL,'Файл');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_xmlfile',NULL,'Файл');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_itemprops_assoc',NULL,'Соответствия полей');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_itemprops_assoc',NULL,'Соответствия полей');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_itemprops_assoc',NULL,'Соответствия полей');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_name_1C',NULL,'Поле в 1С');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_name_1C',NULL,'Поле в 1С');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_name_1C',NULL,'Поле в 1С');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_name_santa',NULL,'Поле в santafox');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_name_santa',NULL,'Поле в santafox');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_name_santa',NULL,'Поле в santafox');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_add_assocline',NULL,'Добавить');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_add_assocline',NULL,'Добавить');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_add_assocline',NULL,'Добавить');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_price_field',NULL,'Цена');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_price_field',NULL,'Цена');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_price_field',NULL,'Цена');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_price_per_field',NULL,'Цена за');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_price_per_field',NULL,'Цена за');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_price_per_field',NULL,'Цена за');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_price_per_field_no_matters',NULL,'--не использовать--');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_price_per_field_no_matters',NULL,'--не использовать--');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_price_per_field_no_matters',NULL,'--не использовать--');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_pricetype',NULL,'Название типа цены в 1С');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_pricetype',NULL,'Название типа цены в 1С');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_pricetype',NULL,'Название типа цены в 1С');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_category',NULL,'Категория для новых');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_category',NULL,'Категория для новых');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_category',NULL,'Категория для новых');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_group',NULL,'Тов.группа');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_group',NULL,'Тов.группа');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_group',NULL,'Тов.группа');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_1C_ID_santafield',NULL,'Свойство каталога , в котором хранится ID из 1С');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_1C_ID_santafield',NULL,'Свойство каталога , в котором хранится ID из 1С');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_1C_ID_santafield',NULL,'Свойство каталога , в котором хранится ID из 1С');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_name_santafield',NULL,'Свойство каталога, в котором хранится название');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_name_santafield',NULL,'Свойство каталога, в котором хранится название');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_name_santafield',NULL,'Свойство каталога, в котором хранится название');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_error_nofile',NULL,'<b style="color:red;">Ошибка: Файл не загружен</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_error_nofile',NULL,'<b style="color:red;">Ошибка: Файл не загружен</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_error_nofile',NULL,'<b style="color:red;">Ошибка: Файл не загружен</b>');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_error_malformed_xml',NULL,'<b style="color:red;">Ошибка: Некорректный XML</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_error_malformed_xml',NULL,'<b style="color:red;">Ошибка: Некорректный XML</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_error_malformed_xml',NULL,'<b style="color:red;">Ошибка: Некорректный XML</b>');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_error_reqfields_not_filled',NULL,'<b style="color:red;">Ошибка: Не заполнены обязательные поля</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_error_reqfields_not_filled',NULL,'<b style="color:red;">Ошибка: Не заполнены обязательные поля</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_error_reqfields_not_filled',NULL,'<b style="color:red;">Ошибка: Не заполнены обязательные поля</b>');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_error_no_group',NULL,'<b style="color:red;">Ошибка: Не найдена тов. группа</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_error_no_group',NULL,'<b style="color:red;">Ошибка: Не найдена тов. группа</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_error_no_group',NULL,'<b style="color:red;">Ошибка: Не найдена тов. группа</b>');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_error_no_pricetype_found',NULL,'<b style="color:red;">Ошибка: Указанный тип цены не найден</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_error_no_pricetype_found',NULL,'<b style="color:red;">Ошибка: Указанный тип цены не найден</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_error_no_pricetype_found',NULL,'<b style="color:red;">Ошибка: Указанный тип цены не найден</b>');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_import_completed',NULL,'<b>Импорт завершён. Добавлено товаров:%added%, обновлено: %updated%</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_import_completed',NULL,'<b>Импорт завершён. Добавлено товаров:%added%, обновлено: %updated%</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_import_completed',NULL,'<b>Импорт завершён. Добавлено товаров:%added%, обновлено: %updated%</b>');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_offers_completed',NULL,'<b>Цены обновлены (%updated%)</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_offers_completed',NULL,'<b>Цены обновлены (%updated%)</b>');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_offers_completed',NULL,'<b>Цены обновлены (%updated%)</b>');
+

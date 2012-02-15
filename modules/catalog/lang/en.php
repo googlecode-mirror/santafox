@@ -132,7 +132,7 @@ $il['catalog_menu_label_cats']             = 'Категории';
 $il['catalog_menu_groups']                 = 'Объектные группы их свойства';
 $il['catalog_menu_items']                  = 'Объекты';
 $il['catalog_menu_cat_props']              = 'Свойства категорий';
-
+$il['catalog_menu_label_import_export']    = 'Import-export';
 
 //Список группы свойств
 $il['catalog_add_group_label']                     = 'Создать новую группу';
@@ -318,36 +318,7 @@ $il['catalog_item_edit_incategories_label']          = 'Входит в кате
 $il['catalog_item_edit_pict_add_mark_for_big']       = 'Водяной знак к БОЛЬШОМУ изображению';
 $il['catalog_item_edit_pict_add_mark_for_source']    = 'Водяной знак к ИХОДНОМУ изображению';
 
-
-
-
-
-
-
-
-
-
-
-
-//$il['catalog_prop_deleted_msg']                    = 'Свойство удалено';
-//$il['catalog_prop_cleared_msg']                    = 'Свойство очищено';
-
-
-
-
-//$il['catalog_add_label']                           = 'Добавить';
-
-//$il['catalog_delete_label']                        = 'Удалить';
 $il['catalog_clear_label']                         = 'Очистить';
-
-
-
-
-
-//$il['catalog_property_dbname_label']               = 'Название(БД)';
-
-
-
 
 
 
@@ -355,21 +326,6 @@ $il['catalog_group_name_label']                    = 'Название';
 $il['catalog_group_id_label']                      = 'Идентификатор';
 $il['catalog_group_props_label']                   = 'Свойства';
 $il['catalog_group_namedb_label']                  = 'Название (БД)';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 $il['catalog_link_details_label']          = 'Подробнее...';
 
@@ -384,54 +340,44 @@ $il['catalog_category_add_label']                  = 'Добавить кате�
 
 $il['catalog_category_new_name']                   = 'Новая категория';
 $il['catalog_category_del_alert']                  = 'Действительно хотите удалить категорию';
-
-
-
-
-
 $il['catalog_category_remove_label']               = 'Удалить категорию';
-
-
 $il['catalog_edit_item_label']                     = 'Редактирование объекта';
-
-
-
-
 $il['catalog_item_order_label']                    = 'Порядок';
-
 $il['catalog_item_name_label']                     = 'Название';
 $il['catalog_item_txt_label']                      = 'Описание';
-
-
 $il['catalog_item_added_msg']                      = 'Объект добавлен';
 $il['catalog_item_saved_msg']                      = 'Объект сохранён';
 $il['catalog_item_del_alert']                      = 'Действительно хотите удалить объект';
-//$il['catalog_item_deleted_msg']                    = 'Объект удалён';
-
-
-
-
-
-
-
-
-
-
-
-
 $il['catalog_group_items_label']                   = 'Объекты';
-
-
-
 $il['catalog_add_prop_label']                      = 'Добавить свойство';
-
-
-
-
 $il['catalog_save_order_label']                    = 'Сохранить порядок';
 $il['catalog_OK_label']                            = 'OK';
-
 $il['catalog_button_show']                         = 'Отобразить';
 
+
+
+$il['catalog_menu_label_import_commerceml']='Импорт из CommerceML';
+$il['catalog_commerceml_type']='Тип импорта';
+$il['catalog_commerceml_type_import']='Сведения о товарах (import.xml)';
+$il['catalog_commerceml_type_offers']='Только цены (offers.xml)';
+$il['catalog_commerceml_do_import']='Импортировать';
+$il['catalog_commerceml_xmlfile']='Файл';
+$il['catalog_commerceml_itemprops_assoc']='Соответствия полей';
+$il['catalog_commerceml_add_assocline']='Добавить';
+$il['catalog_commerceml_price_field']='Цена';
+$il['catalog_commerceml_price_per_field']='Цена за';
+$il['catalog_commerceml_price_per_field_no_matters']='--не использовать--';
+$il['catalog_commerceml_pricetype']='Название типа цены в 1С';
+$il['catalog_commerceml_category']='Категория для новых';
+$il['catalog_commerceml_group']='Тов.группа';
+$il['catalog_commerceml_1C_ID_santafield']='Свойство каталога , в котором хранится ID из 1С';
+$il['catalog_commerceml_name_santafield']='Свойство каталога, в котором хранится название';
+$il['catalog_commerceml_error_nofile']='<b style="color:red;">Ошибка: Файл не загружен</b>';
+$il['catalog_commerceml_error_malformed_xml']='<b style="color:red;">Ошибка: Некорректный XML</b>';
+$il['catalog_commerceml_error_reqfields_not_filled']='<b style="color:red;">Ошибка: Не заполнены обязательные поля</b>';
+$il['catalog_commerceml_error_no_group']='<b style="color:red;">Ошибка: Не найдена тов. группа</b>';
+$il['catalog_commerceml_error_no_pricetype_found']='<b style="color:red;">Ошибка: Указанный тип цены не найден</b>';
+$il['catalog_commerceml_import_completed']='<b>Импорт завершён. Добавлено товаров:%added%, обновлено: %updated%</b>';
+$il['catalog_commerceml_offers_completed']='<b>Цены обновлены (%updated%)</b>';
 
 ?>

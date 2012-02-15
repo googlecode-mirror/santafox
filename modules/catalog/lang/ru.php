@@ -94,7 +94,7 @@ $il['catalog_items_search_link_label'] = 'Поиск';
 
 
 //для экспорта
-$il['catalog_export_csv_menuitem']        = 'Экспорт';
+$il['catalog_export_csv_menuitem']        = 'Экспорт  в CSV';
 $il['catalog_export_csv_formlabel']       = 'Экспортировать в CSV';
 $il['catalog_export_csv_tpl_label']       = 'Шаблон строки';
 $il['catalog_export_button_label']        = 'Экспорт';
@@ -237,6 +237,7 @@ $il['catalog_menu_label_cats']             = 'Категории';
 $il['catalog_menu_groups']                 = 'Товарные группы их свойства';
 $il['catalog_menu_items']                  = 'Товары';
 $il['catalog_menu_cat_props']              = 'Свойства категорий';
+$il['catalog_menu_label_import_export']    = 'Импорт-экспорт';
 
 
 //Список группы свойств
@@ -409,9 +410,6 @@ $il['catalog_list_category_item_table_action_change_sord']       = 'Измени
 $il['catalog_list_category_item_table_alertdel']         = 'Вы действительно хотите ПОЛНОСТЬЮ уничтожить товар';
 $il['catalog_list_category_item_table_alertdel_alt']         = 'Уничтожить товар';
 
-
-
-
 //Форма редактирования товара
 $il['catalog_item_edit_mainlabel']        = 'Редактируем свойства товара';
 $il['catalog_item_edit_table_nameprop_label']        = 'Название свойства';
@@ -423,58 +421,12 @@ $il['catalog_item_edit_incategories_label']          = 'Входит в кате
 $il['catalog_item_edit_pict_add_mark_for_big']       = 'Водяной знак к БОЛЬШОМУ изображению';
 $il['catalog_item_edit_pict_add_mark_for_source']    = 'Водяной знак к ИХОДНОМУ изображению';
 
-
-
-
-
-
-
-
-
-
-
-
-//$il['catalog_prop_deleted_msg']                    = 'Свойство удалено';
-//$il['catalog_prop_cleared_msg']                    = 'Свойство очищено';
-
-
-
-
-//$il['catalog_add_label']                           = 'Добавить';
-
-//$il['catalog_delete_label']                        = 'Удалить';
 $il['catalog_clear_label']                         = 'Очистить';
-
-
-
-
-
-//$il['catalog_property_dbname_label']               = 'Название(БД)';
-
-
-
-
-
 
 $il['catalog_group_name_label']                    = 'Название';
 $il['catalog_group_id_label']                      = 'Идентификатор';
 $il['catalog_group_props_label']                   = 'Свойства';
 $il['catalog_group_namedb_label']                  = 'Название (БД)';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 $il['catalog_link_details_label']          = 'Подробнее...';
 
@@ -485,57 +437,47 @@ $il['catalog_categories_build_from_depth_label']   = 'Уровень начал�
 $il['catalog_categories_open_levels_show_label']   = 'Количество раскрываемых уровней меню';
 $il['catalog_categories_max_levels_show_label']    = 'Макс. количество выводимых уровней меню';
 $il['catalog_category_add_label']                  = 'Добавить категорию';
-
-
 $il['catalog_category_new_name']                   = 'Новая категория';
 $il['catalog_category_del_alert']                  = 'Действительно хотите удалить категорию';
-
-
-
-
-
 $il['catalog_category_remove_label']               = 'Удалить категорию';
-
-
 $il['catalog_edit_item_label']                     = 'Редактирование товара';
-
-
-
-
 $il['catalog_item_order_label']                    = 'Порядок';
-
 $il['catalog_item_name_label']                     = 'Название';
 $il['catalog_item_txt_label']                      = 'Описание';
-
-
 $il['catalog_item_added_msg']                      = 'Товар добавлен';
 $il['catalog_item_saved_msg']                      = 'Товар сохранён';
 $il['catalog_item_del_alert']                      = 'Действительно хотите удалить товар';
 //$il['catalog_item_deleted_msg']                    = 'Товар удалён';
 
-
-
-
-
-
-
-
-
-
-
-
 $il['catalog_group_items_label']                   = 'Товары';
-
-
-
 $il['catalog_add_prop_label']                      = 'Добавить свойство';
-
-
-
-
 $il['catalog_save_order_label']                    = 'Сохранить порядок';
 $il['catalog_OK_label']                            = 'OK';
-
 $il['catalog_button_show']                         = 'Отобразить';
 
+$il['catalog_menu_label_import_commerceml']='Импорт из CommerceML';
+$il['catalog_commerceml_type']='Тип импорта';
+$il['catalog_commerceml_type_import']='Сведения о товарах (import.xml)';
+$il['catalog_commerceml_type_offers']='Только цены (offers.xml)';
+$il['catalog_commerceml_do_import']='Импортировать';
+$il['catalog_commerceml_xmlfile']='Файл';
+$il['catalog_commerceml_itemprops_assoc']='Соответствия полей';
+$il['catalog_commerceml_name_1C']='Поле в 1С';
+$il['catalog_commerceml_name_santa']='Поле в santafox';
+$il['catalog_commerceml_add_assocline']='Добавить';
+$il['catalog_commerceml_price_field']='Цена';
+$il['catalog_commerceml_price_per_field']='Цена за';
+$il['catalog_commerceml_price_per_field_no_matters']='--не использовать--';
+$il['catalog_commerceml_pricetype']='Название типа цены в 1С';
+$il['catalog_commerceml_category']='Категория для новых';
+$il['catalog_commerceml_group']='Тов.группа';
+$il['catalog_commerceml_1C_ID_santafield']='Свойство каталога , в котором хранится ID из 1С';
+$il['catalog_commerceml_name_santafield']='Свойство каталога, в котором хранится название';
+$il['catalog_commerceml_error_nofile']='<b style="color:red;">Ошибка: Файл не загружен</b>';
+$il['catalog_commerceml_error_malformed_xml']='<b style="color:red;">Ошибка: Некорректный XML</b>';
+$il['catalog_commerceml_error_reqfields_not_filled']='<b style="color:red;">Ошибка: Не заполнены обязательные поля</b>';
+$il['catalog_commerceml_error_no_group']='<b style="color:red;">Ошибка: Не найдена тов. группа</b>';
+$il['catalog_commerceml_error_no_pricetype_found']='<b style="color:red;">Ошибка: Указанный тип цены не найден</b>';
+$il['catalog_commerceml_import_completed']='<b>Импорт завершён. Добавлено товаров:%added%, обновлено: %updated%</b>';
+$il['catalog_commerceml_offers_completed']='<b>Цены обновлены (%updated%)</b>';
 ?>

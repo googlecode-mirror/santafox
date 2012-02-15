@@ -4396,7 +4396,7 @@ class catalog extends basemodule
         elseif (in_array($pname,$reservedCustom))
             return true;
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_item_props','`name_db` ="'.$pname.'" AND `props`.`group_id`='.$group_id);
+        return $kernel->db_get_record_simple('_catalog_item_props','`name_db` ="'.$pname.'" AND `group_id`='.$group_id);
     }
 
 
@@ -6714,16 +6714,18 @@ class catalog extends basemodule
         $menu->set_menu("[#catalog_menu_cat_props#]", "show_cat_props", array('flush' => 1));
         $menu->set_menu("[#catalog_menu_items#]", "show_items", array('flush' => 1));
         $menu->set_menu("[#catalog_inner_filters#]", "show_inner_filters", array('flush' => 1));
-        $menu->set_menu("[#catalog_import_csv_menuitem#]", "import_csv", array('flush' => 1));
-        $menu->set_menu("[#catalog_export_csv_menuitem#]", "show_csv_export", array('flush' => 1));
         $menu->set_menu("[#catalog_basket_order_settings_label#]", "show_order_fields", array('flush' => 1));
         $menu->set_menu("[#catalog_menu_variables#]", "show_variables", array('flush' => 1));
+
+        $menu->set_menu_block('[#catalog_menu_label_import_export#]');
+        $menu->set_menu("[#catalog_import_csv_menuitem#]", "import_csv", array('flush' => 1));
+        $menu->set_menu("[#catalog_export_csv_menuitem#]", "show_csv_export", array('flush' => 1));
+        $menu->set_menu("[#catalog_menu_label_import_commerceml#]", "import_commerceml", array('flush' => 1));
 
         $menu->set_menu_block('[#catalog_menu_label_cats#]');
         $menu->set_tree($this->create_categories_tree());
 
-        //$menu->set_menu_plain($this->create_categories_tree());
-        $menu->set_menu_default('show_groups');
+        //$menu->set_menu_default('show_groups');
         return true;
     }
 
@@ -7799,6 +7801,408 @@ class catalog extends basemodule
     }
 
     /**
+     *  сохраняет настройки для импорта commerceml
+     *  пока в сессии, позже в БД
+     *  @param $settings array
+     */
+    private function save_import_commerceml_settings($settings)
+    {
+        global $kernel;
+        //$kernel->pub_session_set('import_commerceml_settings',$settings);
+        $_SESSION['import_commerceml_settings']=serialize($settings);
+    }
+
+    /**
+     *  возвращает настройки для импорта commerceml
+     *  пока в сессии, позже в БД
+     *  @return array
+     */
+    private function get_import_commerceml_settings()
+    {
+        /*
+        global $kernel;
+        $settings=$kernel->pub_session_get('import_commerceml_settings');
+        if (!$settings)
+        {
+            //если нет сохранённых - создадим заглушки
+            $settings=array('groupid'=>-1,'catid'=>-1,'assoc'=>array(),'priceField'=>'','pricePerField'=>'');
+        }
+        */
+        if (isset($_SESSION['import_commerceml_settings']))
+            return unserialize($_SESSION['import_commerceml_settings']);
+        else
+            return array('groupid'=>-1,'catid'=>-1,'assoc'=>array(),'priceField'=>'','pricePerField'=>'','priceType'=>'','ID_field'=>'','name_field'=>'');
+    }
+
+    private function import_commerceml_buildprops_select($commonProps, $selected)
+    {
+        $options = '';
+        foreach ($commonProps as $cprop)
+        {
+            if ($cprop['name_db'] == $selected)
+                $line = $this->get_template_block('common_prop_option_selected');
+            else
+                $line = $this->get_template_block('common_prop_option');
+
+            $line = str_replace('%name_db%', $cprop['name_db'], $line);
+            $line = str_replace('%name_full%', $cprop['name_full'], $line);
+            $options .= $line;
+        }
+        return $options;
+    }
+
+    private function import_commerceml()
+    {
+        global $kernel;
+        $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'import_commerceml.html'));
+
+        $msg='';
+        $settings=$this->get_import_commerceml_settings();
+        if (isset($_POST['upload_import_file']))
+        {
+            //сначала заполнение всех настроек из POST, чтобы они сохранились даже в случае ошибки 
+            $settings['catid']=intval($kernel->pub_httppost_get('catid'));
+            $settings['groupid']=intval($kernel->pub_httppost_get('groupid'));
+            $settings['priceField']=$kernel->pub_httppost_get('price_field',false);
+            $settings['pricePerField']=$kernel->pub_httppost_get('price_per_field',false);
+            $settings['ID_field']=$kernel->pub_httppost_get('ID_field',false);
+            $settings['name_field']=$kernel->pub_httppost_get('name_field',false);
+            $settings['priceType']=trim($kernel->pub_httppost_get('priceType',false));
+            $settings['assoc']=array();//очистим, и заполним данными из POST
+            if (isset($_POST['assocprops']))
+            {
+                foreach ($_POST['assocprops'] as $aprop)
+                {
+                    if (isset($aprop['name']) && isset($aprop['propid']) && !empty($aprop['name']) && !empty($aprop['propid']))
+                        $settings['assoc'][trim($aprop['name'])]=$aprop['propid'];
+                }
+            }
+
+            $this->save_import_commerceml_settings($settings);
+
+            if ($kernel->pub_httppost_get('import_type',false)=='import')
+                $import_type='import';//информация о товарах
+            else
+                $import_type='offers';//цены
+            $shouldProcess=true;
+            if (!isset($_FILES['commerceml_file']) || !is_uploaded_file($_FILES['commerceml_file']['tmp_name']))
+            {
+                $shouldProcess=false;
+                $msg.='[#catalog_commerceml_error_nofile#]';
+            }
+            elseif(!$settings['ID_field'])
+            {
+                $shouldProcess=false;
+                $msg='[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
+            }
+            else
+            {
+                //для разных типов импорта разные обязательные поля
+                if ($import_type=='import')
+                {
+                    if (!$settings['groupid'] || !$settings['name_field'])
+                    {
+                        $shouldProcess=false;
+                        $msg='[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
+                    }
+                }
+                else
+                {
+                    if (!$settings['priceField'] || !$settings['priceType'])
+                    {
+                        $shouldProcess=false;
+                        $msg='[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
+                    }
+                }
+            }
+
+            if ($shouldProcess)
+            {
+                libxml_use_internal_errors(true);//чтобы не было ворнингов
+                $xml = simplexml_load_file($_FILES['commerceml_file']['tmp_name']);
+
+                $moduleid=$kernel->pub_module_id_get();
+                if ($import_type=='import')
+                {
+                    $group = $this->get_group($settings['groupid']);
+                    if (!$group)
+                        $msg='[#catalog_commerceml_error_no_group#]';
+                    elseif (!$xml || !isset($xml->{'Классификатор'}->{'Свойства'}) || !isset($xml->{'Каталог'}->{'Товары'}))
+                        $msg='[#catalog_commerceml_error_malformed_xml#]';
+                    else
+                    {
+                        //пройдём по свойствам, запомним ID
+                        $assocs=array();
+                        foreach ($xml->{'Классификатор'}->{'Свойства'}[0] as $prop)
+                        {
+                            $propID=(string)$prop->{'Ид'};
+                            $propName=(string)$prop->{'Наименование'};
+                            if (isset($settings['assoc'][$propName]))//
+                                $assocs[$propID]=$propName;
+                        }
+                        $updated=0;
+                        $added=0;
+                        foreach ($xml->{'Каталог'}->{'Товары'}[0] as $item)
+                        {
+                            $item1Cid=(string)$item->{'Ид'};
+                            $item1Cname=(string)$item->{'Наименование'};
+                            $commonFields=array("`".$settings['name_field']."`"=>"'".mysql_real_escape_string($item1Cname)."'");
+                            $groupFields=array();
+                            if (isset($item->{'ЗначенияСвойств'}[0]))
+                            {
+                                foreach ($item->{'ЗначенияСвойств'}[0] as $fvalue)
+                                {
+                                    $propID=(string)$fvalue->{'Ид'};
+                                    if (!isset($assocs[$propID]))
+                                        continue;
+
+                                    $propValue=(string)$fvalue->{'Значение'};
+                                    $propDbName=$settings['assoc'][$assocs[$propID]];
+                                    if (preg_match('~^group0_~',$propDbName))
+                                    {
+                                        $propDbName=substr($propDbName,7);
+                                        $commonFields["`".$propDbName."`"]="'".mysql_real_escape_string($propValue)."'";
+                                    }
+                                    else
+                                        $groupFields["`".$propDbName."`"]="'".mysql_real_escape_string($propValue)."'";
+                                }
+                            }
+                            $exRec=$kernel->db_get_record_simple('_catalog_'.$moduleid.'_items',"`".$settings['ID_field']."`='".mysql_real_escape_string($item1Cid)."'");
+
+
+                            if ($exRec)
+                            {
+                                if (count($groupFields))
+                                {
+                                    $q="UPDATE `".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($group['name_db'])."`
+                                    SET ";
+                                    foreach ($groupFields as $k=>$v)
+                                    {
+                                        $q.=$k."=".$v.", ";
+                                    }
+                                    $q.=" id=".$exRec['ext_id']." WHERE id='".$exRec['ext_id']."'";
+                                    $kernel->runSQL($q);
+                                }
+                                //в $commonFields как минимум одно свойство из-за name
+                                $q="UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
+                                    SET ";
+                                foreach ($commonFields as $k=>$v)
+                                {
+                                    $q.=$k."=".$v.", ";
+                                }
+                                $q.=" id=".$exRec['id']." WHERE id='".$exRec['id']."'";
+                                $kernel->runSQL($q);
+                                $updated++;
+                            }
+                            else
+                            {
+                                $groupFields["`id`"]="NULL";
+                                $commonFields["`".$settings['ID_field']."`"]="'".mysql_real_escape_string($item1Cid)."'";
+                                $query = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($group['name_db'])."`
+                                          (".implode(",",array_keys($groupFields)).")
+                                          VALUES
+                                          (".implode(",",$groupFields).")";
+                                $kernel->runSQL($query);
+                                $ext_id = mysql_insert_id();
+
+                                //в $commonFields как минимум одно свойство из-за name и 1СID
+                                $q="INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
+                                    (".implode(",",array_keys($commonFields)).",`available`,`group_id`,`ext_id`)
+                                    VALUES
+                                    (".implode(",",$commonFields).",'1','".$settings['groupid']."','".$ext_id."')";
+                                $kernel->runSQL($q);
+
+                                if ($settings['catid'])
+                                {//если надо - добавляем в категорию
+                                    $newItemID=mysql_insert_id();
+                                    $newOrdr=$this->get_next_order_in_cat($settings['catid']);
+                                    $query = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat` ".
+                                    		 "(`cat_id`,`item_id`,`order`) VALUES ".
+                                    		 "(".$settings['catid'].", ".$newItemID.", ".$newOrdr.")";
+                                    $kernel->runSQL($query);
+                                }
+                                $added++;
+                            }
+                        }
+                        $msg=$kernel->pub_page_textlabel_replace("[#catalog_commerceml_import_completed#]");
+                        $msg=str_replace('%added%',$added,$msg);
+                        $msg=str_replace('%updated%',$updated,$msg);
+
+                    }
+                }
+                else
+                {//offers.xml
+                    if (!$xml || !isset($xml->{'ПакетПредложений'}->{'Предложения'})|| !isset($xml->{'ПакетПредложений'}->{'ТипыЦен'}))
+                        $msg='[#catalog_commerceml_error_malformed_xml#]';
+                    else
+                    {
+
+                        $priceTypeID=false;
+                        foreach($xml->{'ПакетПредложений'}->{'ТипыЦен'}[0] as $priceType)
+                        {
+                            if ((string)$priceType->{'Наименование'}==$settings['priceType'])
+                            {
+                                $priceTypeID=(string)$priceType->{'Ид'};
+                                break;
+                            }
+                        }
+                        if (!$priceTypeID)
+                            $msg='[#catalog_commerceml_error_no_pricetype_found#]';
+                        else
+                        {
+                            $updated=0;
+                            foreach($xml->{'ПакетПредложений'}->{'Предложения'}[0] as $offer)
+                            {
+                                $offerID=(string)$offer->{'Ид'};
+
+
+                                if (!isset($offer->{'Цены'}[0]))
+                                    continue;
+
+                                $oprice=false;
+                                foreach ($offer->{'Цены'}[0] as $opriceElem)
+                                {
+                                    if ($priceTypeID==(string)$opriceElem->{'ИдТипаЦены'})
+                                    {
+                                        $oprice=$opriceElem;
+                                        break;
+                                    }
+                                }
+                                if (!$oprice)
+                                    continue;
+
+                                $price=$oprice->{'ЦенаЗаЕдиницу'};
+                                $q="UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
+                                SET `".$settings['priceField']."`='".mysql_real_escape_string($price)."' ";
+                                if ($settings['pricePerField'])
+                                    $q.=",`".$settings['pricePerField']."`='".(string)$oprice->{'Единица'}."'";
+                                $q.=" WHERE `".$settings['ID_field']."`='".mysql_real_escape_string($offerID)."'";
+                                $kernel->runSQL($q);
+                                $updated++;
+                            }
+                            $msg=$kernel->pub_page_textlabel_replace("[#catalog_commerceml_offers_completed#]");
+                            $msg=str_replace('%updated%',$updated,$msg);
+                        }
+                    }
+                }
+
+            }
+
+            $_SESSION['import_commerceml_msg']=$msg;
+            return $kernel->pub_redirect_refresh_reload("import_commerceml");
+        }
+
+        if (isset($_SESSION['import_commerceml_msg']) && !empty($_SESSION['import_commerceml_msg']))
+        {
+            $msg=$_SESSION['import_commerceml_msg'];
+            unset($_SESSION['import_commerceml_msg']);
+        }
+
+        $content=$this->get_template_block('content');
+
+        $currGroupProps=array();
+        $gprops='';
+        $groups = CatalogCommons::get_groups();
+        $gblock = '';
+        foreach ($groups as $group)
+        {
+            $props = CatalogCommons::get_props($group['id'], true);
+            if ($group['id']==$settings['groupid'])
+            {
+                foreach ($props as $prop)
+                {
+                    $opt_name=$prop['name_db'];
+                    if ($prop['group_id'] == 0)
+                        $opt_name = 'group0_'.$opt_name;
+                    $currGroupProps[$opt_name]=$prop['name_full'];
+                }
+                $gblock .= $this->get_template_block('group_item_selected');
+
+            }
+            else
+                $gblock .= $this->get_template_block('group_item');
+            $gblock = str_replace('%group_id%', $group['id'], $gblock);
+            $gblock = str_replace('%group_name%', htmlspecialchars($group['name_full']), $gblock);
+
+
+
+            $thisGroupProps=array();
+            foreach ($props as $prop)
+            {
+                if ($prop['type']=='file' || $prop['type']=='pict')
+    		        continue;
+                $opt_name=$prop['name_db'];
+                if ($prop['group_id'] == 0)
+                    $opt_name = 'group0_'.$opt_name;
+                $thisGroupProps[]='{"name_db":"'.$opt_name.'","name_full":"'.$prop['name_full'].'"}';
+            }
+            $gprops.='"'.$group['id'].'":['.implode(",",$thisGroupProps).'],'."\n";
+        }
+
+        $props_assoc_lines='';
+        $assocLinesCount=0;
+        foreach ($settings['assoc'] as $name1C=>$nameDB)
+        {
+            if (!array_key_exists($nameDB,$currGroupProps))
+                continue;
+            $assocLinesCount++;
+            $line=$this->get_template_block('props_assoc_line');
+
+            $proplines='';
+            foreach($currGroupProps as $propNameDB=>$propNameFull)
+            {
+                if ($propNameDB==$nameDB)
+                    $propline = $this->get_template_block('propline_selected');
+                else
+                    $propline = $this->get_template_block('propline');
+                $propline = str_replace('%namedb%',$propNameDB,$propline);
+                $propline = str_replace('%namefull%',$propNameFull,$propline);
+                $proplines.=$propline;
+            }
+            $line=str_replace('%proplines%',$proplines,$line);
+            $line=str_replace('%name1C%',htmlspecialchars($name1C),$line);
+
+            $props_assoc_lines.=$line;
+        }
+
+        $commonProps = CatalogCommons::get_common_props($kernel->pub_module_id_get());
+
+        $price_per_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['pricePerField']);
+        $price_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['priceField']);
+        $ID_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['ID_field']);
+        $name_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['name_field']);
+
+        $cats = $this->get_child_categories(0, 0, array());
+        $options = '';
+        $cat_shift = $this->get_template_block('cat_shift');
+        foreach ($cats as $cat)
+        {
+            if ($cat['id']==$settings['catid'])
+                $option = $this->get_template_block('cat_option_selected');
+            else
+                $option = $this->get_template_block('cat_option');
+            $option = str_replace('%cat_id%'  ,$cat['id']  ,$option);
+            $option = str_replace('%cat_name%',str_repeat($cat_shift,$cat['depth']).$cat['name'],$option);
+            $options .= $option;
+        }
+        $content = str_replace('%cats_options%', $options , $content);
+        $content = str_replace('var currAssocLines=0;', 'var currAssocLines='.$assocLinesCount.';', $content);
+        $content = str_replace('%props_assoc_lines%', $props_assoc_lines, $content);
+        $content = str_replace('%groups%', $gblock, $content);
+        $content = str_replace('/*gprops*/', $gprops, $content);
+        $content = str_replace('%price_field_options%', $price_field_options, $content);
+        $content = str_replace('%price_per_field_options%', $price_per_field_options, $content);
+        $content = str_replace('%ID_field_options%', $ID_field_options, $content);
+        $content = str_replace('%name_field_options%', $name_field_options, $content);
+        $content = str_replace('%priceType%', htmlspecialchars($settings['priceType']), $content);
+
+
+        $content = str_replace('%form_action%',$kernel->pub_redirect_for_form('import_commerceml'),$content);
+        $content = str_replace('%msg%',$msg,$content);
+        return $content;
+    }
+
+    /**
 	 * Функция для отображения административного интерфейса
 	 *
 	 * @return string
@@ -7809,6 +8213,9 @@ class catalog extends basemodule
 
         switch ($kernel->pub_section_leftmenu_get())
         {
+            case 'import_commerceml':
+                return $this->import_commerceml();
+                break;
             case 'item_clone':
                 $id = $kernel->pub_httpget_get('id');
                 $newID = $this->item_clone($id);

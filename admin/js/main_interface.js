@@ -364,11 +364,11 @@ function start_include_content(name_area)
 		name_area = 'content_html';
     var config =
            {
-               skin : 'v2',
+               skin : 'kama',
                autoUpdateElement:true,
-               filebrowserBrowseUrl :'/components/html_editor/plugins/ajaxfilemanager/ajaxfilemanager.php',
-               filebrowserImageBrowseUrl : '/components/html_editor/plugins/ajaxfilemanager/ajaxfilemanager.php',
-               filebrowserFlashBrowseUrl :'/components/html_editor/plugins/ajaxfilemanager/ajaxfilemanager.php',
+               /*filebrowserBrowseUrl :'/components/html_editor/ckeditor/plugins/ajaxfilemanager/ajaxfilemanager.php',
+               filebrowserImageBrowseUrl : '/components/html_editor/ckeditor/plugins/ajaxfilemanager/ajaxfilemanager.php',
+               filebrowserFlashBrowseUrl :'/components/html_editor/ckeditor/plugins/ajaxfilemanager/ajaxfilemanager.php',*/
                LinkBrowserWindowHeight:440,
                ImageBrowserWindowHeight:440,
                FlashBrowserWindowHeight:440,

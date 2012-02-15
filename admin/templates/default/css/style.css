@@ -376,7 +376,8 @@ fieldset {
 
 fieldset.page_submit_field { margin-top:15px; text-align:center; }
 input { position:relative; }
-input[type=text] {
+
+div.content input[type=text] {
 	position:relative;
 	font-family:Arial,Hevletica,sans-serif;
 	font-size:11px; font-weight:bold; color:#666;
@@ -406,7 +407,7 @@ input.textInput {
 	border-radius: 4px;
 }
 
-textarea {
+div.content textarea {
 	padding:5px 6px;
 	font-family:Arial,Hevletica,sans-serif;
 	color:#666; font-weight:bold; font-size:11px;
@@ -417,7 +418,7 @@ textarea {
 	border-radius: 4px;
 }
 
-input:focus, textarea:focus {
+div.content input:focus, div.content textarea:focus {
 	color:#000;
 	border:1px solid #2595c9;
 	background:#fff;
@@ -426,7 +427,7 @@ input:focus, textarea:focus {
 	box-shadow: #00addb 0px 0px 3px;
 }
 
-input[type=radio], input[type=checkbox] {
+div.content input[type=radio], input[type=checkbox] {
 	margin:7px 5px 0 0;
 	cursor: pointer;
 	float: left;
@@ -442,7 +443,7 @@ input.redirect_to_input {
 	width:238px; margin-right:5px;
 }
 
-label {
+div.content label {
 	width:35%; max-width:300px;
 	padding:7px 0 0 0; margin-right:15px;
 	font-size:11px; font-weight:bold; color:#444;

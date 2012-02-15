@@ -621,33 +621,40 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 
 /* modmenu
 ----------------------------------*/
-.ui-modmenu { display: block; display: inline-block; padding: 0px 13px 0 0; margin: 2px 2px 2px 0; position: relative; text-decoration: none; overflow: hidden; zoom: 1; border-radius:4px; }
-.ui-modmenu:hover { color:#000; }
-.ui-state-active:hover { color:#fff; }
+#modules_toolbar div { padding:0; margin:3px 2px 0px 0; float:left; }
+.ui-modmenu { display: block; display: inline-block; float:left; background:#fff; position: relative; vertical-align: middle; text-decoration: none; overflow: hidden; zoom: 1; border-radius:4px; }
 .ui-modmenu-icon { position: absolute; right: 0;  top: 0px; height: 26px; padding: 0; border:none; border-left:1px solid #ededed; background-position: -64px -12px;}
-.ui-modmenu-icon:hover { position: absolute; right: 0;  top: 0px; background:transparent url(images/ui-icons_333333_256x240.png); height: 26px; padding: 0; border:none; border-left:1px solid #ccc; background-position: -64px -12px;}
-.ui-modmenu-icon .ui-state-active .ui-state-hover { background:transparent url(images/ui-icons_ffffff_256x240.png); border-left:1px solid #fff; }
-.ui-modmenu-menu { padding:2px 2px; margin:0; list-style:none; position:absolute; top:0; visibility: hidden; overflow: auto; z-index: 1005; box-shadow:#999 0 0 3px;} /* z-index: 1005 to make selectmenu work with dialog */
-.ui-modmenu-open { visibility: visible; }
+.ui-state-focus .ui-modmenu { opacity:.7; }
+.ui-modmenu-icon:hover { position: absolute; right: 0;  top: 0px; background:#fff url(images/ui-icons_333333_256x240.png); height: 26px; padding: 0; border:none; border-left:1px solid #ccc; background-position: -64px -12px;}
+.ui-state-active .ui-modmenu-icon:hover { background-color:transparent; }
+.ui-state-active { background:#00ADDB; }
+.ui-modmenu-menu {  padding:0 5px 0 2px;  margin:1px 0; position:absolute; top: 0; display: none; z-index: 1005;} /* z-index: 1005 to make modmenu work with dialog */
+.ui-modmenu-menu  ul { padding:2px 2px; margin:0; list-style:none; position: relative; overflow: auto; overflow-y: auto ; overflow-x: hidden; box-shadow:#999 0 0 3px; border-radius:4px; } 
+.ui-modmenu-open { display: block; }
 .ui-modmenu-menu-popup { margin-top: -1px; }
-.ui-modmenu-menu-dropdown { border-radius:4px; }
-.ui-modmenu-menu li { padding:0 5px 0 2px;  margin:1px 0; display: block; border-top: 1px dotted transparent; border-bottom: 1px dotted transparent; border-right-width: 0 !important; border-left-width: 0 !important; font-weight: normal !important; border-radius:4px; }
-.ui-modmenu-menu li a,.ui-modmenu-status { line-height: 1.4em; display: block; padding: .405em 1em; outline:none; text-decoration:none; white-space: nowrap;}
-.ui-modmenu-menu li a { line-height:1em; text-align:left; }
+.ui-modmenu-menu-dropdown { }
+.ui-modmenu-menu li { padding:0 5px 0 2px; margin:0; display: block; border-top: 1px dotted transparent; border-bottom: 1px dotted transparent; border-right-width: 0 !important; border-left-width: 0 !important; font-weight: normal !important; border-radius:4px; }
+.ui-modmenu-menu li a,.ui-modmenu-status { line-height: 1.1em; display: block; margin-right:0; padding: .405em .9em .405em .7em; outline:none; text-decoration:none; white-space: nowrap; }
+.ui-modmenu-menu li.ui-state-disabled a, .ui-state-disabled { cursor: default; }
 .ui-modmenu-menu li.ui-modmenu-hasIcon a,
 .ui-modmenu-hasIcon .ui-modmenu-status { padding-left: 20px; position: relative; margin-left: 5px; }
 .ui-modmenu-menu li .ui-icon, .ui-modmenu-status .ui-icon { position: absolute; top: 1em; margin-top: -8px; left: 0; }
-.ui-modmenu-status { white-space: nowrap; }
+.ui-modmenu-status { line-height: 1.4em; }
 .ui-modmenu-open li.ui-modmenu-item-focus a { }
 .ui-modmenu-open li.ui-modmenu-item-selected { }
 .ui-modmenu-menu li span,.ui-modmenu-status span { display:block; margin-bottom: .2em; }
 .ui-modmenu-menu li .ui-modmenu-item-header { font-weight: bold; }
 .ui-modmenu-menu li .ui-modmenu-item-content { }
 .ui-modmenu-menu li .ui-modmenu-item-footer { opacity: .8; }
-/*for optgroups*/
+/* for optgroups */
 .ui-modmenu-menu .ui-modmenu-group { font-size: 1em; }
-.ui-modmenu-menu .ui-modmenu-group .ui-modmenu-group-label { line-height: 1.4em; display:block; padding:.6em .5em 0; font-weight: bold; }
+.ui-modmenu-menu .ui-modmenu-group .ui-modmenu-group-label { line-height: 1.4em; display:block; padding: .6em .5em 0; font-weight: bold; }
 .ui-modmenu-menu .ui-modmenu-group ul { margin: 0; padding: 0; }
+/* IE6 workaround (dotted transparent borders) */
+* html .ui-modmenu-menu li { border-color: pink; filter:chroma(color=pink); width:100%; }
+* html .ui-modmenu-menu li a { position: relative }
+/* IE7 workaround (opacity disabled) */
+*+html .ui-state-disabled, *+html .ui-state-disabled a { color: silver; }
 
 
 

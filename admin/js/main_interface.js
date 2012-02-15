@@ -22,8 +22,6 @@ function show_action_edit(strlink, name)
 
 function santaUpdateRegion(regid, loadFrom)
 {
-    //на всякий случай скроем всякие всплывающие окна
-    $('#popup_msg_div').css('display','none');
     $('#popup_div').css('display','none');
     $("#"+regid).html('<span id="contentLoading">Loading, Please wait..</span>'); // @todo use lang[]
     $("#"+regid).load(loadFrom, function(response, status, xhr) {
@@ -178,7 +176,7 @@ function jspub_form_submit(formID, url)
                 var msg_label = post_res.result_label;
                 var msg = post_res.result_message;
                 if (msg != "")
-                    santaShowPopupHint(msg_label, msg,1500);
+                    santaShowPopupHint(msg_label, msg,3000);
                 //...и возможно перейти на другой пункт меню
                 var id_link =  post_res.redirect;
                 if (id_link != "")

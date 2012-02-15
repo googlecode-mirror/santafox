@@ -6066,7 +6066,7 @@ class catalog extends basemodule
                     if ($cprop['type'] == 'number' || $cprop['type'] == "string")
                     {
                         $prop_value = htmlspecialchars($prop_value);
-                        $prop_value ='<input type="text" name="iv['.$item['id'].']['.$cprop['name_db'].']" value="'.$prop_value.'">';
+                        $prop_value ='<input style="width:150px;" type="text" name="iv['.$item['id'].']['.$cprop['name_db'].']" value="'.$prop_value.'">';
                     }
                     else
                     {

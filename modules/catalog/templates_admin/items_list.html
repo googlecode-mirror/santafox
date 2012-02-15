@@ -1,4 +1,10 @@
 <!-- @header -->
+
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+
+
 <script type="text/javascript">
  function groupSelectChange()
  {
@@ -49,7 +55,7 @@
 <table class="admin_table">
     <thead>
         <tr>
-            <th width="30">[#catalog_items_all_list_table_checkbox#]</th>
+            <th width="30"><!-- [#catalog_items_all_list_table_checkbox#] --></th>
             <th>[#catalog_items_all_list_table_num#]</th>
             %list_prop_names%
             <th>[#catalog_items_all_list_table_group#]</th>
@@ -65,7 +71,7 @@
 <td>%list_prop_value%</td>
 
 <!-- @list_prop_value_edit -->
-<td><input type="text" name="iv[%id%][%name_db%]" value="%list_prop_value%"></td>
+<td><input type="text" name="iv[%id%][%name_db%]" value="%list_prop_value%" style="width: 150px;"></td>
 
 <!-- @table_body-->
         <tr>
@@ -73,7 +79,7 @@
             <td>%number%</td>
             %list_prop_values%
             <td>%group%</td>
-            <td valign="middle">
+            <td valign="middle" nowrap>
                 <a href="#" onclick="jspub_click('item_clone&id=%id%')" title="клонировать"><img src="/admin/templates/default/images/eye_old.gif" alt="клонировать"/></a>
 	            <a href="#" onclick="jspub_confirm('item_delete&id=%id%&group_id=%group_id%','[#catalog_items_all_list_table_action_alertdel#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_items_all_list_table_action_alertdel#]"/></a>
                 <a href="#" onclick="jspub_click('item_edit&id=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#catalog_items_all_list_table_action_edit#]"/></a>
@@ -103,6 +109,10 @@
   <input type="submit" value="[#catalog_items_all_list_table_action_with_sel_go#]">
   <input type="submit" name="change_items" value="Сохранить поля">
 </form>
+
+ </div>
+ </div>
+</div>
 
 <!-- @category_value -->
 <option value="%category_id%">-&gt;%shift%%category_name%</option>

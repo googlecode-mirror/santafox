@@ -1,4 +1,9 @@
 <!-- @header -->
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+     <span class="content_header"><span class="black">%cname%</span></span>
+<br/><br/>
 <script type="text/javascript">
  function add_new_item()
  {
@@ -17,9 +22,6 @@
 
 </script>
 
-
-
-<h1>%cname%</h1><br />
 <input type="button" onclick="jspub_click('category_edit&id=%cid%')" value="[#catalog_list_category_edit_label#]" >&nbsp;&nbsp;
 [#catalog_list_category_add_item_label#]&nbsp;<select name="group_id_for_add" id="group_id_for_add">%group_values%</select><input type="button" value="[#catalog_list_category_add_item_bt_label#]" onclick="add_new_item()"><br />
 <br/>
@@ -48,7 +50,7 @@
 <table class="admin_table">
     <thead>
       <tr>
-        <th width="30">[#catalog_list_category_item_table_num#]</th>
+        <th width="30"><!--[#catalog_list_category_item_table_num#]--></th>
         %colum_th%
         <th width="30">[#catalog_list_category_item_table_order_num#]</th>
         <th>[#catalog_items_all_list_table_group#]</th>
@@ -96,16 +98,16 @@
   </table>
 </form>
 
-
+</div></div></div>
 
 
 <!-- @cat_items_line -->
 <tr>
   <td align="center"><input type="checkbox" name="icb[%item_id%]"></td>
   %colum_td%
-  <td><input type="text" name="iorder[%item_id%]" value="%item_order%" style="width:100%"></td>
+  <td><input type="text" name="iorder[%item_id%]" value="%item_order%" style="width:50px;"></td>
   <td>%group_name%</td>
-  <td align="center" valign="middle">
+  <td align="center" valign="middle"  nowrap>
       <a href="#" onclick="jspub_click('item_clone&id=%item_id%')" title="клонировать"><img src="/admin/templates/default/images/eye_old.gif" alt="клонировать"/></a>
       <a href="#" onclick="jspub_confirm('item_delete&id=%item_id%&id_cat=%cid%&group_id=0','[#catalog_list_category_item_table_alertdel#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_list_category_item_table_alertdel_alt"/></a>
       <a href="#" onclick="jspub_click('item_edit&id=%item_id%&id_cat=%cid%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#catalog_list_category_item_action_edit#]"/></a>

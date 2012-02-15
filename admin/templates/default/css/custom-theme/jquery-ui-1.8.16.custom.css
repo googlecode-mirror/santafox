@@ -514,6 +514,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  *
  * http://docs.jquery.com/UI/Datepicker#theming
  */
+#ui-datepicker-div { display:none; }
 .ui-datepicker { width: 17em; margin:0 auto; padding: .2em .2em 0; display: block; background:#fff; border-color:#ccc; }
 .ui-datepicker .ui-datepicker-header { position:relative; padding:.2em 0; background:#fff; color:#2595c9; }
 .ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next { position:absolute; top: 2px; width: 1.8em; height: 1.8em; }

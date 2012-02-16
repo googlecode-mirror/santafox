@@ -366,9 +366,12 @@ function start_include_content(name_area)
            {
                skin : 'kama',
                autoUpdateElement:true,
-               /*filebrowserBrowseUrl :'/components/html_editor/ckeditor/plugins/ajaxfilemanager/ajaxfilemanager.php',
-               filebrowserImageBrowseUrl : '/components/html_editor/ckeditor/plugins/ajaxfilemanager/ajaxfilemanager.php',
-               filebrowserFlashBrowseUrl :'/components/html_editor/ckeditor/plugins/ajaxfilemanager/ajaxfilemanager.php',*/
+               filebrowserBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
+               filebrowserImageBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=images',
+               filebrowserFlashBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=flash',
+               filebrowserUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=files',
+               filebrowserImageUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=images',
+               filebrowserFlashUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=flash',
                LinkBrowserWindowHeight:440,
                ImageBrowserWindowHeight:440,
                FlashBrowserWindowHeight:440,
@@ -377,7 +380,7 @@ function start_include_content(name_area)
                FlashUpload:false,
                language:'ru',
                toolbar_Full: [
-                ['Source','-',/*'AjaxSave'*/,'Preview'],
+                ['Source','-','Preview'],
                 ['Cut','Copy','Paste','PasteText','PasteFromWord'],
                 ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
                 '/',

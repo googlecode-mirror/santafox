@@ -7,21 +7,21 @@
  * По версии данного класса определяется версия административного интерфейса
  * @name manager_interface
  * @package AdminInterface
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2012
+ * @version 3.0
  */
 
 class manager_interface
 {
-    var $main_menu_template = array();
-    var	$main_menu = array
-        (
-        	'global_prop' => array('name' => '[#global_properties_CMS#]'     , 'count_panel' => 1, 'img' => 'settings.gif'),
-        	'polzovateli' => array('name' => '[#top_menu_items3_main_admin#]', 'count_panel' => 1, 'img' => 'admins.gif'),
-            'modules'     => array('name' => '[#top_menu_items2_main_admin#]', 'count_panel' => 1, 'img' => 'moduls.gif'),
-            'structure'   => array('name' => '[#top_menu_items1_main_admin#]', 'count_panel' => 1, 'img' => 'structure.gif'),
-			'stat'        => array('name' => '[#top_menu_items4_main_admin#]', 'count_panel' => 1, 'img' => 'statistic.gif')
-        );
+    private $main_menu_template = array();
+    private $main_menu = array
+    (
+        'global_prop' => array('name' => '[#global_properties_CMS#]', 'count_panel' => 1, 'img' => 'settings.gif'),
+        'polzovateli' => array('name' => '[#top_menu_items3_main_admin#]', 'count_panel' => 1, 'img' => 'admins.gif'),
+        'modules' => array('name' => '[#top_menu_items2_main_admin#]', 'count_panel' => 1, 'img' => 'moduls.gif'),
+        'structure' => array('name' => '[#top_menu_items1_main_admin#]', 'count_panel' => 1, 'img' => 'structure.gif'),
+        'stat' => array('name' => '[#top_menu_items4_main_admin#]', 'count_panel' => 1, 'img' => 'statistic.gif')
+    );
 
 
     function manager_interface()
@@ -44,6 +44,13 @@ class manager_interface
         global $kernel;
         if ($kernel->priv_admin_current_get())
         {
+            //активируем kcfinder
+            $uploadRelPath="/content";
+            $_SESSION['KCFINDER'] = array();
+            $_SESSION['KCFINDER']['disabled'] = false;
+            $_SESSION['KCFINDER']['uploadURL'] = $uploadRelPath;
+            $_SESSION['KCFINDER']['uploadDir'] = $kernel->pub_site_root_get().$uploadRelPath;
+
             $kernel->priv_session_vars_set();
             $this->show_backoffice();
         }
@@ -66,16 +73,11 @@ class manager_interface
     function exit_backofice()
     {
         global $kernel;
-        $sql = "UPDATE
-                ".$kernel->pub_prefix_get()."_admin_trace
-                SET
-                time = ''
-                WHERE
-                id_admin='".$kernel->priv_admin_id_current_get()."'
-                ";
+        $sql = "UPDATE ".$kernel->pub_prefix_get()."_admin_trace SET time = '' WHERE id_admin='".$kernel->priv_admin_id_current_get()."'";
         $kernel->runSQL($sql);
 
         $kernel->priv_session_empty();
+        $_SESSION['KCFINDER']['disabled'] = true;//отключаем kcfinder
         $kernel->pub_redirect_refresh_global('/');
     }
 

@@ -1,49 +1,53 @@
 <!-- @header -->
+<script type="text/javascript">
+ $("input:submit, input:button").button();
+</script>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
 %label_table%
-
-<input type="button" onclick="jspub_click('prop_edit&id=0&id_group=%groupid%&idg_control=%groupid%')" value="[#catalog_edit_property_bt_add_prop#]"/>
 
 <form action="%form_action%" method="post" id="gprops">
 <input type="hidden" name="group_id" value="%gid%">
-
 %table%
 </form>
+ </div>
+ </div>
+</div>
 
 
 <!-- @label_table_group -->
-<h3>[#catalog_group_prop_list_mainlabel#] <b>"%name%"</b></h3>
+<h3>[#catalog_group_prop_list_mainlabel#] <span class="highlight">"%name%"</span></h3>
 <!-- @label_table_global -->
 <h3>[#catalog_group_prop_list_mainlabel_global#]</h3>
 
 <!-- @table_header -->
-<br />
-<table class="admin_table">
-<thead>
+<table>
   <tr>
-     <th>[#catalog_group_prop_list_table_label_num#]</th>
+     <th width="15" class="first">[#catalog_group_prop_list_table_label_num#]</th>
      <th>[#catalog_group_prop_list_table_label_name#]</th>
      <th>[#catalog_group_prop_list_table_label_namedb#]</th>
      <th>[#catalog_group_prop_list_table_label_global#]</th>
      <th>[#catalog_group_prop_list_table_label_type#]</th>
      <th>[#catalog_group_prop_list_table_label_order#]</th>
      <th>[#catalog_prop_in_group_header#]</th>
-     <th>[#catalog_group_prop_list_table_label_actions#]</th>
+     <th class="last">[#catalog_group_prop_list_table_label_actions#]</th>
   </tr>
-</thead>
 <!-- @property -->
 <tr>
- <td align="center">%num%</td>
+ <td width="15">%num%</td>
  <td>%property_name%</td>
  <td>%property_dbname%</td>
- <td align="center">%property_global%</td>
- <td align="center">%property_type%</td>
- <td align="center"><input type="text" name="porder[%property_id%]" value="%order%" size="3"></td>
- <td align="center"> %visible_in_group_checkbox%</td>
- <td align="center">%actions%</td>
+ <td>%property_global%</td>
+ <td style="max-width:150px; word-wrap:break-word;">%property_type%</td>
+ <td><input type="text" name="porder[%property_id%]" value="%order%" style="width:25px; margin:0 auto; float:none;"></td>
+ <td> %visible_in_group_checkbox%</td>
+ <td>%actions%</td>
 </tr>
 
 <!-- @visible_in_group_checkbox -->
-<input type="checkbox" name="grprop[%prop%]" %grprop_checked%>
+<input type="checkbox" name="grprop[%prop%]" style="float:none; margin:0 auto;" %grprop_checked%>
 
 <!-- @property_is_global -->
 <img src="/admin/templates/default/images/24-em-check-gray.gif"/>
@@ -56,10 +60,9 @@
 
 
 <!-- @table_footer -->
-<tr class="admin_table_wstring">
-     <td colspan="6" align="right"><input type="submit" name="save_gprops_order" value="[#catalog_group_prop_list_table_label_change_sord#]"></td>
-     <td></td>
-</tr>
 </table>
-<br />
+<fieldset class="page_submit_field">
+ <input type="button" onclick="jspub_click('prop_edit&id=0&id_group=%groupid%&idg_control=%groupid%')" value="[#catalog_edit_property_bt_add_prop#]">
+ <input type="submit" name="save_gprops_order" value="[#catalog_group_prop_list_table_label_change_sord#]">
+</fieldset>
 <!-- @no_props -->

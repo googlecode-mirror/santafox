@@ -116,15 +116,15 @@ a, a:link {
 /* north layout styles */
 div.ui-layout-north { position:relative; margin:0; padding:0; height:5%; display:block; overflow:hidden; }
 div.north-top { width:98%; margin:0 auto; padding:5px 0 7px 0; display:block; clear:both; }
-div.north-bottom { position:relative; height:36px; width:100%; margin:0 auto; border-bottom:1px solid #f5f5f5; overflow:visible; z-index:9999; clear:both; }
+div.north-bottom { position:relative; height:37px; width:100%; margin:0 auto; border-bottom:1px solid #f5f5f5; overflow:visible; z-index:9999; clear:both; }
 
 span.curr_a_sname { width:263px;  padding:5px 0 0 10px; font-size:18px; color:#000; display:block; float:left; }
 
 /* modules container */
 #mod_block {
 	position:relative;
-	top:1px;
-	height:31px;
+	top:1px; bottom:1px;
+	height:32px;
 	margin:auto 0;
 	margin-left:273px; margin-right:4px;
 	z-index:9999;
@@ -136,7 +136,7 @@ span.curr_a_sname { width:263px;  padding:5px 0 0 10px; font-size:18px; color:#0
 .hidden { position:absolute; top:0; left:-9999px; width:1px; height:1px; overflow:hidden; }
 
 #modules_toolbar {
-	height:31px;
+	height:32px;
 	padding-left:3px; padding-right:20px;
 	overflow:hidden;
 	background:#ededed;
@@ -191,6 +191,7 @@ span.content_header {
 #page_container {
 	width:100%; height:auto!important; max-height:94%;
 	margin:auto; padding:0;
+	min-width:600px;
 	background:#fff;
 	display:block;
 	overflow:hidden;
@@ -241,8 +242,8 @@ div.content h4 {
 .act_btn_holder { margin-top:15px; display:block; text-align:center; }
 
 table {
-	border-collapse:collapse;
 	width:100%;
+	border-collapse:collapse;
 	font-size:0.9em;
 	margin: 10px 0;
 	background:#f5f5f5;
@@ -369,13 +370,12 @@ form {
 }
 
 fieldset {
-	margin:8px 0; padding:0;
+	margin:10px 0; padding:0;
 	border:none;
 	clear:both;
 }
 
 fieldset.page_submit_field { margin-top:15px; text-align:center; }
-input { position:relative; }
 
 div.content input[type=text] {
 	position:relative;
@@ -463,13 +463,13 @@ div.content input[disabled='disabled']:hover, div.content select[disabled='disab
 }
 
 select {
-	width:300px;
+	width:282px;
 	height:22px;
 	float:left;
 }
 
 div.content select {
-	width:300px;
+	width:282px;
 	height:22px;
 }
 

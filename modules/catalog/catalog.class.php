@@ -6726,6 +6726,7 @@ class catalog extends basemodule
         $menu->set_tree($this->create_categories_tree());
 
         //$menu->set_menu_default('show_groups');
+        $menu->set_menu_default('show_items');
         return true;
     }
 

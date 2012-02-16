@@ -452,13 +452,13 @@ div.content label {
 	float:left;
 }
 
-input[type=text]:hover, textarea:hover {
+div.content input[type=text]:hover, textarea:hover {
 	border-color:#2595c9;
 }
 
-input[disabled='disabled'], select[disabled='disabled'] { opacity:.5; }
+div.content input[disabled='disabled'], div.content select[disabled='disabled'] { opacity:.5; }
 
-input[disabled='disabled']:hover, select[disabled='disabled']:hover {
+div.content input[disabled='disabled']:hover, div.content select[disabled='disabled']:hover {
 	border:1px solid #ccc;
 }
 

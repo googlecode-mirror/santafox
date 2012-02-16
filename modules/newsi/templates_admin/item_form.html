@@ -35,8 +35,18 @@
  
  <h3>Форма добавления/редактирования новости</h3>
  
- <form action="%form_action%" style="margin:10px 0;" method="POST" enctype="multipart/form-data">
+ <form action="%form_action%" method="POST" enctype="multipart/form-data">
  <input type="hidden" name="values[id]" value="%id%">
+ 
+ <fieldset>
+  <div style="padding:0 0 5px; 0">
+  <input id="mod_news_1" type="checkbox" name="values[available]" value="1" %available%>&nbsp;<label for="mod_news_1" style="width:110px;">[#news_property_available_label#]</label>
+  <input id="mod_news_2" type="checkbox" name="values[lenta]" value="1" %lenta%>&nbsp;<label for="mod_news_2" style="width:120px;">[#news_property_lenta_label#]</label>
+  <input id="mod_news_3" type="checkbox" name="values[delivery]" value="1" %delivery%>&nbsp;<label for="mod_news_3" style="width:150px;">[#news_property_delivery_label#]</label>
+  <input id="mod_news_4" type="checkbox" name="values[rss]" value="1" %rss%>&nbsp;<label for="mod_news_4" style="width:110px;">[#news_property_rss_label#]</label>
+  <div class="clear"></div>
+  </div>
+ </fieldset>
  
  <fieldset>
   <label for="date" style="width:150px;">[#news_property_date_label#]</label>
@@ -56,14 +66,7 @@
  </fieldset>
  
  <fieldset>
-  <div style="padding: 6px 0;"><input id="mod_news_1" type="checkbox" name="values[available]" value="1" %available%>&nbsp;<label for="mod_news_1">[#news_property_available_label#]</label></div>
-  <div style="padding: 6px 0;"><input id="mod_news_2" type="checkbox" name="values[lenta]" value="1" %lenta%>&nbsp;<label for="mod_news_2">[#news_property_lenta_label#]</label></div>
-  <div style="padding: 6px 0;"><input id="mod_news_3" type="checkbox" name="values[delivery]" value="1" %delivery%>&nbsp;<label for="mod_news_3">[#news_property_delivery_label#]</label></div>
-  <div style="padding: 6px 0;"><input id="mod_news_4" type="checkbox" name="values[rss]" value="1" %rss%>&nbsp;<label for="mod_news_4">[#news_property_rss_label#]</label></div>
- </fieldset>
- 
- <fieldset>
-  <div style="display:block; width:650px; clear:both;">
+  <div style="display:block; width:625px; height:325px; clear:both;">
   %description_full%
   </div>
  </fieldset>
@@ -85,7 +88,7 @@
 
  <fieldset>
   <label for="image">[#news_property_image_label#]</label>
-  <input type="file" id="image" name="image" value="%image%">
+  <input type="file" style="float:left;" size="31" id="image" name="image" value="%image%">
   <span style="float:left; margin-left:15px;">%image_block%</span>
  </fieldset>
  
@@ -97,4 +100,4 @@
  </div>
 </div>
 <!-- @image -->
-<img src="%image_url%" width="100px" height="75px"><br><label style="width:70px; float:none;" for="remove_image">Удалить</label><input id="remove_image" type="checkbox" name="values[remove_image]">
+<img src="%image_url%" width="100px" height="75px"><br><input id="remove_image" type="checkbox" name="values[remove_image]">&nbsp;<label style="width:70px;" for="remove_image">Удалить</label>

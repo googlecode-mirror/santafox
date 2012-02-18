@@ -67,9 +67,15 @@ a, a:link {
 }
 
 .black { color:#000; }
-.clear { clear:both; }
-.bold { font-weight:bold; }
 .highlight { color:#2595c9; }
+.bold { font-weight:bold; }
+
+.fLeft { float:left; }
+.fRight { float:left; }
+.fNone { float:none; }
+
+.clear { clear:both; }
+.block { display:block; }
 /* standart tag css styles */
 
 /* end of standart tag css styles */
@@ -228,7 +234,7 @@ div.content a { color:#000; text-decoration:none; }
 div.content a:hover { color:#00ADDB; }
 
 div.content h3 {
-	margin:-5px 0 5px 0; padding:0;
+	margin:-8px 0 10px 0; padding:0;
 	line-height:normal;
 	font-size:14px;
 	color:#333;

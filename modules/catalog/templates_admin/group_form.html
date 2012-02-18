@@ -1,47 +1,61 @@
 <!-- @form_header -->
-<div style="width: 450px;">
-<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-<form action="%form_action%" method="POST" enctype="multipart/form-data" id="savegroupform">
-<input type="hidden" name="id" value="%groupid%"/>
-<h3>%form_header_txt%</h3>
-<table border="0" cellpadding="3" cellspacing="3" width="420">
-    <tbody>
-        <tr>
-            <td width="150" align="right" valign="top">[#catalog_edit_group_name_label#]</td>
-            <td width="270" valign="top"><input type="text" name="name" value="%name%" style="width: 100%;"></td>
-        </tr>
-        <tr>
-            <td width="150" align="right" valign="top">[#catalog_edit_group_id_label#]</td>
-            <td width="270" valign="top"><input type="text" name="namedb" value="%dbname%" style="width: 100%;"></td>
-        </tr>
-        <tr>
-            <td width="150" align="right" valign="top">[#catalog_edit_group_template_list_label#]</td>
-            <td width="270" valign="top"><select style="width:100%" name="list_items">%template_list%</select></td>
-        </tr>
-        <tr>
-            <td width="150" align="right" valign="top">[#catalog_edit_group_template_item_label#]</td>
-            <td width="270" valign="top"><select style="width:100%" name="one_items">%template_item%</select></td>
-        </tr>
+<script type="text/javascript">
+ $("input:button, button").button();
+ 
+ $('div.content select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+</script>
 
-<tr><td colspan=2 align="center"><a href="#" onclick="jspub_click('show_gen_search_form&groupid=%groupid%')">[#catalog_generate_search_form_label#]</td></tr>
-
-        <tr>
-	    <td valign="top">[#catalog_group_default_cats_label#]</td>
-            <td colspan="1">%categories%</td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center"><input type="button" name="submit"  value="[#catalog_edit_group_action_save#]" onclick="jspub_form_submit('savegroupform','%form_action%')">&nbsp;&nbsp;<input type="button" name="submit"  value="[#catalog_edit_group_action_new_template#]" onclick="jspub_confirm('%form_action2%', '[#catalog_edit_group_action_new_template_alert#]')"></td>
-        </tr>
-    </tbody>
-</table>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ <h3>%form_header_txt%</h3>
+ 
+ <form action="%form_action%" method="POST" enctype="multipart/form-data" id="savegroupform">
+ <input type="hidden" name="id" value="%groupid%">
+ 
+ <fieldset>
+  <label for="name">[#catalog_edit_group_name_label#]</label>
+  <input type="text" name="name" value="%name%" id="name">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="namedb">[#catalog_edit_group_id_label#]</label>
+  <input type="text" name="namedb" value="%dbname%" id="namedb">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="list_items">[#catalog_edit_group_template_list_label#]</label>
+  <select id="list_items" name="list_items">
+   %template_list%
+  </select>
+ </fieldset>
+ 
+ <fieldset class="page_submit_field">
+  <button onclick="jspub_click('show_gen_search_form&groupid=%groupid%')">[#catalog_generate_search_form_label#]</button>
+ </fieldset>
+ 
+ <fieldset>
+  <label>[#catalog_group_default_cats_label#]</label>
+  <ul style="margin:5px 0; padding:0; list-style:none; float:left;">
+   %categories%
+  </ul>
+ </fieldset>
+ 
+ <fieldset class="page_submit_field">
+  <input type="button" name="submit"  value="[#catalog_edit_group_action_save#]" onclick="jspub_form_submit('savegroupform','%form_action%')">&nbsp;&nbsp;<input type="button" name="submit"  value="[#catalog_edit_group_action_new_template#]" onclick="jspub_confirm('%form_action2%', '[#catalog_edit_group_action_new_template_alert#]')">
+ </fieldset>
+ 
 </form>
-</div></div></div>
-<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+ </div>
+ </div>
 </div>
 
 <!-- @category_item -->
-%shift%<input type="checkbox" id="ccb[%id%]" name="ccb[%id%]" %checked%><label for="ccb_%id%">%catname%</label><br>
+<li style="display:block; margin:3px 0; clear:both;"><span style="float:left; display:block;">%shift%</span><input type="checkbox" id="ccb[%id%]" name="ccb[%id%]" %checked%><label for="ccb[%id%]" style="width:250px;">%catname%</label></li>
 
 <!-- @option_for_select -->
 <option value="%key%" %sel%>%name%</option>

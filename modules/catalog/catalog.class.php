@@ -4052,7 +4052,7 @@ class catalog extends basemodule
             $values = "NULL";
         else
         {
-            $pva =  explode("\\n",$pvalues);
+            $pva =  explode("\n",$pvalues);
             $values = array();
             foreach ($pva as $v)
             {
@@ -6164,7 +6164,7 @@ class catalog extends basemodule
 
                 //Для файла нужно вывести форму загрузки файла, и возможность удалить этот файл
                 case 'file':
-                    $prop_val = '<input type="file" name="'.$prop['name_db'].'" size="60">';
+                    $prop_val = '<input type="file" name="'.$prop['name_db'].'" size="31">';
                     if (!empty($cat[$prop['name_db']]))
                     {
                         $prop_val = 'content/files/'.$kernel->pub_module_id_get().'/'.$cat[$prop['name_db']]."&nbsp;&nbsp;".
@@ -6178,7 +6178,7 @@ class catalog extends basemodule
 
                 //Ихображение
                 case 'pict':
-                    $prop_val = '<input type="file" name="'.$prop['name_db'].'" size="60">';
+                    $prop_val = '<input type="file" class="inputFile" name="'.$prop['name_db'].'" size="31">';
                     if (!empty($cat[$prop['name_db']]))
                     {
                        // $pict_full_name = 'content/files/'.$kernel->pub_module_id_get().'/'.$cat[$prop['name_db']];

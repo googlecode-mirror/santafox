@@ -1,80 +1,84 @@
 <!-- @header -->
-<h3>[#catalog_edit_category_label_main#]</h3>
-<div style="width: 800px;">
-<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-<form action="%form_action%" method="POST" enctype="multipart/form-data" id="savecategoryform" onsubmit="form_submit_include_content_auto();">
-<input type="hidden" name="id" value="%id%"/>
-<input type="hidden" name="pid" value="%pid%"/>
-<table border="0" width="770">
-    <tbody>
-        <tr>
-            <td width="150" align="right" valign="top">[#catalog_edit_category_isdefault_label#]:</td>
-            <td><input type="checkbox" name="isdefault" %isdefaultchecked%></td>
-        </tr>
-        %props%
+<script type="text/javascript">
+ $("input:submit").button();
+ 
+ $('div.content select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+</script>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ 
+ <h3>[#catalog_edit_category_label_main#]</h3>
+ 
+ <form action="%form_action%" method="POST" enctype="multipart/form-data" id="savecategoryform" onsubmit="form_submit_include_content_auto();">
+ <input type="hidden" name="id" value="%id%">
+ <input type="hidden" name="pid" value="%pid%">
+ 
+ <fieldset>
+  <label for="isdefault">[#catalog_edit_category_isdefault_label#]:</label>
+  <input type="checkbox" id="isdefault" name="isdefault" %isdefaultchecked%>
+ </fieldset>
+ 
+ %props%
 
 <!-- @prop_text -->
-        <tr>
-            <td width="150"  align="right" valign="top">%prop_name_full%:</td>
-            <td><textarea name="%prop_name_db%" style="width: 100%;">%prop_value%</textarea></td>
-        </tr>
+<fieldset>
+ <label for="%prop_name_db%">%prop_name_full%:</label>
+ <textarea id="%prop_name_db%" name="%prop_name_db%" style="width:272px;">%prop_value%</textarea>
+</fieldset>
 
 <!-- @prop_html -->
-        <tr>
-            <td width="150" align="right" valign="top">%prop_name_full%:</td>
-            <td height="300">%prop_value%</td>
-        </tr>
+<fieldset>
+ <label class="fNone clear">%prop_name_full%:</label>
+ <div class="block clear" style="padding:10px 0; width:600px; height:300px;">%prop_value%</div>
+</fieldset>
 
 <!-- @prop_file -->
-        <tr>
-            <td width="150"  align="right" valign="top">%prop_name_full%:</td>
-            <td>%prop_value%</td>
-        </tr>
+<fieldset>
+ <label>%prop_name_full%:</label>
+ <span class="block fLeft">%prop_value%</span>
+</fieldset>
 
 <!-- @prop_pict -->
-        <tr>
-            <td width="150"  align="right" valign="top">%prop_name_full%:</td>
-            <td>%prop_value%</td>
-        </tr>
+<fieldset>
+ <label>%prop_name_full%:</label>
+ <span class="block fLeft">%prop_value%</span>
+</fieldset>
 
 <!-- @prop_string -->
-        <tr>
-            <td width="150"  align="right" valign="top">%prop_name_full%:</td>
-            <td><input type="text" name="%prop_name_db%" value="%prop_value%" style="width:100%"></td>
-        </tr>
-
+<fieldset>
+ <label for="%prop_name_db%">%prop_name_full%:</label>
+ <input type="text" id="%prop_name_db%" name="%prop_name_db%" value="%prop_value%">
+</fieldset>
 
 <!-- @prop_number -->
-        <tr>
-            <td width="150"  align="right" valign="top">%prop_name_full%:</td>
-            <td><input type="text" name="%prop_name_db%" style="width: 100%;" value="%prop_value%"></td>
-        </tr>
+<fieldset>
+ <label for="%prop_name_db%">%prop_name_full%:</label>
+ <input type="text" id="%prop_name_db%" name="%prop_name_db%" value="%prop_value%">
+</fieldset>
 
 <!-- @prop_enum -->
+<fieldset>
+ <label for="%prop_name_db%">%prop_name_full%:</label>
+ <select id="%prop_name_db%" name="%prop_name_db%">
+  %prop_enum_values%
+ </select>
+</fieldset>
 
-        <tr>
-            <td width="150"  align="right" valign="top">%prop_name_full%:</td>
-            <td><select name="%prop_name_db%">%prop_enum_values%</select></td>
-        </tr>
 <!-- @prop_enum_value -->
 <option value="%enum_value%" %selected%>%enum_name%</option>
 
-
-
 <!-- @footer -->
-        <tr>
-            <td width="150" valign="top">&nbsp;</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-        	<td width="150" valign="top">&nbsp;</td>
-            <td align="left"><input type="submit" name="submit" value="[#catalog_edit_category_bt_save_label#]"></td>
-		<!--<input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('savecategoryform','/admin/index.php?action=set_left_menu&leftmenu=category_save')">-->
-        </tr>
-    </tbody>
-</table>
-</form>
-    </div></div></div>
-<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+ <fieldset class="page_submit_field">
+  <input type="submit" name="submit" value="[#catalog_edit_category_bt_save_label#]">
+  <!--<input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('savecategoryform','/admin/index.php?action=set_left_menu&leftmenu=category_save')">-->
+ </fieldset>
+ </form>
+ 
+ </div>
+ </div>
 </div>

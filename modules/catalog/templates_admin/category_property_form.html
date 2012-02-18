@@ -1,5 +1,12 @@
 <!-- @header -->
-<script>
+<script type="text/javascript">
+ $("input:button").button();
+ 
+ $('div.content select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+
  function pict_on_off(id_object)
  {
      if ($('#'+id_object+'_isset').attr("checked"))
@@ -7,151 +14,159 @@
      else
          $('#'+id_object).css('display','none');
  }
-
 </script>
-<h3>[#catalog_edit_property_cat_edit_label_main#]</h3><br />
-<div style="width: 450px;">
-<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-<form action="%form_action%" method="POST" enctype="multipart/form-data" id="savepropform" name="savepropform">
-<input type="hidden" name="id" value="%id%"/>
-<table width="430">
-    <tbody>
-        <tr>
-            <td width="150" align="right">[#catalog_edit_property_cat_edit_name_label#]:</td>
-            <td colspan="2"><input type="text" name="name_full" value="%name_full%" style="width: 100%;"></td>
-        </tr>
-        <tr>
-            <td width="150" align="right">[#catalog_edit_property_cat_edit_dbname_label#]:</td>
-            <td><input type="text" name="name_db" value="%name_db%" style="width: 100%;"></td>
-        </tr>
-        <tr>
-            <td width="150" align="right">[#catalog_edit_property_cat_edit_type_label#]:</td>
-            <td>%prop_type%</td>
-        </tr>
-%block_addparam%
-        <tr>
-        	<td>&nbsp;</td>
-            <td align="left"><input type="button" name="submit" value="[#catalog_edit_property_cat_edit_bt_save#]" onclick="jspub_form_submit('savepropform','/admin/index.php?action=set_left_menu&leftmenu=cat_prop_save')"></td>
-        </tr>
-    </tbody>
-</table>
-</form>
-    </div></div></div>
-<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ 
+ <h3>[#catalog_edit_property_cat_edit_label_main#]</h3>
+ <form action="%form_action%" method="POST" enctype="multipart/form-data" id="savepropform" name="savepropform">
+ <input type="hidden" name="id" value="%id%"/>
+ 
+ <fieldset>
+  <label for="name_full">[#catalog_edit_property_cat_edit_name_label#]:</label>
+  <input type="text" id="name_full" name="name_full" value="%name_full%">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="name_db">[#catalog_edit_property_cat_edit_dbname_label#]:</label>
+  <input type="text" id="name_db" name="name_db" value="%name_db%">
+ </fieldset>
+ 
+ <fieldset>
+  <label>[#catalog_edit_property_cat_edit_type_label#]:</label>
+  <span class="block highlight fLeft" style="width:300px; padding-top:5px; font-size:11px; font-weight:bold;">%prop_type%</span>
+ </fieldset>
+ 
+ <div class="block clear">
+  %block_addparam%
+ </div>
+ 
+ <fieldset class="page_submit_field">
+  <input type="button" name="submit" value="[#catalog_edit_property_cat_edit_bt_save#]" onclick="jspub_form_submit('savepropform','/admin/index.php?action=set_left_menu&leftmenu=cat_prop_save')">
+ </fieldset>
+ </form>
+
+ </div>
+ </div>
 </div>
-
-
-
 
 <!-- @enum_val -->
-        <tr>
-            <td width="150" align="right">%val_name%</td>
-            <td><a href="#" onclick="jspub_confirm('cat_enum_prop_delete&enumval=%val_name%&propid=%id%','[#catalog_edit_property_cat_enum_del_alert#] %val_name%?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_delete_label#]"/></a></td>
-        </tr>
+  <tr>
+   <td>%val_name%</td>
+   <td width="150"><a href="#" onclick="jspub_confirm('cat_enum_prop_delete&enumval=%val_name%&propid=%id%','[#catalog_edit_property_cat_enum_del_alert#] %val_name%?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_delete_label#]"/></a></td>
+  </tr>
 
 <!-- @enum_vals -->
+ <table>
   <tr>
-    <td colspan="2" align="center"><br /><b>[#catalog_edit_property_cat_enum_label#]</b></td>
+    <th colspan="2" class="first last">[#catalog_edit_property_cat_enum_label#]</th>
   </tr>
   %lines%
-  <tr>
-   <td align="right" valign="top">[#catalog_edit_property_cat_enum_addnew#]:</td>
-    <td>
-     <input type="text" name="enumval" value=""><input type="button" name="submit" value="[#catalog_edit_property_cat_enum_addnew_bt#]" onclick="jspub_form_submit('savepropform','%add_enum%')">
-    </td>
-  </tr>
+ </table>
+ 
+ <fieldset>
+  <label for="enumval" style="width:150px;">[#catalog_edit_property_cat_enum_addnew#]:</label>
+  <input type="text" id="enumval" name="enumval" value="">
+  <input type="button" style="margin-left:15px; float:left;" name="submit" value="[#catalog_edit_property_cat_enum_addnew_bt#]" onclick="jspub_form_submit('savepropform','%add_enum%')">
+ </fieldset>
 
 <!-- @addons_pict -->
-    <tr>
-	    <td width="150" align="right" valign="top">[#catalog_edit_property_pict_path#]:</td>
-    	<td>%pict_path_start%<input type="text" value="%pict_path%" size="15" name="pict_path"/></td>
-    </tr>
-	<tr><td colspan="2">
-<fieldset><legend><label for="pict_source_isset" style="cursor:pointer;">[#catalog_edit_property_pict_source_create_label#]</label> <input type="checkbox" name="pict_source_isset" id="pict_source_isset" %source_check% onchange="pict_on_off('pict_source')"/></legend>
-<div id="pict_source" style="display:none;">
-<table width="420" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-    <tr>
-		<td width="150" align="right" valign="top">[#catalog_edit_property_pict_width_and_height#]:</td>
-        <td><input type="text" size="4" name="pict_source_width" id="pict_source_width" value="%pict_source_width%"/>x<input type="text" size="4" name="pict_source_height" id="pict_source_height" value="%pict_source_height%"/><br /><small>[#catalog_edit_property_pict_width_and_height_help#]</small></td>
-    </tr>
-	<tr>
-	    <td width="150" align="right" valign="top">[#catalog_edit_property_pict_watermark_add#]:</td>
-    	<td><select name="pict_source_water_add"><option value="0" %pswas0%>[#catalog_edit_property_pict_watermark_val1#]</option>
-        									  <option value="1" %pswas1%>[#catalog_edit_property_pict_watermark_val2#]</option>
-                                              <option value="2" %pswas2%>[#catalog_edit_property_pict_watermark_val3#]</option>
-                                              </select>
-         </td>
-    </tr>
-    <tr>
-	    <td width="150" align="right" valign="top">[#catalog_edit_property_pict_watermark_path#]:</td>
-    	<td><input type="text" value="%path_source_water_path%" size="30" name="path_source_water_path"/></td>
-    </tr>
-	<tr>
-	    <td width="150" align="right" valign="top">[#catalog_edit_property_pict_watermark_place#]</td>
-    	<td><select name="pict_source_water_position"><option value="0" %pswps0%>[#catalog_edit_property_pict_watermark_place_val0#]</option>
-                                              <option value="1" %pswps1%>[#catalog_edit_property_pict_watermark_place_val1#]</option>
-                                              <option value="2" %pswps2%>[#catalog_edit_property_pict_watermark_place_val2#]</option>
-                                              <option value="3" %pswps3%>[#catalog_edit_property_pict_watermark_place_val3#]</option>
-                                              <option value="4" %pswps4%>[#catalog_edit_property_pict_watermark_place_val4#]</option></select>
-        </td>
-    </tr>
+<fieldset>
+ <label for="pict_path">[#catalog_edit_property_pict_path#]:<br>
+ <span style="display:block; font-weight:normal; color:#2AADE1;">%pict_path_start%</span>
+ </label>
+ <input type="text" id="pict_path" value="%pict_path%" name="pict_path">
+</fieldset>
+ 
+<fieldset>
+ <label for="pict_source_isset">[#catalog_edit_property_pict_source_create_label#]</label>
+ <input type="checkbox" name="pict_source_isset" id="pict_source_isset" %source_check% onchange="pict_on_off('pict_source')">
+ 
+ <div id="pict_source" style="display:none; border:1px solid #ccc; margin:40px 0 0 0; border-radius:6px; padding:0 10px; clear:both;">
+ <fieldset>
+  <label>[#catalog_edit_property_pict_width_and_height#]:<br><small>[#catalog_edit_property_pict_width_and_height_help#]</small></label>
+  <input type="text" style="width:121px;" name="pict_source_width" id="pict_source_width" value="%pict_source_width%"><span style="float:left; display:block; padding:5px;">x</span><input type="text" style="width:121px;" name="pict_source_height" id="pict_source_height" value="%pict_source_height%">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="pict_source_water_add">[#catalog_edit_property_pict_watermark_add#]:</label>
+  <select id="pict_source_water_add" name="pict_source_water_add">
+   <option value="0" %pswas0%>[#catalog_edit_property_pict_watermark_val1#]</option>
+   <option value="1" %pswas1%>[#catalog_edit_property_pict_watermark_val2#]</option>
+   <option value="2" %pswas2%>[#catalog_edit_property_pict_watermark_val3#]</option>
+  </select>
+ </fieldset>
+ 
+ <fieldset>
+  <label for="path_source_water_path">[#catalog_edit_property_pict_watermark_path#]:</label>
+  <input type="text" id="path_source_water_path" value="%path_source_water_path%" name="path_source_water_path">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="pict_source_water_position">[#catalog_edit_property_pict_watermark_place#]</label>
+  <select id="pict_source_water_position" name="pict_source_water_position">
+   <option value="0" %pswps0%>[#catalog_edit_property_pict_watermark_place_val0#]</option>
+   <option value="1" %pswps1%>[#catalog_edit_property_pict_watermark_place_val1#]</option>
+   <option value="2" %pswps2%>[#catalog_edit_property_pict_watermark_place_val2#]</option>
+   <option value="3" %pswps3%>[#catalog_edit_property_pict_watermark_place_val3#]</option>
+   <option value="4" %pswps4%>[#catalog_edit_property_pict_watermark_place_val4#]</option>
+  </select>
+ </fieldset>
+ </div>
+</fieldset>
 
-    </tbody>
-</table>
-</div>
+<fieldset>
+ <label for="pict_big_isset">[#catalog_edit_property_pict_big_create_label#]</label>
+ <input type="checkbox" name="pict_big_isset" id="pict_big_isset" %big_check% onchange="pict_on_off('pict_big')">
+ 
+ <div id="pict_big" style="display:none; border:1px solid #ccc; margin:40px 0 0 0; border-radius:6px; padding:0 10px; clear:both;">
+ <fieldset>
+  <label for="">[#catalog_edit_property_pict_width_and_height#]:<br><small>[#catalog_edit_property_pict_width_and_height_help#]</small></label>
+  <input type="text" style="width:121px;" name="pict_big_width" id="pict_big_width" value="%pict_big_width%"><span style="float:left; display:block; padding:5px;">x</span><input type="text" style="width:121px;" name="pict_big_height" id="pict_big_height" value="%pict_big_height%">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="pict_big_water_add">[#catalog_edit_property_pict_watermark_add#]:</label>
+  <select id="pict_big_water_add" name="pict_big_water_add">
+   <option value="0" %pbwas0%>[#catalog_edit_property_pict_watermark_val1#]</option>
+   <option value="1" %pbwas1%>[#catalog_edit_property_pict_watermark_val2#]</option>
+   <option value="2" %pbwas2%>[#catalog_edit_property_pict_watermark_val3#]</option>
+  </select>
+ </fieldset>
+ 
+ <fieldset>
+  <label for="path_big_water_path">[#catalog_edit_property_pict_watermark_path#]:</label>
+  <input type="text" id="path_big_water_path" value="%path_big_water_path%" name="path_big_water_path">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="">[#catalog_edit_property_pict_watermark_place#]</label>
+  <select name="pict_big_water_position">
+   <option value="0" %pbwps0%>[#catalog_edit_property_pict_watermark_place_val0#]</option>
+   <option value="1" %pbwps1%>[#catalog_edit_property_pict_watermark_place_val1#]</option>
+   <option value="2" %pbwps2%>[#catalog_edit_property_pict_watermark_place_val2#]</option>
+   <option value="3" %pbwps3%>[#catalog_edit_property_pict_watermark_place_val3#]</option>
+   <option value="4" %pbwps4%>[#catalog_edit_property_pict_watermark_place_val4#]</option>
+  </select>
+ </fieldset>
+ </div>
 </fieldset>
-</td></tr>
-<tr><td colspan="2">
-<fieldset><legend><label for="pict_big_isset" style="cursor:pointer;">[#catalog_edit_property_pict_big_create_label#]</label> <input type="checkbox" name="pict_big_isset" id="pict_big_isset" %big_check% onchange="pict_on_off('pict_big')"/></legend>
-<div id="pict_big" style="display:none;">
-<table width="420" border="0" cellpadding="0" cellspacing="0" >
-    <tbody>
-    <tr>
-		<td width="150" align="right" valign="top">[#catalog_edit_property_pict_width_and_height#]:</td>
-        <td><input type="text" size="4" name="pict_big_width" id="pict_big_width" value="%pict_big_width%"/>x<input type="text" size="4" name="pict_big_height" id="pict_big_height" value="%pict_big_height%"/><br /><small>[#catalog_edit_property_pict_width_and_height_help#]</small></td>
-    </tr>
-	<tr>
-	    <td width="150" align="right" valign="top">[#catalog_edit_property_pict_watermark_add#]:</td>
-    	<td><select name="pict_big_water_add"><option value="0" %pbwas0%>[#catalog_edit_property_pict_watermark_val1#]</option>
-        									  <option value="1" %pbwas1%>[#catalog_edit_property_pict_watermark_val2#]</option>
-                                              <option value="2" %pbwas2%>[#catalog_edit_property_pict_watermark_val3#]</option>
-                                              </select>
-         </td>
-    </tr>
-    <tr>
-	    <td width="150" align="right" valign="top">[#catalog_edit_property_pict_watermark_path#]:</td>
-    	<td><input type="text" value="%path_big_water_path%" size="30" name="path_big_water_path"/></td>
-    </tr>
-	<tr>
-	    <td width="150" align="right" valign="top">[#catalog_edit_property_pict_watermark_place#]</td>
-    	<td><select name="pict_big_water_position"><option value="0" %pbwps0%>[#catalog_edit_property_pict_watermark_place_val0#]</option>
-                                              <option value="1" %pbwps1%>[#catalog_edit_property_pict_watermark_place_val1#]</option>
-                                              <option value="2" %pbwps2%>[#catalog_edit_property_pict_watermark_place_val2#]</option>
-                                              <option value="3" %pbwps3%>[#catalog_edit_property_pict_watermark_place_val3#]</option>
-                                              <option value="4" %pbwps4%>[#catalog_edit_property_pict_watermark_place_val4#]</option></select>
-        </td>
-    </tr>
 
-    </tbody>
-</table></div>
+
+<fieldset>
+ <label for="pict_small_isset">[#catalog_edit_property_pict_small_create_label#]</label>
+ <input type="checkbox" name="pict_small_isset" id="pict_small_isset" %small_check% onchange="pict_on_off('pict_small')">
+ <div id="pict_small" style="display:none;  border:1px solid #ccc; margin:40px 0 0 0; border-radius:6px; padding:0 10px; clear:both;">
+
+ <fieldset>
+  <label>[#catalog_edit_property_pict_width_and_height#]:<br><small>[#catalog_edit_property_pict_width_and_height_help#]</small></label>
+  <input type="text" name="pict_small_width" style="width:121px;" id="pict_small_width" value="%pict_small_width%"><span style="float:left; display:block; padding:5px;">x</span><input type="text" name="pict_small_height" style="width:121px;" id="pict_small_height" value="%pict_small_height%">
+ </fieldset>
+ </div>
 </fieldset>
-</td></tr>
-<tr><td colspan="2">
-<fieldset><legend><label for="pict_small_isset" style="cursor:pointer;">[#catalog_edit_property_pict_small_create_label#]</label> <input type="checkbox" name="pict_small_isset" id="pict_small_isset" %small_check% onchange="pict_on_off('pict_small')"/></legend>
-<div id="pict_small" style="display:none;">
-<table width="420" border="0" cellpadding="0" cellspacing="0" >
-    <tbody>
-    <tr>
-		<td width="150" align="right" valign="top">[#catalog_edit_property_pict_width_and_height#]:</td>
-        <td><input type="text" size="4" name="pict_small_width" id="pict_small_width" value="%pict_small_width%"/>x<input type="text" size="4" name="pict_small_height" id="pict_small_height" value="%pict_small_height%"/><br /><small>[#catalog_edit_property_pict_width_and_height_help#]</small></td>
-    </tr>
-    </tbody>
-</table></div>
-</fieldset>
-</td></tr>
-<script>
+<script type="text/javascript">
 	pict_on_off('pict_small');
 	pict_on_off('pict_big');
 	pict_on_off('pict_source');

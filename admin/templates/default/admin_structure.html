@@ -91,7 +91,7 @@
             {
 
                 $('#'+d.page_prop[i].name_nasled).attr("checked","checked");
-                $('#'+d.page_prop[i].name).attr("disabled",true);
+                $('#'+d.page_prop[i].name).attr("disabled", true);
             }
             else
             {
@@ -100,17 +100,17 @@
             }
 
             if (d.page_is_main)//если главная - отключим чекбокс
-                $('#'+d.page_prop[i].name_nasled).attr("disabled",true);
-            else
-                $('#'+d.page_prop[i].name_nasled).removeAttr("disabled");
+                $('#'+d.page_prop[i].name_nasled).attr("disabled",true); 
+            //else 
+                //$('#'+d.page_prop[i].name_nasled).removeAttr("disabled"); 
 		}
 	}
 
-
 	function set_metki(d)
-	{
+	{    
         $('#table_metki').html('');//очистим таблицу меток
         var str_code = "";
+        
         metkiCount = d.length;
         arr_link_content = new Array();
         for (var i = 0; i < d.length; i++)
@@ -121,15 +121,16 @@
             //str_content += '<td class="name">';
             str_content += '<label for="flag_metka_'+i+'">'+d[i].name+'</label>';
             //Галочка наследования
-            str_content += '<input type="checkbox" name="'+d[i].name+'" id="flag_metka_'+i+'" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', [arr_link_select['+i+'], \'metka_real_'+i+'\']);show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');">';
+            str_content += '<input type="checkbox" name="'+d[i].name+'" id="flag_metka_'+i+'" onclick="show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_'+i+'\');show_icon_go_edit_content(arr_link_select['+i+'],\'img_edit_s_'+i+'\');">';
             //Селект, который на который навешивается экстовская форма
             str_content += '<select id="sel_modul_ext_'+i+'"></select>';
-            str_content +='<span style="height: 26px; display: block;"><img class="edit_icon" id="img_edit_'+i+'" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content['+i+'], false)" /><img class="edit_icon"  id="img_edit_s_'+i+'" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content['+i+'], true)" /></span>';
+            str_content +='<span style="height: 26px; display: block;"><img class="edit_icon" title="Визуальный редактор контента" id="img_edit_'+i+'" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content['+i+'], false)"><img class="edit_icon"  id="img_edit_s_'+i+'" title="HTML редактор контента" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content['+i+'], true)"></span>';
             str_content += '</fieldset>';
             //Добавляем небольшими кусками, так как иначе IE глючит
             $(str_content).appendTo('#table_metki');
 
             buildMetkaActionsSelect("select#sel_modul_ext_"+i);
+            
 
             //при изменении селекта с действиями скроем или покажем иконки редактора контента
             $("select#sel_modul_ext_"+i).change(function () {
@@ -139,16 +140,17 @@
             });
 
             $("#sel_modul_ext_"+i).val(d[i].id_action);//поставим в селект выбранное значение
-
-            //если унаследовано - отключим селект и поставим чекбокс наследования
+            
+            
+            // если унаследовано - отключим селект и поставим чекбокс наследования
             if (d[i].naslednoe)
             {
-                $("#flag_metka_"+i).attr("checked","checked");
-                $("#sel_modul_ext_"+i).attr("disabled",true);
+               $("#flag_metka_"+i).attr("checked","checked");
+               $("#sel_modul_ext_"+i).attr("disabled",true);
             }
 
             //повесим обработчик на клик по чекбоксу
-            $("#flag_metka_"+i).change(function () {
+            /*$("#flag_metka_"+i).change(function () {
                 var elID = new String(this.id).split("_").pop();
                 show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
                 show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
@@ -157,17 +159,32 @@
                     $("#sel_modul_ext_"+elID).removeAttr("disabled");
                 else
                     $("#sel_modul_ext_"+elID).attr("disabled",true);
-            });
+            });*/
+            
 
+            // прячем иконки
             show_icon_go_edit_content("sel_modul_ext_"+i,'img_edit_'+i);
             show_icon_go_edit_content("sel_modul_ext_"+i,'img_edit_s_'+i);
 
             //сохраняем название файла для редактирования контента
             arr_link_content[i] = d[i].file_edit;
-
-            $('#table_metki select').selectmenu({
+            
+            $('#sel_modul_ext_'+i).selectmenu({
                style:'dropdown',
                maxHeight: 200
+            });
+            
+            
+            // выключаем, включаем select если checkbox checked и прячем иконки редактирования
+            $("#flag_metka_"+i).bind('click', function () {
+               var elID = new String(this.id).split("_").pop();
+               if ($(this).attr('checked')) {
+                     $("#sel_modul_ext_"+elID).selectmenu('disable');
+               } else {
+                     $("#sel_modul_ext_"+elID).selectmenu('enable');
+                     show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
+                     show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
+               }
             });
         }
 
@@ -379,7 +396,7 @@ $( "input:button").button();
 $('#page_tabs').parent().tabs();
 
 $('#content_container select').selectmenu({
-   style:'dropdown',
-   maxHeight: 200
-});
+      style:'dropdown',
+      maxHeight: 200
+   });
 </script>

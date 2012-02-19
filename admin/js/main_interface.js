@@ -492,18 +492,26 @@ function set_propertes_main(d)
     if (d.template_naslednoe)
     {
         $('#flag_template').attr("checked", "checked");
-        $('#fieldPageTemplate').attr('disabled', true);
+        $('#fieldPageTemplate').selectmenu('disable');
     }
     else
     {
         $('#flag_template').removeAttr('checked');
-        $('#fieldPageTemplate').removeAttr('disabled');
+        $('#fieldPageTemplate').selectmenu('enable');
     }
 
     if (d.page_is_main)
         $('#flag_template').attr("disabled", true);
     else
         $('#flag_template').removeAttr("disabled");
+    
+    // включаем, выключаем select выбора шаблона
+    $("#flag_template").bind('click', function () {
+      if($(this).attr('checked'))
+         $('#fieldPageTemplate').selectmenu('disable');
+      else
+         $('#fieldPageTemplate').selectmenu('enable');
+    });
 
     //Заполняем остальные вспомогательные элементы
     $('#main_label_name_page').html(d.caption);

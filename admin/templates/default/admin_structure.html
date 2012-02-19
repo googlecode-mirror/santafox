@@ -166,20 +166,20 @@
 		
   <fieldset>
 		                        	<label for="fieldPageURL">[#page_prop_link_page#]</label>
-		                        	<input type="text" name="page_properties[page_url]" value="%page_url%" id="fieldPageURL">
-   <span class="ui-icon ui-icon-folder-open" style="cursor: pointer;" id="opentree"></span>
+		                        	<input type="text" name="page_properties[page_url]" style="margin-right:5px;" value="%page_url%" id="fieldPageURL">
+   <span class="ui-icon ui-icon-folder-open" style="cursor: pointer; margin-top:5px;" id="opentree"></span>
   </fieldset>
 		
   <fieldset>
 		                        	<label for="fieldPageOnlyAuth">Только авторизированым</label>
 		                        	<input type="checkbox" name="page_properties[only_auth]" id="fieldPageOnlyAuth" %only_auth%>
-		                        	Если отмечен, доступен только авторизованным
+		                        	<span class="block fLeft" style="padding-top:5px;">Если отмечен, доступен только авторизованным</span>
   </fieldset>
 		
   <fieldset>
 		                        	<label for="flag_template">[#page_prop_templte_page#]</label>
-		                        	<input type="checkbox" onClick="jspub_disabled_change('flag_template', 'fieldPageTemplate')" name="page_properties[flag_template]" id="flag_template">
-   <select name="page_properties[page_template]" style="width:300px;" id="fieldPageTemplate"></select>
+		                        	<input type="checkbox" name="page_properties[flag_template]" id="flag_template">
+   <select name="page_properties[page_template]" style="width:264px;" id="fieldPageTemplate"></select>
                 </fieldset>
   </div>
 

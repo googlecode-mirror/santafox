@@ -174,7 +174,6 @@ a.mod_box_sbtn_active:hover { background:url('../images/modblock_resize_ic.png')
 div.ui-layout-center { position:relative; width:100%; height:100%; padding:4px; margin:0; overflow:hidden; }
 
 /* center-middle_content area */
-
 .middle_content {
 	position:relative;
 	width:98.5%; height:98.5%;

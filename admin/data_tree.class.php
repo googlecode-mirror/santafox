@@ -498,8 +498,8 @@ class data_tree
         $link = 'start_interface.link_go("'.$this->action_node.'&id=" + currNodeId)';
         //А вот если это работа со структурой, то всё сложнее, так как нужно только обновить
         //уже загруженную форму
-        //if ($this->is_page_structure)//@todo uncomment?
-        //    $link = 'structure_tree_click_node("'.$this->action_node.'&id=" + currNodeId)';
+        if ($this->is_page_structure)//@todo uncomment?
+            $link = 'structure_tree_click_node("'.$this->action_node.'&id=" + currNodeId)';
 
         $html = str_replace("[#linkmenu#]"  , $link, $html);
 
@@ -521,6 +521,8 @@ class data_tree
                 $html = str_replace("%nod_select_node%" , "false" , $html);
         }
 
+        if ($this->is_page_structure && isset($this->template['block4struct']))
+            $html.=$this->template['block4struct'];
         return $html;
     }
 

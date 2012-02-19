@@ -1,26 +1,22 @@
 <!-- @tree_data_url -->
 
-,"ajax" : {
-			    "url" : "[#data_url#]",
- 	             "data":function(n) {
-					return { pid : n.attr ? n.attr("id") : "" };
-				}
- 	        }
+"ajax" : {
+    "url" : "[#data_url#]",
+     "data":function(n) {
+        return { pid : n.attr ? n.attr("id") : "" };
+    }
+},
 
 
 <!-- @main -->
 <div id="[#tree_id#]"></div>
 <script type="text/javascript">
 
-//data.inst._get_parent(data.rslt.obj).attr("id")
-
     jQuery("#[#tree_id#]")
-            [#dnd_action2#]
+            /*[#dnd_action2#]*/
             .bind("select_node.jstree", function (e,data) {
-                //var treeInstance = data.inst;
                 var currNodeId = data.rslt.obj.attr("id");
-                //alert("node selected: "+currNodeId);
-                var dc = [#direct_click#];
+                var dc = true/*[#direct_click#]*/;
                 //if (!n.attributes.notclick)
                 //{
                     if (!dc)
@@ -30,13 +26,10 @@
                         var node_way = jQuery.jstree._reference("#[#tree_id#]").get_path(selectedNode, true);//works!
                         //Теперь, в куках храниться дорога до текущей ноды
                         jspub_cookie_set("%cookie_name_tree%",node_way.join(","));
-                        //alert("after cookie set");
                         //Если надо, то уберём текущее выделение с пункта левого меню
                         start_interface.left_menu_clear_select();
-                        //alert("after left_menu_clear_select");
                         start_interface.save_link_node_select(selectedNode);
-                        //structure_tree_click_node("view&id=" + currNodeId);
-                        [#linkmenu#]
+                        /*[#linkmenu#]*/
                         
                     }
                     else
@@ -44,26 +37,21 @@
                         //Это клик когда надо будет проставить значение выбранной ноды
                         //и вызвать событие на закрытие окна. Используется для выбора
                         //страницы сайта в качестве свойства чего-либо.
-                        //console.dir($('#[#tree_id#]').jstree('get_selected'));//works
-                        //console.log($('#[#tree_id#]').jstree('get_selected').attr('id'));//
                         $('#'+start_interface.select_element).val(currNodeId);//start_interface.select_element.setValue(n.attributes.id);
-                        //if (start_interface.dialog != null)
-                        //    start_interface.dialog.hide();
-                        //$('#popup_div').css('display','none');
                         $("#popup_sitemap_div").dialog("destroy");
                     }
 
             })
             .bind("loaded.jstree", function (event, data) {
                 var str_cook = jspub_cookie_get("%cookie_name_tree%");
-                var arr_node = new Array([#node_default#]);
+                var arr_node = new Array(/*[#node_default#]*/);
                 if (str_cook.length > 0)
                 {
                     //Так как ID могут быть строками, надо заменить там запятые на
                     //кавычки
                     str_cook = '"'+str_cook.replace(/,/g,'","')+'"';
                     //Массив нужно создать таким страшным способом.
-                    var arr_node = eval(' new Array(' + str_cook.toString() + ')');
+                    arr_node = eval(' new Array(' + str_cook.toString() + ')');
                 }
                 var sel_node=false;
                 //Теперь начнём раскрывать необходимые ноды
@@ -71,7 +59,6 @@
                 for (i = 0; i < arr_node.length; i++)
                 {
                     sel_node=arr_node[i];
-                    //alert('checkin '+arr_node[i]);
                     //This can be a DOM node, jQuery node or selector pointing to an element we want opened.
                     if (!data.inst.is_open("#"+arr_node[i]))
                     {
@@ -82,7 +69,7 @@
                 if (sel_node)
                 {
                     //alert('before click_node_default');
-                    //[#click_node_default#]
+                    /*[#click_node_default#]*/
                     data.inst.select_node("#"+sel_node);
                 }
 
@@ -93,23 +80,18 @@
 	    }).jstree({  //сначала привязываем  loaded.jstree, select_node.jstree и только ПОТОМ создаём дерево
 
         "ui": {
-                "select_limit": 1 //no multiselect
+            "select_limit": 1 //no multiselect
         },
 		"json_data" : {
-			//"data" : [{"data":"[#root_name#]","attr":{"id":"[#root_id#]"},"state":"opened","children":
-			"data" : [{"data":"[#root_name#]","attr":{"id":"[#root_id#]"},"state":"closed","children":
-                    %tree_data_children%
-                    }]
-
-            %tree_data_url%  ,
-
+			"data" : [{"data":"[#root_name#]","attr":{"id":"[#root_id#]"},"state":"closed","children": "%tree_data_children%"}],
+            /*%tree_data_url%*/
             "correct_state":true
 			//,"progressive_render" : true
 		},
 
 
-		"plugins" : [ "json_data", "ui", [#dnd_enabled#] "types", "contextmenu","themes"],
-      "types" : {
+		"plugins" : [ "json_data", "ui", /*[#dnd_enabled#]*/ "types", "contextmenu","themes"],
+        "types" : {
 			// I set both options to -2, as I do not need depth and children count checking
 			// Those two checks may slow jstree a lot, so use only when needed
 			"max_depth" : -2,
@@ -157,7 +139,7 @@
 			"dots" : true,
 			"icons" : true
 		},
-        [#dnd_action1#]
+        /*[#dnd_action1#]*/
 
 		"contextmenu" : {
             //"show_at_node" : true,
@@ -166,18 +148,12 @@
                 "remove" : false,//Delete
                 "ccp" : false,
                 "create":false
-                [#context_menu_functions#]
+                /*[#context_menu_functions#]*/
                
 
             }
 		}
 	});
-
-</script>
-
-<!-- @block4struct -->
-<!--  блок, который "приклеится" к коду дерева для стуктуры -->
-<script type="text/javascript">
 
 </script>
 
@@ -277,7 +253,6 @@
             var disabledForNodes = new String("[#node_exclude#]").split(",");
             if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
             {
-                //console.log("create disabled for this node");
                 return;
             }
             [#action#]
@@ -291,7 +266,6 @@
             var disabledForNodes = new String("[#node_exclude#]").split(",");
             if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
             {
-                //console.log("delete disabled for this node");
                 return;
             }
         [#action#]

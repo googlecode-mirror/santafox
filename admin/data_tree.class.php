@@ -182,16 +182,15 @@ class data_tree
 	    $this->template = $kernel->pub_template_parse('admin/templates/default/tree.html');
 	    $this->set_nodes($nodes);
 
-        //$this->template['main'] = str_replace('%tree_data_url%', $this->template['tree_data_url'], $this->template['main']);
 	    if (is_null($this->nodes))
 	    {
-            $this->template['main'] = str_replace('%tree_data_url%', $this->template['tree_data_url'], $this->template['main']);
-            $this->template['main'] = str_replace('%tree_data_children%', 'null', $this->template['main']);
+            $this->template['main'] = str_replace('/*%tree_data_url%*/', $this->template['tree_data_url'], $this->template['main']);
+            $this->template['main'] = str_replace('"%tree_data_children%"', 'null', $this->template['main']);
 	    }
 	    else
 	    {
-            $this->template['main'] = str_replace('%tree_data_url%', '', $this->template['main']);
-            $this->template['main'] = str_replace('%tree_data_children%', $kernel->pub_json_encode($this->nodes), $this->template['main']);
+            $this->template['main'] = str_replace('/*%tree_data_url%*/', '', $this->template['main']);
+            $this->template['main'] = str_replace('"%tree_data_children%"', $kernel->pub_json_encode($this->nodes), $this->template['main']);
 	    }
 
 	    if ($root_name)
@@ -454,7 +453,7 @@ class data_tree
                 //$node = $this->node_default;
                 $this->node_default = "'".$this->node_default."'";
             }
-            //Это первый возов этого интерфейса, и значит что нужно полностью
+            //Это первый вызов этого интерфейса, и значит что нужно полностью
             //загрузить интерфейс формы, так как его ещё точно нет
             if ($this->is_page_structure)
             {
@@ -473,37 +472,37 @@ class data_tree
         $html = str_replace("[#data_url#]"    , $data_url,          $html);
         $html = str_replace("[#move_url#]"    , $move_url,          $html);
         $html = str_replace("[#not_click#]"   , $notclick,          $html);
-        $html = str_replace("[#direct_click#]", $direct_click,      $html);
-        $html = str_replace("[#node_default#]", $this->node_default, $html);
+        $html = str_replace("true/*[#direct_click#]*/", $direct_click,      $html);
+        $html = str_replace("/*[#node_default#]*/", $this->node_default, $html);
 
         //Настройки drag&drop, меняются 3 части шаблона
         if ($this->drag_and_drop)
         {
-            $html = str_replace("[#dnd_enabled#]", $this->template['dnd_enabled'], $html);
-            $html = str_replace("[#dnd_action1#]", $this->template['dnd_action1'], $html);
-            $html = str_replace("[#dnd_action2#]", $this->template['dnd_action2'], $html);
+            $html = str_replace("/*[#dnd_enabled#]*/", $this->template['dnd_enabled'], $html);
+            $html = str_replace("/*[#dnd_action1#]*/", $this->template['dnd_action1'], $html);
+            $html = str_replace("/*[#dnd_action2#]*/", $this->template['dnd_action2'], $html);
         }
         else
         {
-            $html = str_replace("[#dnd_enabled#]", "", $html);
-            $html = str_replace("[#dnd_action1#]", "", $html);
-            $html = str_replace("[#dnd_action2#]", "", $html);
+            $html = str_replace("/*[#dnd_enabled#]*/", "", $html);
+            $html = str_replace("/*[#dnd_action1#]*/", "", $html);
+            $html = str_replace("/*[#dnd_action2#]*/", "", $html);
         }
 
 
         //$html = str_replace("[#context_menu#]"          , $html_context_menu         , $html);
-        $html = str_replace("[#context_menu_functions#]", $html_context_menu_function, $html);
+        $html = str_replace("/*[#context_menu_functions#]*/", $html_context_menu_function, $html);
 
         //Обычный клик по ноде будет вызывать перегрузку сентрaльного блока
-        $link = 'start_interface.link_go("'.$this->action_node.'&id=" + currNodeId)';
+        $link = 'start_interface.link_go("'.$this->action_node.'&id=" + currNodeId);';
         //А вот если это работа со структурой, то всё сложнее, так как нужно только обновить
         //уже загруженную форму
-        if ($this->is_page_structure)//@todo uncomment?
-            $link = 'structure_tree_click_node("'.$this->action_node.'&id=" + currNodeId)';
+        if ($this->is_page_structure)
+            $link = 'structure_tree_click_node("'.$this->action_node.'&id=" + currNodeId);';
 
-        $html = str_replace("[#linkmenu#]"  , $link, $html);
+        $html = str_replace("/*[#linkmenu#]*/"  , $link, $html);
 
-        $html = str_replace("[#click_node_default#]" , $def_link                      , $html);//@todo remove?
+        $html = str_replace("/*[#click_node_default#]*/" , $def_link                      , $html);
         $html = str_replace("%cookie_name_tree%"     , "name_".$this->name_for_cookie , $html);
 
 
@@ -520,9 +519,6 @@ class data_tree
             else
                 $html = str_replace("%nod_select_node%" , "false" , $html);
         }
-
-        if ($this->is_page_structure && isset($this->template['block4struct']))
-            $html.=$this->template['block4struct'];
         return $html;
     }
 

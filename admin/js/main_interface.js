@@ -444,13 +444,22 @@ function structure_tree_click_node(url)
     //Сначала надо получить эти данные
     var url_link_main = start_interface.global_link + url + "&type=get_main_param";//index.php?action=set_left_menu&leftmenu=view&id=about2&type=get_main_param
 
+    $('#content_header').html('');
+    $('#page_container').css({'display':'none'});
+    $('#contentLoading').show();
+    
     //Загрузка данных о самой странице и свойствах модулей
     $.get(url_link_main, function (data)
     {
         var comboStore = jQuery.parseJSON(data);
         if (comboStore != null)
             set_propertes_main(comboStore);
+        
+        $("#contentLoading").hide();
+        $('#page_tabs').parent().tabs({ selected: 0 });
+        $('#page_container').css({'display':'block'});
     });
+    
     run_update_metki(url);
 }
 
@@ -470,6 +479,9 @@ function run_update_metki(url)
 //созданым при инсталяции
 function set_propertes_main(d)
 {
+    // название страницы
+    $('#content_header').html('Страница: <span class="black">"<a href="/'+d.id_curent_page+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+d.caption+'</a>"</span>');
+    
     //Проставляем поля формы
     $("#fieldPageName").val(d.caption);
     $("#fieldPageTitle").val(d.name_title);

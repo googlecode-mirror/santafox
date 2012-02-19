@@ -1,5 +1,5 @@
 <!-- @body -->
-<script type="text/javascript" language="javascript">
+<script type="text/javascript">
 	var arr_link_select = new Array();
 	arr_link_content = new Array();//массив имён файлов для редактирования контента
 
@@ -130,11 +130,10 @@
 	%--str_prop_modul_code--%
     */
 	run_update_metki('%link_show_metki%');
-
-
 </script>
+<span id="contentLoading">Loading, Please wait..</span>
 <!-- page name -->
-<span class="content_header">Страница: <span class="black">"<a href="%link_page_view%" class="link2page" target="_blank" title="Откроется в новом окне">%page_name%</a>"</span></span>
+<span id="content_header" class="content_header"></span>
 <!-- page container -->
 <div id="page_container">
 <div id="content_container">

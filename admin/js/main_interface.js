@@ -127,13 +127,21 @@ function jspub_click(lnk)
  */
 function jspub_disabled_change(elem1ID,elem2ID)
 {
-
-    if ($('#'+elem1ID).attr("checked"))
-        $('#'+elem2ID).attr("disabled",true);
-    else
-        $('#'+elem2ID).removeAttr("disabled");
+   if($('#'+elem2ID).is('select'))
+   {
+      if ($('#'+elem1ID).attr('checked'))
+         $('#'+elem2ID).selectmenu('disable');
+      else
+         $('#'+elem2ID).selectmenu('enable');
+   }
+   else
+   {
+      if ($('#'+elem1ID).attr("checked"))
+         $('#'+elem2ID).attr("disabled",true);
+      else
+         $('#'+elem2ID).removeAttr("disabled");
+   }
 }
-
 
 /**
  * Производит отправку формы
@@ -504,14 +512,6 @@ function set_propertes_main(d)
         $('#flag_template').attr("disabled", true);
     else
         $('#flag_template').removeAttr("disabled");
-    
-    // включаем, выключаем select выбора шаблона
-    $("#flag_template").bind('click', function () {
-      if($(this).attr('checked'))
-         $('#fieldPageTemplate').selectmenu('disable');
-      else
-         $('#fieldPageTemplate').selectmenu('enable');
-    });
 
     //Заполняем остальные вспомогательные элементы
     $('#main_label_name_page').html(d.caption);
@@ -523,14 +523,19 @@ function set_propertes_main(d)
         $('#' + d.page_prop[i].name).val(d.page_prop[i].value);
         if (d.page_prop[i].naslednoe)//чекбокс наследования если надо
         {
-
             $('#' + d.page_prop[i].name_nasled).attr("checked", "checked");
-            $('#' + d.page_prop[i].name).attr("disabled", true);
+            if($('#' + d.page_prop[i].name).is('select'))
+               $('#' + d.page_prop[i].name).selectmenu("disable");
+            else
+               $('#' + d.page_prop[i].name).attr("disabled", true);
         }
         else
         {
             $('#' + d.page_prop[i].name_nasled).removeAttr('checked');
-            $('#' + d.page_prop[i].name).removeAttr("disabled");
+            if($('#' + d.page_prop[i].name).is('select'))
+               $('#' + d.page_prop[i].name).selectmenu("enable");
+            else
+               $('#' + d.page_prop[i].name).removeAttr("disabled");
         }
 
         if (d.page_is_main)//если главная - отключим чекбокс
@@ -556,7 +561,7 @@ function set_metki(d)
         //str_content += '<td class="name">';
         str_content += '<label for="flag_metka_' + i + '">' + d[i].name + '</label>';
         //Галочка наследования
-        str_content += '<input type="checkbox" name="' + d[i].name + '" id="flag_metka_' + i + '" onclick="show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_' + i + '\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_s_' + i + '\');">';
+        str_content += '<input type="checkbox" name="' + d[i].name + '" id="flag_metka_' + i + '" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_modul_ext_' +i+'\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_' + i + '\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_s_' + i + '\');">';
         //Селект, который на который навешивается экстовская форма
         str_content += '<select id="sel_modul_ext_' + i + '"></select>';
         str_content += '<span style="height: 26px; display: block;"><img class="edit_icon" title="Визуальный редактор контента" id="img_edit_' + i + '" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content[' + i + '], false)"><img class="edit_icon"  id="img_edit_s_' + i + '" title="HTML редактор контента" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content[' + i + '], true)"></span>';
@@ -611,17 +616,12 @@ function set_metki(d)
         });
 
 
-        // выключаем, включаем select если checkbox checked и прячем иконки редактирования
+        // показываем иконки редактирования контента
         $("#flag_metka_" + i).bind('click', function ()
         {
             var elID = new String(this.id).split("_").pop();
-            if ($(this).attr('checked'))
+            if(!$(this).attr('checked'))
             {
-                $("#sel_modul_ext_" + elID).selectmenu('disable');
-            }
-            else
-            {
-                $("#sel_modul_ext_" + elID).selectmenu('enable');
                 show_icon_go_edit_content("sel_modul_ext_" + elID, 'img_edit_' + elID);
                 show_icon_go_edit_content("sel_modul_ext_" + elID, 'img_edit_s_' + elID);
             }

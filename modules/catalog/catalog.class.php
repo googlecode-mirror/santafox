@@ -6881,8 +6881,6 @@ class catalog extends basemodule
 
         //Теперь, в зависимости от того, какое это поле, возможно нам нужно показать
         //что-то дополнительное
-
-        $addons_param = '';
         if ($prop['type'] == 'enum')
         {
             //Если это поле "список значений", получим уже введённые значения
@@ -6904,6 +6902,8 @@ class catalog extends basemodule
             $addons_param = str_replace('%vals%'       , $lines, $addons_param);
             $addons_param = str_replace('%form_action%', $kernel->pub_redirect_for_form('order_enum_field_add'), $addons_param);
         }
+        else
+            $addons_param = $this->get_template_block('enum_new');
 
         $content = str_replace('%addons_param%', $addons_param , $content);
         $content = str_replace('%form_action%' , $kernel->pub_redirect_for_form($action), $content);

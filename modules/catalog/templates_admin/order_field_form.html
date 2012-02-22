@@ -11,27 +11,20 @@
 
 <!-- @header -->
 <script type="text/javascript">
- 
- $("input:submit, input:button, button").button();
- 
- $('#content_container select').selectmenu({
-   style:'dropdown',
-   maxHeight: 200
- });
- 
- function selectChange()
- {
-  if ($('#stype').val()=='enum')
-  {
-  	   $('#prop_addon').html($('#enum_for_add').html());
-       $('#prop_addon').css('display','block');
-  }
-  else
-  {
-      $('#prop_addon').css('display','none');
-      $('#prop_addon').html('');
-  }
- }
+
+    $("input:submit, input:button, button").button();
+    $('#content_container select').selectmenu({
+        style:'dropdown',
+        maxHeight:200
+    });
+    function selectChange()
+    {
+        if ($('#stype').val() == 'enum')
+            $('#prop_addon').css('display', 'block');
+        else
+            $('#prop_addon').css('display', 'none');
+    }
+    selectChange();
 </script>
 
 <span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
@@ -73,6 +66,7 @@
   
   <div id="prop_addon" class="block" style="display: none; border-top:1px solid #ededed; margin:5px 0; padding:5px 0; clear:both;">
    %addons_param%
+
   </div>
  
  <fieldset class="page_submit_field">
@@ -80,13 +74,13 @@
  </fieldset>
 
 
-<div id="enum_for_add" style="visibility:hidden; width:0px; height:0px;">
+
+
+<!-- @enum_new -->
  <fieldset>
   <label>[#catalog_edit_property_enum_label#]:<br /><small>[#catalog_edit_property_enum_help#]</small></label>
   <textarea rows="" cols="" name="enum_values" style="width:272px; height:75px;"></textarea>
  </fieldset>
-</div>
-
 <!-- @enum_vals -->
 <table class="admin_table" width="420">
     <tr>

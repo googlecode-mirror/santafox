@@ -1,5 +1,12 @@
 <!-- @header -->
 <script type="text/javascript">
+ $("input:submit, input:button, button").button();
+ 
+ $('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+ 
 function generate_go()
 {
 	var id = $('#gengroupid').val();
@@ -8,27 +15,37 @@ function generate_go()
 
 }
 </script>
-<h3>[#catalog_inner_filters#]</h3>
-%table%
-<a href="#" onclick="jspub_click('show_inner_filter_form&id=-1');">[#catalog_add_inner_filter_label#]</a>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ 
+ <h3>[#catalog_inner_filters#]</h3>
+ 
+ %table%
+ 
+ <fieldset class="page_submit_field">
+  <button onclick="jspub_click('show_inner_filter_form&id=-1');">[#catalog_add_inner_filter_label#]</button>
+ </fieldset>
 
-<br><br>
-<form action="%gen_form_action%" method="post" id="generateform">
-<select name="groupid" id="gengroupid">%group_items%</select>
-<input type="button"  value="[#catalog_generate_search_form_label#]" onclick="generate_go()">
-</form>
+ <fieldset style="border-top:1px solid #ededed; padding-top:10px;">
+  <form action="%gen_form_action%" method="post" id="generateform">
+   <select name="groupid" id="gengroupid">%group_items%</select>
+   <input type="button" style="margin-left:10px;" value="[#catalog_generate_search_form_label#]" onclick="generate_go()">
+  </form>
+ </fieldset>
+ </div>
+</div>
+</div>
 
 <!-- @table_header -->
 <form action="%form_action%" method="post">
 <table class="admin_table">
-    <thead>
-        <tr>
+ <tr>
             <th>[#catalog_list_inner_filter_stringid_label#]</th>
             <th>[#catalog_list_inner_filter_name_label#]</th>
             <th>[#catalog_list_inner_filter_actions#]</th>
         </tr>
-    </thead>
-    <tbody>
 <!-- @table_body-->
         <tr>
             <td>%stringid%</td>
@@ -39,11 +56,8 @@ function generate_go()
             </td>
         </tr>
 <!-- @table_footer -->
-</tbody>
 </table>
 </form>
-
-<br />
 
 
 <!-- @group_item -->

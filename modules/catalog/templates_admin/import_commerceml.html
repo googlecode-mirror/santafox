@@ -1,91 +1,112 @@
 <!-- @content -->
-<span class="content_header"><span class="black">[#catalog_menu_label_import_commerceml#]</span></span>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
 <div id="page_container">
  <div id="content_container">
  <div class="content">
+ <h3>[#catalog_menu_label_import_commerceml#]</h3>
+ %msg%
+ <form method="post" action="%form_action%" enctype="multipart/form-data">
+ 
+ <fieldset>
+  <label for="commerceml_file">[#catalog_commerceml_xmlfile#]: <sup style="color:red;">*</sup></label>
+  <input type="file" class="file" id="commerceml_file" name="commerceml_file">
+ </fieldset>
+ 
+ <fieldset>
+  <label>[#catalog_commerceml_1C_ID_santafield#]: <sup style="color:red;">*</sup></label>
+  <select name="ID_field">
+   %ID_field_options%
+  </select>
+ </fieldset>
+ 
+ <h3 style="margin-top:5px;">[#catalog_commerceml_type#]</h3>
+ 
+  <fieldset style="margin-top:0px;">
+   <input type="radio" name="import_type" id="import_type_import" value="import" checked>
+   <label for="import_type_import">[#catalog_commerceml_type_import#]</label>
+  <span class="block clear"></span>
+   <input type="radio" name="import_type" id="import_type_offers" value="offers">
+   <label for="import_type_offers">[#catalog_commerceml_type_offers#]</label>
+  </fieldset>
+  
+  <div id="import_type_import_block" class="clear" style="margin:10px 0; padding:5px; border-bottom:1px solid #ededed; border-top:1px solid #ededed; display:none; clear:both;">
+  <span class="black">[#catalog_commerceml_itemprops_assoc#]</span>
+  
+   <table id="assoc_table" class="admin_table" style="width:460px;">
+    <tr>
+      <th width="200">[#catalog_commerceml_name_1C#]</th>
+      <th>[#catalog_commerceml_name_santa#]</th>
+    </tr>
+    <tr>
+     <td style="text-align:left;">[#catalog_commerceml_name_santafield#]</td>
+     <td>
+      <select name="name_field">
+       %name_field_options%
+      </select>
+     </td>
+     </tr>
+     %props_assoc_lines%
+   </table>
+   
+   <span class="block clear" style="width:460px; text-align:center;">
+    <a href="#" onclick="return addAssocLine();">[#catalog_commerceml_add_assocline#]</a>
+   </span>
+   
+   <fieldset>
+    <label>[#catalog_commerceml_category#]:</label><select name="catid">%cats_options%</select>
+   </fieldset>
+   
+   <fieldset>
+    <label>[#catalog_commerceml_group#]:</label><select name="groupid" id="groups_select">%groups%</select>
+   </fieldset>
+  </div>
+    
+  <div id="import_type_offers_block" style="margin:10px 0; padding:5px; border-top:1px solid #ededed; border-bottom:1px solid #ededed; display:none; clear:both;">
+   <span class="black">[#catalog_commerceml_itemprops_assoc#]</label>
+   <table class="admin_table" style="width:460px;">
+    <tr>
+     <th>[#catalog_commerceml_name_1C#]</th>
+     <th>[#catalog_commerceml_name_santa#]</th>
+    </tr>
 
-     %msg%
-<form method="post" action="%form_action%" enctype="multipart/form-data">
-   [#catalog_commerceml_xmlfile#]: <sup>*</sup> <input type="file" class="file" name="commerceml_file"><br clear="all">
-   [#catalog_commerceml_1C_ID_santafield#]: <sup>*</sup><br clear="all">
+    <tr>
+     <td style="text-align:left;">[#catalog_commerceml_price_field#]<sup style="color:red;">*</sup></td>
+     <td>
+      <select name="price_field">
+       %price_field_options%
+      </select>
+      </td>
+     </tr>
 
-    <select name="ID_field">
-        %ID_field_options%
-    </select>
+     <tr>
+      <td style="text-align:left;">[#catalog_commerceml_price_per_field#]</td>
+      <td>
+      <select name="price_per_field">
+      <option value="">[#catalog_commerceml_price_per_field_no_matters#]</option>
+      %price_per_field_options%
+      </select>
+      </td>
+     </tr>
+     
+     <tr>
+      <td style="text-align:left;">[#catalog_commerceml_pricetype#]<sup style="color:red;">*</sup></td>
+      <td>
+       <input type="text" name="priceType" value="%priceType%">
+      </td>
+     </tr>
 
-    <br clear="all">
-
-
-    <label>[#catalog_commerceml_type#]</label><br clear="all">
-    <input type="radio" name="import_type" id="import_type_import" value="import" checked>[#catalog_commerceml_type_import#]<br clear="all">
-
-    <div id="import_type_import_block" style="display: none;width: 300px;">
-        <label style="width: 300px;">[#catalog_commerceml_itemprops_assoc#]</label><br clear="all">
-        <table id="assoc_table">
-            <tr>
-                <th>[#catalog_commerceml_name_1C#]</th>
-                <th>[#catalog_commerceml_name_santa#]</th>
-            </tr>
-            <tr>
-                <td>[#catalog_commerceml_name_santafield#]</td>
-                <td>
-                    <select name="name_field">
-                        %name_field_options%
-                    </select>
-                </td>
-            </tr>
-            %props_assoc_lines%
-
-        </table>
-       <!-- <br clear="all"> -->
-        <a href="#" onclick="return addAssocLine();">[#catalog_commerceml_add_assocline#]</a><br><br>
-
-        [#catalog_commerceml_category#]: <select name="catid">%cats_options%</select><br clear="all">
-        [#catalog_commerceml_group#]: <select name="groupid" id="groups_select">%groups%</select><br clear="all">
-    </div>
-
-    <input type="radio" name="import_type" id="import_type_offers" value="offers">[#catalog_commerceml_type_offers#]<br clear="all">
-    <div id="import_type_offers_block" style="display: none;width: 300px;">
-        <label style="width: 300px;">[#catalog_commerceml_itemprops_assoc#]</label><br clear="all">
-        <table class="admin_table">
-            <tr>
-                <th>[#catalog_commerceml_name_1C#]</th>
-                <th>[#catalog_commerceml_name_santa#]</th>
-            </tr>
-
-            <tr>
-                <td>[#catalog_commerceml_price_field#]<sup>*</sup></td>
-                <td>
-                    <select name="price_field" style="width: 170px;">
-                        %price_field_options%
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <td>[#catalog_commerceml_price_per_field#]</td>
-                <td>
-                    <select name="price_per_field" style="width: 170px;">
-                        <option value="">[#catalog_commerceml_price_per_field_no_matters#]</option>
-                        %price_per_field_options%
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>[#catalog_commerceml_pricetype#]<sup>*</sup></td>
-                <td>
-                    <input type="text" name="priceType" value="%priceType%" style="width: 170px;">
-                </td>
-            </tr>
-
-        </table>
-    </div>
+   </table>
+  </div>
+  
+  <fieldset class="page_submit_field">
    <input type="submit" name="upload_import_file" value="[#catalog_commerceml_do_import#]">
-</form>
+  </fieldset>
+  
+ </form>
  </div>
  </div>
 </div>
- <script type="text/javascript">
+<script type="text/javascript">
 
      var gprops={
      /*gprops*/
@@ -95,7 +116,7 @@
      $('#import_type_import').click(importTypeClick);
      $('#import_type_offers').click(importTypeClick);
      $('#groups_select').change(groupSelectChange);
-     $("input:submit").button();
+     
      var currGroupID=-1;
      var currAssocLines=0;
 
@@ -111,7 +132,6 @@
      }
      function addAssocLine()
      {
-
          var i,entry,select='<select name="assocprops['+currAssocLines+'][propid]">';
          for (i = 0; i < gprops[currGroupID].length; i++)
          {
@@ -122,6 +142,7 @@
 
          select+='</select>';
          $('#assoc_table tr:last').after('<tr rel="assoc_line"><td><input type="text" style="width: 170px;" name="assocprops['+currAssocLines+'][name]" value=""></td><td>'+select+'</td></tr>');
+         $('div.content select').selectmenu({ style:'dropdown', maxHeight: 200 });
          currAssocLines++;
          return false;
      }
@@ -144,7 +165,13 @@
      }
 
     importTypeClick();
-
+    
+    $("input:submit, input:button, button").button();
+ 
+    $('div.content select').selectmenu({
+     style:'dropdown',
+     maxHeight: 200
+    });
  </script>
 
 <!-- @common_prop_option -->
@@ -162,12 +189,12 @@
 <option value="%cat_id%" selected>%cat_name%</option>
 <!-- @props_assoc_line -->
 <tr>
-    <td><input type="text" name="assocprops[%num%][name]" value="%name1C%" style="width: 170px;" ></td>
-    <td>
-        <select name="assocprops[%num%][propid]">
-            %proplines%
-        </select>
-    </td>
+ <td><input type="text" name="assocprops[%num%][name]" value="%name1C%" style="width: 170px;" ></td>
+ <td>
+ <select name="assocprops[%num%][propid]">
+  %proplines%
+ </select>
+ </td>
 </tr>
 <!-- @propline -->
 <option value="%namedb%">%namefull%</option>

@@ -1,42 +1,65 @@
 <!-- @import_form -->
-<div style="width:80%;">
-<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-<form action="%form_action%" method="POST"  id="exportcsvform">
-<table border="0" width="100%">
-    <tbody>
-    <tr><td colspan="3"><b>[#catalog_export_csv_formlabel#]</b></td></tr>
-    <tr>
-      <td align="left" colspan="2" valign="top" height="50">
-        [#catalog_export_csv_tpl_label#]:<br/>
-        <input type="text" name="template" value="%template_value%" style="width:100%;" />
-
-        [#catalog_export_filter_select_label#]:
-        <select name="filterid" id="import_filterid">
-            <option value="">[#catalog_export_filter_select_all_items#]</option>
-            %filter_items%
-        </select>
-      </td>
-      <td rowspan="3" valign="top" width="33%"><b>[#catalog_export_groups_props_label#]</b><br/>%all_props%</td>
-    </tr>
-    <tr>
-      <td width="66%" colspan="2" valign="top">
-      <input type="submit" name="submit" value="[#catalog_export_button_label#]">
-      </td>
-    </tr>
-
-    <tr>
-      <td width="66%" colspan="2" valign="top" height="100%">&nbsp;
-      </td>
-    </tr>
-
-
-
-    </tbody>
-</table>
-</form>
-    </div></div></div>
-<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+<script type="text/javascript">
+ $("input:submit").button();
+ 
+ $('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+ 
+ $('#template').focus(function(){
+   $(this).animate({width:'70%'});
+ });
+ 
+ $('#template').focusout(function(){
+   $(this).animate({width:'272px'});
+ });
+ 
+ $('#export_group_props ul li ul').css({'display':'none'});
+ $('#export_group_props ul li b').css({'cursor':'pointer'});
+ //$('#export_group_props ul li b').css('cursor':'pointer');
+ $('#export_group_props ul li b').each(function(){
+   $(this).toggle(function(){
+      $(this).parent().find('ul').slideDown();
+   },
+   function (){
+      $(this).parent().find('ul').slideUp();
+   });
+ });
+ 
+</script>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ <h3>[#catalog_export_csv_formlabel#]</h3>
+ 
+ <form action="%form_action%" method="POST"  id="exportcsvform">
+ 
+ <fieldset>
+  <label for="template" style="width:150px;">[#catalog_export_csv_tpl_label#]:</label>
+  <input type="text" id="template" name="template" value="%template_value%">
+ </fieldset>
+ 
+ <fieldset>
+  <label style="cursor:default; width:150px;">[#catalog_export_filter_select_label#]:</label>
+  <select name="filterid" id="import_filterid">
+   <option value="">[#catalog_export_filter_select_all_items#]</option>
+   %filter_items%
+  </select>
+ </fieldset>
+ 
+ <fieldset id="export_group_props" style="font-size:11px;">
+ <span class="block clear"><b>[#catalog_export_groups_props_label#]</b></span>
+ %all_props%
+ </fieldset>
+ 
+ <fieldset class="page_submit_field">
+  <input type="submit" name="submit" value="[#catalog_export_button_label#]">
+ </fieldset>
+ </form>
+ </div>
+ </div>
 </div>
 
 <!-- @filter_items -->

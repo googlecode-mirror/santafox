@@ -1,10 +1,16 @@
 <!-- @header -->
-<div id="page_container">
- <div id="content_container">
- <div class="content">
-     <span class="content_header"><span class="black">%cname%</span></span>
-<br/><br/>
 <script type="text/javascript">
+ $("input:submit, input:button, button").button();
+ 
+ $('.checkallbtn').button({
+   icons: { primary: "ui-icon-check" }
+ });
+ 
+ $('div.content select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+ 
  function add_new_item()
  {
  	jspub_click('item_add&id_cat=%cid%&group_id='+document.getElementById('group_id_for_add').value);
@@ -19,13 +25,20 @@
  {
       $('form#savecategoryitemsform input[type=checkbox]').removeAttr('checked');
  }
-
 </script>
 
-<input type="button" onclick="jspub_click('category_edit&id=%cid%')" value="[#catalog_list_category_edit_label#]" >&nbsp;&nbsp;
-[#catalog_list_category_add_item_label#]&nbsp;<select name="group_id_for_add" id="group_id_for_add">%group_values%</select><input type="button" value="[#catalog_list_category_add_item_bt_label#]" onclick="add_new_item()"><br />
-<br/>
-%items%
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+
+ <h3>%cname% <small> &mdash; <a href="#" style="font-weight:normal;" onclick="jspub_click('category_edit&id=%cid%')">[#catalog_list_category_edit_label#]</a></small></h3>
+ 
+ <fieldset>
+  <label style="width:120px; cursor:default;">[#catalog_list_category_add_item_label#]</label><select name="group_id_for_add" id="group_id_for_add">%group_values%</select>&nbsp;&nbsp;<input type="button" value="[#catalog_list_category_add_item_bt_label#]" onclick="add_new_item()">
+ </fieldset>
+
+ %items%
 
 <!-- @cat_items_empty -->
 [#catalog_list_category_item_list_notitems#]
@@ -43,69 +56,55 @@
          $('#catsdiv').css('display','none');
  }
 </script>
-<br />
-<h3>[#catalog_list_category_item_list_label#]</h3>
+
+<h3 style="margin-top:10px;">[#catalog_list_category_item_list_label#]</h3>
 <form action="%form_action%" method="POST" enctype="multipart/form-data" id="savecategoryitemsform" name="scif">
 <input type="hidden" name="catid" value="%cid%"/>
 <table class="admin_table">
-    <thead>
       <tr>
-        <th width="30"><!--[#catalog_list_category_item_table_num#]--></th>
+        <th width="20"><!--[#catalog_list_category_item_table_num#]--></th>
         %colum_th%
-        <th width="30">[#catalog_list_category_item_table_order_num#]</th>
+        <th width="20">[#catalog_list_category_item_table_order_num#]</th>
         <th>[#catalog_items_all_list_table_group#]</th>
         <th>[#catalog_list_category_item_table_action#]</th>
       </tr>
-    </thead>
-    <tbody>
-
     %cat_items_line%
-    <tr class="admin_table_wstring">
-    	<td colspan="%numcolspan%" align="right"><input type="submit" name="saveorder" value="[#catalog_list_category_item_table_action_change_sord#]"></td>
-        <td>&nbsp;</td>
-    </tr>
-    </tbody>
-  </table>
-<br />
+</table>
+
+<fieldset style="text-align:center;">
+ <input type="submit" name="saveorder" value="[#catalog_list_category_item_table_action_change_sord#]">
+</fieldset>
+
 %pages%
 
-<br />
-<a href="#" onclick="checkall();return false;">[#catalog_list_category_item_table_check_all#]</a>&nbsp;&nbsp;
-<a href="#" onclick="uncheckall();return false;">[#catalog_list_category_item_table_uncheck_all#]</a>
-<br/>
-[#catalog_list_category_item_table_action_selected#] <br/>
-<table class="admin_table">
-    <tbody>
-      <tr class="admin_table_wstring">
-        <td><select name="withselected" id="withselected" onChange="selectChange()">
-            <option value="">[#catalog_list_category_item_table_action_selected0#]</option>
-            <option value="remove_from_current">[#catalog_list_category_item_table_action_selected1#]</option>
-            <option value="move2">[#catalog_list_category_item_table_action_selected2#]</option>
-            <option value="delete_selected">[#catalog_list_category_item_table_action_selected3#]</option>
-          </select></td>
-        <td><div id="catsdiv" style="display:none;">
-            <select name="cats">
-              %cats_options%
-            </select>
-          </div>
-        </td>
-        <td>
-            <input type="submit" name="saveselected" value="[#catalog_list_category_item_table_action_run#]">
-            <input type="submit" name="change_items" value="Сохранить поля">
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<fieldset style="border-top:1px solid #ededed; padding-top:10px;">
+ <button class="checkallbtn"onclick="checkall();return false;">[#catalog_list_category_item_table_check_all#]</button>&nbsp;&nbsp;<button onclick="uncheckall();return false;">[#catalog_list_category_item_table_uncheck_all#]</button>
+</fieldset>
+
+<fieldset style="border-top:1px solid #ededed; padding-top:10px;">
+ <label style="width:150px; cursor:default; padding:5px 0 10px 0; float:none;" class="clear">[#catalog_list_category_item_table_action_selected#]</label>
+ <select name="withselected" id="withselected" onChange="selectChange()">
+  <option value="">[#catalog_list_category_item_table_action_selected0#]</option>
+  <option value="remove_from_current">[#catalog_list_category_item_table_action_selected1#]</option>
+  <option value="move2">[#catalog_list_category_item_table_action_selected2#]</option>
+  <option value="delete_selected">[#catalog_list_category_item_table_action_selected3#]</option>
+ </select>
+ <div id="catsdiv" style="display:none; margin-left:5px; float:left;">
+   <select name="cats">
+   %cats_options%
+  </select>
+ </div>
+ 
+ <input type="submit" class="fLeft" style="margin-left:5px;" name="saveselected" value="[#catalog_list_category_item_table_action_run#]">
+ <input type="submit" class="fLeft" style="margin-left:5px;" name="change_items" value="Сохранить поля">
+</fieldset>
 </form>
-
-</div></div></div>
-
 
 <!-- @cat_items_line -->
 <tr>
   <td align="center"><input type="checkbox" name="icb[%item_id%]"></td>
   %colum_td%
-  <td><input type="text" name="iorder[%item_id%]" value="%item_order%" style="width:50px;"></td>
+  <td width="20"><input type="text" name="iorder[%item_id%]" value="%item_order%" style="float:none; margin:0 auto; text-align:center; width:25px;"></td>
   <td>%group_name%</td>
   <td align="center" valign="middle"  nowrap>
       <a href="#" onclick="jspub_click('item_clone&id=%item_id%')" title="клонировать"><img src="/admin/templates/default/images/eye_old.gif" alt="клонировать"/></a>
@@ -118,13 +117,14 @@
 <!-- @cat_option -->
 <option value="%cat_id%">%cat_name%</option>
 <!-- @cat_shift -->
--
+&rarr;
 <!-- @group_value -->
 <option value="%group_id%" %gselected%>%group_name%</option>
 
 
-
-
+ </div>
+</div>
+</div>
 
 
 <!-- @pages -->
@@ -158,6 +158,3 @@
 &nbsp;-&nbsp;
 
 <!-- @page_null -->
-
-
-

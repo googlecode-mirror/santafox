@@ -1,5 +1,12 @@
 <!--@form -->
-<script language="javascript">
+<script type="text/javascript">
+ $("input:submit, input:button, button").button();
+ 
+ $('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+
 	function confirm_need_add_big_water(btn)
 	{
 		if (btn == 'no')
@@ -8,85 +15,87 @@
 			$('#need_add_big_water').val('1');
 	}
 </script>
-<h3>[#catalog_item_edit_mainlabel#]</h3>
-<br />
-<form action="%form_action%" method="POST" enctype="multipart/form-data" id="saveitemform" onsubmit="form_submit_include_content_auto()">
-<input type="hidden" name="id" value="%id%">
-<input type="hidden" name="group_id" value="%group_id%">
-<table><tr valign="top"><td>
-    <table class="admin_table">
-        <thead>
-            <th>[#catalog_item_edit_table_nameprop_label#]</th>
-            <th>[#catalog_item_edit_table_value_label#]</th>
-        </thead>
-        <tbody>
-        <tr>
-            <td align="right">id:</td>
-            <td>%id%</td>
-        </tr>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ <h3>[#catalog_item_edit_mainlabel#]</h3>
+ 
+ <form action="%form_action%" method="POST" enctype="multipart/form-data" id="saveitemform" onsubmit="form_submit_include_content_auto()">
+ <input type="hidden" name="id" value="%id%">
+ <input type="hidden" name="group_id" value="%group_id%">
 
-        <tr>
-            <td align="right"></td>
-            <td><input id="item_avaible" type="checkbox" name="available" %isavalchecked%>&nbsp;<label for="item_avaible"><b>[#catalog_item_edit_available_label#]</b></label></td>
-        </tr>
-        <tr>
-            <td align="right">[#catalog_items_group_name_label#]</td>
-            <td>%group.name%</td>
-        </tr>
-        %props%
-        <tr class="admin_table_wstring">
-            <td>&nbsp;</td>
-            <td align="left">
-                <!--<input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('saveitemform','/admin/index.php?action=set_left_menu&leftmenu=item_save')">-->
-
-                <input type="submit" name="submit" value="[#catalog_item_edit_bt_save_label#]">
-
-
-
-
-
-            </td>
-        </tr>
-
-
-        </tbody>
+ <table class="container">
+  <tr>
+   <th width="120">[#catalog_item_edit_table_nameprop_label#]</th>
+   <th>[#catalog_item_edit_table_value_label#]</th>
+   <th width="150">[#catalog_item_edit_incategories_label#]</th>
+  </tr>
+  <tr>
+   <td colspan="2" valign="top" style="padding:0; margin:0; border:0;">
+    <table class="admin_table" style="margin:0; font-size:11px;">
+     <tr>
+      <td width="120" style="text-align:left;" valign="top"><b>ID:</b></td>
+      <td><b>%id%</b></td>
+     </tr>
+     
+     <tr>
+      <td colspan="2" valign="middle">
+       <span class="block clear"><input id="item_avaible" type="checkbox" name="available" %isavalchecked%><label for="item_avaible" style="float:none; margin-left:5px; display:inline;">[#catalog_item_edit_available_label#]</label></span>
+      </td>
+     </tr>
+     
+     <tr>
+      <td width="120" style="text-align:left;" valign="top">[#catalog_items_group_name_label#]</td>
+      <td>%group.name%</td>
+     </tr>
+     
+     %props%
+     
     </table>
-</td>
-	<td align="left">
-        <div style="width: 200px;">
-        <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-            <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-            <h3>[#catalog_item_edit_incategories_label#]</h3>
-            %categories%
-            </div></div></div>
-        <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
-        </div>
-	</td>
-   </tr>
-</table>
-</form>
-
-
-%linked%
+   </td>
+   
+   <td width="150" valign="top">
+    <div class="incat block clear" style="width:90%; margin:0 auto;">
+     %categories%
+    </div>
+   </td>
+  </tr>
+ </table>
+ 
+ <fieldset class="page_submit_field">
+  <!--<input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('saveitemform','/admin/index.php?action=set_left_menu&leftmenu=item_save')">-->
+  <input type="submit" name="submit" value="[#catalog_item_edit_bt_save_label#]">
+ </fieldset>
+ 
+ </form>
+  
+  %linked%
+ 
+ </div>
+</div>
+</div>
 
 <!-- @linked -->
-
-<table class="admin_table">
-<tbody>
-    <tr>
-        <td align="right">[#catalog_add_linked_item_label#]</td>
-        <td>
-         <form action="" method="POST" id="addlinkedform">
-         	<input type="hidden" name="itemid" value="%id%">
-         	<select name="addlinkedid">%addlinked%</select>
-         	<input type="button" name="addlink" value="[#catalog_add_linked_item_button_label#]" onclick="jspub_form_submit('addlinkedform','/admin/index.php?action=set_left_menu&leftmenu=add_linked_item')">
-         </form>
-        </td>
-    </tr>
-    <tr><td colspan="2"><b>[#catalog_linked_items_list_label#]:</b></td></tr>
-    %linked_items%
-</tbody>
-</table>
+ <fieldset style="border-top:1px solid #ededed; padding:10px 0;">
+  <form action="" method="POST" id="addlinkedform">
+  <input type="hidden" name="itemid" value="%id%">
+  
+  <span class="block clear">
+   <label style="width:170px;">[#catalog_add_linked_item_label#]</label>
+   <select name="addlinkedid">%addlinked%</select>
+   <input type="button" name="addlink" style="margin-left:10px;" value="[#catalog_add_linked_item_button_label#]" onclick="jspub_form_submit('addlinkedform','/admin/index.php?action=set_left_menu&leftmenu=add_linked_item')">
+  </span>
+ </form>
+ </fieldset>
+ 
+ <table class="admin_table">
+  <tr>
+   <th colspan=>[#catalog_linked_items_list_label#]</th>
+  </tr>
+  
+  %linked_items%
+ </table>
 
 <!-- @linked_item -->
 <tr><td colspan="2"><a href="#" onclick="form_submit_include_content_auto();jspub_click('item_edit&id=%lid%')">%namestring%</a><a href="#" onclick="form_submit_include_content_auto();jspub_click('item_edit&id=%id%&removlinkedid=%lid%')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_remove_linked_item_label#]"/></a></td></tr>
@@ -96,83 +105,82 @@
 
 <!-- @prop_string -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
-            <td><input type="text" name="%prop_name_db%" value="%prop_value%" style="width:100%"></td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
+            <td><input type="text" name="%prop_name_db%" value="%prop_value%" style="width:95%; margin:0 auto;"></td>
         </tr>
 
 <!-- @prop_date -->
-
-
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
-            <td><input type="text" name="%prop_name_db%" id='dp%prop_name_db%' value="%prop_value%" /></td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
+            <td><input type="text" name="%prop_name_db%" id='dp%prop_name_db%' value="%prop_value%" style="width:95%; margin:0 auto;"></td>
         </tr>
 
 <script type='text/javascript'>
-
 $(function() {
-    $( "#dp%prop_name_db%" ).datepicker({
-            dateFormat:"dd.mm.yy"
-    }
-   );
+   $( "#dp%prop_name_db%" ).datepicker({
+      dateFormat:"dd.mm.yy"
+   });
 });
-
-
 </script>
 
 <!-- @prop_number -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
-            <td><input type="text" name="%prop_name_db%" value="%prop_value%" size="25"></td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
+            <td><input type="text" name="%prop_name_db%" value="%prop_value%" style="width:95%; margin:0 auto; float:none;"></td>
         </tr>
 
 <!-- @prop_text -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
-            <td><textarea name="%prop_name_db%" style="width: 100%;" rows="4">%prop_value%</textarea></td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
+            <td><textarea name="%prop_name_db%" style="width:95%; height:75px; margin:0 auto;" rows="" cols="">%prop_value%</textarea></td>
         </tr>
 
 <!-- @prop_html -->
-        <tr %class%>
-            <td colspan="2" height="350">%prop_name_full%:<br>%prop_value%</td>
+        <tr style="background:none;">
+         <td colspan="2" style="text-align:left;">
+           <b>%prop_name_full%:</b>
+           <div class="block clear" style="width:98%;">%prop_value%</div>
+         </td>
         </tr>
 
 <!-- @prop_file -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
-            <td><input type="file" name="%prop_name_db%" size="45"></td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
+            <td><input type="file" name="%prop_name_db%" size="30"></td>
         </tr>
 
 <!-- @prop_file_edit -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
             <td><b>%prop_value%</b> <a href="#" onclick="jspub_confirm('item_clear_field&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
         </tr>
 
 <!-- @prop_pict -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
-            <td><input type="file" name="%prop_name_db%" size="45" />%need_add_water_marka%</td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
+            <td><input type="file" name="%prop_name_db%" size="30">%need_add_water_marka%</td>
         </tr>
 
 <!-- @prop_pict_edit -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
             <td><img src="%prop_value%" width="50"><a href="#" onclick="form_submit_include_content_auto();jspub_confirm('item_clear_field&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
         </tr>
 <!-- @prop_pict_marka_source -->
-<br/><input type="checkbox" name="%prop_name_db%_need_add_source_water" id="%prop_name_db%_need_add_source_water" checked="checked"/><label for="%prop_name_db%_need_add_source_water">[#catalog_item_edit_pict_add_mark_for_source#]</label>
+<br><input type="checkbox" name="%prop_name_db%_need_add_source_water" id="%prop_name_db%_need_add_source_water" checked="checked"/><label for="%prop_name_db%_need_add_source_water">[#catalog_item_edit_pict_add_mark_for_source#]</label>
 <!-- @prop_pict_marka_big -->
-<br /><input type="checkbox" name="%prop_name_db%_need_add_big_water" id="%prop_name_db%_need_add_big_water" checked="checked"/><label for="%prop_name_db%_need_add_big_water">[#catalog_item_edit_pict_add_mark_for_big#]</label>
+<br><input type="checkbox" name="%prop_name_db%_need_add_big_water" id="%prop_name_db%_need_add_big_water" checked="checked"/><label for="%prop_name_db%_need_add_big_water">[#catalog_item_edit_pict_add_mark_for_big#]</label>
 <!-- @prop_enum -->
         <tr %class%>
-            <td width="100" align="right" valign="top">%prop_name_full%:</td>
-            <td><select name="%prop_name_db%">%prop_value%</select></td>
+            <td width="120" style="text-align:left;" valign="top">%prop_name_full%:</td>
+            <td><select name="%prop_name_db%" style="width:98%; margin:0 auto; float:none;">%prop_value%</select></td>
         </tr>
 <!-- @prop_enum_value -->
 <option value="%enum_key%" %selected%>%enum_val%</option>
 
 <!-- @category_item -->
-%shift%<input type="checkbox" id="ccb_%id%" name="ccb_%id%" %checked%><label for="ccb_%id%">%catname%</label><br>
+<span class="block clear">
+<span class="block fLeft">%shift%</span><input type="checkbox" id="ccb_%id%" style="float:left;" name="ccb_%id%" %checked%><label for="ccb_%id%" style="width:100px; float:left;">%catname%</label>
+</span>
 
 

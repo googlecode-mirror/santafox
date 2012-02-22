@@ -1,115 +1,135 @@
 <!-- @form_header -->
-<script>
+<script type="text/javascript">
+ $("input:submit, input:button, button").button();
+ 
+ $('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+ 
 	function show_filter_results()
 	{
-        santaUpdateRegion('content',start_interface.global_link + 'test_filter&id=%id%');
+        santaUpdateRegion('filter',start_interface.global_link + 'test_filter&id=%id%');
         return false;
 	}
+ 
+ $('#inner_form_cats ul li ul').css({'display':'none'});
+ $('#inner_form_cats ul li b').css({'cursor':'pointer'});
+ $('#inner_form_cats ul li b').each(function(){
+   $(this).toggle(function(){
+      $(this).parent().find('ul').slideDown();
+   },
+   function (){
+      $(this).parent().find('ul').slideUp();
+   });
+ });
 </script>
+<span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div id="filter" class="content">
+ 
+ <h3>%form_header_txt%</h3>
+ 
+ <form action="%form_action%" method="POST" enctype="multipart/form-data" id="saveinnerfilterform">
+ <input type="hidden" name="id" value="%id%"/>
+ 
+ <div style="width:75%; min-width:400px; max-width:600px; float:left;">
+  <fieldset>
+   <label for="name">[#catalog_edit_inner_filter_name_label#]</label>
+   <input type="text" id="name" name="name" value="%name%">
+  </fieldset>
+  
+  <fieldset>
+   <label for="stringid">[#catalog_edit_inner_filter_stringid_label#]</label>
+   <input type="text" id="stringid" name="stringid" value="%stringid%">
+  </fieldset>
+  
+  <fieldset>
+   <label for="query">[#catalog_edit_inner_filter_query_label#]</label>
+   <textarea name="query" id="query" style="width:272px; height:75px;" cols="" rows="">%query%</textarea>
+   
+   <div class="block clear" style="text-align:center; border-top:1px solid #ededed; border-bottom:1px solid #ededed; margin:5px auto; padding:5px;">
+    <a href="#" onClick="$('#sqlquery').toggle(); return false;">[#catalog_edit_inner_filter_showsql_label#]</a>
+    
+    <div id="sqlquery" style="display:none;">
+     <fieldset>
+      <small>%sql%</small>
+     </fieldset>
+    </div>
+    
+   </div>
+   
+  </fieldset>
+  
+  <fieldset>
+   <label>[#catalog_edit_inner_filter_template_label#]</label>
+   <select name="template">
+    %template%
+   </select>
+  </fieldset>
+  
+  <fieldset>
+   <label for="limit">[#catalog_edit_inner_filter_limit_label#]</label>
+   <input type="text" id="limit" name="limit" value="%limit%">
+  </fieldset>
+  
+  <fieldset>
+   <label for="perpage">[#catalog_edit_inner_filter_perpage_label#]</label>
+   <input type="text" id="perpage" name="perpage" value="%perpage%">
+  </fieldset>
+  
+  <fieldset>
+   <label for="maxpages">[#catalog_edit_inner_filter_maxpages_label#]</label>
+   <input type="text" id="maxpages" name="maxpages" value="%maxpages%">
+  </fieldset>
+  
+  <fieldset>
+   <label>[#catalog_edit_inner_filter_groupid_label#]</label>
+   <select name="groupid">
+    <option value="0">[#catalog_filter_all_groups#]</option>
+    %groupselectlist%
+   </select>
+  </fieldset>
+  
+  <fieldset>
+   <label for="ppv_target">[#catalog_edit_inner_filter_targetpage_label#]</label>
+   <input type="text" style="width:150px;" name="properties[%name%]" value="%targetpage%" id="ppv_target" onClick="get_properes_page(event, 'ppv_target')">
+  </fieldset>
+  
+  <fieldset>
+   <label>[#catalog_edit_inner_filter_categories_label#]</label>
+   <select name="cattype">
+    <option value="all" %cattype_all% onClick="document.getElementById('selectedcats').style.display='none';">[#catalog_edit_inner_filter_all_categories_label#]</option>
+    <option value="current" %cattype_current% onClick="document.getElementById('selectedcats').style.display='none';"> [#catalog_edit_inner_filter_current_category_label#]</option>
+    <option value="selected" %cattype_selected% onClick="document.getElementById('selectedcats').style.display='block';">[#catalog_edit_inner_filter_selected_categories_label#]</option>
+   </select>
+   
+   <div id="selectedcats" style="display:%selectedcats_display%">%categories%</div>
+  </fieldset>
+  
+  <fieldset style="text-align:center;">
+  <a href="#" onclick="return show_filter_results()">[#catalog_inner_filter_test#]</a>
+  </fieldset>
+  
+  <fieldset class="page_submit_field">
+   <input type="button" name="submit"  value="[#catalog_edit_inner_filter_action_save#]" onclick="jspub_form_submit('saveinnerfilterform','%form_action%')">
+  </fieldset>
+  
+ </div>
+ 
+ <div id="inner_form_cats" style="width:25%; float:left;">
+  %groups_props%
+ </div>
 
-<div style="width: 100%;">
-<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-<form action="%form_action%" method="POST" enctype="multipart/form-data" id="saveinnerfilterform">
-<input type="hidden" name="id" value="%id%"/>
-
-<table border="0" cellpadding="3" cellspacing="3" width="100%">
-
-    <tbody>
-        <tr>
-            <td colspan="3" align="center"><h2>%form_header_txt%</h2></td>
-
-        <tr>
-            <td width="10%" align="right" valign="top">[#catalog_edit_inner_filter_name_label#]</td>
-            <td valign="top" width="55%"><input type="text" name="name" value="%name%" style="width: 100%;"></td>
-            <td valign="top" width="35%" rowspan="11">%groups_props%</td>
-        </tr>
-        <tr>
-            <td align="right" valign="top">[#catalog_edit_inner_filter_stringid_label#]</td>
-            <td valign="top"><input type="text" name="stringid" value="%stringid%" style="width: 100%;"></td>
-        </tr>
-        <tr>
-            <td align="right" valign="top">[#catalog_edit_inner_filter_query_label#]</td>
-            <td valign="top">
-              <textarea style="width:100%" name="query" cols=20 rows=5>%query%</textarea>
-                <a href="#" onClick="$('#sqlquery').toggle(); return false;">[#catalog_edit_inner_filter_showsql_label#]</a>
-                <div id="sqlquery" style="display:none;">
-                  <FIELDSET>
-                  <small>%sql%</small>
-                  </FIELDSET>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td align="right" valign="top">[#catalog_edit_inner_filter_template_label#]</td>
-            <td valign="top"><select style="width:100%" name="template">%template%</select></td>
-        </tr>
-
-        <tr>
-            <td colspan="2" align="center" width="100%">
-
-            <table width="100%">
-            <tr>
-                <td width="33%" align="right" valign="top">[#catalog_edit_inner_filter_limit_label#]</td>
-                <td valign="top"><input type="text" name="limit" value="%limit%" size="3"></td>
-            </tr>
-            <tr>
-                <td align="right" valign="top">[#catalog_edit_inner_filter_perpage_label#]</td>
-                <td valign="top"><input type="text" name="perpage" value="%perpage%" size="3"></td>
-            </tr>
-            <tr>
-                <td align="right" valign="top">[#catalog_edit_inner_filter_maxpages_label#]</td>
-                <td valign="top"><input type="text" name="maxpages" value="%maxpages%" size="3"></td>
-            </tr>
-            </table>
-
-	    </td>
-        <tr>
-        <tr>
-            <td align="right" valign="top">[#catalog_edit_inner_filter_groupid_label#]</td>
-            <td valign="top">
-                <select name="groupid">
-                    <option value="0">[#catalog_filter_all_groups#]</option>
-                    %groupselectlist%
-                </select>
-            </td>
-        </tr>
-
-        <tr>
-            <td align="right" valign="top">[#catalog_edit_inner_filter_targetpage_label#]</td>
-            <td valign="top" id="lrp_target"><input type="text" style="width:150px;" name="properties[%name%]" value="%targetpage%" id="ppv_target" onClick="get_properes_page(event, 'ppv_target')"></td>
-        </tr>
-
-        <tr>
-            <td align="right" valign="top">[#catalog_edit_inner_filter_categories_label#]</td>
-            <td valign="top">
-              <select name="cattype">
-              <option value="all" %cattype_all% onClick="document.getElementById('selectedcats').style.display='none';">[#catalog_edit_inner_filter_all_categories_label#]</option>
-              <option value="current" %cattype_current% onClick="document.getElementById('selectedcats').style.display='none';"> [#catalog_edit_inner_filter_current_category_label#]</option>
-              <option value="selected" %cattype_selected% onClick="document.getElementById('selectedcats').style.display='block';">[#catalog_edit_inner_filter_selected_categories_label#]</option>
-              </select>
-              <div id="selectedcats" style="display:%selectedcats_display%">%categories%</div>
-            </td>
-        </tr>
-
-
-        <tr>
-            <td colspan="2" align="center"><a href="#" onclick="return show_filter_results()">[#catalog_inner_filter_test#]</a><br></td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center"><input type="button" name="submit"  value="[#catalog_edit_inner_filter_action_save#]" onclick="jspub_form_submit('saveinnerfilterform','%form_action%')"></td>
-        </tr>
-    </tbody>
-</table>
 </form>
-</div></div></div>
-<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+ </div>
+ </div>
 </div>
 
 
 <!-- @group_option_for_select -->
 <option value="%id%" %sel%>%name%</option>
-
 
 <!-- @option_for_select -->
 <option value="%key%" %sel%>%name%</option>

@@ -248,51 +248,6 @@ div.content h4 {
 
 .act_btn_holder { margin-top:15px; display:block; text-align:center; }
 
-table.admin_table {
-	width:100%;
-	border-collapse:collapse;
-	font-size:0.9em;
-	margin: 10px 0;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-}
-
-table.admin_table td a { color:#000; text-decoration:none; }
-table.admin_table td a:hover { color:#00ADDB; text-decoration:underline; }
-
-table.admin_table th a.sort { color:#fff; text-decoration:underline; }
-table.admin_table th a.sort:hover { color:#fff; text-decoration:none; }
-
-table.admin_table th.first { border-top-left-radius:5px; }
-table.admin_table th.last { border-top-right-radius:6px; }
-table.admin_table tr:last-child { border-bottom-right-radius:10px; border-bottom-left-radius:9px; }
-
-table.admin_table th {
-	background:#00ADDB;
-	font-size:11px; font-weight:bold;
-	padding:4px 5px; margin-bottom:1px;
-	color: #fff;
-	text-align:center;
-	border-right:2px solid #fff; border-bottom:2px solid #fff;
-	-webkit-border-radius: 6px;
-	-moz-border-radius: 6px;
-	border-radius: 6px;
-}
-
-table.admin_table tr { background:#f5f5f5; }
-table.admin_table tr:hover { background:#fefefe; }
-
-
-table.admin_table td {
-	text-align:center;
-	border-right:2px solid #ffffff; border-bottom:2px solid #fff;
-	padding:3px 5px;
-}
-
-table.admin_table td input { float:none; width:auto; margin:0; }
-table.admin_table td label { float:none; width:auto; margin:0; }
-
 div.left {
 	width:49%;
 	display:block;
@@ -480,13 +435,11 @@ div.content input[disabled='disabled']:hover, div.content select[disabled='disab
 
 select {
 	width:282px;
-	height:22px;
 	float:left;
 }
 
 div.content select {
 	width:282px;
-	height:22px;
 }
 
 #modules_toolbar select { width:auto; }
@@ -528,3 +481,78 @@ a.text_editor_button, a.html_editor_button  { width:24px; height:24px; outline:n
 a.text_editor_button { margin:2px 0 0 10px; background:url('../images/editor_button_ics.png') no-repeat 0 0; }
 a.html_editor_button { margin:2px 0 0 5px; background:url('../images/editor_button_ics.png') no-repeat -24px 0; }
 
+
+/* admin table */
+table.admin_table {
+	width:100%;
+	border-collapse:collapse;
+	font-size:0.9em;
+	margin: 10px 0;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+table.admin_table td a { color:#000; text-decoration:none; }
+table.admin_table td a:hover { color:#00ADDB; }
+
+
+table.admin_table th a.sort { color:#fff; text-decoration:underline; }
+table.admin_table th a.sort:hover { color:#fff; text-decoration:none; }
+
+table.admin_table th.first { border-top-left-radius:5px; }
+table.admin_table th.last { border-top-right-radius:6px; }
+table.admin_table tr:last-child { border-bottom-right-radius:10px; border-bottom-left-radius:9px; }
+
+table.admin_table th {
+	background:#00ADDB;
+	font-size:11px; font-weight:bold;
+	padding:4px 5px; margin-bottom:1px;
+	color: #fff;
+	text-align:center;
+	border-right:2px solid #fff; border-bottom:2px solid #fff;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+}
+
+
+.admin_table tr { background-color:#f5f5f5; }
+.admin_table tr:hover { background-color:#fefefe; }
+.admin_table table.cke_editor tr, .admin_table table.cke_editor tr:hover { background-color:none; }
+.cke_editor tr:hover { background-color:none; }
+
+table.admin_table td {
+	text-align:center;
+	border-right:2px solid #ffffff; border-bottom:2px solid #fff;
+	padding:3px 5px;
+}
+
+table.admin_table input { float:none; width:auto; margin:0; }
+table.admin_table label { float:none; width:auto; margin:0; }
+
+table.container {
+	width:100%;
+	border-collapse:collapse;
+	font-size:0.9em;
+	margin: 10px 0;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+table.container th {
+	background:#00ADDB;
+	font-size:11px; font-weight:bold;
+	padding:4px 5px; margin-bottom:1px;
+	color: #fff;
+	text-align:center;
+	border-right:2px solid #fff; border-bottom:2px solid #fff;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+}
+
+/* some modules styles */
+#inner_form_cats ul { margin:5px 10px; padding-left:10px; }
+#inner_form_cats ul li ul { margin:5px 10px; padding-left:10px; }

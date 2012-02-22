@@ -1,7 +1,16 @@
-<form method="post" action="/admin/index.php?action=set_left_menu&leftmenu=show_items" id="searchform">
-<table class="admin_table" width="80%">
 
-<input type="hidden" name="group_id" value="2"><tr><td>Название: </td><td><input type="text" name="name1" value=""></td></tr>
-<tr><td colspan="2"><input type="submit" name="search" value="Искать"></td></tr>
-</table>
+<form method="post" action="/admin/index.php?action=set_left_menu&leftmenu=show_items" id="searchform">
+<input type="hidden" name="group_id" value="2">
+
+
+<fieldset>
+ <label>Название:</label>
+ <input type="text" name="name1" value="">
+</fieldset>
+
+
+
+<fieldset class="page_submit_field">
+ <input type="submit" name="search" value="Искать">
+</fieldset>
 </form>

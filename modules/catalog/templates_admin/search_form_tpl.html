@@ -1,44 +1,62 @@
 <!-- @header -->
- 
 <form method="post" action="%search_form_action%" id="searchform">
-<table class="admin_table" width="80%">
-
 <input type="hidden" name="group_id" value="%groupid%">
+
 <!-- @checkbox -->
-<tr><td>%prop_full_name%</td><td>%checkboxs%</td></tr>
+<fieldset>
+ <label>%prop_full_name%</label>
+ %checkboxs%
+</fieldset>
+
 <!-- @checkboxs -->
-<input type="checkbox" name="%prop_db_name%[]" value="%valuekey%">%value%<br>
+<input type="checkbox" name="%prop_db_name%[]" value="%valuekey%">%value%
 
 <!-- @radio -->
-<tr><td>%prop_full_name%</td><td>%radios%</td></tr>
+<fieldset>
+ <label>%prop_full_name%</label>
+ %radios%
+</fieldset>
 <!-- @radios -->
-<input type="radio" name="%prop_db_name%" value="%valuekey%"> %value%<br>
+<input type="radio" name="%prop_db_name%" value="%valuekey%"> %value%
 
 <!-- @select -->
-<tr><td>%prop_full_name%:</td><td><select name="%prop_db_name%">%selects%</select></td></tr>
+<fieldset>
+ <label>%prop_full_name%:</label>
+ <select name="%prop_db_name%">
+  %selects%
+ </select>
+</fieldset>
 <!-- @selects -->
 <option value="%valuekey%">%value%</option>
 
-
 <!-- @diapazon -->
-<tr><td>%prop_full_name%</td><td> от %diapazons_from% до %diapazons_to%</td></tr>
+<fieldset>
+ <label>%prop_full_name%</label>
+ <span class="block fLeft">
+  от %diapazons_from% до %diapazons_to%
+ </span>
+</fieldset>
+<tr><td></td><td> </td></tr>
 <!-- @diapazons_from -->
-<input type="text" name="%prop_db_name%_from" value="" size="5">
+<input type="text" name="%prop_db_name%_from" style="width:130px;" value="">
 <!-- @diapazons_to -->
-<input type="text" name="%prop_db_name%_to" value="" size="5">
+<input type="text" name="%prop_db_name%_to" style="width:130px;" value="">
 
 
 
 <!-- @numberinput -->
-<tr><td>%prop_full_name%:</td><td> <input type="text" name="%prop_db_name%" value="" size="5"></td></tr>
+<fieldset>
+ <label>%prop_full_name%:</label>
+ <input type="text" name="%prop_db_name%" value="">
+</fieldset>
 <!-- @textinput -->
-<tr><td>%prop_full_name%: </td><td><input type="text" name="%prop_db_name%" value=""></td></tr>
-
+<fieldset>
+ <label>%prop_full_name%:</label>
+ <input type="text" name="%prop_db_name%" value="">
+</fieldset>
 
 <!-- @footer -->
-<tr><td colspan="2"><input type="submit" name="search" value="Искать"></td></tr>
-</table>
+<fieldset class="page_submit_field">
+ <input type="submit" name="search" value="Искать">
+</fieldset>
 </form>
- </div>
- </div>
-</div>

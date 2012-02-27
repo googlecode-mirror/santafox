@@ -3256,21 +3256,30 @@ class catalog extends basemodule
             switch ($kernel->pub_httppost_get("withselected"))
             {
             	case "remove_from_current":
-            	    $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND '.
-            	    '`item_id` IN ('.implode(',',$itemids).')';
-            	    $kernel->runSQL($query);
+                    if (count($itemids))
+                    {
+                        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
+                        $kernel->runSQL($query);
+                    }
             	    break;
             	case "move2":
             	    $moveid = intval($kernel->pub_httppost_get("cats"));
             	    if ($moveid > 0)
             	    {
+                        if (count($itemids))
+                        {
+                            $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
+                            $kernel->runSQL($query);
+                        }
+
             	        foreach ($itemids as $itemid)
             	        {
-            	            $order = $this->get_next_order_in_cat($moveid);
-            	            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` '.
-            	            		 'SET `cat_id`='.$moveid.', `order`='.$order.' '.
-            	            		 'WHERE `item_id`='.$itemid.' AND `cat_id`='.$catid;
-            	            $kernel->runSQL($query);
+                            $order = $this->get_next_order_in_cat($moveid);
+               	            $query = 'REPLACE INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat`
+               	                    (`cat_id`,`order`,`item_id`)
+               	                    VALUES
+               	                    ("'.$moveid.'","'.$order.'","'.$itemid.'")';
+               	            $kernel->runSQL($query);
             	        }
             	    }
             	    break;

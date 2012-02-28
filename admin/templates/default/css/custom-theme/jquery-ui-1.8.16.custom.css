@@ -598,6 +598,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .wrap ul.ui-selectmenu-menu li a { text-decoration: underline !important; }
 
 .ui-selectmenu { background:url('../../images/input-bg.gif') repeat-x left center; margin-top:0px; display: block; display: inline-block; position: relative; height: 2.2em; vertical-align: middle; text-decoration: none; overflow: hidden; zoom: 1; float:left; border-radius:4px; }
+table .ui-selectmenu { height:2.5em; }
 .ui-selectmenu:hover { border-color:#2595C9; }
 .ui-selectmenu-icon { position:absolute; right:6px; margin-top:-8px; top: 50%; }
 .ui-selectmenu-menu { padding:0; margin:0; position:absolute; top: 0; display: none; z-index: 1005; -webkit-box-shadow: #b2b2b2 0px 0px 8px; -moz-box-shadow: #b2b2b2 0px 0px 8px; box-shadow: #b2b2b2 0px 0px 8px; border-radius:6px; } /* z-index: 1005 to make selectmenu work with dialog */
@@ -607,14 +608,14 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-selectmenu-menu li a:hover { text-decoration:none; }
 .ui-selectmenu-menu li { background:none; padding:0; margin:0; display: block; border-top: 1px dotted transparent; border-bottom: 1px dotted transparent; border-right-width: 0 !important; border-left-width: 0 !important; font-weight: normal !important; }
 .ui-selectmenu-menu li a, .ui-selectmenu-status {line-height: 1.4em; display: block; padding: .405em 2.1em .405em 1em; outline:none; text-decoration:none;}
-.ui-selectmenu-status { background:url('../../images/input-bg.gif') repeat-x left center; }
 .ui-selectmenu-menu li:hover { border-top:1px solid #ccc; border-bottom:1px solid #ccc; }
 .ui-selectmenu-menu li.ui-state-disabled a, .ui-state-disabled { cursor: default; opacity:.5; }
 .ui-selectmenu-menu li.ui-state-disabled a, .ui-state-disabled:hover { border:1px solid #ccc; }
 .ui-selectmenu-menu li.ui-selectmenu-hasIcon a,
 .ui-selectmenu-hasIcon .ui-selectmenu-status { background:url('../../images/input-bg.gif') repeat-x left center; padding-left: 20px; position: relative; margin-left: 5px; }
 .ui-selectmenu-menu li .ui-icon, .ui-selectmenu-status .ui-icon { position: absolute; top: 1em; margin-top: -8px; left: 0; }
-.ui-selectmenu-status { line-height: 1.4em; color:#666; text-decoration:none;   }
+.ui-state-default .ui-selectmenu-status { background:url('../../images/input-bg.gif') repeat-x left center; line-height: 1.4em; color:#666; text-decoration:none;   }
+.ui-state-active .ui-selectmenu-status { background:#00ADDB; color:#fff; }
 .ui-selectmenu-menu li span,.ui-selectmenu-status span { display:block; margin-bottom: .3em; }
 .ui-selectmenu-menu li .ui-selectmenu-item-header { font-weight: bold; }
 .ui-selectmenu-menu li .ui-selectmenu-item-footer { opacity: .8; }

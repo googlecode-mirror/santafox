@@ -1,13 +1,10 @@
 <!-- @form -->
-<div style="width: 680px;">
-<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-
 <script type="text/javascript">
+ $( "input:submit").button();
 
     $(function() {
         $( "#date" ).datepicker({
-                dateFormat:"dd.mm.yy"
+         dateFormat:"dd.mm.yy"
         }
        );
     });
@@ -58,55 +55,60 @@ syncList.prototype._sync = function (firstSelectId, secondSelectId)
 	secondSelect.onchange && secondSelect.onchange();
   };
 </script>
-<form action="%form_action%" method="POST" enctype="multipart/form-data">
-<input type="hidden" name="values[id]" value="%id%"/>
-<input type="hidden" name="values[page_sub_id]" value="%page_sub_id%"/>
-<table border="0">
-    <tbody>
-        <tr>
-            <td width="100" align="right">
-                [#comments_property_date_label#]            </td>
-            <td>
-                <table>
-                    <tr>
-                        <td><input id="date" type="text" name="values[date]" value="%date%" size="12"></td>
-                        <td><nowrap>[#comments_property_time_label#]&nbsp;<input id="time" type="text" name="values[time]" value="%time%" size="10"></nowrap></td>
-                    </tr>
-                </table>
-            </td>
-            <td rowspan="3">
-             <div style="padding: 6px 0;"><input id="mod_comments_1" type="checkbox" name="values[available]" value="1" %available%>&nbsp;<label for="mod_comments_1">[#comments_property_available_label#]</label></div>
-            </td>
-        </tr>
-        <tr>
-            <td width="100" align="right">[#comments_property_author_label#]</td>
-            <td><input type="text" name="values[author]" value="%author%" style="width: 100%;"></td>
-        </tr>
-        <tr>
-            <td width="100" align="right">[#comments_property_txt_label#]</td>
-            <td><textarea name="values[txt]" style="width: 100%;" rows="4">%txt%</textarea></td>
-        </tr>
- %rows%
-        <tr>
-            <td colspan="2" align="right"><input type="submit" name="submit" value="[#comments_submit_label#]" onclick="return submitMyForm();"></td>
-        </tr>
-    </tbody>
-</table>
-</form>
-    </div></div></div>
-<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
+<span class="content_header">Модуль &rarr; <span class="black">[#comments_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+   
+   <h3>Добавить/Редактировать комментарий</h3>
+  
+   <form action="%form_action%" method="POST" enctype="multipart/form-data">
+   <input type="hidden" name="values[id]" value="%id%">
+   <input type="hidden" name="values[page_sub_id]" value="%page_sub_id%">
+   
+   <fieldset>
+    <label for="mod_comments_1">[#comments_property_available_label#]</label>
+    <input id="mod_comments_1" type="checkbox" name="values[available]" value="1" %available%>
+   </fieldset>
+   
+   <fieldset>
+    <label for="date" style="width:150px;">[#comments_property_date_label#]</label>
+    <input id="date" style="width:130px; margin-right:15px;" type="text" name="values[date]" value="%date%">
+    <label for="time" style="width:150px;">[#comments_property_time_label#]</label>
+    <input id="time" type="text" style="width:130px;" name="values[time]" value="%time%">
+   </fieldset>
+   
+   <fieldset>
+    <label style="width:150px;" for="author">[#comments_property_author_label#]</label>
+    <input type="text" style="width:455px;" id="author" name="values[author]" value="%author%">
+   </fieldset>
+   
+   <fieldset>
+    <label for="comment" style="width:150px;">[#comments_property_txt_label#]</label>
+    <textarea id="comment" name="values[txt]" style="width:455px; height:75px;" rows="" cols="">%txt%</textarea>
+   </fieldset>
+   
+   <fieldset>
+    %rows%
+   </fieldset>
+
+   <fieldset class="page_submit_field">
+    <input type="submit" name="submit" value="[#comments_submit_label#]" onclick="return submitMyForm();">
+   </fieldset>
+   </form>
+  </div>
+ </div>
 </div>
+
 <!-- @select -->
-<tr>
-            <td width="100" align="right">[#comments_property_pages_label#]</td>
-            <td>
+<label style="width:150px;">[#comments_property_pages_label#]</label>
 <!-- Первый список (изначально заполнен вручную) -->
-  <select name="values[page_id]" size="4" id="List1" style="width:150px">
+  <select name="values[page_id]" style="width:230px; margin-right:10px;" size="4" id="List1">
   %select_page%
   </select>
 
 <!-- Подчиненный список (изначально пуст) -->
-  <select name="values[page_sub_id]" size="4" id="List2" style="width:150px"></select>
+<select name="values[page_sub_id]" size="4" id="List2" style="width:226px"></select>
 <script type="text/javascript">
 // Создаем новый объект связанных списков
 var syncList1 = new syncList;
@@ -117,12 +119,8 @@ syncList1.dataList = {
 syncList1.sync("List1","List2");
 </script>
 
-            </td>
-        </tr>
 <!-- @page_info -->
-<tr>
-    <td width="100" align="right">[#comments_property_edit_label#]</td>
-    <td>
-    %page_info%
-    </td>
-</tr>
+<span class="block clear">
+ <label style="width:120px; cursor:default">[#comments_property_edit_label#]</label>
+ <span class="block fLeft">%page_info%gfdgdf</span>
+</span>

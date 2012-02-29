@@ -1,19 +1,29 @@
 <!-- @table_header -->
+<script type="text/javascript">
+ $( "input:submit").button();
+
+ $('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+</script>
+<span class="content_header">Модуль &rarr; <span class="black">[#comments_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+  <h3>Список комментариев</h3>
 <form action="%form_action%" method="POST">
-<table class="admin_table" width="800">
-  <thead>
+<table class="admin_table" style="margin-bottom:10px;">
      <tr>
       <th>&nbsp;</th>
       <th>[#comments_item_number#]</th>
       <th>[#comments_item_pages#]</th>
-      <th><a href="#" onclick="jspub_click('%url_sort_date%')">[#comments_item_date#]&nbsp;%img_sort_date%</a></th>
-      <th><a href="#" onclick="jspub_click('%url_sort_txt%')">[#comments_item_txt#]&nbsp;%img_sort_txt%</a></th>
-      <th><a href="#" onclick="jspub_click('%url_sort_available%')">[#comments_item_available#]&nbsp;%img_sort_available%</a></th>
-      <th><a href="#" onclick="jspub_click('%url_sort_author%')">[#comments_item_author#]&nbsp;%img_sort_author%</a></th>
+      <th><a href="#" class="sort"  onclick="jspub_click('%url_sort_date%')">[#comments_item_date#]&nbsp;%img_sort_date%</a></th>
+      <th><a href="#" class="sort"  onclick="jspub_click('%url_sort_txt%')">[#comments_item_txt#]&nbsp;%img_sort_txt%</a></th>
+      <th><a href="#" class="sort"  onclick="jspub_click('%url_sort_available%')">[#comments_item_available#]&nbsp;%img_sort_available%</a></th>
+      <th><a href="#" class="sort"  onclick="jspub_click('%url_sort_author%')">[#comments_item_author#]&nbsp;%img_sort_author%</a></th>
       <th>[#comments_item_actions#]</th>
     </tr>
-  </thead>
-  <tbody>
 <!-- @img_sort_asc -->
 <img src="/admin/templates/default/images/12-em-up-blue.gif" />
 <!-- @img_sort_desc -->
@@ -24,20 +34,34 @@
             <td>%number%</td>
             <td>%page_id%</td>
             <td>%date%<br />%time%</td>
-            <td>%txt%</td>
-            <td align="center">%available%</td>
+            <td style="text-align:left;">%txt%</td>
+            <td>%available%</td>
             <td>%author%</td>
             <td><a href="#" onclick="jspub_click('%action_edit%&id=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#comments_item_action_edit#]"/></a>&nbsp;<a href="#" onclick="jspub_confirm('%action_remove%&id=%id%', '[#comments_delete_confirm#]')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#comments_item_action_remove#]"/></a></td>
         </tr>
 <!-- @table_footer -->
-
 </table>
-<br/><p>[#comments_actions_with_selected#]&nbsp;<br/>%actions%<input type="submit" name="submit" value="[#comments_show_list_submit#]"/></p><br/>
-<p>%pages%</p>
 
+<h3 style="margin-top:10px;">[#comments_actions_with_selected#]</h3>
+<fieldset>
+%actions%
+<input type="submit" style="margin-left:10px;" name="submit" value="[#comments_show_list_submit#]"/></p><br/>
+</fieldset>
+
+<p>%pages%</p>
 </form>
+</div>
+</div>
+</div>
 <!-- @no_data -->
-Нет данных для отображения
+<span class="content_header">Модуль &rarr; <span class="black">[#comments_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+   Нет данных для отображения
+  </div>
+ </div>
+</div>
 <!-- @on -->
 <img src="/admin/templates/default/images/24-em-check.gif" alt=""/>
 <!-- @off -->

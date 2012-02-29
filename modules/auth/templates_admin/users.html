@@ -1,78 +1,99 @@
 <!-- @form_user -->
-<form action="" method="POST" id="edit_user">
-<div id="sel_group" style="position:absolute; display:none;"></div>
-  <table cellpadding="5" cellspacing="1" border="0" class="admin_table">
-    <tr>
-      <th colspan="2">[#auth_users_edit_user_label1#]</th>
-	</tr>
-    <tr>
-      <td>[#auth_users_edit_user_label2#]</td>
-      <td><table border="0" cellpadding="0" cellspacing="0" width="100%">
-          <tr>
-            <td><input type="text" name="login" value="%login%" class="text" style="width:100%"></td>
-            <td width="10">&nbsp;&nbsp;[#auth_users_edit_user_label7#]&nbsp;%date%</td>
-          </tr>
-        </table></td>
-    </tr>
-    <tr class="admin_table_string">
-      <td>[#auth_users_edit_user_label3#]</td>
-      <td><input type="text" name="name" value="%name%" class="text" style="width:100%"></td>
-    </tr>
-    <tr>
-      <td>[#auth_users_edit_user_label4#]</td>
-      <td><input type="password" name="password" value="%password%" class="text">
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        [#auth_users_edit_user_label5#]&nbsp;&nbsp;
-        <input type="password" name="re_password" value="%password%"  class="text">
-      </td>
-    </tr>
-    <tr class="admin_table_string">
-      <td>[#auth_users_edit_user_label6#]</td>
-      <td><input type="text" name="email" value="%email%" class="text" style="width:100%"></td>
-    </tr>
-    <tr>
-      <td><label for="verified" style="cursor:pointer;">[#auth_users_edit_user_label8#]</label></td>
-      <td><input id="verified" type="checkbox" name="verified" %v_checked%></td>
-    </tr>
-    <tr class="admin_table_string">
-      <td><label for="enabled" style="cursor:pointer;">[#auth_users_edit_user_label9#]</label></td>
-      <td><input id="enabled" type="checkbox" name="enabled" %e_checked%></td>
-    </tr>
-    <tr>
-      <th colspan="2">[#auth_users_edit_user_label10#]</th>
-    <tr>
-	%str_fields%
-    <tr>
-      <th colspan="2">[#auth_user_in_group_label#]</th>
-    <tr>
-    %str_fields_group%
-  <tr class="admin_table_wstring"><td colspan="2" align="right"><input type="button" value="[#auth_users_edit_user_action_save#]" onclick="jspub_form_submit('edit_user','%url%')"></td></tr>
-  </table>
-</form>
+<script type="text/javascript">
+ $("input:button").button();
+</script>
+<span class="content_header">Модуль &rarr; <span class="black">[#auth_modul_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+   <h3>[#auth_users_list_buttom1#] / [#auth_users_list_action1#]</h3>
+   <form action="" method="post" id="edit_user">
+   <div id="sel_group" style="position:absolute; display:none;"></div>
+   
+   <span class="header_block">[#auth_users_edit_user_label1#]</span>
+   <fieldset>
+    <label for="login" style="padding-top:0;">[#auth_users_edit_user_label2#]<br><small style="font-weight:normal;">[#auth_users_edit_user_label7#]&nbsp;%date%</small></label>
+    <input type="text" id="login" name="login" value="%login%">
+   </fieldset>
+   
+   <fieldset>
+    <label for="name">[#auth_users_edit_user_label3#]</label>
+    <input type="text" id="name" name="name" value="%name%">
+   </fieldset>
+   
+   <fieldset>
+    <label for="password">[#auth_users_edit_user_label4#]</label>
+    <input type="password" id="password" name="password" value="%password%">
+   </fieldset>
+   
+   <fieldset>
+    <label for="re_password">[#auth_users_edit_user_label5#]</label>
+    <input type="password" id="re_password" name="re_password" value="%password%">
+   </fieldset>
+   
+   <fieldset>
+    <label for="email">[#auth_users_edit_user_label6#]</label>
+    <input type="text" id="email" name="email" value="%email%" class="text">
+   </fieldset>
+   
+   <fieldset>
+    <label for="verified" style="cursor:pointer;">[#auth_users_edit_user_label8#]</label>
+    <input id="verified" type="checkbox" name="verified" %v_checked%>
+   </fieldset>
+   
+   <fieldset>
+    <label for="enabled" style="cursor:pointer;">[#auth_users_edit_user_label9#]</label>
+    <input id="enabled" type="checkbox" name="enabled" %e_checked%>
+   </fieldset>
+   
+   <span class="header_block">[#auth_users_edit_user_label10#]</span>
+   %str_fields%
+   
+   
+   <span class="header_block">[#auth_user_in_group_label#]</span>
+   %str_fields_group%
+   
+   <fieldset class="page_submit_field">
+    <input type="button" value="[#auth_users_edit_user_action_save#]" onclick="jspub_form_submit('edit_user','%url%')">
+   </fieldset>
+  </form>
+
+</div>
+</div>
+</div>
 
 <!-- @form_line -->
-    <tr %class_str%>
-      <td>%caption%<font size="-4" color="#999999">%only_admin%</font></td>
-      <td><input type="text" name="fields_%id%" value="%value%" class="text" style="width:100%"></td>
+    <fieldset %class_str%>
+      <label for="fields_%id%">%caption% <small style="color:#999; font-weight:normal;">%only_admin%</small></label>
+      <input type="text" id="fields_%id%" name="fields_%id%" value="%value%">
     </tr>
 <!-- @form_line_group -->
-  <tr %class_str%>
-    <td><label for="dirs%id%" style="cursor:pointer;">%name%</label></td>
-    <td><input type="checkbox" name="group_%id%" id="dirs%id%" %checked%></td>
-  </tr>
+  <fieldset %class_str%>
+    <label for="dirs%id%">%name%</label>
+    <input type="checkbox" name="group_%id%" id="dirs%id%" %checked%>
+  </fieldset>
 
 <!-- @begin -->
-<table cellpadding="5" cellspacing="1" border="0" class="admin_table">
-	<tr>
-		<th>[#auth_users_list_label1#]</th>
-		<th><a href="#" onclick="jspub_click('users_list&sortby=login')">[#auth_users_list_label2#]</a></th>
-		<th>[#auth_users_list_label3#]</th>
-		<th><a href="#" onclick="jspub_click('users_list&sortby=email')">[#auth_users_list_label4#]</a></th>
-        <th><a href="#" onclick="jspub_click('users_list&sortby=date')">[#auth_users_list_label8#]</a></th>
-		<th>[#auth_users_list_label5#]</th>
-		<th>[#auth_users_list_label6#]</th>
-		<th>[#auth_users_list_label7#]</th>
-	</tr>
+<script type="text/javascript">
+ $("input:button").button();
+</script>
+<span class="content_header">Модуль &rarr; <span class="black">[#auth_modul_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+  <div class="content">
+  <h3>[#auth_users_list#]</h3>
+  
+   <table class="admin_table">
+      <tr>
+         <th>[#auth_users_list_label1#]</th>
+         <th><a href="#" class="sort" onclick="jspub_click('users_list&sortby=login')">[#auth_users_list_label2#]</a></th>
+         <th>[#auth_users_list_label3#]</th>
+         <th><a href="#" class="sort" onclick="jspub_click('users_list&sortby=email')">[#auth_users_list_label4#]</a></th>
+         <th><a href="#" class="sort" onclick="jspub_click('users_list&sortby=date')">[#auth_users_list_label8#]</a></th>
+         <th>[#auth_users_list_label5#]</th>
+         <th>[#auth_users_list_label6#]</th>
+         <th>[#auth_users_list_label7#]</th>
+      </tr>
 
 <!-- @line -->
 	<tr>
@@ -89,10 +110,17 @@
 	</tr>
 
 <!-- @end -->
-<tr class="admin_table_wstring"><td colspan="7"><input type="button" onclick="jspub_click('user_add')" value="[#auth_users_list_buttom1#]" /></td></tr>
 </table>
+
+<fieldset class="page_submit_field">
+ <input type="button" onclick="jspub_click('user_add')" value="[#auth_users_list_buttom1#]">
+</fieldset>
+
 %pages%
 
+</div>
+</div>
+</div>
 
 
 <!-- @pages -->

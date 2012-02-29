@@ -134,7 +134,7 @@ span.curr_a_sname { width:263px;  padding:5px 0 0 10px; font-size:18px; color:#0
 	top:1px; bottom:1px;
 	height:32px;
 	margin:auto 0;
-	margin-left:273px; margin-right:4px;
+	/* margin-left:273px; */ margin-left:4px; margin-right:4px;
 	z-index:9999;
 	-webkit-border-radius: 6px;
 	-moz-border-radius: 6px;

@@ -352,16 +352,14 @@
         mainLayout.allowOverflow('north');
         $(this).addClass('mod_box_sbtn_active');
         // $('#modules_toolbar').css({'overflow':'visible', 'background':'#ededed', 'marginLeft':'-263px', 'height':'auto', 'paddingBottom':'3px'});
-        $('#modules_toolbar').animate({'overflow':'visible', 'backgroundColor':'#ededed', 'marginLeft':'-269px'}, "slow", function(){
-          $(this).css({'height':'auto', 'min-height':'32px'});
-        });
+        $('#modules_toolbar').css({'overflow':'visible', 'backgroundColor':'#ededed', 'height':'auto', 'min-height':'32px'});
         // $('#modules_toolbar').addClass('mod_toolbar_opened');
 	  },
 	  function (){
         $(this).removeClass('mod_box_sbtn_active');
         mainLayout.resetOverflow('north');
         // $('#modules_toolbar').css({'overflow':'hidden','height':'28px', 'background':'none', 'minHeight':'28px', 'paddingBottom':'0px'});
-        $('#modules_toolbar').animate({'overflow':'hidden','height':'32px', 'background':'none', 'marginLeft':'0px'});
+        $('#modules_toolbar').css({'overflow':'hidden','height':'32px'});
         // $('#modules_toolbar').removeClass('mod_toolbar_opened');
      });
 
@@ -387,7 +385,7 @@
 			</div>
 
    <div class="north-bottom">
-    <span class="curr_a_sname">&ndash; Структура</span>
+    <!--span class="curr_a_sname">&ndash; Структура</span-->
 
     <div id="mod_block">
 			<div id="modules_toolbar"></div>

@@ -340,7 +340,7 @@ class catalog extends basemodule
      *
      * @param string $propname
      * @param string $propval
-     * @return array|false
+     * @return mixed
      */
     private function get_item_by_prop($propname, $propval)
     {
@@ -398,9 +398,11 @@ class catalog extends basemodule
         $main_prop = $this->get_common_main_prop();
 
 
+        $order=0;
         if ($cat_id>0)
             $order = $this->get_next_order_in_cat($cat_id);
 
+        $order4newcat=0;
         if ($cat_id4new>0)
             $order4newcat = $this->get_next_order_in_cat($cat_id4new);
 
@@ -2106,12 +2108,13 @@ class catalog extends basemodule
                         return $this->get_template_block('list_null');
                     }
                     else
-                        return "Нет товаров";//@todo use lang[]
+                        return $kernel->priv_page_textlabels_replace("[#catalog_show_items_list_no_items#]");
                 }
             }
         }
 
         $itemids = array();
+        $groupid=0;
         //проверим, принадлежат ли все товары к одной товарной группе
         //и сохраним id-шники
         $is_single_group = true;
@@ -2128,6 +2131,7 @@ class catalog extends basemodule
                 }
             }
         }
+        $group=false;
         if ($is_single_group)
         {
             $group = $this->get_group($groupid);
@@ -2136,7 +2140,7 @@ class catalog extends basemodule
             else
             {
                 if (empty($group['template_items_list']))
-                    return "У товарной группы не определён шаблон вывода списка товаров";
+                    return $kernel->priv_page_textlabels_replace("[#catalog_no_group_template_list#]");
                 $tpl = CatalogCommons::get_templates_user_prefix().$group['template_items_list'];
             }
 
@@ -4541,18 +4545,9 @@ class catalog extends basemodule
 		{
 		    while ($row = mysql_fetch_assoc($query))
 		    {
-                /*
-		        $array = array(
-                    'text'  => htmlentities($row['name'], ENT_QUOTES, 'utf-8'),
-		            'id'    => $row['id'],
-		            'expanded'   => false,
-		            'allowDelete' => true,
-		            'allowDrop' => true
-                );
-                 */
                  $array = array(
-                    'data'  => htmlentities($row['name'], ENT_QUOTES, 'UTF-8'),
-		           'attr'=>array("id"=>$row['id']),
+                   'data'  => htmlentities($row['name'], ENT_QUOTES, 'UTF-8'),
+		           'attr'=>array("id"=>$row['id'],'rel'=>'default'),
                 );
 
                 $children = $this->get_categories_tree($row['id'], $module_id);
@@ -4563,6 +4558,7 @@ class catalog extends basemodule
                 {
                 	$array['children'] = $children;
                 	$array['leaf'] = false;
+                    $array['attr']['rel'] = "folder";
                 }
 		        $data[] = $array;
 
@@ -5109,13 +5105,14 @@ class catalog extends basemodule
                 //Получили значения для перечечления
                 $enum_vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
                 $enum_options = array();
+                $not_selected_lang_var=$kernel->priv_page_textlabels_replace("[#catalog_prop_type_enum_notselect#]");
                 foreach ($enum_vals as $enum_val)
                 {
                     $enum_templ = $this->get_template_block('prop_enum_value');
                     $repl = "";
                     if ((isset($item[$prop['name_db']])) && ($item[$prop['name_db']] == $enum_val))
                         $repl = ' selected="selected"';
-                    if ($enum_val != "Не выбран") //@todo use lang[]
+                    if ($enum_val != $not_selected_lang_var)
                         $enum_templ = str_replace("%enum_key%", $enum_val  , $enum_templ);
                     else
                         $enum_templ = str_replace("%enum_key%", ""  , $enum_templ);
@@ -5450,6 +5447,7 @@ class catalog extends basemodule
             //Если формируется только общий список свойств
             $html = str_replace('%label_table%', $this->get_template_block('label_table_global'), $html);
             $gvisprops=array();
+            $tinfo_group=array();
         }
         else
         {
@@ -5551,7 +5549,7 @@ class catalog extends basemodule
             $array_select[] = '[#label_properties_no_select_option#]';
 		$exts   = array('html','htm');
 		$d = dir($path);
-		while (false !== ($entry = $d->read()))
+		while ($entry = $d->read())
 		{
 			$link = $path.'/'.$entry;
 			if (is_file($link))
@@ -5780,7 +5778,7 @@ class catalog extends basemodule
         $groups = CatalogCommons::get_groups();
         ///$groupline = $this->get_template_block('group_item');
 
-        $selected_group = false;
+        $selected_group = array();
 
         $groupselectlist = "";
         foreach ($groups as $group)
@@ -6679,33 +6677,15 @@ class catalog extends basemodule
         $tree->set_action_click_node('category_items');
         $tree->set_action_move_node('category_move');
         $tree->set_drag_and_drop(true);
+
         //$tree->set_name_cookie("catalog_structure");
         //$tree->not_click_main = true;
-/*
-        //Теперь сформируем небольшой дорогу, для того, что бы можно
-        //ыбло открыть текущую ноду по её пути
-        $res = array();
-        foreach ($kernel->pub_waysite_get($kernel->pub_page_current_get()) as $value)
-        	$res[] = $value['id'];
-* */
-        /*
-        $node_default = 0;
-        if (isset($_GET['selectcat']))
-            $node_default = $_GET['selectcat'];
-        */
         //$tree->set_node_default($node_default);
 
-
         //Создаём контекстное меню
-        //
         $tree->contextmenu_action_set('[#catalog_category_add_label#]', 'category_add');
 		$tree->contextmenu_delimiter();
         $tree->contextmenu_action_remove('[#catalog_category_remove_label#]', 'category_delete', 0, '[#catalog_category_del_alert#]');
-
-        //$object->set_tree($tree);
-        //$object->set_menu_default('view');
-
-
         return $tree;
     }
 
@@ -7817,8 +7797,6 @@ class catalog extends basemodule
      */
     private function save_import_commerceml_settings($settings)
     {
-        global $kernel;
-        //$kernel->pub_session_set('import_commerceml_settings',$settings);
         $_SESSION['import_commerceml_settings']=serialize($settings);
     }
 
@@ -8471,6 +8449,7 @@ class catalog extends basemodule
                     $sep = ";";
 
                 $need_save = false;
+                $newfilename='';
                 if ($import_from == "textarea")
                 {//через буфер обмена
                     $buffer = trim($kernel->pub_httppost_get("textarea", false));

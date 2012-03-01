@@ -2145,3 +2145,11 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_commerceml_offers_complete
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_commerceml_offers_completed',NULL,'<b>Цены обновлены (%updated%)</b>');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_commerceml_offers_completed',NULL,'<b>Цены обновлены (%updated%)</b>');
 
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_no_group_template_list',NULL,'У товарной группы не определён шаблон вывода списка товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_no_group_template_list',NULL,'У товарной группы не определён шаблон вывода списка товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_no_group_template_list',NULL,'У товарной группы не определён шаблон вывода списка товаров');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_show_items_list_no_items',NULL,'Нет товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_show_items_list_no_items',NULL,'Нет товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_show_items_list_no_items',NULL,'Нет товаров');
+

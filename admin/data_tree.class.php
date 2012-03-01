@@ -24,13 +24,13 @@ class data_tree
      * Если стоит в false, то при нали
      * @var bool
      */
-    var $prioritet_node_and_other_menu = true;
+    private $prioritet_node_and_other_menu = true;
     /**
      * Уникальное имя для сохранения куков о текущем положении пользователя
      *
      * @var string
      */
-    var $name_for_cookie = "tree";
+    private $name_for_cookie = "tree";
 
 	/**
 	 * Действие для загрузки дерева
@@ -39,49 +39,49 @@ class data_tree
 	 * для загрузки дерева
 	 * @var string
 	 */
-	var $action_get_data = '';
+	private $action_get_data = '';
 
 	/**
 	 * ID главной ноды
 	 *
 	 * @var string
 	 */
-    var $root_id = 'index';
+    private $root_id = 'index';
 
     /**
      * Имя главной ноды
      *
      * @var string
      */
-    var $root_name = 'Tree';
+    private $root_name = 'Tree';
 
 	/**
 	 * Разрешает/запрещает перенос нод
 	 *
 	 * @var boolean
 	 */
-    var $drag_and_drop = false;
+    private $drag_and_drop = false;
 
     /**
      * Определяет ID действие, которое должно выполнояться при клике по ноде
      *
      * @var string
      */
-    var $action_node = '';
+    private $action_node = '';
 
     /**
      * ID действия, вызываемого при перемещении ноды
      *
-     * @var unknown_type
+     * @var string
      */
-    var $action_move = '';
+    private $action_move = '';
 
     /**
      * Шаблон, используемый для построения дерева
      *
-     * @var String
+     * @var array
      */
-	var $template;
+    private $template;
 
     /**
      * Массив действий контекстного меню
@@ -130,7 +130,7 @@ class data_tree
      *
      * @var array
      */
-    var $nodes = null;
+    private $nodes = null;
 
     /**
      * Признак того, что идёт работа со структурой сайта

@@ -380,4 +380,7 @@ $il['catalog_commerceml_error_no_pricetype_found']='<b style="color:red;">Оши
 $il['catalog_commerceml_import_completed']='<b>Импорт завершён. Добавлено товаров:%added%, обновлено: %updated%</b>';
 $il['catalog_commerceml_offers_completed']='<b>Цены обновлены (%updated%)</b>';
 
+$il['catalog_no_group_template_list']='У товарной группы не определён шаблон вывода списка товаров';
+$il['catalog_show_items_list_no_items']='Нет товаров';
+
 ?>

@@ -45,7 +45,7 @@ class manager_modules
         $show->set_menu_default('select_modul');
 
         //Создаём дерево модулей
-        $tree = new data_tree('[#modules_label_structur#]','index', $this->modules_structure_all_get(true));
+        $tree = new data_tree('[#modules_label_structur#]','index', $this->modules_structure_all_get());
         $tree->set_action_click_node('select_modul');
         $tree->set_drag_and_drop(false);
         $tree->set_name_cookie("modules_structure");
@@ -334,8 +334,7 @@ class manager_modules
         	$query = 'UPDATE '.$kernel->pub_prefix_get().'_action
         	      	  SET caption = "'.$action_name.'",
         	          param_array = "'.addslashes(serialize($array_param)).'"
-                      WHERE id = '.$id_action.'
-				  ';
+                      WHERE id = '.$id_action;
 
 			$kernel->runSQL($query);
 			$this->update_macros_in_page();
@@ -621,7 +620,9 @@ class manager_modules
 			//Удаляем только дочерний модуль
 			include 'modules/'.$arr_modul['parent_id'].'/install.php';
 			//$install = new install_modules();
-			@$install->uninstall_children($id_modul);
+
+            /** @var $install install_modules */
+            $install->uninstall_children($id_modul);
 			$users->delete_feild_for_user($id_modul);
 		}
 
@@ -709,7 +710,7 @@ class manager_modules
     *
     * @param integer $id_action
     * @param string $id_metod
-    * @return HTML
+    * @return string
     */
     function action_edit($id_action, $id_metod = '')
 	{
@@ -1024,6 +1025,8 @@ class manager_modules
 
         if ($result)
         	return $base_modul.$num_id;
+        else
+            return 0;
     }
 
 
@@ -1113,6 +1116,7 @@ class manager_modules
 			include $str_file;
 			$name = str_replace("[#","",$name);
 			$name = str_replace("#]","",$name);
+            /** @var $il array */
             $return_name = $il[$name];
             unset($il);
         }
@@ -1266,12 +1270,10 @@ class manager_modules
         {
         	foreach ($array_modul as $key => $val)
             {
-                $out[] = array('data'     => htmlentities($val['caption'], ENT_QUOTES, 'UTF-8'),
-                               //'id'       => $key,
-                                'attr'=>array("id"=>$key),
-                               //'expanded' => true,
-                               //'leaf'     => $fol
-                             );
+                $out[] = array(
+                    'data'     => htmlentities($val['caption'], ENT_QUOTES, 'UTF-8'),
+                    'attr'=>array("id"=>$key),
+                );
             }
         }
         return $out;
@@ -1289,22 +1291,19 @@ class manager_modules
 
             $data = array(
                 'data'     => htmlentities($property['caption'], ENT_QUOTES, 'UTF-8'),
-                //'id'       => $id,
                 'attr'=>array('id'=>$id),
-                //'expanded' => $expanded
-//                'leaf'     => ((empty($children))?(true):(false))
             );
 
             if (empty($children))
             {
-                //$data['leaf'] = true;
                 $data['state'] = "closed";
+                $data['attr']['rel'] = "default";
             }
             else
             {
-                //$data['leaf'] = false;
                 $data['state'] = "open";
                 $data['children'] = $this->modules_prepeare_children($children);
+                $data['attr']['rel'] = "folder";
             }
 
             $array[] = $data;
@@ -1320,14 +1319,7 @@ class manager_modules
     	foreach ($modules as $id => $property)
     	{
             $array[] = array(
-                /*
-                'id' => $id,
-                'text' => htmlentities($property['caption'], ENT_QUOTES, 'UTF-8'),
-                'leaf' => true
-
-                 */
-                //'id' => $id,
-                'attr'=>array('id'=>$id),
+                'attr'=>array('id'=>$id,"rel"=>"default"),
                 'data' => htmlentities($property['caption'], ENT_QUOTES, 'UTF-8'),
             );
     	}
@@ -1433,13 +1425,11 @@ class manager_modules
     }
 
 
-    //************************************************************************
     /**
-    * @return HTML
+    * @return array
     * @param $id_modul string
     * @desc Возвращает массив имеющихся макросов.
     **/
-    //************************************************************************
 	function list_array_macros($id_modul)
 	{
 		global $kernel;
@@ -1470,7 +1460,7 @@ class manager_modules
     * Сформированый код добавляется в форму со свойствами модуля
     * @param  string $id_modul ID модуля, чьи действия нужно вывести
     * @param  array $template HTML шаблон одно строки действия
-    * @return HTML
+    * @return string
     **/
 	function action_exist_get($id_modul, $template)
 	{

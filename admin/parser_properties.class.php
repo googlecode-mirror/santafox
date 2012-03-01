@@ -707,11 +707,14 @@ class parse_properties
             default:
                 //Действие structura_tree будет вызвано в том менеджере, который
                 //явялется текущим, при выполнение запроса get_structure()
-                $tree = new data_tree('Структура','index');
+
+                $ms = new manager_structue();
+                $tree = new data_tree('Структура','index',$ms->get_all_nodes('index'));
                 $tree->set_action_get_data('action=select_page&action_tree=get');
                 $tree->set_action_click_node('action=select_page&action_tree=click');
                 $tree->set_direct_action();
                 $tree->set_drag_and_drop(false);
+
 
                 //Необходимо заключит построеное дерево в див, так и задать его имя
                 $html = $tree->get_tree();
@@ -726,7 +729,7 @@ class parse_properties
                     $node = 'index';
 
                 $mod  = new manager_structue();
-                $html = $kernel->pub_json_encode($mod->get_nodes($node));
+                $html = $kernel->pub_json_encode($mod->get_all_nodes($node));
                 break;
             case 'click':
                 $html='';

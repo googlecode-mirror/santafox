@@ -59,10 +59,12 @@ class manager_structue
         switch ($action)
         {
         	//Вызывается для получения данных о структуре
+            /* //@todo cleanup?
     		case 'get_tree':
     			$node_id = (isset($_REQUEST['node'])?($_REQUEST['node']):('index'));
                 $html = $kernel->pub_json_encode($this->get_nodes($node_id));
     			break;
+            */
 
     		//Перемещаем ноду по структуре
     	    case 'move':
@@ -124,88 +126,67 @@ class manager_structue
 
     /**
      * Фомирует массив со страницами по заданному родителю
-     *
+     * используется для "get_tree"
+     * now using only get_all_nodes //@todo cleanup?
      * @param string $node_id ID родителя
      * @return array
      */
+    /*
     function get_nodes($node_id)
     {
     	global $kernel;
 
-		$data = '';
-		//Пока сделаем напрямую запросом
-		$sql = 'SELECT *
-				FROM `'.$kernel->pub_prefix_get().'_structure`
-				WHERE `parent_id` = "'.$node_id.'"
-				ORDER BY `order_number` ASC';
-
-		$query = $kernel->runSQL($sql);
-
-		if (mysql_num_rows($query) > 0)
-		{
-		    $data = array();
-		    while ($row = mysql_fetch_assoc($query))
-		    {
-		        $data[] = array(
-		            'data'  => htmlentities($row['caption'], ENT_QUOTES, 'utf-8'),
-		            'attr'  => array('id'=> $row['id']),
-		            //'expanded'   => false,
-		            //'allowDelete' => true,
-		            //'leaf'  => false
-			   );
-		    }
-		}
+		$sql = 'SELECT pages.id,pages.caption, (subpages.id IS NOT NULL) AS hasChildren
+				FROM `'.$kernel->pub_prefix_get().'_structure` AS pages
+				LEFT JOIN `'.$kernel->pub_prefix_get().'_structure` `subpages` ON subpages.parent_id=pages.id
+				WHERE pages.`parent_id` = "'.$node_id.'"
+				GROUP BY `pages`.`id`
+				ORDER BY `pages`.`order_number` ASC';
+		$res = $kernel->runSQL($sql);
+        $data = array();
+        while ($row = mysql_fetch_assoc($res))
+        {
+            $data[] = array(
+                'data'  => htmlentities($row['caption'], ENT_QUOTES, 'utf-8'),
+                'attr'  => array('id'=> $row['id'],'rel'=>($row['hasChildren']?'folder':'default')),
+           );
+        }
+        mysql_free_result($res);
 		return $data;
     }
+    */
 
     function get_all_nodes($node_id = 'index')
     {
     	global $kernel;
 
-		$data = '';
-		//Пока сделаем напрямую запросом
-		$sql = 'SELECT *
-				FROM `'.$kernel->pub_prefix_get().'_structure`
-				WHERE `parent_id` = "'.$node_id.'"
-				ORDER BY `order_number` ASC';
+        $sql = 'SELECT pages.id,pages.caption, (subpages.id IS NOT NULL) AS hasChildren
+      				FROM `'.$kernel->pub_prefix_get().'_structure` AS pages
+      				LEFT JOIN `'.$kernel->pub_prefix_get().'_structure` `subpages` ON subpages.parent_id=pages.id
+      				WHERE pages.`parent_id` = "'.$node_id.'"
+      				GROUP BY `pages`.`id`
+      				ORDER BY `pages`.`order_number` ASC';
 
 		$query = $kernel->runSQL($sql);
 
-		if (mysql_num_rows($query) > 0)
-		{
-		    $data = array();
-		    while ($row = mysql_fetch_assoc($query))
-		    {
+        $data = array();
+        while ($row = mysql_fetch_assoc($query))
+        {
+            $array = array(
+                'data'  => htmlentities($row['caption'], ENT_QUOTES, 'utf-8'),
+                'attr'=>array('id'=>$row['id']),
+            );
 
+            if (!$row['hasChildren'])
+                $array['attr']['rel']='default';
+            else
+            {
+                $array['attr']['rel']='folder';
+                $array['children'] = $this->get_all_nodes($row['id']);
+            }
 
-		        $array = array(
-                    /*
-                    'text'  => htmlentities($row['caption'], ENT_QUOTES, 'utf-8'),
-		            'id'    => $row['id'],
-		            'expanded'   => false,
-		            'allowDelete' => true,
-		            'allowDrop' => true
-
-                     */
-                    'data'  => htmlentities($row['caption'], ENT_QUOTES, 'utf-8'),
-		            //'id'    => $row['id'],
-                    'attr'=>array('id'=>$row['id']),
-		            'state'   => "closed",
-		            //'allowDelete' => true,
-		            //'allowDrop' => true
-                );
-
-                if ($this->is_leaf($row['id'])) {
-//                	$array['children'] = null;
-                	//$array['leaf'] = true;
-                } else {
-                	$array['children'] = $this->get_all_nodes($row['id']);
-                	//$array['leaf'] = false;
-                }
-
-		        $data[] = $array;
-		    }
-		}
+            $data[] = $array;
+        }
 		return $data;
     }
 
@@ -228,7 +209,8 @@ class manager_structue
      * Сохраняет массив с данными страницы в БД и возвращает сообщение
      *
      * @param array $properties
-     * @return JSON
+     * @param boolean $only_page_properties
+     * @return string
      */
     function properties_save($properties, $only_page_properties = false)
     {
@@ -265,8 +247,6 @@ class manager_structue
 
         	    //Перед тем как это делать, надо чуть обрабаотать массив, так как он содержит
         	    //лишнию информация для того что бы работал ява скрипт
-        	    //$kernel->debug($properties['page_inheritance'], true);
-        	    //$kernel->debug($properties['page_modules'], true);
         		$manager->save_link($properties['page_modules'], $properties['page_inheritance']);
             	$saved = true;
         	}
@@ -286,62 +266,52 @@ class manager_structue
      *
      * @param string $node_current_id
      * @param string $node_parent_new_id
-     * @param string $node_parent_old_id
      * @param string $node_current_index
-     * @return javaScript
+     * @return string
      */
     function node_move($node_current_id, $node_parent_new_id, $node_current_index)
     {
         global $kernel;
         $this->structure_reorder($node_current_id, $node_current_index);
 
-        $query = "UPDATE `".$kernel->pub_prefix_get()."_structure` SET "
-        . " `parent_id` = '$node_parent_new_id', "
-        . " `order_number` = '$node_current_index' "
-        . " WHERE "
-        . " `id`= '$node_current_id' "
-        . " LIMIT 1";
+        $query = "UPDATE `".$kernel->pub_prefix_get()."_structure` SET
+             `parent_id` = '$node_parent_new_id',
+             `order_number` = '$node_current_index'
+              WHERE `id`= '$node_current_id' LIMIT 1";
         $kernel->runSQL($query);
-        //@todo cleanup
-
         if (mysql_affected_rows() <= 0)
         	$ret = array("success"=>false);
         else
             $ret = array("success"=>true);
-
         return $kernel->pub_json_encode($ret);
     }
 
     /**
      * Создаёт новую страницу в структуре
      *
-     * @param unknown_type $node_new_id
-     * @param unknown_type $node_new_text
-     * @param unknown_type $node_parent_id
-     * @return void
+     * @param integer $node_parent_id
+     * @return integer
      */
     function node_add($node_parent_id)
     {
         global $kernel;
 
-        $query = " SELECT MAX(`order_number`) + 1 AS `order` FROM `".$kernel->pub_prefix_get()."_structure` WHERE `parent_id` = '".$node_parent_id."' ";
+        $query = "SELECT MAX(`order_number`) + 1 AS `order`
+                 FROM `".$kernel->pub_prefix_get()."_structure`
+                 WHERE `parent_id` = '".$node_parent_id."' ";
 	    $result = mysql_fetch_assoc($kernel->runSQL($query));
 	    if(isset($result['order']))
 		    $neworder = $result['order'];
 	    else
 		    $neworder = 1;
         $node_new_id = $node_parent_id.'_p_'.$neworder;
-        $node_new_text = "New page";
-
+        $node_new_text = "New page";//@todo use lang[]
         $query = "INSERT INTO `".$kernel->pub_prefix_get()."_structure` "
                  . " (`id` ,`parent_id` ,`caption` ,`order_number` ,`properties` ,`serialize`) "
                  . " VALUES ('".$node_new_id."', '".$node_parent_id."', '".$node_new_text."', '".$neworder."', NULL , NULL)";
-        $result = $kernel->runSQL($query);
-
+        $kernel->runSQL($query);
     	$this->structure_reorder($node_new_id);
-
     	return $node_new_id;
-
     }
 
     /**

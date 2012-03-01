@@ -1,20 +1,26 @@
 <!-- @table -->
-<table border="0" width="100%" cellpadding="0" cellspacing="1" class="admin_table">
-	<tr>
-		<th>[#faq_list_partition#]</th>
-        <th>[#faq_list_manage#]</th>
-	</tr>
-	%rows%
-</table>
+<script type="text/javascript">
+ $("input:submit, input:button").button();
+ 
+ $('div.content select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+</script>
+ <h3>[#faq_menu_partitions#]</h3>
+ <table class="admin_table">
+  <tr>
+   <th>[#faq_list_partition#]</th>
+   <th>[#faq_list_manage#]</th>
+  </tr>
+  %rows%
+ </table>
 <!-- @row -->
-<tr valign="top">
-  <td>
-      <a href="#" onclick="jspub_click('show_list&pid=%pid%')" title="[#faq_list_show_partition_questions#]">%name%</a>
-  </td>
+ <tr>
+  <td><a href="#" onclick="jspub_click('show_list&pid=%pid%')" title="[#faq_list_show_partition_questions#]">%name%</a></td>
   <td width="100" nowrap="nowrap">
-      <img onclick="jspub_click('%action_edit%')"  src="/admin/templates/default/images/icon_edit.gif" alt="[#faq_list_edit_partition_name#]" border="0" style="cursor:pointer;" />
-      <img onclick="jspub_click('%action_addco%')" src="/admin/templates/default/images/12-em-plus_26x26.gif" border="0" alt="[#faq_list_add_element#]" title="[#faq_list_add_element#]" style="cursor:pointer;">
-      <img onclick="jspub_confirm('%action_delet%','[#faq_list_delete_partition_alert#]')" src="/admin/templates/default/images/icon_delet.gif" border="0" alt="[#faq_list_delete_partition#]" title="[#faq_list_delete_partition#]" style="cursor:pointer;">
-
-      </td>
-</tr>
+   <img onclick="jspub_click('%action_edit%')"  src="/admin/templates/default/images/icon_edit.gif" alt="[#faq_list_edit_partition_name#]" border="0" style="cursor:pointer;" />
+   <img onclick="jspub_click('%action_addco%')" src="/admin/templates/default/images/12-em-plus_26x26.gif" border="0" alt="[#faq_list_add_element#]" title="[#faq_list_add_element#]" style="cursor:pointer;">
+   <img onclick="jspub_confirm('%action_delet%','[#faq_list_delete_partition_alert#]')" src="/admin/templates/default/images/icon_delet.gif" border="0" alt="[#faq_list_delete_partition#]" title="[#faq_list_delete_partition#]" style="cursor:pointer;">
+  </td>
+ </tr>

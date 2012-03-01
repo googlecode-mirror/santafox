@@ -499,7 +499,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  *
  * http://docs.jquery.com/UI/Tabs#theming
  */
-.ui-tabs { position: relative; padding: .2.3em; background:#fff; zoom: 1; border:none; border-radius:4px; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+.ui-tabs { position: relative; padding: .2.3em; background:#fff; zoom: 1; border:none; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
 .ui-tabs .ui-tabs-nav { width:100%; margin: 0; padding:.2em .2em 0; position:absolute; border-bottom:1px solid #ccc; padding-top:4px; border-radius:0; }
 .ui-tabs-nav { background:#ededed url('images/tabs-bg.gif') repeat-x top left; padding-top:50px; }
 .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; background:#ddd; top: 2px; border:none; border:1px solid #ddd; margin: 5px .4em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
@@ -629,11 +629,12 @@ table .ui-selectmenu { height:2.5em; }
 
 /* modmenu
 ----------------------------------*/
-#modules_toolbar div { padding:0; margin:3px 2px 3px 0; float:left; }
-.ui-modmenu { display: block; display: inline-block; float:left; background:#fff; position: relative; vertical-align: middle; text-decoration: none; overflow: hidden; zoom: 1; border-radius:4px; }
-.ui-modmenu-icon { position: absolute; right: 0px;  top: 0px; height: 26px; padding: 0; border:none; border-left:1px solid #ededed; background-position: -64px -12px;}
+#modules_toolbar div { padding:0; margin:1px 2px 2px 0; float:left; }
+.ui-modmenu { display: block; display: inline-block; padding:0; height:24px; float:left; position: relative; vertical-align: middle; text-decoration: none; overflow: hidden; zoom: 1; border-radius:4px; }
+.ui-modmenu-icon { position: absolute; right: 0px;  top: 0px; height: 24px; padding: 0; border:none; border-left:1px solid #ededed; background-position: -64px -12px;}
 .ui-state-focus .ui-modmenu { opacity:.7; }
-.ui-modmenu-icon:hover { position: absolute; right: 0;  top: 0px; background:#fff url(images/ui-icons_333333_256x240.png); height: 26px; padding: 0; border:none; border-left:1px solid #ccc; background-position: -64px -12px;}
+.ui-state-hover .ui-modmenu { opacity:.5; }
+.ui-modmenu-icon:hover { position: absolute; right: 0;  top: 0px; background:#fff url(images/ui-icons_333333_256x240.png); height: 24px; padding: 0; border:none; border-left:1px solid #ccc; background-position: -64px -12px;}
 .ui-state-active .ui-modmenu-icon:hover { background-color:transparent; }
 .ui-state-active { background:#00ADDB; }
 .ui-modmenu-menu {  padding:0 5px 0 2px;  margin:1px 0; position:absolute; top: 0; display: none; z-index: 1005;} /* z-index: 1005 to make modmenu work with dialog */

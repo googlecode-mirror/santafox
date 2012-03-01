@@ -319,6 +319,7 @@
 			$("#link_for_debug").css("color", "#CCCCCC").css("cursor","");
 			setTimeout('fulltime()',500)
 			}
+         
 </script>
 
 <script type="text/javascript">
@@ -352,15 +353,20 @@
         mainLayout.allowOverflow('north');
         $(this).addClass('mod_box_sbtn_active');
         // $('#modules_toolbar').css({'overflow':'visible', 'background':'#ededed', 'marginLeft':'-263px', 'height':'auto', 'paddingBottom':'3px'});
-        $('#modules_toolbar').css({'overflow':'visible', 'backgroundColor':'#ededed', 'height':'auto', 'min-height':'32px'});
+        $('#modules_toolbar').css({'overflow':'visible', 'backgroundColor':'#fff', 'paddingBottom':'2px', 'height':'auto', 'min-height':'28px'});
         // $('#modules_toolbar').addClass('mod_toolbar_opened');
 	  },
 	  function (){
         $(this).removeClass('mod_box_sbtn_active');
         mainLayout.resetOverflow('north');
         // $('#modules_toolbar').css({'overflow':'hidden','height':'28px', 'background':'none', 'minHeight':'28px', 'paddingBottom':'0px'});
-        $('#modules_toolbar').css({'overflow':'hidden','height':'32px'});
+        $('#modules_toolbar').css({'overflow':'hidden', 'paddingBottom':'0px', 'height':'28px'});
         // $('#modules_toolbar').removeClass('mod_toolbar_opened');
+     });
+     
+     // убираем .ui-state-active с блока модулей при клике в главной навигации
+     $('#main_menu a').click(function(){
+       $('#mod_block a').removeClass('ui-state-active');
      });
 
    });

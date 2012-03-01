@@ -114,8 +114,10 @@ $.widget("ui.modmenu", {
 				return false;
 			})
 			.bind('click.modmenu', function(event) {
+            $('.ui-modmenu').removeClass('ui-state-active');
             self.element.trigger('change');
             self._trigger("change", event);
+            $(this).addClass('ui-state-active');
 				return false;
 			})
 			.bind("keydown.modmenu", function(event) {

@@ -400,7 +400,13 @@ class faq
 
         $get_values = $kernel->pub_httpget_get();
         $moduleid = $kernel->pub_module_id_get();
-
+        
+        $template = "modules/faq/templates_admin/container.html";
+        $this->parse_template($template);
+        
+        $container_begin = $this->template_array['container_begin'];
+        $container_end = $this->template_array['container_end'];
+        
         $html = '';
         $view = $kernel->pub_section_leftmenu_get();
         switch ($view)
@@ -420,9 +426,11 @@ class faq
                     $line = str_replace("%action_addco%", "add_quest&partition_id=".$value['id'], $line);
                     $lines.=$line;
                 }
-                $html = $this->template_array['table'];
+                $html = $container_begin;
+                $html .= $this->template_array['table'];
                 $html = str_replace('%rows%', $lines, $html);
                 $html .=$this->priv_form_add_partition();
+                $html .= $container_end;
                 break;
             case "faq_import_csv":
                 $partid = intval($_POST['csvpart']);
@@ -458,10 +466,12 @@ class faq
 
             //Форма редактирования раздела
             case "partition_edit":
-
+                $html = $container_begin;
+                
                 if (isset($get_values['id']))
-                    $html = $this->priv_form_add_partition($get_values['id']);
-
+                    $html .= $this->priv_form_add_partition($get_values['id']);
+                    
+                $html .= $container_end;
                 break;
 
             //Удаляем раздел
@@ -488,8 +498,9 @@ class faq
         	    $content_id = 0;
         	    if (isset($get_values['content_id']))
                     $content_id = $get_values['content_id'];
-
-                $html = $this->priv_create_form_element($sel_par_id, $content_id);
+                $html = $container_begin;
+                $html .= $this->priv_create_form_element($sel_par_id, $content_id);
+                $html .= $container_end; 
                 break;
 
             //Сохранение отредактированного вопроса
@@ -546,17 +557,21 @@ class faq
 
                         $lines .= $line;
                     }
-                    $html = $this->template_array['begin'].$lines.$this->template_array['end'];
+                    $html = $container_begin;
+                    $html .= $this->template_array['begin'].$lines.$this->template_array['end'];
+                    $html .= $container_end;
                     mysql_free_result($res);
                 }
                 else
-                    $html = "[#faq_menu_users_questions_nonew#]";
+                    $html = $container_begin."[#faq_menu_users_questions_nonew#]".$container_end;
 
                 break;
 
             // Выводим список разделов
             case "show_list":
-                $html = $this->priv_create_list_partition();
+                $html = $container_begin;
+                $html .= $this->priv_create_list_partition();
+                $html .= $container_end;
                 break;
         }
         return $html;

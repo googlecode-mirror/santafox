@@ -17,29 +17,27 @@
             .bind("select_node.jstree", function (e,data) {
                 var currNodeId = data.rslt.obj.attr("id");
                 var dc = true/*[#direct_click#]*/;
-                //if (!n.attributes.notclick)
-                //{
-                    if (!dc)
-                    {
-                        //var selectedNode = data.inst.data.ui.selected[0];//works!
-                        var selectedNode = data.rslt.obj;//!works!
-                        var node_way = jQuery.jstree._reference("#[#tree_id#]").get_path(selectedNode, true);//works!
-                        //Теперь, в куках храниться дорога до текущей ноды
-                        jspub_cookie_set("%cookie_name_tree%",node_way.join(","));
-                        //Если надо, то уберём текущее выделение с пункта левого меню
-                        start_interface.left_menu_clear_select();
-                        start_interface.save_link_node_select(selectedNode);
-                        /*[#linkmenu#]*/
-                        
-                    }
-                    else
-                    {
-                        //Это клик когда надо будет проставить значение выбранной ноды
-                        //и вызвать событие на закрытие окна. Используется для выбора
-                        //страницы сайта в качестве свойства чего-либо.
-                        $('#'+start_interface.select_element).val(currNodeId);//start_interface.select_element.setValue(n.attributes.id);
-                        $("#popup_sitemap_div").dialog("destroy");
-                    }
+                if (!dc)
+                {
+                    //var selectedNode = data.inst.data.ui.selected[0];//works!
+                    var selectedNode = data.rslt.obj;//!works!
+                    var node_way = jQuery.jstree._reference("#[#tree_id#]").get_path(selectedNode, true);//works!
+                    //Теперь, в куках храниться дорога до текущей ноды
+                    jspub_cookie_set("%cookie_name_tree%",node_way.join(","));
+                    //Если надо, то уберём текущее выделение с пункта левого меню
+                    start_interface.left_menu_clear_select();
+                    start_interface.save_link_node_select(selectedNode);
+                    /*[#linkmenu#]*/
+
+                }
+                else
+                {
+                    //Это клик когда надо будет проставить значение выбранной ноды
+                    //и вызвать событие на закрытие окна. Используется для выбора
+                    //страницы сайта в качестве свойства чего-либо.
+                    $('#'+start_interface.select_element).val(currNodeId);//start_interface.select_element.setValue(n.attributes.id);
+                    $("#popup_sitemap_div").dialog("destroy");
+                }
 
             })
             .bind("loaded.jstree", function (event, data) {
@@ -92,41 +90,28 @@
 
 		"plugins" : [ "json_data", "ui", /*[#dnd_enabled#]*/ "types", "contextmenu","themes"],
         "types" : {
-			// I set both options to -2, as I do not need depth and children count checking
-			// Those two checks may slow jstree a lot, so use only when needed
 			"max_depth" : -2,
 			"max_children" : -2,
-			// I want only `drive` nodes to be root nodes
-			// This will prevent moving or creating any other type as a root node
 			"valid_children" : [ "root" ],
 			"types" : {
-				// The default type
 				"default" : {
-					// I want this type to have no children (so only leaf nodes)
-					// In my case - those are files
 					"valid_children" : "file",
-					// If we specify an icon for the default type it WILL OVERRIDE the theme icons
 					"icon" : {
 						"image" : "/admin/templates/default/images/file.png"
 					}
 				},
 				// The `folder` type
 				"folder" : {
-					// can have files and other folders inside of it, but NOT `drive` nodes
 					"valid_children" : [ "default", "folder" ],
 					"icon" : {
 						"image" : "/admin/templates/default/images/folder.png"
 					}
 				},
-				// The `drive` nodes
 				"root" : {
-					// can have files and folders inside, but NOT other `drive` nodes
 					"valid_children" : [ "default", "folder" ],
 					"icon" : {
 						"image" : "/admin/templates/default/images/root.png"
 					},
-					// those prevent the functions with the same name to be used on `drive` nodes
-					// internally the `before` event is used
 					"start_drag" : false,
 					"move_node" : false,
 					"delete_node" : false,
@@ -142,7 +127,6 @@
         /*[#dnd_action1#]*/
 
 		"contextmenu" : {
-            //"show_at_node" : true,
             "items" : {
                 "rename" : false,
                 "remove" : false,//Delete
@@ -158,30 +142,16 @@
 </script>
 
 <!-- @dnd_action1 -->
-        "crrm" : {
-            "move" : {
-				//"default_position" : "first",
-				"default_position" : "inside",
-				//"move" : function (m) {alert('moving!');}
-				"check_move" : function (m) {
-
-				/*
-				m = lastly prepared move. The returned object contains:
-                .o - the node being moved
-                .r - the reference node in the move
-                .ot - the origin tree instance
-                .rt - the reference tree instance
-                .p - the position to move to (may be a string - "last", "first", etc)
-                .cp - the calculated position to move to (always a number)
-                .np - the new parent
-                */
-
-                    if (m.o[0].id=="index" || m.np[0].id=="[#tree_id#]")
-                        return false;//no index node drag && no drag to top
-                    return true;
-				}
-			}
-        },
+    "crrm" : {
+        "move" : {
+            "default_position" : "inside",
+            "check_move" : function (m) {
+                if (m.o[0].id=="index" || m.np[0].id=="[#tree_id#]")
+                    return false;//no index node drag && no drag to top
+                return true;
+            }
+        }
+    },
 <!-- @dnd_action2 -->
  .bind("move_node.jstree", function (e, data) {
                     var index=data.rslt.cp;
@@ -191,41 +161,14 @@
                                //santaUpdateRegion('west','index.php?action=get_left_menu');
                            }
                     );
-                /*
-                data.rslt.o.each(function (i) {
-                    $.ajax({
-                        async : false,
-                        type: 'POST',
-                        url: "./server.php",
-                        data : {
-                            "operation" : "move_node",
-                            "id" : $(this).attr("id").replace("node_",""),
-                            "ref" : data.rslt.cr === -1 ? 1 : data.rslt.np.attr("id").replace("node_",""),
-                            "position" : data.rslt.cp + i,
-                            "title" : data.rslt.name,
-                            "copy" : data.rslt.cy ? 1 : 0
-                        },
-                        success : function (r) {
-                            if(!r.status) {
-                                $.jstree.rollback(data.rlbk);
-                            }
-                            else {
-                                $(data.rslt.oc).attr("id", "node_" + r.id);
-                                if(data.rslt.cy && $(data.rslt.oc).children("UL").length) {
-                                    data.inst.refresh(data.inst._get_parent(data.rslt.oc));
-                                }
-                            }
-                        }
-                    });
-                });
-                */
+
 
             })
 <!-- @dnd_enabled -->
 "crrm", "dnd",
 <!-- @context_menu_not -->
-        //@todo remove this block?
-        //return true;
+// @todo remove this block?
+// return true;
 
 <!-- @context_empty -->
 //this.contextmenu.add('-');
@@ -260,7 +203,7 @@
 }
 <!-- @context_element_remov_click_function -->
 "delete":{
-    "label" : "Удалить",
+    "label" : "Удалить", // @todo use lang[]
     "action":function (par){
         structTreeCurrPID = par.attr("id");
             var disabledForNodes = new String("[#node_exclude#]").split(",");
@@ -280,14 +223,13 @@ if (par.attr("id")!="index")
         height:140,
         modal: true,
         buttons: {
-            "Yes": function() {
+            "Yes": function() {// @todo use lang[]
                  $.post('[#link#]',{ node :  par.attr("id")}, function(data){
-                        //document.location.href = "/admin/index.php";
                         santaUpdateRegion('west','index.php?action=get_left_menu');
                     });
                 $(this).dialog( "close" );
             },
-            "No": function() {
+            "No": function() {// @todo use lang[]
                 $(this).dialog( "close" );
             }
         }
@@ -296,16 +238,13 @@ if (par.attr("id")!="index")
 
 <!-- @context_element_normal_context_action-->
     $.post('[#link#]',{ node :  par.attr("id")}, function(data){
-        //document.location.href = "/admin/index.php";
         santaUpdateRegion('west','index.php?action=get_left_menu');
     });
 <!-- @context_element_add_context_action-->
     $.post('[#link#]',{ node :  par.attr("id")}, function(data){
-        //document.location.href = "/admin/index.php";
         santaUpdateRegion('west','index.php?action=get_left_menu');
     });
 <!-- @context_element_remov_context_action-->
     $.post('[#link#]',{ node :  par.attr("id")}, function(data){
-        //document.location.href = "/admin/index.php";
         santaUpdateRegion('west','index.php?action=get_left_menu');
     });

@@ -8,7 +8,7 @@ $il['admin_lang_caption_for_ua'] 		= 'Украинский';
 $il['admin_codepage_caption_for_utf8'] = 'Русская (UTF8)';
 $il['admin_backof_global_save']         = 'Сохранить';
 
-$il['in_register_pregloshenie'] 		= 'Вход в административный интерфейс <br> сайта';
+$il['in_register_pregloshenie'] 		= 'Вход в административный интерфейс сайта';
 $il['main_exit'] 						= 'Выход';
 $il['big_text_pod_exit'] 				= 'из административного интерфейса';
 $il['small_text_pod_exit'] 				= '(с переходом на главную страницу сайта)';

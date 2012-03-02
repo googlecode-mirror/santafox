@@ -1,7 +1,7 @@
 <?php
 
 $type_langauge					= 'en';
-$il['in_register_pregloshenie'] 		= 'Enter in administring interface <br> sait';
+$il['in_register_pregloshenie'] 		= 'Enter in administring interface sait';
 
 
 ?>

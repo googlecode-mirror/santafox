@@ -21,19 +21,19 @@
 
 <div id="form_container" class="content">
  
- <span class="header block clear">[#in_register_pregloshenie#] <span class="highlight"><a href="http://www.[#server#]" target="_blank">[#server#]</a></span></span>
+ <span class="header block clear">[#in_register_pregloshenie#] <span class="highlight"><a href="http://[#server#]" target="_blank">[#server#]</a></span></span>
  
  <form method="post" action="index.php">
  <input type="hidden" name="action" value="registration">
 
  <fieldset>
   <label for="login">[#start_login#]:</label>
-  <input type="text" id="login" name="login" value="John Doe" onBlur="if(this.value=='')this.value=this.defaultValue;" onFocus="if(this.value==this.defaultValue)this.value='';">
+  <input type="text" id="login" name="login">
  </fieldset>
  
  <fieldset>
   <label for="pwd">[#start_password#]:</label>
-  <input type="password" id="pwd" name="pwd" value="Password" onBlur="if(this.value=='')this.value=this.defaultValue;" onFocus="if(this.value==this.defaultValue)this.value='';">
+  <input type="password" id="pwd" name="pwd">
  </fieldset>
  
  <span class="error block clear">[#errore#]</span>

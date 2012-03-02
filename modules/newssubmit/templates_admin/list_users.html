@@ -1,9 +1,16 @@
 <!-- @form -->
-<form method=POST name="formuser" enctype="multipart/form-data" action="%form_url%">
-  <br/>
+<script type="text/javascript">
+ $("input:submit, input:button").button();
+</script>
+<span class="content_header">Модуль &rarr; <span class="black">[#newssubmit_name_modul_base_name#]</span></span>
+<div id="page_container">
+ <div id="content_container">
+ <div class="content">
+ <h3>[#module_newssubmit_menu_show_users#]</h3>
+ <form method="post" name="formuser" enctype="multipart/form-data" action="%form_url%">
   <!--<p>Всего подписчиков: %users_count%</p>-->
   %pages%
-  <table border="0" cellspacing="1" cellpadding="3" class="admin_table">
+  <table class="admin_table">
   	<tr>
         <th width="30" rowspan="2">[#module_newssubmit_admin_table_label_check#]</th>
         <th width="30" rowspan="2">[#module_newssubmit_admin_table_label_num#]</th>
@@ -15,13 +22,18 @@
     	%lenta_news_label%
     </tr>
     %users%
-    <tr class="admin_table_wstring">
-      <td align="left" colspan="4">
-      	<input type="submit" value="[#module_newssubmit_admin_but_delete_users#]" name="delete_users" class="text"/></td>
-    </tr>
   </table>
-</form>
-%pages%
+  
+  <fieldset class="page_submit_field">
+   <input type="submit" value="[#module_newssubmit_admin_but_delete_users#]" name="delete_users">
+  </fieldset>
+ </form>
+ 
+ %pages%
+ 
+ </div>
+ </div>
+</div>
 <!-- onsubmit="jspub_confirm('Предупреждение','Вы действительно хотите удалить выбранных подписчиков из рассылки')"-->
 <!-- @user -->
   	<tr %class%>

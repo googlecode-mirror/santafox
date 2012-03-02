@@ -442,7 +442,7 @@ div.content label {
 	float:left;
 }
 
-div.content input[type=text]:hover, textarea:hover {
+div.content input[type=text]:hover, div.content input[type=password]:hover, textarea:hover {
 	border-color:#2595c9;
 }
 
@@ -589,3 +589,26 @@ table.container tr td:first-child { border-left:none; }
 /* some modules styles */
 #inner_form_cats ul { margin:5px 10px; padding-left:10px; }
 #inner_form_cats ul li ul { margin:5px 10px; padding-left:10px; }
+
+/* admin_auth style */
+#form_container {
+   padding:15px; margin:-95px 0 0 -150px;
+   width:270px;
+   display:block; 
+   position:absolute; 
+   top:50%; left:50%; 
+   -webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-shadow: #aaa 0px 3px 20px;
+	-moz-box-shadow: #aaa 0px 3px 20px;
+	box-shadow: #aaa 0px 3px 20px;
+}
+
+#form_container span.header { font-size:11px; font-weight:bold; }
+#form_container span.error { padding:1px 0; color:red; font-size:11px; font-weight:bold; text-align:center; }
+#form_container label { width:85px; color:#666; }
+#form_container input { width:150px; }
+#form_container input[type=submit] { width:auto; }
+#form_container fieldset.fslast { margin:5px 0 0 0;h:auto; }
+/* end of admin_auth style */

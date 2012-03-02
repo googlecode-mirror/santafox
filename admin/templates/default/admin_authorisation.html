@@ -1,51 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=[#set_charset#]">
-<link rel="StyleSheet" href="templates/default/css/css.css" type="text/css"/>
+   
+   <title>[#in_register_pregloshenie#] [#server#]</title>
+   
+<link href="/admin/templates/default/css/style.css" rel="stylesheet" type="text/css">
+<link href="/admin/templates/default/css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/admin/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/admin/js/jquery-ui-1.8.17.custom.min.js"></script>
+
+<script type="text/javascript">
+ $(document).ready(function(){
+   $('input:submit').button();
+ });
+</script>
 </head>
-<body leftmargin="0" topmargin="0" rightmargin="0" bottommargin="0">
-<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-  <tr>
-    <td bgcolor="#FFFFFF">&nbsp;</td>
-  </tr>
-  <tr height="200">
-    <td valign="top" height="200">
-	<table height="200" border="0" align="center" cellpadding="7" cellspacing="0"  background="templates/default/images/main_fon_gradient.png" style="border-color:#98C0F4; border-width:1px; border-style:solid;">
-        <tr valign="top">
-          <td height="60" align="left" ><span class="zagol_start">[#in_register_pregloshenie#]</span> <span class="zagol_start_red">[#server#]</span></td>
-        </tr>
-        <tr valign="top" height="140">
-          <td align="left" height="140"><form method="POST" action="index.php">
-              <INPUT type="hidden" name="action" value="registration">
-              <table border="0" cellspacing="0" cellpadding="0">
-                <tr style="padding-bottom:5px; padding-left:10px;">
-                  <td align="right" valign="middle">[#start_login#]:</td>
-                  <td width="10px"></td>
-                  <td align="left" valign="middle"><input type="text" size="40"  style="width: 200px;" name="login"></td>
-                <tr>
-                <tr style="padding-bottom:5px; padding-left:10px;">
-                  <td align="right" valign="middle">[#start_password#]:</td>
-                  <td width="10px"></td>
-                  <td align="left" valign="middle"><input size="40" type="password" style="width:200px;" name="pwd"></td>
-                </tr>
-                <tr>
-                  <td align="right" valign="middle"></td>
-                  <td width="10px"></td>
-                  <td align="left" valign="middle">&nbsp;[#errore#]&nbsp;</td>
-                </tr>
-                <tr>
-                  <td align="right" valign="middle"></td>
-                  <td width="10px"></td>
-                  <td align="left" valign="middle"><input  type="submit" value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ОК&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"></td>
-                </tr>
-              </table>
-            </form></td>
-        </tr>
-      </table></td>
-  </tr>
-  <tr>
-    <td bgcolor="#FFFFFF">&nbsp;</td>
-  </tr>
-</table>
+<body>
+
+<div id="form_container" class="content">
+ 
+ <span class="header block clear">[#in_register_pregloshenie#] <span class="highlight"><a href="http://www.[#server#]" target="_blank">[#server#]</a></span></span>
+ 
+ <form method="post" action="index.php">
+ <input type="hidden" name="action" value="registration">
+
+ <fieldset>
+  <label for="login">[#start_login#]:</label>
+  <input type="text" id="login" name="login" value="John Doe" onBlur="if(this.value=='')this.value=this.defaultValue;" onFocus="if(this.value==this.defaultValue)this.value='';">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="pwd">[#start_password#]:</label>
+  <input type="password" id="pwd" name="pwd" value="Password" onBlur="if(this.value=='')this.value=this.defaultValue;" onFocus="if(this.value==this.defaultValue)this.value='';">
+ </fieldset>
+ 
+ <span class="error block clear">[#errore#]</span>
+ 
+ <fieldset class="page_submit_field fslast">
+  <input type="submit" value="Войти">
+ </fieldset>
+ 
+</form>
+</div>
 </body>
 </html>

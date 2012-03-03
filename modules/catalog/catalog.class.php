@@ -3719,6 +3719,7 @@ class catalog extends basemodule
             {
                 $group = $this->get_group($prop['group_id']);
                 $table = '_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']);
+                @unlink($kernel->pub_site_root_get()."/modules/catalog/templates_admin/items_search_form_".$group['name_db'].".html");
             }
             else
             {
@@ -4013,8 +4014,8 @@ class catalog extends basemodule
 
         if ($group_id > 0)
         {
-	        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` '
-            . ' ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+	        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+            @unlink($kernel->pub_site_root_get()."/modules/catalog/templates_admin/items_search_form_".$group['name_db'].".html");
         }
         else
         {//common-свойство
@@ -6264,20 +6265,20 @@ class catalog extends basemodule
     {
         global $kernel;
         $prop  = $this->get_prop($propid);
-        $group = $this->get_group($groupid);
+
         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_item_props` WHERE `id`='.$propid;
         $kernel->runSQL($query);
         if ($groupid > 0)
         {
-	        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'`'
-            . ' DROP COLUMN `'.$prop['name_db']."`";
+            $group = $this->get_group($groupid);
+	        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` DROP COLUMN `'.$prop['name_db']."`";
             $kernel->runSQL($query);
             //$this->regenerate_group_tpls($groupid, false);
+            @unlink($kernel->pub_site_root_get()."/modules/catalog/templates_admin/items_search_form_".$group['name_db'].".html");
         }
         else
         {//общее свойство
-	        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items`'
-            . ' DROP COLUMN `'.$prop['name_db']."`";
+	        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` DROP COLUMN `'.$prop['name_db']."`";
             $kernel->runSQL($query);
 
 

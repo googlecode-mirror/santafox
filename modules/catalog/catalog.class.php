@@ -7538,7 +7538,7 @@ class catalog extends basemodule
 
         foreach ($props as $propname=>$processtype)
         {
-            if ($processtype == "ignore")
+            if ($processtype == "ignore" || !isset($all_group_props[$propname]))
                 continue;
 
             if ($all_group_props[$propname]['group_id'] != 0) //НЕ общее свойство

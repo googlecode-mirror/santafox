@@ -1,37 +1,28 @@
-<script type="text/javascript">
+<p class="header_box">Введите адрес Вашего сервера, логин и пароль для подключения к нему.</p>
 
-</script>
-<div>
-    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-        <h3 style="margin-bottom:5px;">Введите адрес Вашего сервера, логин и пароль для подключения к нему.</h3>
-        <div id="form-step1">
-
-            <form action="" method="post" id="sinstall_form">
-                <table>
-                    <tr>
-                        <td align="right">Доменное имя (должно начинаться на http://)</td>
-                        <td><input type="text" name="domen" value="[#value_domen#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Адрес FTP сервера</td>
-                        <td><input type="text" name="hostadress" value="[#value_hostadress#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Логин FTP</td>
-                        <td><input type="text" name="login" value="[#value_login#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Пароль FTP</td>
-                        <td><input type="text" name="password" value="[#value_password#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Путь, куда проинсталировать CMS (папка)</td>
-                        <td><input type="text" name="path" value="[#value_path#]" style="width:250px;" disabled /></td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    </div></div></div>
-    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
-</div>
+<form action="" method="post" id="sinstall_form">
+ <fieldset>
+  <label for="domen" style="padding-top:0;">Доменное имя:<br><small>(должно начинаться на http://)</small></label>
+  <input type="text" id="domen" name="domen" value="[#value_domen#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="hostadress">Адрес FTP сервера:</label>
+  <input type="text" id="hostadress" name="hostadress" value="[#value_hostadress#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="loginftp">Логин FTP:</label>
+  <input type="text" id="loginftp" name="login" value="[#value_login#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="ftppass">Пароль FTP:</label>
+  <input type="text" id="ftppass" name="password" value="[#value_password#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="path" style="padding-top:0;">Путь, куда проинсталировать CMS:<br><small>(папка)</small></label>
+  <input type="text" id="path" name="path" value="[#value_path#]" disabled>
+ </fieldset>
+</form>

@@ -1,37 +1,28 @@
-<script type="text/javascript">
-
-</script>
-
-<div>
-    <div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>
-    <div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">
-        <h3 style="margin-bottom:5px;">Введите параметры для доступа к mySQL</h3>
-        <div id="form-step2">
-            <form action="" method="post" id="sinstall_form">
-                <table>
-                    <tr>
-                        <td align="right">Адрес сервера MySQL</td>
-                        <td><input type="text" name="hostadress" value="[#value_hostadress#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Логин для соединения с MySQL</td>
-                        <td><input type="text" name="login" value="[#value_login#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Пароль для соединения с MySQL</td>
-                        <td><input type="text" name="password" value="[#value_password#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Имя базы данных</td>
-                        <td><input type="text" name="namebase" value="[#value_namebase#]" style="width:250px;" /></td>
-                    </tr>
-                    <tr>
-                        <td align="right">Префикс таблиц</td>
-                        <td><input type="text" name="prefix" value="[#value_prefix#]" style="width:250px;;" /></td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    </div></div></div>
-    <div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>
-</div>
+<p class="header_box">Введите параметры для доступа к mySQL</p>
+ 
+<form action="" method="post" id="sinstall_form">
+ <fieldset>
+  <label for="hostadress">Адрес сервера MySQL:</label>
+  <input type="text" id="hostadress" name="hostadress" value="[#value_hostadress#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="login">Логин для соединения с MySQL:</label>
+  <input type="text" id="login" name="login" value="[#value_login#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="password">Пароль для соединения с MySQL:</label>
+  <input type="text" id="password" name="password" value="[#value_password#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="namebase">Имя базы данных</label>
+  <input type="text" id="namebase" name="namebase" value="[#value_namebase#]">
+ </fieldset>
+ 
+ <fieldset>
+  <label for="prefix">Префикс таблиц</label>
+  <input type="text" id="prefix" name="prefix" value="[#value_prefix#]">
+ </fieldset>
+</form>

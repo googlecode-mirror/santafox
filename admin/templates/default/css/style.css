@@ -24,6 +24,8 @@ body {
 	behavior: url(PIE.htc);
 }
 
+img { border:none; }
+
 
 #contentLoading {
 	position:relative;

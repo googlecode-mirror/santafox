@@ -493,7 +493,7 @@ Closes the Linkselect's dropdown menu.
 					//Создаём тул бар для севера
 					//в котором выбираются доступные админки модулей
 					//this.toolbar = new Ext.Toolbar('main-tb');
-                    //@todo здесь табы модулей
+                    // @todo здесь табы модулей
 				    //[#modules_menus_tabs#]
 
                     /*

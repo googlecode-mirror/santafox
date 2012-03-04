@@ -21,7 +21,7 @@ $('#langselect').selectmenu({
 $('#form_admin_buttonsave').click(function(){
     // @todo use lang[]
     if (!$('#login').val() || !$('#pass').val())
-        santaShowPopupHint("Error", 'Ошибка - логин и пароль должны быть заполнены',0);//@todo use lang vars
+        santaShowPopupHint("Error", 'Ошибка - логин и пароль должны быть заполнены',0);// @todo use lang vars
     else
     {
         var postArr = $('#form_admin_edit_and_add').serializeArray();

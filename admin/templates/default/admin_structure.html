@@ -32,7 +32,7 @@
 	var label3 = '[#page_prop_name_id#]'; 	   label3 = label3.ellipse(28);
 	var label4 = '[#page_prop_link_page#]';    label4 = label4.ellipse(28);
 	var label5 = '[#page_prop_templte_page#]'; label5 = label5.ellipse(28);
-	var label6 = 'Доступна только авторизированым'; label6 = label6.ellipse(28);//@todo move to lang vars
+	var label6 = 'Доступна только авторизированым'; label6 = label6.ellipse(28);// @todo move to lang vars
 
 
     //построение селекта с шаблонами и инициализация
@@ -64,7 +64,7 @@
                         page_url:$("#fieldPageURL").val()
                        }};
 
-        //@todo замена имени ноды в дереве
+        // @todo замена имени ноды в дереве
         if ($('#flag_template').attr('checked'))
             postArr.page_properties.flag_template='on';
         if ($('#fieldPageOnlyAuth').attr('checked'))

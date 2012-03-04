@@ -377,10 +377,10 @@
 <div id="mainContainer">
 
  <div class="mcLayer">
-  <span class="csite"><a href="http://www.[#server#]" target="_blank">[#server#]</a> &mdash; редактируемый сайт</span>
+  <span class="csite"><a href="http://[#server#]" target="_blank">[#server#]</a> &mdash; редактируемый сайт</span>
   <span id="todayIs" class="today"></span>
-  <span class="santafox"><a href="#" target="_blank">Santafox</a></span>
-				</div>
+  <span class="santafox"><a href="http://www.santafox.ru" target="_blank">Santafox</a></span>
+ </div>
 
  <!-- mainLayout -->
  <div id="mainLayout">
@@ -388,20 +388,20 @@
   <div class="ui-layout-north">
    <div class="north-top">
    [#main_menu#]
-			</div>
+   </div>
 
    <div class="north-bottom">
     <!--span class="curr_a_sname">&ndash; Структура</span-->
 
     <div id="mod_block">
-			<div id="modules_toolbar"></div>
+      <div id="modules_toolbar"></div>
       <a href="#" id="mod_box_sbtn" class="mod_box_sbtn"></a>
       <div class="clear"></div>
-		</div>
+    </div>
 
     <div class="clear"></div>
-		</div>
-		</div>
+   </div>
+  </div>
 
   <!-- WEST PANEL -->
   <div id="west" class="ui-layout-west"></div>
@@ -416,8 +416,8 @@
  <!-- end of mainLayout -->
 
  <div class="mcLayer">
-  <span class="active_admin">Активных администраторов: <a href="javascript:;" onClick="start_interface.main_menu_click(this, 'polzovateli');">%admins_count%</a></span>
-  <span class="debug"><a href="javascript:;" onClick ="start_interface.show_debug_info(this)">DEBUG</a></span>
+  <span class="active_admin">Активных администраторов: <a href="#" onClick="start_interface.main_menu_click(this, 'polzovateli');">%admins_count%</a></span>
+  <span class="debug"><a href="#" onClick ="start_interface.show_debug_info(this)">DEBUG</a></span>
   <span class="update">CMS ver. [#curent_version#] [#version_update#]</span>
  </div>
 

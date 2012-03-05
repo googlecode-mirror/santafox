@@ -19,6 +19,7 @@
  *	Just to make demo-pages look better - not actually relevant to Layout!
  */
 .ui-layout-container { 
+	position:relative;
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
 	border-radius: 8px;
@@ -39,6 +40,9 @@
 	padding:8px 10px; 
 	overflow:	auto;
 	*overflow-x: hidden;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
 	}
 	/* (scrolling) content-div inside pane allows for fixed header(s) and/or footer(s) */
 	.ui-layout-content {

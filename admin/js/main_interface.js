@@ -277,10 +277,10 @@ function go_edit_content(name_file, no_redactor)
 		var name_edit = 'edit_';
 		var left=parseInt(100);
 		var top=parseInt(1);
-		var width = parseInt(screen.width - 810);
-		var height = parseInt(screen.height - 180);
-		if (width < 810)
-			width = 810;
+		var width = parseInt(screen.width / 3 );
+		var height = parseInt(screen.height / 2);
+		if (width < 700)
+			width = 700;
         var newWin;
 		if (no_redactor)
 			newWin=window.open('/admin/index.php?action=edit_content&file='+name_file+'&edit='+name_edit+'&no_redactor=1', '_blank', 'alwaysRaised=yes,dependent=yes,resizable=yes,titlebar=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=no,left=' + left + ',top=' + top + ',width=' + width +',height='+height,'Content');

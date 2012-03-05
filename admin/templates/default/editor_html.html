@@ -9,10 +9,16 @@
 <script type="text/javascript">
 
 $(function() {
+
+$(window).bind('resize', function(){
+ $('#cke_content_html').css({'height':'98.5%'});
+ $('.cke_wrapper').css({'height':'98.5%'});
+ $('.cke_skin_kama, .cke_editor').css({'height':'98.5%'});
+});
+
 var config =
            {
-               width : '100%',
-               height :'100%',
+               width : '99%',
                skin : 'kama',
                extraPlugins : 'ajaxsave',
                autoUpdateElement:true,
@@ -50,15 +56,19 @@ var config =
             close_on_save:[#close_on_save#]
            };
 
-   $('#[#name_edit#]').ckeditor(config);
+   $('#[#name_edit#]').ckeditor(config, function(){
+      $('#cke_content_html').css({'height':'98.5%'});
+      $('.cke_wrapper').css({'height':'98.5%'});
+      $('.cke_skin_kama, .cke_editor').css({'height':'98.5%'});
+   });
 });
 
 </script>
 </head>
 
-<body>
+<body style="margin:0; width:100%; height:100%;">
 <form method="post" action="/admin/?action=save_content">
-<textarea id="[#name_edit#]" name="[#name_edit#]">[#edit_content#]</textarea>
+<textarea id="[#name_edit#]" style="width:100%; height:100%;" name="[#name_edit#]">[#edit_content#]</textarea>
 <input type="hidden" value="[#file_name#]" name="file">
 </form>
 </body>

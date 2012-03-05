@@ -1,29 +1,46 @@
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=[#set_charset#]" />
+<meta http-equiv="Content-Type" content="text/html; charset=[#set_charset#]">
+<script type="text/javascript" src="/admin/js/jquery-1.7.1.min.js"></script>
 <script type="text/javascript" src="../components/syntax/edit_area_full.js"></script>
 <script type="text/javascript">
+function htmlFormSubmit(id, content){
+      $('#'+id+'').val(''+content+'');
+      var postArr = $('#htmlForm').serializeArray();
+      $.post('/admin/?action=save_content&no_redactor=1', postArr,  function(data){
+            //Обрабатываем ответ
+            var post_res=jQuery.parseJSON(data);
+            if (post_res!=null)
+            {
+                //сначала проверка на наличие ошибок
+                if (!post_res.success)
+                    alert('Error: '+post_res.info);
+            }
+      });
+}
+
 editAreaLoader.init({
 			id: "[#name_edit#]"
 			,start_highlight: true
 			,allow_toggle: false
+         ,fullscreen: true
 			,language: "ru"
 			,syntax: "html"
-			,toolbar: "search, go_to_line, |, undo, redo, |, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help"
+			,toolbar: "save, |, search, go_to_line, |, undo, redo, |, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help"
 			,syntax_selection_allow: "css,html,js,php,xml"
 			,show_line_colors: true
 			,allow_resize: "no"
+         ,save_callback: "htmlFormSubmit"
 		});
 	</script>
 <style type="text/css">
-            html, body{height:100%}
-            form{height:100%}
+            html, body{width:100%; height:100%}
+            form{width:100%; height:100%}
 </style>
 </head>
 <body leftmargin="0" topmargin="0" bottommargin="0" marginwidth="0" marginheight="0">
-<form method="post" action="/admin/?action=save_content&no_redactor=1">
-<textarea id="[#name_edit#]" name="[#name_edit#]" class="mceEditor">[#edit_content#]</textarea>
+<form id="htmlForm" action="/admin/?action=save_content&no_redactor=1" method="post">
+<textarea id="[#name_edit#]" name="[#name_edit#]" style="position:relative;" class="mceEditor">[#edit_content#]</textarea>
 <input type="hidden" value="[#file_name#]" name="file">
-<input type="submit" name="save" value="Save">
 </form>
 </body>
 </html>

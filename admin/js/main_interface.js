@@ -304,6 +304,7 @@ function update_action_list()
 {
     $("#actions_list_table").load(start_interface.global_link + 'action_update_list', function(response, status, xhr) {
           $('#module_actions_container').css("display","block");
+          $('#page_tabs').find('a[href=#mod_action_list]').parent().show();
           if (status == "error")
           {
             $("#actions_list_table").html("Load error: " + xhr.status + " " + xhr.statusText);

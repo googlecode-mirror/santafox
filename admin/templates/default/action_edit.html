@@ -68,6 +68,15 @@
 
         }
     });
+    
+   $('.prop-description b').next('ul').css({'display':'none'});
+   
+   $('.prop-description b').toggle(function(){
+      $(this).next('ul').slideDown();
+   },
+   function (){
+      $(this).parent().find('ul').slideUp();
+   });
 
 
 	%action_param_code%

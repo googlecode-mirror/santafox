@@ -4,8 +4,8 @@
 <!-- @html_main -->
 	<fieldset>
     <label for="ppf_%name%">%caption%</label>
-    <input type="checkbox" class="inputCheckbox" id="ppf_%name%" name="properties_cb[ppf_%name%]" onClick="jspub_disabled_change('ppf_%name%', 'ppv_%name%')" %checked% %disabled%>
-    <div class="value" id="lrp_%name%">%element% <div class="clear">%description%</div></div>
+    <input type="checkbox" id="ppf_%name%" name="properties_cb[ppf_%name%]" onClick="jspub_disabled_change('ppf_%name%', 'ppv_%name%')" %checked% %disabled%>
+    <div class="value" id="lrp_%name%">%element% <div class="prop-description">%description%</div></div>
    </fieldset>
 
 <!-- @select_html -->
@@ -32,7 +32,7 @@ jspub_disabled_change('ppf_%name%', 'ppv_%name%');
 
 
 <!-- @text_html -->
-<input id="ppv_%name%" class="textInput" name="properties[%name%]" value="%value%" style="width:290px;"/>
+<input type="text" id="ppv_%name%" name="properties[%name%]" value="%value%" style="width:290px;"/>
 
 <!-- @text_code -->
 jspub_disabled_change('ppf_%name%', 'ppv_%name%');

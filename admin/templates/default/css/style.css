@@ -269,6 +269,19 @@ div.right {
 	float:right;
 }
 
+.prop-description {
+	display:block;
+	clear:both;
+}
+
+.prop-description ul li ul { display:none; }
+.prop-description b { line-height:2.2em; margin-left:30px; border-bottom:1px dotted; cursor:pointer;}
+.prop-description b:hover { color:#00ADDB; }
+.prop-description ul { list-style:none; margin:0 35px; padding:0; }
+.prop-description ul li ul { margin:0 10px; padding:0; }
+.prop-description li b { margin:0px; }
+.prop-description ul li { padding:3px 0; }
+
 /* end of center layout styles */
 
 /* west layout styles */

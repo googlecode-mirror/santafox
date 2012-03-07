@@ -2,14 +2,17 @@
 <script type="text/javascript">
 	//var arr_var_lang = new Array();
     [#action_modules#]
-
-    var htmlSelectActions='';
-    for (var j=0;j<moduleActions.length;j++)
+    
+    if(window.moduleActions)
     {
-        var elem = moduleActions[j];
-        htmlSelectActions+='<option value="'+elem[0]+'">'+elem[1]+'</option>';
+       var htmlSelectActions='';
+       for (var j=0;j<moduleActions.length;j++)
+       {
+           var elem = moduleActions[j];
+           htmlSelectActions+='<option value="'+elem[0]+'">'+elem[1]+'</option>';
+       }
+       $("#moduleNewActionSelect").html(htmlSelectActions);
     }
-    $("#moduleNewActionSelect").html(htmlSelectActions);
 
 
 	%prop_modul_code%
@@ -61,12 +64,23 @@
       style:'dropdown',
       maxHeight: 200
    });
+   
+   
+   $('.prop-description b').next('ul').css({'display':'none'});
+   
+   $('.prop-description b').toggle(function(){
+      $(this).next('ul').slideDown();
+   },
+   function (){
+      $(this).parent().find('ul').slideUp();
+   });
+   
+   // content таба пустой ? прячем
+   if($('#mod_props').children('fieldset').length == 0)
+      $('#page_tabs').find('a[href=#mod_props]').parent().css({'display':'none'});
+
 </script>
 %writeable%
-<!--div id="loading-mask" style="position: absolute"></div-->
-<!--div id="loading" class="loading">
-    <div class="loading-indicator">&#160;Loading...</div>
-</div-->
 
 <span class="content_header">Модули &rarr; <span class="black">[#modules_lable_info#]</span> <span style="font-size:11px; font-weight:normal; color:#666;">(Идентификатор: %id_modul%)</span></span>
 <div id="page_container">
@@ -76,7 +90,7 @@
   <ul>
    <li><a href="#mod_all_lang_name">[#modules_legend_name_all_lang#]</a></li>
    <li><a href="#mod_props">[#modules_legend_all_modul#]</a></li>
-   <li><a href="#mod_action_list">[#modules_legend_action_modul#]</a></li>
+   <li style="display:none;"><a href="#mod_action_list">[#modules_legend_action_modul#]</a></li>
   </ul>
  </div>
 
@@ -84,23 +98,14 @@
 
  <div id="mod_all_lang_name" class="content">
                     [#modules_form_edit_all_name#]
-                </fieldset>
             </div>
 
- <div id="mod_props" class="content">
-                    <table class="admin_table">
-                        %str_prop_modul%
-                    </table>
-                </fieldset>
-            </div>
+ <div id="mod_props" class="content">%str_prop_modul%</div>
 
  <div id="mod_action_list" class="content">
   <div id="module_actions_container" style="padding:none; display:none;">
-                <fieldset>
      <label style="width:170px;">[#modules_label_action_new#]</label>
-     <select id="moduleNewActionSelect" style="width:330px;">
-
-     </select>
+     <select id="moduleNewActionSelect" style="width:330px;"></select>
      <input type="button" style="margin-left:15px;" id="button_add_action" value="Создать"> <!-- // @todo move 2 lang vars  -->
                     </div>
 
@@ -114,7 +119,6 @@
             </form>
 
         </div>
-</div>
 
 <!-- @names_module -->
 <fieldset>

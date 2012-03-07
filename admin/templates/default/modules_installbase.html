@@ -16,6 +16,10 @@ $("#new_module_install").click(function () {
        start_interface.main_menu_click('main_menu_modules', 'modules');
     });
 });
+
+if($('#select_modul').is(':empty'))
+   $('.content').html('<h3>[#modules_install_base_header#]</h3><p>Все доступные модули установлены</p>');
+
 </script>
 %writeable%
 <span class="content_header">Модули &rarr; <span class="black">Инсталляция модулей</span></span>
@@ -27,9 +31,7 @@ $("#new_module_install").click(function () {
             <form action="%url_action%" method="post">
   <fieldset>
    <label for="select_modul">[#modules_install_spisok_dostupnih#]:</label>
-   <select name="modul_install" id="select_modul">
-                %modules_rows%
-   </select>
+   <select name="modul_install" id="select_modul">%modules_rows%</select>
   </fieldset>
 
   <fieldset class="page_submit_field">

@@ -114,7 +114,7 @@ class manager_stat
                     $labels[] = $row['tstc_date'];
                 }
 
-                include_once( 'components/ofc/php-ofc-library/open-flash-chart.php' );
+                require_once(dirname(dirname(__FILE__)).'/components/ofc/php-ofc-library/open-flash-chart.php');
                 if (($this->date_to_untixtime($_SESSION['stat_date_end'], true) - $this->date_to_untixtime($_SESSION['stat_date_start'])) >= 604800 )
                 {
                     $g = new graph();
@@ -205,7 +205,7 @@ class manager_stat
                 {
                     $data_percents[] = round((100 * $value / array_sum($data)), 2);
                 }
-                include_once('components/ofc/php-ofc-library/open-flash-chart.php');
+                require_once(dirname(dirname(__FILE__)).'/components/ofc/php-ofc-library/open-flash-chart.php');
                 $g = new graph();
                 $g->bg_colour = '#E0EDFD';
                 $g->pie(80,'#505050','#000000');
@@ -258,6 +258,8 @@ class manager_stat
                     $IDDomain = $this->get_IDDomain_by_domain($domain);
                     if( !$IDDomain )
                     {
+                        if (mb_strlen($domain)>128)
+                            $domain=mb_substr($domain,0,128);
                         $query = "INSERT INTO ".$kernel->pub_prefix_get()."_stat_domain (IDDomain, domain) VALUES (0, '".mysql_real_escape_string($domain)."')";
                         $kernel->runSQL($query);
                     }
@@ -300,7 +302,7 @@ class manager_stat
     	global $kernel;
     	$IDRobot	=	0;
     	if( !$q = $kernel->runSQL("SELECT * FROM ".$kernel->pub_prefix_get()."_stat_robot") )
-            echo "<BR>".mysql_error()."<BR>";
+            return $IDRobot;
         while( $qa = mysql_fetch_array($q))
         {
             if( preg_match("/".preg_quote($qa["agent"], "/")."/i", "$agent") )
@@ -332,7 +334,7 @@ class manager_stat
     	$IDDomain	=	0;
 
     	if( !$q = $kernel->runSQL("SELECT IDDomain FROM ".$kernel->pub_prefix_get()."_stat_domain WHERE domain='".mysql_real_escape_string($domain)."' OR domain='www.".mysql_real_escape_string($domain)."'") )
-            echo "<BR>".mysql_error()."<BR>";
+            return $IDDomain;
         if( $qa = mysql_fetch_array($q) )
             $IDDomain	=	$qa["IDDomain"];
     	mysql_free_result($q);
@@ -344,7 +346,7 @@ class manager_stat
     	global $kernel;
     	$list_domain	=	array();
     	if( !$q = $kernel->runSQL("SELECT * FROM ".$kernel->pub_prefix_get()."_stat_domain") )
-            echo "<BR>".mysql_error()."<BR>";
+            return $list_domain;
         while( $qa = mysql_fetch_array($q))
         {
             $list_domain[] = array("IDDomain" => "$qa[IDDomain]", "domain" => "$qa[domain]");
@@ -356,7 +358,7 @@ class manager_stat
     /**
      * Определяет партнера по заправшиваемой странице сайта
      *
-     * @param String $uri
+     * @param string $str
      * @return integer
      */
     function get_IDPartner($str)
@@ -385,7 +387,7 @@ class manager_stat
     	$q = $kernel->runSQL($sql);
 		if ($qa = mysql_fetch_array($q))
 		{
-			if( preg_match("/".$qa['preg_word']."(.*?)(\&|$)/i", "$referer", $matches) )
+			if( preg_match("/".$qa['preg_word']."(.*?)(\\&|$)/i", "$referer", $matches) )
 			{
 				$count_matches	=	count($matches);
 				$word			=	trim($matches[($count_matches-2)]);
@@ -418,20 +420,33 @@ class manager_stat
     {
     	global $kernel;
 
-    	if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_uri (IDUri, uri, tstc) VALUES (0, '".mysql_real_escape_string($uri)."', UNIX_TIMESTAMP())") )
-            echo "<BR>".mysql_error()."<BR>";
+        if (mb_strlen($uri)>255)
+            $uri=mb_substr($uri,0,255);
+        $q="INSERT INTO ".$kernel->pub_prefix_get()."_stat_uri
+            (IDUri, uri, tstc)
+            VALUES
+            (0, '".mysql_real_escape_string($uri)."', UNIX_TIMESTAMP())";
+    	if (!$kernel->runSQL($q))
+            return 0;
     	$IDUri = mysql_insert_id();
-
     	return $IDUri;
     }
 
     function save_referer($IDDomain, $IDPartner, $IDSearch, $referer, $referer_domain)
     {
     	global $kernel;
+        if (mb_strlen($referer)>255)
+            $referer=mb_substr($referer,0,255);
+        if (mb_strlen($referer_domain)>128)
+            $referer_domain=mb_substr($referer_domain,0,128);
 
-    	if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_referer (IDReferer, IDDomain, IDPartner, IDSearch, referer, referer_domain, tstc) VALUES (0, ".mysql_real_escape_string($IDDomain).", ".mysql_real_escape_string($IDPartner).", ".mysql_real_escape_string($IDSearch).", '".mysql_real_escape_string($referer)."', '".mysql_real_escape_string($referer_domain)."', UNIX_TIMESTAMP())") )
-            echo "<BR>".mysql_error()."<BR>";
-    	$IDReferer		=		mysql_insert_id();
+        $q="INSERT INTO ".$kernel->pub_prefix_get()."_stat_referer
+            (IDReferer, IDDomain, IDPartner, IDSearch, referer, referer_domain, tstc)
+            VALUES
+            (0, '".intval($IDDomain)."', '".intval($IDPartner)."', '".intval($IDSearch)."', '".mysql_real_escape_string($referer)."', '".mysql_real_escape_string($referer_domain)."', UNIX_TIMESTAMP())";
+    	if( !$kernel->runSQL($q))
+            return 0;
+    	$IDReferer = mysql_insert_id();
 
     	return $IDReferer;
     }
@@ -439,9 +454,14 @@ class manager_stat
     function save_word($IDSearch, $IDReferer, $IDPartner, $word)
     {
     	global $kernel;
-    	$word = addslashes($word);
-    	if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_word (IDWord, IDSearch, IDReferer, IDPartner, word, tstc) VALUES (0, ".mysql_real_escape_string($IDSearch).", ".mysql_real_escape_string($IDReferer).", ".mysql_real_escape_string($IDPartner).", '".mysql_real_escape_string($word)."', UNIX_TIMESTAMP())") )
-            echo "<BR>".mysql_error()."<BR>";
+        if (mb_strlen($word)>255)
+            $word=mb_substr($word,0,255);
+        $q="INSERT INTO ".$kernel->pub_prefix_get()."_stat_word
+            (IDWord, IDSearch, IDReferer, IDPartner, word, tstc)
+            VALUES
+            (0, ".intval($IDSearch).", ".intval($IDReferer).", ".intval($IDPartner).", '".mysql_real_escape_string($word)."', UNIX_TIMESTAMP())";
+    	if( !$kernel->runSQL($q))
+            return 0;
     	$IDWord = mysql_insert_id();
     	return $IDWord;
     }
@@ -450,16 +470,25 @@ class manager_stat
     {
     	global $kernel;
         $iplong	= sprintf("%u", ip2long($ip));
-    	if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_host (IDHost, IDPartner, IDReferer, IDUri, IDSearch, IDWord, IDSess, ip, iplong, tstc) VALUES (0, ".mysql_real_escape_string($IDPartner).", ".mysql_real_escape_string($IDReferer).", ".mysql_real_escape_string($IDUri).", ".mysql_real_escape_string($IDSearch).", ".mysql_real_escape_string($IDWord).", '".mysql_real_escape_string($IDSess)."', '".mysql_real_escape_string($ip)."', ".mysql_real_escape_string($iplong).", UNIX_TIMESTAMP())") )
-            echo "<BR>".mysql_error()."<BR>";
+        $q="INSERT INTO ".$kernel->pub_prefix_get()."_stat_host
+            (IDHost, IDPartner, IDReferer, IDUri, IDSearch, IDWord, IDSess, ip, iplong, tstc)
+            VALUES
+            (0, '".intval($IDPartner)."', '".intval($IDReferer)."', '".intval($IDUri)."', '".intval($IDSearch)."', '".intval($IDWord)."', '".mysql_real_escape_string($IDSess)."', '".mysql_real_escape_string($ip)."', '".mysql_real_escape_string($iplong)."', UNIX_TIMESTAMP())";
+    	if (!$kernel->runSQL($q))
+            return 0;
     	$IDHost = mysql_insert_id();
     	return $IDHost;
     }
+
     function save_index($IDRobot, $IDUri)
     {
     	global $kernel;
-    	if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_index (IDIndex, IDRobot, IDUri, tstc) VALUES (0, ".mysql_real_escape_string($IDRobot).", ".mysql_real_escape_string($IDUri).", UNIX_TIMESTAMP())") )
-            echo "<BR>".mysql_error()."<BR>";
+        $q="INSERT INTO ".$kernel->pub_prefix_get()."_stat_index
+            (IDIndex, IDRobot, IDUri, tstc)
+            VALUES
+            (0, '".intval($IDRobot)."', '".intval($IDUri)."', UNIX_TIMESTAMP())";
+    	if( !$kernel->runSQL($q))
+            return 0;
     	$IDIndex = mysql_insert_id();
     	return $IDIndex;
     }
@@ -569,12 +598,10 @@ class manager_stat
 		if( $stat["IDSearch"] )
 			$stat["word"]		=	$this->get_word_by_referer($stat["IDSearch"], $stat["referer"]);
 
-	    //////////////////////////////////////////////////////////////Начало сохранения статистики//////////////////////////////////////////////////////////
-
 		$_SESSION["IDHost"]		=		0;
 		$stat["IDUri"]			=		$this->save_uri($stat["uri"]);
-		if( $stat["IDRobot"] )			//this robot
-			$stat["IDIndex"]		=		$this->save_index($stat["IDRobot"], $stat["IDUri"]);
+		if( $stat["IDRobot"] && $stat["IDUri"])			//this robot
+			$this->save_index($stat["IDRobot"], $stat["IDUri"]);
 		else 							//this user
 		{
 			if( $stat["referer"] )		//Если есть реферер
@@ -583,31 +610,39 @@ class manager_stat
 				$stat["IDReferer"]		=	$this->save_referer($stat["IDDomain"], $stat["IDPartner"], $stat["IDSearch"], $stat["referer"], $stat["referer_domain"]);
 
 				//Если пришел с поисковика то сохраняем ключевое слово.
-				if( $stat["IDSearch"] )
+				if( $stat["IDSearch"] && $stat["IDReferer"])
 					$stat["IDWord"]			=	$this->save_word($stat["IDSearch"], $stat["IDReferer"], $stat["IDPartner"], $stat["word"]);
 
 				//Все данные хоста готовы, сохраняем его
-				$stat["IDHost"]			=	$this->save_host($stat["IDPartner"], $stat["IDReferer"], $stat["IDUri"], $stat["IDSearch"], $stat["IDWord"], $stat["IDSess"], $stat["ip"]);
-				$_SESSION["IDHost"]		=	$stat["IDHost"];
+                if ($stat["IDUri"] && $stat["IDWord"] && $stat["IDReferer"])
+                {
+                    $stat["IDHost"]			=	$this->save_host($stat["IDPartner"], $stat["IDReferer"], $stat["IDUri"], $stat["IDSearch"], $stat["IDWord"], $stat["IDSess"], $stat["ip"]);
+                    if ($stat["IDHost"])
+                        $_SESSION["IDHost"]		=	$stat["IDHost"];
+                }
 			}
 			else 						//Прямой заход
 			{
-				$stat["IDHost"]			=	$this->save_host($stat["IDPartner"], 0, $stat["IDUri"], 0, 0, $stat["IDSess"], $stat["ip"]);
-				$_SESSION["IDHost"]		=	$stat["IDHost"];
+                if ($stat["IDUri"])
+                {
+                    $stat["IDHost"]			=	$this->save_host($stat["IDPartner"], 0, $stat["IDUri"], 0, 0, $stat["IDSess"], $stat["ip"]);
+                    if ($stat["IDHost"])
+                        $_SESSION["IDHost"]		=	$stat["IDHost"];
+                }
 			}
 		}
-    	//////////////////////////////////////////////////////////////Конец сохранения статистики///////////////////////////////////////////////////////////
     }
-    function get_partner_list($IDPartner)
+
+    function get_partner_list()
     {
     	global $kernel;
-    	$partner_list	=	"";
     	$query = "SELECT * FROM ".$kernel->pub_prefix_get()."_stat_partner";
     	$result = $kernel->runSQL($query);
     	$partner_list = array();
     	$partner_list[0] = "[#statist_all_all_partnets#]";
         while( $qa = mysql_fetch_array($result) )
             $partner_list[$qa['IDPartner']] = $qa['partner'];
+        mysql_free_result($result);
     	return $partner_list;
     }
 
@@ -615,13 +650,9 @@ class manager_stat
     function get_form($stat_type, $label_form, $url, $partner = true, $data = true)
     {
         global $kernel;
-
         $action = $kernel->pub_httppost_get();
-
         $template = $kernel->pub_template_parse("admin/templates/default/statnew_global_param.html");
         $html = $template['begin'];
-
-        //$html_add = '';
         $date_start = '';
         $date_end = '';
         $diapazon_block = $template['diapazon_block'];
@@ -704,9 +735,9 @@ class manager_stat
         $html_add = '';
         if ($partner)
         {
-	   		$IDPartner = isset($action["partners"])?(int)$action["partners"]:0;
+	   		//$IDPartner = isset($action["partners"])?(int)$action["partners"]:0;
             $html_add = $template['set_partner'];
-            $partners =	$this->get_partner_list($IDPartner);
+            $partners =	$this->get_partner_list();
             $plines = '';
             foreach ($partners as $pk=>$pv)
             {
@@ -814,7 +845,7 @@ class manager_stat
     /**
      * Отвечает за формирвоание отчета по хостам и хитам
      *
-     * @return HTML
+     * @return string
      */
     function get_host()
     {
@@ -879,7 +910,7 @@ class manager_stat
 
 		//Выведем график
 
-        include_once 'components/ofc/php-ofc-library/open_flash_chart_object.php';
+        require_once(dirname(dirname(__FILE__)).'/components/ofc/php-ofc-library/open_flash_chart_object.php');
 		$html .= str_replace("%link_image%", open_flash_chart_object_str(500, 400, $kernel->pub_redirect_for_form("get_host_data&partners=$IDPartner&date_start=$date_start&date_end=$date_end&f_people=$checked_f_people"), false, '../components/ofc/'), $template['image']);
 
         //Set table stat
@@ -902,7 +933,7 @@ class manager_stat
     /**
      * Выводит форму и формирует отчет "Ссылающиеся страницы"
      *
-     * @return HTML
+     * @return string
      */
     function get_referer()
     {
@@ -976,7 +1007,6 @@ class manager_stat
 
 
         //Теперь сформируем таблицу с непосредственно ссылками
-        $rhtml = '';
         $rhtml = $template['ref_begin'];
         for ($i=0; $i<count($stat); $i++ )
         {
@@ -1004,7 +1034,7 @@ class manager_stat
      * Выводит форму и формирует отчет по популярным ключевым словам, по которым
      * люди приходят на сайт
      *
-     * @return HTML
+     * @return string
      */
 
     function get_word()
@@ -1132,7 +1162,7 @@ class manager_stat
 	        $html_str = str_replace("%name_link%", $stat[$i]["word"], $html_str);
 	        $html_str = str_replace("%count%",  $stat[$i]["count"],  $html_str);
 
-            include_once 'components/ofc/php-ofc-library/open_flash_chart_object.php';
+            require_once(dirname(dirname(__FILE__)).'/components/ofc/php-ofc-library/open_flash_chart_object.php');
     		$html_str = str_replace("%link_image%", open_flash_chart_object_str(300, 150, $kernel->pub_redirect_for_form($link_image), false, '../components/ofc/'), $html_str);
 	        $html .= $html_str.$template['tr_end'];
         }
@@ -1289,7 +1319,7 @@ class manager_stat
     /**
 	 * Выводит форму и формирует отчет по прямым заходом на сайт
      *
-     * @return HTML
+     * @return string
      */
     function get_ip()
     {
@@ -1300,7 +1330,6 @@ class manager_stat
    		$date_start_dmy = $this->date_to_untixtime($date_start);
         $date_end_dmy   = $this->date_to_untixtime($date_end, true);
         $_where		=	"";
-        $i 			=		0;
         $stat		=		array();
         $sql = "SELECT COUNT(".$kernel->pub_prefix_get()."_stat_host.IDHost) as cip,
                         ".$kernel->pub_prefix_get()."_stat_host.ip
@@ -1343,7 +1372,7 @@ class manager_stat
     /**
 	 * Выводит форму и формирует отчет по индексированию сайта роботами
      *
-     * @return HTML
+     * @return string
      */
 
     function get_index()
@@ -1361,7 +1390,6 @@ class manager_stat
         $date_end_dmy   = $this->date_to_untixtime($date_end, true);
 
         //Get stat
-        $i      = 0;
         $stat   = array();
         $robots = array();
 
@@ -1405,7 +1433,7 @@ class manager_stat
 		$html .= $template['begin'];
 
 		//Выведем график
-        include_once 'components/ofc/php-ofc-library/open_flash_chart_object.php';
+        require_once(dirname(dirname(__FILE__)).'/components/ofc/php-ofc-library/open_flash_chart_object.php');
 		$html .= str_replace("%link_image%", open_flash_chart_object_str(500, 400, $kernel->pub_redirect_for_form("get_index_img"), false, '../components/ofc/'), $template['image']);
 
         //Сформируем шапку таблицы
@@ -1505,7 +1533,7 @@ class manager_stat
     /**
      * Отображает форму для управления доменами, являющимися доменами сайта
      *
-     * @return HTML
+     * @return string
      */
     function show_domain($form = true)
     {
@@ -1539,7 +1567,7 @@ class manager_stat
      * Выводит форму и управляет партнерами, используемыми в статистике
      *
      * @param integer $IDPartner
-     * @return HTML
+     * @return string
      */
     function show_partner($IDPartner)
     {
@@ -1549,6 +1577,8 @@ class manager_stat
     	{
     		if( $action["partner"] )
     		{
+                if (mb_strlen($action['partner'])>64)
+                    $action['partner']=mb_substr($action['partner'],0,64);
                 if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_partner (IDPartner, partner, tstc) VALUES (0, '".mysql_real_escape_string($action['partner'])."', UNIX_TIMESTAMP())") )
                     echo "<BR>".mysql_error()."<BR>";
                 else
@@ -1565,7 +1595,9 @@ class manager_stat
     	}
     	if( isset($action["add_preg_partner"]) )
     	{
-    		if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_partner_eregs (IDPEregs, IDPartner, preg_partner) VALUES (0, ".mysql_real_escape_string($action['IDPartner_select']).", '".mysql_real_escape_string($action['preg_partner'])."')") )
+            if (mb_strlen($action['preg_partner'])>64)
+                $action['preg_partner']=mb_substr($action['preg_partner'],0,64);
+    		if( !$kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get()."_stat_partner_eregs (IDPEregs, IDPartner, preg_partner) VALUES (0, ".intval($action['IDPartner_select']).", '".mysql_real_escape_string($action['preg_partner'])."')") )
     		    echo "<BR>".mysql_error()."<BR>";
     		else
                 $kernel->pub_redirect_refresh_reload('show_partner');
@@ -1636,7 +1668,7 @@ class manager_stat
             $data[$row['IDRobot']]['data'][$row['tstc_date']] = $row['cindex'];
         }
 
-        include_once( 'components/ofc/php-ofc-library/open-flash-chart.php' );
+        require_once(dirname(dirname(__FILE__)).'/components/ofc/php-ofc-library/open-flash-chart.php' );
         $g = new graph();
 
         if (($this->date_to_untixtime($_SESSION['stat_date_end'], true) - $this->date_to_untixtime($_SESSION['stat_date_start'])) >= 60*60*24*2 )

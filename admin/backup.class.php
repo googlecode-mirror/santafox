@@ -147,31 +147,22 @@ class backup
     {
         global $kernel;
         $full_path = false;
+        $filename="";
         $root = $kernel->pub_site_root_get();
         if (is_numeric($id) && ($id > 0))
         {
-            $sql = "SELECT
-                    real_filename,
-                    filename
-                    FROM
-                    ".PREFIX."_backup
-                    WHERE
-                    id='".$id."'
-                    ";
-            $result = $kernel->runSQL($sql);
-            if (mysql_num_rows($result))
+
+            $data = $kernel->db_get_record_simple("_backup","id='".intval($id)."'");
+            if ($data)
             {
-                $data = mysql_fetch_assoc($result);
                 $real_filename = $data['real_filename'];
                 $filename = $data['filename'];
                 $full_path = $root."/backup/".$real_filename;
             }
         }
         else
-        {
             $full_path = $root."/backup/".$id;
-            $real_filename = $id;
-        }
+
         if ($full_path)
         {
             $file_content = $this->give_file($full_path);
@@ -427,8 +418,6 @@ class backup
     function backup_table_get_uploaded($files)
     {
         global $kernel;
-        $content = '';
-
         $sql = 'SELECT * FROM '.PREFIX.'_backup';
         $result = $kernel->runSQL($sql);
 
@@ -437,14 +426,12 @@ class backup
         {
             $array[] = $row['real_filename'];
         }
-        //$files = $array;
         $files = array_diff($files, $array);
 
         $template = $kernel->pub_template_parse("admin/templates/default/backup_files.html");
         $content = $template['backup_table'];
 
         $lines = ''; $i = 1;
-        //foreach ($files as $key => $value)
         foreach ($files as $value)
         {
             if ($value == '.' || $value == '..'|| $value == '.htaccess') {
@@ -676,6 +663,7 @@ class backup
      *
      * @param number $ruleid ID-шник правила
      * @param string $uniqID уникальный ID-шник бэкапа
+     * @return array
      */
     function dump_mysql_table4backup($ruleid, $uniqID)
     {
@@ -781,12 +769,13 @@ class backup
      * @param string $backup_action
      * @param array $my_get
      * @param array $my_post
-     * @return HTML
+     * @return string
      */
     function backup_start($backup_action, $my_get, $my_post)
     {
         global $kernel;
         $root = $kernel->pub_site_root_get();
+        $html_content='';
         switch ($backup_action)
 		{
 		    default:
@@ -809,15 +798,24 @@ class backup
 		        break;
 		    case 'edit_rule':
 		        $id = $my_get['id'];
-		        if ($id==0)
-		            $rule = array("needcontent"=>0, "needsystem"=>0, "needtables"=>0, "needdesign"=>0,
-		            			  "name"=>"", "stringid"=>"",
-		            			  "ftphost"=>"","ftpuser"=>"", "ftppass"=>"", "ftpdir"=>"/");
-		        else
-		            $rule = $this->get_backup_rule($id);
+
 		        $template = $kernel->pub_template_parse($root."/admin/templates/default/backup_rules.html");
 		        $html_content = $template['backup_rule_edit'];
 		        $html_content = str_replace("%form_action%",$kernel->pub_redirect_for_form("backup&backup=save_rule&id=".$id), $html_content);
+
+                if ($id==0)
+                {
+                    $rule = array("needcontent"=>0, "needsystem"=>0, "needtables"=>0, "needdesign"=>0,
+      		            			  "name"=>"", "stringid"=>"",
+      		            			  "ftphost"=>"","ftpuser"=>"", "ftppass"=>"", "ftpdir"=>"/");
+                    $edit_details_link='';
+                }
+                else
+                {
+                    $rule = $this->get_backup_rule($id);
+                    $edit_details_link=$template['rule_details_link'];
+                }
+                $html_content=str_replace('%rule_details_link%',$edit_details_link,$html_content);
 
 		        if ($rule['needcontent']==1)
 		            $html_content = str_replace("%needcontent%", "checked", $html_content);
@@ -1047,10 +1045,10 @@ class backup
 		    case 'run_save':
 		        $ruleid = $my_post['ruleid'];
 		        $rule = $this->get_backup_rule($ruleid);
-		        $backup_res = $this->backup_run_save($rule, $my_post['needcontent']==1?true:false,
-		                                $my_post['needsystem']==1?true:false,
-		                                $my_post['needtables']==1?true:false,
-		                                $my_post['needdesign']==1?true:false,
+		        $backup_res = $this->backup_run_save($rule, $my_post['needcontent']==1,
+		                                $my_post['needsystem']==1,
+		                                $my_post['needtables']==1,
+		                                $my_post['needdesign']==1,
 		                                $my_post['description']);
 		        if ($backup_res)
 		            return $kernel->pub_httppost_response("[#admin_backup_rule_finished_ok_msg#]","/admin");

@@ -1,29 +1,5 @@
 <!-- @form_header -->
-<script type="text/javascript">
- $("input:submit, input:button, button").button();
- 
- $('#content_container select').selectmenu({
-   style:'dropdown',
-   maxHeight: 200
- });
- 
-	function show_filter_results()
-	{
-        santaUpdateRegion('filter',start_interface.global_link + 'test_filter&id=%id%');
-        return false;
-	}
- 
- $('#inner_form_cats ul li ul').css({'display':'none'});
- $('#inner_form_cats ul li b').css({'cursor':'pointer'});
- $('#inner_form_cats ul li b').each(function(){
-   $(this).toggle(function(){
-      $(this).parent().find('ul').slideDown();
-   },
-   function (){
-      $(this).parent().find('ul').slideUp();
-   });
- });
-</script>
+
 <span class="content_header">Модуль &rarr; <span class="black">[#catalog_base_name#]</span></span>
 <div id="page_container">
  <div id="content_container">
@@ -99,10 +75,10 @@
   
   <fieldset>
    <label>[#catalog_edit_inner_filter_categories_label#]</label>
-   <select name="cattype">
-    <option value="all" %cattype_all% onClick="document.getElementById('selectedcats').style.display='none';">[#catalog_edit_inner_filter_all_categories_label#]</option>
-    <option value="current" %cattype_current% onClick="document.getElementById('selectedcats').style.display='none';"> [#catalog_edit_inner_filter_current_category_label#]</option>
-    <option value="selected" %cattype_selected% onClick="document.getElementById('selectedcats').style.display='block';">[#catalog_edit_inner_filter_selected_categories_label#]</option>
+   <select name="cattype" id="cattype">
+    <option value="all" %cattype_all% >[#catalog_edit_inner_filter_all_categories_label#]</option>
+    <option value="current" %cattype_current%> [#catalog_edit_inner_filter_current_category_label#]</option>
+    <option value="selected" %cattype_selected%>[#catalog_edit_inner_filter_selected_categories_label#]</option>
    </select>
    
    <div id="selectedcats" style="display:%selectedcats_display%">%categories%</div>
@@ -127,6 +103,39 @@
  </div>
 </div>
 
+<script type="text/javascript">
+ $("input:submit, input:button, button").button();
+ $('#cattype').change(function(){
+     console.log('cattype: '+$(this).val());
+     if ($(this).val()!='selected')
+         $('#selectedcats').hide();
+     else
+         $('#selectedcats').show();
+
+ });
+
+ $('#content_container select').selectmenu({
+   style:'dropdown',
+   maxHeight: 200
+ });
+
+	function show_filter_results()
+	{
+        santaUpdateRegion('filter',start_interface.global_link + 'test_filter&id=%id%');
+        return false;
+	}
+
+ $('#inner_form_cats ul li ul').css({'display':'none'});
+ $('#inner_form_cats ul li b').css({'cursor':'pointer'});
+ $('#inner_form_cats ul li b').each(function(){
+   $(this).toggle(function(){
+      $(this).parent().find('ul').slideDown();
+   },
+   function (){
+      $(this).parent().find('ul').slideUp();
+   });
+ });
+</script>
 
 <!-- @group_option_for_select -->
 <option value="%id%" %sel%>%name%</option>

@@ -8216,6 +8216,11 @@ class catalog extends basemodule
             case 'show_variables':
             	return $this->show_variables();
                 break;
+            case 'variable_delete':
+            	$namedb=$kernel->pub_httpget_get('name_db');
+                $kernel->runSQL("DELETE FROM `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_variables` WHERE `name_db`='".$namedb."'");
+                $kernel->pub_redirect_refresh('show_variables');
+                break;
             case 'show_variable_form':
                 $name_db = $kernel->pub_httpget_get("name_db");
                 return  $this->show_variable_form($name_db);

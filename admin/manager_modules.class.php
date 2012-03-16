@@ -146,7 +146,8 @@ class manager_modules
                 $html = $this->modules_form_installed_get();
             	break;
             case 'modules_base_install':
-				$html = $this->modules_base_modul_install();
+				$this->modules_base_modul_install();
+                $kernel->pub_redirect_refresh_global('/admin/');
             	break;
             case 'module_delet':
             	$node = $kernel->pub_httppost_get('node');
@@ -809,8 +810,6 @@ class manager_modules
 
 	/**
 	 * Инсталирует новый базовый модуль в системе
-	 *
-	 * @return string
 	 */
 	function modules_base_modul_install()
     {
@@ -820,7 +819,7 @@ class manager_modules
         $path = "modules/".$id_modul;
 
         if (empty($id_modul))
-            return '';
+            return;
 
         //Подключим инсталятор
         $install = new install_modules();
@@ -909,7 +908,7 @@ class manager_modules
 				}
 			}
 		}
-        return '';
+        return;
     }
 
 
@@ -1032,7 +1031,7 @@ class manager_modules
 
     /**
     * Возвращает список модулей, которые ещё можно проинсталировать
-    * @return HTML
+    * @return string
     */
 	function modules_form_installed_get()
     {
@@ -1333,7 +1332,7 @@ class manager_modules
      *
      * Выводит на экран страницу для редактирования настроек модуля. Причем для базового модуля
      * нам не нужны действия
-     * @return HTML
+     * @return string
      */
     function show_properties_module()
     {

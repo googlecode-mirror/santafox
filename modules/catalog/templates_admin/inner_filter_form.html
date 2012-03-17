@@ -22,8 +22,8 @@
   </fieldset>
   
   <fieldset>
-   <label for="query">[#catalog_edit_inner_filter_query_label#]</label>
-   <textarea name="query" id="query" style="width:272px; height:75px;" cols="" rows="">%query%</textarea>
+   <label for="query">[#catalog_edit_inner_filter_query_label#]</label><br>
+   <textarea name="query" id="query" style="margin-top:5px;" cols="93" rows="5">%query%</textarea>
    
    <div class="block clear" style="text-align:center; border-top:1px solid #ededed; border-bottom:1px solid #ededed; margin:5px auto; padding:5px;">
     <a href="#" onClick="$('#sqlquery').toggle(); return false;">[#catalog_edit_inner_filter_showsql_label#]</a>
@@ -81,7 +81,11 @@
     <option value="selected" %cattype_selected%>[#catalog_edit_inner_filter_selected_categories_label#]</option>
    </select>
    
-   <div id="selectedcats" style="display:%selectedcats_display%">%categories%</div>
+   <div id="selectedcats" style="clear:both; display:%selectedcats_display%">
+    <ul>
+     %categories%
+    </ul>
+   </div>
   </fieldset>
   
   <fieldset style="text-align:center;">
@@ -135,6 +139,8 @@
       $(this).parent().find('ul').slideUp();
    });
  });
+ 
+ $("#query").autoGrow();
 </script>
 
 <!-- @group_option_for_select -->
@@ -144,4 +150,4 @@
 <option value="%key%" %sel%>%name%</option>
 
 <!-- @category_item -->
-%shift%<input type="checkbox" id="ccb_%id%" name="ccb[%id%]" %checked%><label for="ccb[%id%]">%catname%</label><br>
+<li class="block clear"><span class="block fLeft">%shift%</span><input type="checkbox" id="ccb_%id%" name="ccb[%id%]" %checked%><label for="ccb_%id%" style="width:auto;">%catname%</label></li>

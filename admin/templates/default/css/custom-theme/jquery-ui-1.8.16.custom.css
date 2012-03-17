@@ -633,7 +633,7 @@ table .ui-selectmenu { height:2.5em; }
 /* modmenu
 ----------------------------------*/
 #modules_toolbar div { padding:0; margin:1px 2px 2px 0; float:left; }
-.ui-modmenu { display: block; display: inline-block; padding:0; height:24px; float:left; position: relative; vertical-align: middle; text-decoration: none; overflow: hidden; zoom: 1; border-radius:4px; }
+.ui-modmenu { display: block; display: inline-block; padding:0; float:left; position: relative; vertical-align: middle; text-decoration: none; overflow: hidden; zoom: 1; border-radius:4px; }
 .ui-modmenu-icon { position: absolute; right: 0px;  top: 0px; height: 24px; padding: 0; border:none; border-left:1px solid #ededed; background-position: -64px -12px;}
 .ui-state-focus .ui-modmenu { opacity:.7; }
 .ui-state-hover .ui-modmenu { opacity:.5; }

@@ -55,7 +55,7 @@ class catalog extends basemodule
      *
      * @var integer
      */
-    private $order_inc = 2;
+    private $order_inc = 5;
 
     /**
      * Название cookie, где храним товары корзины

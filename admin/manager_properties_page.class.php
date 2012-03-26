@@ -579,8 +579,11 @@ class properties_page
                     $html = str_replace('%str_prop_modul%', '', $html);
                 }
 
-                //new!
-                $html = str_replace('%prop_modul_array%', $kernel->pub_array_convert_form(array_combine($properties_labels,$properties_selects)), $html);
+                if (count($properties_labels))
+                    $arr=array_combine($properties_labels,$properties_selects);
+                else
+                    $arr=array();
+                $html = str_replace('%prop_modul_array%', $kernel->pub_array_convert_form($arr), $html);
 
 
                 //Создаем массив достпуных объектов

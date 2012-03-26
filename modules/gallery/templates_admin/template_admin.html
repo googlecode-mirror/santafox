@@ -1,0 +1,284 @@
+<!-- @import_form -->
+<span class="content_header">Модуль &rarr; <span class="black">[#gallery_modul_base_name#]</span></span>
+<div id="page_container">
+<div id="content_container">
+<div class="content">
+
+<h3>[#gallery_import_archive_title#]</h3>
+<b style="color: red;">%msg%</b><br>
+<form action="%action%" method="post" enctype="multipart/form-data">
+<table class="admin_table" cellpadding="0" align="left" cellspacing="1">
+<tr>
+	<td><label for="gallery_filenames">[#gallery_import_gen_names#]: </label></td>
+    <td>
+        <input id="gallery_filenames" type="radio" name="gen_names" value="filenames" checked>[#gallery_import_gen_names_filename#]<br clear="all" />
+        <input type="radio" name="gen_names" value="number">[#gallery_import_gen_names_number#]
+    </td>
+</tr>
+<tr>
+	<td><label for="gallery_copyright">[#gallery_property_add_copyright#]</label></td>
+    <td><input id="gallery_copyright" name="copyright" type="checkbox" value="1" /></td>
+</tr>    
+<tr>
+	<td><label for="gallery_catid">[#gallery_imageform_category#]: </label></td>
+    <td>
+        <select name="cat_id" id="gallery_catid">
+            <option value="0">[#gallery_imageform_category_empty#]</option>
+            %catlines%
+        </select>
+    </td>
+</tr>
+<tr>
+	<td><label>[#gallery_import_from#]: </label></td>
+    <td>
+
+        <input type="radio" name="import_from" value="upload_file" checked onclick="document.getElementById('div_import_onserver').style.display='none';document.getElementById('div_import_upload').style.display='block';">[#gallery_import_upload_file#] (max: %max_upload_size%)<br>
+        <div id="div_import_upload">
+            <input type="file" name="archive"><br>
+        </div>
+
+        <input type="radio" name="import_from" value="file_on_server"  onclick="document.getElementById('div_import_upload').style.display='none';document.getElementById('div_import_onserver').style.display='block';">[#gallery_import_file_on_server#] (/upload/)
+        <div id="div_import_onserver" style="display: none;">
+            <select name="file_on_server">
+                <option value="">-----</option>
+                %server_files%
+            </select>
+        </div>
+    </td>
+</tr>
+<tr>
+	<td colspan="2" align="center"><input type="submit" name="do_archive_import" value="[#gallery_import_archive#]" /></td>
+</tr>
+</table>
+</form>
+<script type="text/javascript">
+    $( "input:submit").button();
+</script>
+</div>
+</div>
+</div>
+
+<!-- @category_form -->
+<span class="content_header">Модуль &rarr; <span class="black">[#gallery_modul_base_name#]</span></span>
+<div id="page_container">
+<div id="content_container">
+<div class="content">
+
+<form action="%action%" method="post" enctype="multipart/form-data" onsubmit="form_submit_include_content_auto();">
+<input type="hidden" name="id" value="%id%">
+<table class="admin_table" cellpadding="0" align="left" cellspacing="1">
+
+<tr>
+	<td><label for="gallery_catname">[#gallery_category_name#]: </label></td>
+    <td><input id="gallery_catname" name="name" type="text" value="%name%" style="width:100%;"/></td>
+</tr>
+<tr>
+	<td colspan="2"><input type="submit" value="[#gallery_save#]" /></td>
+</tr>
+</table>
+</form>
+<script type="text/javascript">
+    $( "input:submit").button();
+</script>
+
+<!-- @categories_list -->
+<a href="#" onclick="jspub_click('category_edit&catid=0');">[#gallery_add_category#]</a>
+<table class="admin_table" cellpadding="0" cellspacing="1">
+<tr>
+    <th>[#gallery_category_name#]</th>
+    <th>[#gallery_delete_category#]</th>
+    <th>[#gallery_edit#]</th>
+</tr>
+    %rows%
+</table>
+</div>
+</div>
+</div>
+
+<!-- @categories_row -->
+<tr>
+    <td><a href="#" onclick="jspub_click('show_photos&catid=%id%')">%name%</a></td>
+    <td><img
+            onclick="jspub_confirm('category_delete&id=%id%','[#gallery_category_delete_alert#]')"
+            src="/admin/templates/default/images/icon_delet.gif"
+            title="[#gallery_delete#]"
+            style="cursor:pointer;"
+            alt="[#gallery_delete#]" />
+    </td>
+    <td><a href="#" onclick="jspub_click('category_edit&catid=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" title="[#gallery_edit#]" alt="[#gallery_edit#]" /></a></td>
+</tr>
+
+
+<!-- @begin -->
+<label for="listcatid">Фотографии:</label> <select name="catid" id="listcatid" onchange="jspub_click('show_photos&sortby=%sortby%&catid='+document.getElementById('listcatid').value);">
+    <option value="0">[#gallery_list_all_cats#]</option>
+    %catlines%
+</select>
+
+<table width="600" class="admin_table" cellpadding="0" cellspacing="1">
+<tr>
+	<th width="45" align="center"><a href="#" onclick="jspub_click('show_photos&sortby=id')">ID</a></th>
+	<th width="86" align="center"><a href="#" onclick="jspub_click('show_photos&sortby=date')">Дата</a></th>
+	<th width="100" align="center">Картинка</th>
+	<th width="263" align="center"><a href="#" onclick="jspub_click('show_photos&sortby=title')">Описание</a></th>
+	<th width="98" align="center">Управление</th>
+</tr>
+
+<!-- @line -->
+<tr>
+<td rowspan="2" align="center">%id%</td>
+<td rowspan="2" align="center">%post_date%</td>
+<td rowspan="2" align="center"><img src="%link_image%" width="100" border="0" align=left alt="" /></td>
+<td align="center" valign="top">%title_image%</td>
+<td rowspan="2" align="center">
+<img
+onclick="jspub_click('image_edit&image_id=%id%')"
+src="/admin/templates/default/images/icon_edit.gif" border="0"
+alt="[#gallery_edit#]"
+title="[#gallery_edit#]"
+style="cursor:pointer;">&nbsp;
+<img
+onclick="jspub_confirm('image_delete&image_id=%id%','[#gallery_list_delete_element_alert#]')"
+src="/admin/templates/default/images/icon_delet.gif" 
+alt="[#gallery_delete#]" border="0"
+title="[#gallery_delete#]"
+style="cursor:pointer;"/></td>
+</tr>
+<tr>
+  <td valign="top">%description%</td>
+</tr>
+<tr class="admin_table_wstring"><td colspan="5" height="5"></td></tr>
+
+<!-- @end -->
+</table>
+всего:%total%<br>
+%pages%
+
+<!-- @form_edit -->
+<span class="content_header">Модуль &rarr; <span class="black">[#gallery_modul_base_name#]</span></span>
+<div id="page_container">
+<div id="content_container">
+<div class="content">
+
+<form action="%action%" method="post" enctype="multipart/form-data" onsubmit="form_submit_include_content_auto();">
+<input type="hidden" name="id" value="%id%" />
+<table class="admin_table" cellpadding="0" align="left" cellspacing="1">
+<tr>
+	<th align="center" colspan="2" >[#gallery_imageform_header#]</th>
+</tr>
+<tr>
+    <td>Изображение</td>
+	<td><img src="%img_src%" alt="" /></td>
+</tr>
+<tr>
+	<td><label for="gallery_title_image">Название картинки: </label></td>
+    <td><input id="gallery_title_image" name="title_image" type="text" value="%title_image%" /></td>
+</tr>
+<tr>
+	<td><label for="gallery_cat_id">[#gallery_imageform_category#]: </label></td>
+    <td>
+        <select name="cat_id" id="gallery_cat_id">
+            <option value="0">[#gallery_imageform_category_empty#]</option>
+            %catlines%
+        </select>
+    </td>
+</tr>
+<tr>
+	<td colspan="2">Описание<br>%editor%</td>
+</tr>
+<tr>
+	<td colspan="2"><input type="submit" value="[#gallery_save#]" /></td>
+</tr>
+</table>
+</form>
+<script type="text/javascript">
+   $( "input:submit").button();
+</script>
+</div>
+</div>
+</div>
+
+<!-- @form_add -->
+<span class="content_header">Модуль &rarr; <span class="black">[#gallery_modul_base_name#]</span></span>
+<div id="page_container">
+<div id="content_container">
+<div class="content">
+
+<form action="%action%" method="post" enctype="multipart/form-data" onsubmit="form_submit_include_content_auto();">
+<input type="hidden" name="id" value="%id%" />
+<table class="admin_table" cellpadding="0" align="left" cellspacing="1">
+<tr>
+	<th align="center" colspan="2" >[#gallery_imageform_header#]</th>
+</tr>
+<tr>
+    <td>Файл</td>
+	<td><input type="file" name="file_image" size="40" /></td>
+</tr>
+<tr>
+	<td><label for="gallery_add_copyright">[#gallery_property_add_copyright#]</label></td>
+    <td><input id="gallery_add_copyright" name="copyright" type="checkbox" value="1" /></td>
+</tr>
+<tr>
+	<td><label for="gallery_add_title">Название картинки: </label></td>
+    <td><input id="gallery_add_title" name="title_image" type="text" value="%title_image%" /></td>
+</tr>
+<tr>
+	<td><label for="gallery_add_catid">[#gallery_imageform_category#]: </label></td>
+    <td>
+        <select name="cat_id" id="gallery_add_catid">
+            <option value="0">[#gallery_imageform_category_empty#]</option>
+            %catlines%
+        </select>
+    </td>
+</tr>
+<tr>
+	<td colspan="2">Описание<br>%editor%</td>
+</tr>
+<tr>
+	<td colspan="2"><input type="submit" value="[#gallery_save#]" /></td>
+</tr>
+</table>
+</form>
+<script type="text/javascript">
+    $( "input:submit").button();
+</script>
+</div>
+</div>
+</div>
+
+
+
+
+
+<!-- @pages -->
+%first% %backward% %previous% %pages_block% %next% %forward% %last%
+
+<!-- @page_first -->
+<a href="#" onclick="jspub_click('%url%')">Начало</a>
+<!-- @page_backward-->
+<a href="#" onclick="jspub_click('%url%')">&laquo;</a>
+<!-- @page_backward_disabled-->
+&laquo;
+<!-- @page_previous-->
+<a href="#" onclick="jspub_click('%url%')">&laquo;</a>
+<!-- @page_previous_disabled-->
+&laquo;
+<!-- @page_forward-->
+<a href="#" onclick="jspub_click('%url%')">&raquo;</a>
+<!-- @page_forward_disabled-->
+&raquo;
+<!-- @page_next-->
+<a href="#" onclick="jspub_click('%url%')">&raquo;</a>
+<!-- @page_next_disabled-->
+&raquo;
+<!-- @page_last -->
+<a href="#" onclick="jspub_click('%url%')">Конец</a>
+<!-- @page_active -->
+<a href="#" onclick="jspub_click('%url%')">%page%</a>
+<!-- @page_passive -->
+%page%
+<!-- @page_delimeter -->
+&nbsp;-&nbsp;
+
+<!-- @page_null -->
+

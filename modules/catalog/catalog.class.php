@@ -101,15 +101,19 @@ class catalog extends basemodule
      */
     private $is_basket_inited = false;
 
+    private $structure_cookie_name;
+
     /**
      *  Конструктор класса модуля
+     *  @return catalog
      */
-    public function catalog()
+    public function __construct()
     {
         parent::__construct();
         global $kernel;
         if ($kernel->pub_httpget_get('flush'))
             $kernel->pub_session_unset();
+        $this->structure_cookie_name = "tree_".$kernel->pub_module_id_get();
     }
 
     private function basket_init()
@@ -254,7 +258,7 @@ class catalog extends basemodule
 
     /**
      * Сохраняет порядок свойств группы
-     *
+     * @return void
      */
     private function save_gprops_order()
     {
@@ -289,6 +293,7 @@ class catalog extends basemodule
      * @param string $moduleid
      * @param integer $groupid
      * @param string $propdb
+     * @return void
      */
     private function add_group_visible_prop($moduleid, $groupid, $propdb)
     {
@@ -360,14 +365,14 @@ class catalog extends basemodule
      *
      * @param integer $itemid1
      * @param integer $itemid2
+     * @return void
      */
     private function add_items_link($itemid1, $itemid2)
     {
         global $kernel;
-        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items_links` (`itemid1`,`itemid2`) '.
+        $query = 'REPLACE INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items_links` (`itemid1`,`itemid2`) '.
                     		' VALUES ('.$itemid1.','.$itemid2.')';
-        //$kernel->runSQL($query);
-        @mysql_query($query);
+        $kernel->runSQL($query);
     }
 
     /**
@@ -378,6 +383,7 @@ class catalog extends basemodule
      * @param string $separator разделитель полей
      * @param integer $cat_id       id-шник категории
      * @param integer $cat_id4new   id-шник категории для новых товаров
+     * @return void
      */
     private function make_csv_import($group_id, $file, $separator, $cat_id, $cat_id4new)
     {
@@ -1385,6 +1391,7 @@ class catalog extends basemodule
      * Убирает товар из корзины
      *
      * @param integer $itemid ID-шник товара
+     * @return void
      */
     private function remove_item_from_basket($itemid)
     {
@@ -1401,6 +1408,7 @@ class catalog extends basemodule
      *
      * @param integer $itemid ID-шник товара
      * @param integer $newqty новое кол-во
+     * @return void
      */
     private function update_basket_item_qty($itemid, $newqty)
     {
@@ -1421,7 +1429,7 @@ class catalog extends basemodule
 
     /**
      * Обновляет время последнего изменения в корзине
-     *
+     * @return void
      */
     private function update_basket_lastaccess()
     {
@@ -1449,7 +1457,7 @@ class catalog extends basemodule
      *
      * @param integer $itemid ID-шник товара
      * @param integer $qty кол-во, которое надо добавить
-     *
+     * @return void
      */
     private function add_basket_item($itemid, $qty=1)
     {
@@ -1537,6 +1545,7 @@ class catalog extends basemodule
     /**
      * Удаляет все товары заказа из корзины
      * @param string $sessionid IDшник сессии
+     * @return void
      */
     private function clear_basket_items($sessionid)
     {
@@ -3158,7 +3167,7 @@ class catalog extends basemodule
      * Сохраняет категорию в БД
      *
      * @param $id integer id-шник категории
-     *
+     * @return void
      */
     private function save_category($id)
     {
@@ -3209,6 +3218,7 @@ class catalog extends basemodule
      * Обновляет порядок товаров в категории с шагом $this->order_inc
      *
      * @param integer $catid id-шник категории
+     * @return void
      */
     private function refresh_items_order_in_cat($catid)
     {
@@ -3228,6 +3238,7 @@ class catalog extends basemodule
     /**
      * Сохраняет товары категории в БД
      * @param integer $catid IDшник категории
+     * @return void
      */
     private function save_category_items($catid)
     {
@@ -3300,6 +3311,7 @@ class catalog extends basemodule
      * Удаляет товары по id-шникам
      *
      * @param array $itemids массив id-шников товаров
+     * @return void
      */
     private function delete_items($itemids)
     {
@@ -3461,7 +3473,7 @@ class catalog extends basemodule
 
     /**
      * Сохраняет изменённые товары в админке при быстром редактировании (пункт "Товары" в меню)
-     *
+     * @return void
      */
     private function change_selected_items()
     {
@@ -3530,7 +3542,7 @@ class catalog extends basemodule
 
     /**
      * Сохраняет товар в БД после его редактирования или добавления
-     *
+     * @return void
      */
     private function save_item()
     {
@@ -3690,6 +3702,7 @@ class catalog extends basemodule
      * @param string $cb_inlist
      * @param string $sort
      * @param string $cb_ismain
+     * @return void
      */
     private function save_prop($pid, $name_full, $name_db, $cb_inlist, $sort, $cb_ismain)
     {
@@ -3833,6 +3846,7 @@ class catalog extends basemodule
      * @param integer $pid id-шник свойства
      * @param string $name_full полное имя свойства
      * @param string $name_db БД-имя свойства
+     * @return void
      */
     private function save_cat_prop($pid, $name_full, $name_db)
     {
@@ -5068,7 +5082,7 @@ class catalog extends basemodule
 
 
         //Строить начнём с
-        //Произведём первичную сортировку массива со свойствами, что бы шаблон был
+        //Произведём первичную сортировку массива со свойствами, чтобы шаблон был
         //оптимизирован изначально. В дальнейшем пользователь его самостоятельно поменяет
         //Получим свойства, которые
         $sort_def =  array();
@@ -6241,6 +6255,7 @@ class catalog extends basemodule
      *
      *  @param $id  integer id-шник категории
      *  @param $pid integer id-шник родительской категории
+     *  @return void
 	*/
     private function delete_category($id, $pid)
     {
@@ -6260,6 +6275,7 @@ class catalog extends basemodule
      *
      *  @param $propid  integer id-шник свойства
      *  @param $groupid integer id-шник товарной группы
+     *  @return void
 	*/
     private function delete_prop($propid, $groupid = 0)
     {
@@ -6295,7 +6311,8 @@ class catalog extends basemodule
      *  Удаляет свойство КАТЕГОРИИ
      *
      *  @param $propid  integer id-шник свойства категории
-	*/
+     *  @return void
+	 */
     private function delete_cat_prop($propid)
     {
         global $kernel;
@@ -6679,7 +6696,6 @@ class catalog extends basemodule
         $tree->set_action_move_node('category_move');
         $tree->set_drag_and_drop(true);
 
-        //$tree->set_name_cookie("catalog_structure");
         //$tree->not_click_main = true;
         //$tree->set_node_default($node_default);
 
@@ -6687,6 +6703,7 @@ class catalog extends basemodule
         $tree->contextmenu_action_set('[#catalog_category_add_label#]', 'category_add');
 		$tree->contextmenu_delimiter();
         $tree->contextmenu_action_remove('[#catalog_category_remove_label#]', 'category_delete', 0, '[#catalog_category_del_alert#]');
+        $tree->set_name_cookie($this->structure_cookie_name);
         return $tree;
     }
 
@@ -6920,6 +6937,7 @@ class catalog extends basemodule
      * @param string $name_db БД-имя поля
      * @param string $regexp регэксп для поля
      * @param string $cb_req чекбокс из POST - обязательное поле или нет
+     * @return void
      */
     private function save_order_field($id, $name_full, $name_db, $regexp, $cb_req)
     {
@@ -7034,7 +7052,8 @@ class catalog extends basemodule
     /**
      *  Удаляет поле из таблицы заказов (корзины)
      *
-     *  @param $id  integer id-шник поля
+     * @param $id  integer id-шник поля
+     * @return void
 	*/
     private function delete_order_field($id)
     {
@@ -7052,7 +7071,7 @@ class catalog extends basemodule
      * Удаляет одно из возможных значений поля типа enum
      * для таблицы заказов (корзины)
      * @param $id integer id-шник поля
-     *
+     * @return void
      */
     private function delete_order_enum_field($id)
     {
@@ -7076,7 +7095,6 @@ class catalog extends basemodule
 
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
         $kernel->runSQL($query);
-        return ;
     }
 
 
@@ -7084,7 +7102,7 @@ class catalog extends basemodule
      *  К уже существующему полю таблицы заказов (корзины)
      *  типа enum  добавляет новое значение
      *  @param $id  integer id-шник поля
-     *
+     *  @return void
      */
     private function add_order_enum_field($id)
     {
@@ -7097,7 +7115,6 @@ class catalog extends basemodule
         $evals[] = $enumval;
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
         $kernel->runSQL($query);
-        return;
     }
 
 
@@ -7106,7 +7123,7 @@ class catalog extends basemodule
      * Пересоздаёт шаблон для списка товаров в корзине
      *
      * @param $out_filename string имя генерируемого файла шаблона
-     *
+     * @return void
      */
     private function regenerate_basket_items_tpl($out_filename)
     {
@@ -7167,7 +7184,7 @@ class catalog extends basemodule
      * Пересоздаёт шаблон для списка формы оформления заказа в корзине
      *
      * @param $out_filename string имя генерируемого файла шаблона
-     *
+     * @return void
      */
     private function regenerate_basket_order_tpl($out_filename)
     {
@@ -7226,6 +7243,7 @@ class catalog extends basemodule
      * Удаляет фильтр из БД
      *
      * @param integer $id
+     * @return void
      */
     private function delete_inner_filter($id)
     {
@@ -7588,6 +7606,7 @@ class catalog extends basemodule
      * @param string $templatename
      * @param integer $groupid
      * @param array $props
+     * @return void
      */
     private function generate_inner_filter($name, $templatename, $groupid, $props)
     {
@@ -7795,6 +7814,7 @@ class catalog extends basemodule
      *  сохраняет настройки для импорта commerceml
      *  пока в сессии, позже в БД
      *  @param $settings array
+     *  @return void
      */
     private function save_import_commerceml_settings($settings)
     {
@@ -8078,7 +8098,7 @@ class catalog extends basemodule
             }
 
             $_SESSION['import_commerceml_msg']=$msg;
-            return $kernel->pub_redirect_refresh_reload("import_commerceml");
+            $kernel->pub_redirect_refresh_reload("import_commerceml");
         }
 
         if (isset($_SESSION['import_commerceml_msg']) && !empty($_SESSION['import_commerceml_msg']))
@@ -8199,12 +8219,15 @@ class catalog extends basemodule
     public function start_admin()
     {
         global $kernel;
-
-        switch ($kernel->pub_section_leftmenu_get())
+        $action=$kernel->pub_section_leftmenu_get();
+        //если это не работа с деревом, "забудем" куку с выделенной нодой
+        if (!in_array($action,array('category_items','category_move','category_items_save','save_selected_items')))
+            setcookie($this->structure_cookie_name,"");
+        switch ($action)
         {
             case 'import_commerceml':
                 return $this->import_commerceml();
-                break;
+
             case 'item_clone':
                 $id = $kernel->pub_httpget_get('id');
                 $newID = $this->item_clone($id);
@@ -8212,25 +8235,25 @@ class catalog extends basemodule
                     return $this->show_item_form($newID, 0);
                 else
                     return $this->show_item_form($id, 0);
-                break;
+
             case 'show_variables':
             	return $this->show_variables();
-                break;
+
             case 'variable_delete':
             	$namedb=$kernel->pub_httpget_get('name_db');
                 $kernel->runSQL("DELETE FROM `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_variables` WHERE `name_db`='".$namedb."'");
                 $kernel->pub_redirect_refresh('show_variables');
                 break;
+
             case 'show_variable_form':
                 $name_db = $kernel->pub_httpget_get("name_db");
                 return  $this->show_variable_form($name_db);
-                break;
+
             case 'variable_save':
                 $name_full    = trim($kernel->pub_httppost_get('name_full'));
                 $name_db      = trim($kernel->pub_httppost_get('name_db'));
                 $prev_name_db = trim($kernel->pub_httppost_get('prev_name_db'));
                 $value        = trim($kernel->pub_httppost_get('value'));
-
                 if (!preg_match("/^([0-9a-z_]+)$/i", $name_db))
                 	return $kernel->pub_httppost_response("[#catalog_variable_save_msg_incorrect_namedb#]");
                 elseif (empty($name_full))
@@ -8250,16 +8273,13 @@ class catalog extends basemodule
                 	$kernel->runSQL($query);
                     return $kernel->pub_httppost_response("[#catalog_variable_save_msg_ok#]","show_variables");
                 }
-            	break;
-
-
 
             case 'show_gen_search_form':
                 $groupid = $kernel->pub_httpget_get('groupid', false);
                 if (empty($groupid))
                     $groupid = $kernel->pub_httppost_get('groupid', false);
                 return $this->show_gen_search_form($groupid);
-                break;
+
             case 'gen_search_form':
                 $groupid = $kernel->pub_httppost_get('id', false);
                 $outfile = $kernel->pub_httppost_get('outfile');
@@ -8278,12 +8298,12 @@ class catalog extends basemodule
                 {
                     $this->generate_inner_filter($filtername, $filtertpl, $groupid, $props);
                 }
-                //return $kernel->pub_redirect_refresh_reload("show_order_fields");
-                return $kernel->pub_redirect_refresh_reload("show_groups");
-                break;
+                $kernel->pub_redirect_refresh_reload("show_groups");
+                return '';
+
             case 'show_csv_export':
                 return $this->show_csv_export_form();
-                break;
+
             case 'make_csv_export':
                 $template = $kernel->pub_httppost_get('template', false);
                 $filterid = intval($kernel->pub_httppost_get('filterid', false));
@@ -8299,22 +8319,19 @@ class catalog extends basemodule
                 flush();
                 print $exported;
                 exit;
-                break;
 
             case 'show_order_fields':
                 return $this->show_order_fields();
-                break;
 
             case 'save_order_fields_order':
                 $this->save_order_fields_order();
-                return $kernel->pub_redirect_refresh_reload("show_order_fields");
+                $kernel->pub_redirect_refresh_reload("show_order_fields");
                 break;
 
             //Вызов формы редактирования добавления/конкретного поля корзины
             case 'order_field_edit':
                 $id  = $kernel->pub_httpget_get('id');
                 return $this->show_order_field_form($id);
-                break;
 
             case 'order_field_save':
                 $id        = $kernel->pub_httppost_get('id', false);
@@ -8324,7 +8341,6 @@ class catalog extends basemodule
                 $regexp    = $kernel->pub_httppost_get('regexp', false);
                 $this->save_order_field($id, $name_full, $name_db, $regexp, $req);
                 return $kernel->pub_httppost_response("[#catalog_order_field_saved_msg#]","show_order_fields");
-                break;
 
             case 'order_field_add':
                 $name_db   = $kernel->pub_httppost_get('name_db', false);
@@ -8338,66 +8354,53 @@ class catalog extends basemodule
                 break;
             case 'order_field_delete':
                 $this->delete_order_field($kernel->pub_httpget_get('id'));
-                return $kernel->pub_redirect_refresh("show_order_fields");
+                $kernel->pub_redirect_refresh("show_order_fields");
                 break;
 
             case 'order_enum_field_delete':
                 $id  = $kernel->pub_httpget_get("id");
                 $this->delete_order_enum_field($id);
                 return $this->show_order_field_form($id);
-                break;
 
             case 'order_enum_field_add':
                 $id  = $kernel->pub_httppost_get("id");
                 $this->add_order_enum_field($id);
                 $str = "order_field_edit&id=".$id;
                 return $kernel->pub_httppost_response("[#catalog_edit_property_enum_add_msg#]", $str);
-                break;
 
             case 'regenerate_order_tpls':
                 $basket_items_tpl = $kernel->pub_httppost_get("basket_items_tpl");
                 $basket_items_tpl_translit = $kernel->pub_translit_string($basket_items_tpl);
-
-                $ext = mb_strtolower(mb_substr($basket_items_tpl_translit, -4));
+                $ext = strtolower(substr($basket_items_tpl_translit, -4));
                 if ($ext != "html" && $ext != ".htm")
                     $basket_items_tpl_translit .= ".html";
-
                 $basket_order_tpl = $kernel->pub_httppost_get("order_form_tpl");
                 $basket_order_tpl_translit = $kernel->pub_translit_string($basket_order_tpl);
-
-                $ext = mb_strtolower(mb_substr($basket_order_tpl_translit, -4));
+                $ext = strtolower(substr($basket_order_tpl_translit, -4));
                 if ($ext != "html" && $ext != ".htm")
                     $basket_order_tpl_translit .= ".html";
-
                 $this->regenerate_basket_items_tpl($basket_items_tpl_translit);
                 $this->regenerate_basket_order_tpl($basket_order_tpl_translit);
-
                 //значит была транслитерация
                 if ($basket_order_tpl_translit != $basket_order_tpl || $basket_items_tpl_translit!=$basket_items_tpl)
                     return $kernel->pub_httppost_response("[#catalog_order_tpls_regenerated_translit_msg#]", "show_order_fields");
                 else
                     return $kernel->pub_httppost_response("[#catalog_order_tpls_regenerated_msg#]", "show_order_fields");
-                break;
-
-
 
         	case 'inner_filter_delete':
         	    $this->delete_inner_filter($kernel->pub_httpget_get("id"));
-        	    return $kernel->pub_redirect_refresh("show_inner_filters");
+        	    $kernel->pub_redirect_refresh("show_inner_filters");
         		break;
 
         	case 'test_filter':
         		return $this->test_filter($kernel->pub_httpget_get("id"));
-        		break;
 
             case 'show_inner_filters':
                 return $this->show_inner_filters();
-                break;
 
             case 'show_inner_filter_form':
                 $id = $kernel->pub_httpget_get("id");
                 return  $this->show_inner_filter_form($id);
-                break;
 
             case 'inner_filter_save':
                 $id = $kernel->pub_httppost_get("id");
@@ -8406,8 +8409,6 @@ class catalog extends basemodule
                     return $kernel->pub_httppost_response("[#catalog_edit_inner_filter_save_msg_ok#]","show_inner_filters");
                 else
                     return $kernel->pub_httppost_response("[#catalog_edit_inner_filter_save_msg_error#]",$saveError);
-                break;
-                break;
 
             case 'category_move':
                 $cid = $kernel->pub_httppost_get("node");
@@ -8419,6 +8420,7 @@ class catalog extends basemodule
                 $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `parent_id`='.$parentNew.', `order`='.$order2replace.' WHERE `id`='.$cid;
                 $kernel->runSQL($query);
                 break;
+
             case 'save_selected_items':
                 $group_id = $kernel->pub_httppost_get('group_id');
                 $change_items = $kernel->pub_httppost_get('change_items');
@@ -8433,15 +8435,11 @@ class catalog extends basemodule
                 $newfilename = $kernel->pub_session_get('importcsv_filename');
                 $group_id    = $kernel->pub_session_get('importcsv_groupid');
                 $separator   = $kernel->pub_session_get('importcsv_separator');
+                //если в сессии есть значения для второго шага импорта, покажем таблицу с первыми 10 эл-тами
                 if (!is_null($newfilename) && !is_null($group_id) && !is_null($separator))
-                {//если в сессии есть значения для второго шага импорта, покажем таблицу с первыми 10 эл-тами
                     return $this->show_import_csv_table($group_id, $newfilename, $separator);
-                }
-                else
-                {//иначе - начальную форму
+                else //иначе - начальную форму
                     return $this->show_import_csv_form();
-                }
-                break;
 
             case 'import_csv2'://сохраняем в сессии данные для импорта
                 $group_id    = $kernel->pub_httppost_get('group');
@@ -8453,7 +8451,6 @@ class catalog extends basemodule
                     $sep = "\t";
                 else
                     $sep = ";";
-
                 $need_save = false;
                 $newfilename='';
                 if ($import_from == "textarea")
@@ -8480,7 +8477,6 @@ class catalog extends basemodule
                     $kernel->pub_session_set('importcsv_catid',$cat_id);
                     $kernel->pub_session_set('importcsv_catid4new',$cat_id4new);
                 }
-
                 $kernel->pub_redirect_refresh_reload('import_csv');
                 break;
 
@@ -8496,28 +8492,23 @@ class catalog extends basemodule
                 $kernel->pub_session_unset('importcsv_separator');
                 $kernel->pub_session_unset('importcsv_catid');
                 $kernel->pub_session_unset('importcsv_catid4new');
-                return $kernel->pub_redirect_refresh_reload('show_items');
+                $kernel->pub_redirect_refresh_reload('show_items');
                 break;
-
 
             //Формирование списка свойств товаров
             //как общего так и для товарной группы
             case 'show_group_props':
                 $id = $kernel->pub_httpget_get('id');
                 return $this->show_group_props($id);
-                break;
 
-            //Вызов формы редактирования добавления/конкртеного
-            //свойства
+            //Вызов формы редактирования добавления/конкртеного свойства
             case 'prop_edit':
-
                 $id_group = $kernel->pub_httpget_get('id_group');
                 $id_prop  = $kernel->pub_httpget_get('id');
                 //ID группы, из которой было вызвано редактирование, так как
                 //из группы могут вызваны на редактирования и общие свойства
                 $id_group_control = $kernel->pub_httpget_get('idg_control');
                 return $this->show_prop_form($id_prop, $id_group, $id_group_control);
-                break;
 
             //Сохраняем значения свойства
             case 'prop_save':
@@ -8532,8 +8523,6 @@ class catalog extends basemodule
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
                 $id_group_control = intval($id_group_control);
                 return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]","show_group_props&id=".$id_group_control);
-                break;
-
 
             //Сохраняем свойство КАТЕГОРИИ
             case 'cat_prop_save':
@@ -8542,7 +8531,6 @@ class catalog extends basemodule
                 $name_full = $kernel->pub_httppost_get('name_full');
                 $this->save_cat_prop($id, $name_full, $name_db);
                 return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]","show_cat_props");
-                break;
 
             //Добавляем новое свойтво и общее и в группу
             case 'prop_add':
@@ -8550,9 +8538,7 @@ class catalog extends basemodule
                 //Теперь определим, куда нужно вернуться
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
                 $id_group_control = intval($id_group_control);
-
                 return $kernel->pub_httppost_response("[#catalog_edit_property_added_msg#]","show_group_props&id=".$id_group_control);
-                break;
 
             //Удаляем свойство товарной группы
             case 'prop_delete':
@@ -8563,7 +8549,7 @@ class catalog extends basemodule
                 //Теперь опрделим, куда нужно вернуться
                 $id_group_control = $kernel->pub_httpget_get('idg_control');
                 $id_group_control = intval($id_group_control);
-                return $kernel->pub_redirect_refresh("show_group_props&id=".$id_group_control);
+                $kernel->pub_redirect_refresh("show_group_props&id=".$id_group_control);
                 break;
 
             //Вызывается при добавлении к уже существующему
@@ -8585,29 +8571,23 @@ class catalog extends basemodule
 
             case 'enum_prop_delete':
                 $this->enum_prop_delete();
-
                 $id_prop          = $kernel->pub_httpget_get('propid');
                 $group_id         = $kernel->pub_httppost_get('group_id');
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
                 $id_group_control = intval($id_group_control);
                 $str = "prop_edit&id=".$id_prop."&id_group=".$group_id."&idg_control=$id_group_control";
-
-                return $kernel->pub_redirect_refresh($str);
+                $kernel->pub_redirect_refresh($str);
                 break;
-
-
 
             //Работа с группами свойств
             //Выводит список доступных товарных групп
             case 'show_groups':
                 return $this->show_groups();
-                break;
 
             //Выводит форму редактирования/добавления товарной группы
             case 'show_group_form':
                 $id = $kernel->pub_httpget_get('id');
                 return $this->show_group_form($id);
-                break;
 
             case 'group_save':
                 $id      = intval($kernel->pub_httppost_get('id'));
@@ -8625,20 +8605,18 @@ class catalog extends basemodule
             case 'save_gprops_order':
                 //$gid = $kernel->pub_httppost_get('group_id');
                 $this->save_gprops_order();
-                return $kernel->pub_redirect_refresh_reload("show_groups");
+                $kernel->pub_redirect_refresh_reload("show_groups");
                 break;
 
             //Управление свойсвами всех категорий
             case 'show_cat_props':
                 $id = $kernel->pub_httpget_get('id');
                 return $this->show_cat_props($id);
-                break;
 
             //Вызывает на редактирование свойство категории
             case 'cat_prop_edit':
                 $id = $kernel->pub_httpget_get('id');
                 return $this->show_cat_prop_form($id);
-                break;
 
             //Добавляет новое свойство к категории
             case 'cat_prop_add':
@@ -8646,16 +8624,13 @@ class catalog extends basemodule
                 $pname   = $kernel->pub_httppost_get('pname');
                 $ptype   = $kernel->pub_httppost_get('ptype');
                 $pnamedb = $kernel->pub_httppost_get('pnamedb');
-
                 $this->add_prop_in_cat($pname,$ptype,$values, $pnamedb);
-
                 return $kernel->pub_httppost_response("[#catalog_edit_property_cat_add_new_prop_msg#]","show_cat_props");
-                break;
 
             case 'cat_prop_delete':
                 $propid  = $kernel->pub_httpget_get("id");
                 $this->delete_cat_prop($propid);
-                return $kernel->pub_redirect_refresh("show_cat_props");
+                $kernel->pub_redirect_refresh("show_cat_props");
                 break;
 
             case 'cat_enum_prop_add':
@@ -8670,7 +8645,6 @@ class catalog extends basemodule
                 $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
                 $kernel->runSQL($query);
                 return $kernel->pub_httppost_response("[#catalog_edit_property_cat_enum_addnew_msg#]","cat_prop_edit&id=".$propid);
-                break;
 
             case 'cat_enum_prop_delete':
                 $enumval = $kernel->pub_httpget_get("enumval");
@@ -8689,9 +8663,8 @@ class catalog extends basemodule
                 $kernel->runSQL($query);
                 $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
                 $kernel->runSQL($query);
-                return $kernel->pub_redirect_refresh("cat_prop_edit&id=".$propid);
+                $kernel->pub_redirect_refresh("cat_prop_edit&id=".$propid);
                 break;
-
 
             //Работа с категориями в дереве
 
@@ -8700,29 +8673,20 @@ class catalog extends basemodule
                 $pid  = $kernel->pub_httppost_get("node");
                 $name = $kernel->pub_page_textlabel_replace('[#catalog_category_new_name#]');
                 if ($pid == 'index')
-                    {$pid = 0;}
-
+                    $pid = 0;
                 $order = $this->get_last_order_in_cat($pid)+2;
                 $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` (`parent_id`,`name`,`order`) '.
-                'VALUES ('.$pid.',"'.$kernel->pub_str_prepare_set($name).'", '.$order.')';
+                          'VALUES ('.$pid.',"'.$kernel->pub_str_prepare_set($name).'", '.$order.')';
                 $kernel->runSQL($query);
                 $cid = mysql_insert_id();
                 $this->regenerate_all_groups_tpls(false);
-
-                return $kernel->pub_redirect_refresh_reload('category_edit&id='.$cid.'&selectcat='.$cid);
-                //$kernel->pub_redirect_refresh_reload('category_edit&id='.$cid.'&selectcat='.$cid);
-
-                //return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]",'category_edit&id='.$cid.'&selectcat='.$cid);
-                //return $kernel->pub_redirect_refresh("category_edit&id=".$cid);
-                //
+                $kernel->pub_redirect_refresh_reload('category_edit&id='.$cid.'&selectcat='.$cid);
                 break;
 
             //Вызов формы редактирования категории
             case 'category_edit':
                 $id = $kernel->pub_httpget_get("id");
                 return $this->show_category_form($id);
-                break;
-
 
             //Сохраняет параметры отредактированнной категории
             case 'category_save':
@@ -8747,21 +8711,16 @@ class catalog extends basemodule
                 $id    = $kernel->pub_httpget_get('id');
                 $dprop = $kernel->pub_httpget_get('field');
                 $cat   = $this->get_category($id);
-
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `'.$dprop.'`=NULL WHERE `id`='.intval($id);
+                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats`
+                            SET `'.$dprop.'`=NULL WHERE `id`='.intval($id);
                 $kernel->runSQL($query);
-
                 $kernel->pub_file_delete('content/files/'.$kernel->pub_module_id_get().'/'.$cat[$dprop]);
                 $kernel->pub_redirect_refresh('category_edit&id='.$id.'&selectcat='.$id);
-                //return $kernel->pub_redirect_refresh("show_item_form&id=".$id);
                 break;
-
 
             //Список товаров в категории
             case 'category_items':
                 return $this->show_category_items();
-                break;
-
 
             //Групповые дейсвтий над товарами
 
@@ -8828,7 +8787,6 @@ class catalog extends basemodule
                     $kernel->pub_redirect_refresh_reload('show_items&search_results=1&group_id='.$group_id);
                 }
                 return $this->show_items($group_id);
-                break;
 
             case 'add_linked_item':
                 $id1 = intval($kernel->pub_httppost_get('itemid'));
@@ -8853,7 +8811,6 @@ class catalog extends basemodule
                 }
 
                 return $this->show_item_form($id, 0, $id_cat);
-            	break;
 
             //Добавление товара вызывает туже строку с редактированием
             case 'item_add':
@@ -8864,32 +8821,25 @@ class catalog extends basemodule
                 if (empty($id_cat))
                 	$id_cat = $kernel->pub_httppost_get('id_cat');
                 return $this->show_item_form(0, intval($group_id), intval($id_cat));
-                break;
 
             //Сохраняет товар после редактирования или добавляет новый
             case 'item_save':
                 $this->save_item();
-
                 //Если указана ID категории, то нужно вренуться в неё
                 $id_cat = $kernel->pub_httpget_get('id_cat');
                 $id_cat = intval($id_cat);
-
                 if ($id_cat > 0)
                     $kernel->pub_redirect_refresh_reload("category_items&id=".$id_cat);
                 else
                     $kernel->pub_redirect_refresh_reload("show_items");
-
                 break;
-
 
             //Очистка поля с файлом в товаре
             case 'item_clear_field':
                 $id_tovar    = $kernel->pub_httpget_get('id');
                 $dprop       = $kernel->pub_httpget_get('field');
                 $id_tovar    = intval($id_tovar);
-
                 $item  = $this->get_item_full_data($id_tovar);
-
                 //определяем, common-свойство или нет
                 $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
                 if (array_key_exists($dprop, $tinfo))
@@ -8902,16 +8852,13 @@ class catalog extends basemodule
                     $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` SET `'.$dprop.'`=NULL WHERE `id`='.$item['id'];
                 }
                 $kernel->runSQL($query);
-
                 //Теперь удаяем само изображение
-
                 //и его уменьшенную копию
                 $path_parts = pathinfo($item[$dprop]);
                 $kernel->pub_file_delete($item[$dprop]);
                 $kernel->pub_file_delete($path_parts['dirname'].'/tn/'.$path_parts['basename']);
                 $kernel->pub_file_delete($path_parts['dirname'].'/source/'.$path_parts['basename']);
-
-                return $kernel->pub_redirect_refresh("item_edit&id=".$id_tovar);
+                $kernel->pub_redirect_refresh("item_edit&id=".$id_tovar);
                 break;
 
             //Удаление товара
@@ -8919,27 +8866,19 @@ class catalog extends basemodule
                 $groupid = $kernel->pub_httpget_get('group_id');
                 $itemid  = $kernel->pub_httpget_get('id');
                 $this->delete_item($itemid);
-
                 //Если указана ID категории, то нужно вренуться в неё
                 $id_cat = $kernel->pub_httpget_get('id_cat');
                 $id_cat = intval($id_cat);
-
                 if ($id_cat > 0)
-                    return $kernel->pub_redirect_refresh("category_items&id=".$id_cat);
+                    $kernel->pub_redirect_refresh("category_items&id=".$id_cat);
                 else
-                    return $kernel->pub_redirect_refresh("show_items&group_id=".$groupid);
-
+                    $kernel->pub_redirect_refresh("show_items&group_id=".$groupid);
                 break;
-
-
-
 
             //Генерация шаблонов
             case 'regen_tpls4groups':
-
                 $id_group = $kernel->pub_httpget_get("id_group");
                 $id_group = intval($id_group);
-
                 if ($id_group > 0)
                 {
                     //Формируем шаблон списка товаров
@@ -8947,13 +8886,11 @@ class catalog extends basemodule
                     //Формируем шаблон карточки товара
                     $this->regenerate_group_tpls($id_group, true);
                 }
-
-                return $kernel->pub_redirect_refresh("show_groups");
+                $kernel->pub_redirect_refresh("show_groups");
                 break;
 
             case 'regen_tpl4itemlist':
-
-                return $kernel->pub_redirect_refresh_reload("show_groups");
+                $kernel->pub_redirect_refresh_reload("show_groups");
                 break;
 
             //Созданием админского шаблона редактирования товара
@@ -8965,12 +8902,9 @@ class catalog extends basemodule
                 return $kernel->pub_redirect_refresh("show_groups");
                 break;
             */
-
-
-
         }
 
-        return null; //((isset($content))?($content):(null));
+        return null;
     }
 
     /**
@@ -9088,7 +9022,7 @@ class catalog extends basemodule
 
     /**
      * Удаляет одно из возможных значений поля типа enum (общее либо товарной группы)
-     *
+     * @return void
      */
     function enum_prop_delete()
     {
@@ -9120,7 +9054,6 @@ class catalog extends basemodule
 
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
         $kernel->runSQL($query);
-        return ;
     }
 
 

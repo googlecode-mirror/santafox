@@ -1365,10 +1365,10 @@ class kernel
      *
      * Производит замену всех меток вида [# #] на их текстовое представление
      * в зависимости от языка
-     * @param HTML $html Строка, в которой проиисходит замена
+     * @param string $html Строка, в которой проиисходит замена
      * @param int $quot_action 0 - ничего не делаем с кавычками, 1 - заменяем на символы HTML, 2 - оставляем как есть, но слэшуем
      * @access private
-     * @return HTML
+     * @return string
      */
     function priv_page_textlabels_replace($html, $quot_action = 0)
     {
@@ -1767,7 +1767,6 @@ class kernel
             if ($id_user == -2)
                 $_SESSION['vars_kernel']['errore_register'] = '[#start_login_failed_entered#]';
 
-            //Значит администратор есть и мы  дальшеего регетсрируем
             if ($id_user > 0)
             {
                 $arr_groups = $this->priv_session_groups_save($id_user);

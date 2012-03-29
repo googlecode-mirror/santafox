@@ -30,7 +30,7 @@ class data_tree
      *
      * @var string
      */
-    private $name_for_cookie = "tree";
+    private $name_for_cookie = "treecookie";
 
 	/**
 	 * Действие для загрузки дерева
@@ -503,7 +503,7 @@ class data_tree
         $html = str_replace("/*[#linkmenu#]*/"  , $link, $html);
 
         $html = str_replace("/*[#click_node_default#]*/" , $def_link                      , $html);
-        $html = str_replace("%cookie_name_tree%"     , "name_".$this->name_for_cookie , $html);
+        $html = str_replace("%cookie_name_tree%"     , $this->name_for_cookie , $html);
 
 
 

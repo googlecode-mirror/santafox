@@ -48,7 +48,7 @@ class manager_modules
         $tree = new data_tree('[#modules_label_structur#]','index', $this->modules_structure_all_get());
         $tree->set_action_click_node('select_modul');
         $tree->set_drag_and_drop(false);
-        $tree->set_name_cookie("modules_structure");
+        $tree->set_name_cookie("tree_modules_structure");
 
         $id_mod = $kernel->pub_module_id_get();
         if (empty($id_mod))

@@ -25,7 +25,7 @@ class manager_structue
         $tree->set_action_click_node('view');
         $tree->set_action_move_node('move');
         $tree->set_drag_and_drop(true);
-        $tree->set_name_cookie("site_structure");
+        $tree->set_name_cookie("tree_site_structure");
 
         //Теперь сформируем небольшой дорогу, для того, что бы можно
         //было открыть текущую ноду по её пути

@@ -541,8 +541,8 @@ function set_propertes_main(d)
 
         if (d.page_is_main)//если главная - отключим чекбокс
             $('#' + d.page_prop[i].name_nasled).attr("disabled", true);
-        //else
-        //$('#'+d.page_prop[i].name_nasled).removeAttr("disabled");
+        else
+            $('#'+d.page_prop[i].name_nasled).removeAttr("disabled");
     }
 }
 var metkiCount=0;

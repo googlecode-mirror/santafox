@@ -2657,7 +2657,7 @@ class catalog extends basemodule
         $namedb   = strtolower($namedb);
 
 
-        $ccbs = $_POST['ccb'];
+        $ccbs = isset($_POST['ccb'])?$_POST['ccb']:array();
 
         $catids = array();
         foreach ($ccbs as $catid=>$value)

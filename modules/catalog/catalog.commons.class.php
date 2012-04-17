@@ -19,10 +19,22 @@ class CatalogCommons
 
 
     /**
+     * Возвращает товарную группу
+     *
+     * @param integer $id  id-шник группы
+     * @return array
+     */
+    public static function get_group($id)
+    {
+        global $kernel;
+        return $kernel->db_get_record_simple("_catalog_item_groups", "`id`=".$id);
+    }
+
+    /**
      * Генерирует случайную строку из латинских букв + цифр
      *
      * @param number $len длина
-     * @param boolena $plusNumbers использовать и цифры?
+     * @param boolean $plusNumbers использовать и цифры?
      * @return string
      */
     public static function generate_random_string($len, $plusNumbers=true)
@@ -42,7 +54,7 @@ class CatalogCommons
      * где key - строковый ID-шник фильтра,
      * value - полное название фильтра
      *
-     * @return unknown
+     * @return array
      */
     public static function get_inner_filters_kvarray()
     {
@@ -77,7 +89,7 @@ class CatalogCommons
     /**
      * Возвращает внутренний фильтр по строковому ID
      *
-     * @param number $id
+     * @param string $stringid
      * @return array
      */
     public static function get_inner_filter_by_stringid($stringid)
@@ -117,7 +129,7 @@ class CatalogCommons
 
     /**
      * Возвращает переменную модуля по идентификатору
-     *
+     * @param string $name_db
      * @return array
      */
     public static function get_variable($name_db)
@@ -160,7 +172,7 @@ class CatalogCommons
     /**
      * Возвращает поле заказа (корзины)
      *
-     * @param integer id id-шник поля
+     * @param integer $id id-шник поля
      * @return array
      */
     public static function get_order_field($id)
@@ -232,7 +244,7 @@ class CatalogCommons
      *   	Бренд (brand)
      *   	Год выпуска (year)
      * для вывода в админке
-     *
+     * @param $needid boolean
      * @return string
      */
     public static function get_all_group_props_html($needid = false)
@@ -297,8 +309,8 @@ class CatalogCommons
   /**
      * Возвращает свойства для группы
      *
-     * @param integer gid          id-шник группы
-     * @param boolean need_common  нужны ли общие для всех товаров свойства?
+     * @param integer $gid          id-шник группы
+     * @param boolean $need_common  нужны ли общие для всех товаров свойства?
      * @return array
      */
     public static function get_props($gid, $need_common = false)
@@ -325,7 +337,7 @@ class CatalogCommons
     /**
      * Возвращает свойства для группы в виде массива с элементами namedb=>array(...свойства...)
      *
-     * @param integer gid          id-шник группы
+     * @param integer $gid id-шник группы
      * @return array
      */
     public static function get_props2($gid)
@@ -362,15 +374,16 @@ class CatalogCommons
 
 	/**
      * Возвращает все товарные группы для текущего модуля из БД
-     *
+     * @param string $moduleid
      * @return array
      */
-    public static function get_groups()
+    public static function get_groups($moduleid=null)
     {
         global $kernel;
         $items = array();
-        $query = 'SELECT * FROM `'.PREFIX.'_catalog_item_groups` '.
-        'WHERE `module_id` = "'.$kernel->pub_module_id_get().'"'.'  ORDER BY `id` DESC';
+        if (!$moduleid)
+            $moduleid=$kernel->pub_module_id_get();
+        $query = 'SELECT * FROM `'.PREFIX.'_catalog_item_groups` WHERE `module_id` = "'.$moduleid.'"  ORDER BY `id` DESC';
         $result = $kernel->runSQL($query);
         while ($row = mysql_fetch_assoc($result))
             $items[$row['id']] = $row;
@@ -495,6 +508,3 @@ class CatalogCommons
         return self::$templates_admin_prefix;
     }
 }
-
-
-?>

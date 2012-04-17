@@ -100,6 +100,7 @@ class catalog_install extends install_modules
      * Инсталяция дочернего модуля
      *
      * @param string $id_module Идентификатор вновь создоваемого дочернего модуля
+     * @param boolean $reinstall
      */
 	function install_children($id_module, $reinstall = false)
 	{
@@ -262,10 +263,10 @@ class catalog_install extends install_modules
 	{
 		global $kernel;
 
-        $groups = CatalogCommons::get_groups();
+        $groups = CatalogCommons::get_groups($id_module);
         foreach ($groups as $group)
         {
-		    $query = 'DROP TABLE `'.PREFIX.'_catalog_items_'.$id_module.'_'.$group['name_db'].'`';
+		    $query = 'DROP TABLE `'.PREFIX.'_catalog_items_'.$id_module.'_'.strtolower($group['name_db']).'`';
 		    $fname = 'modules/catalog/templates_admin/'.$id_module.'_'.$group['name_db'].'_edit_tpl.html';
 		    unlink($fname);
 		    $kernel->runSQL($query);
@@ -274,6 +275,8 @@ class catalog_install extends install_modules
         $query = 'DELETE FROM `'.PREFIX.'_catalog_item_groups` WHERE `module_id`="'.$id_module.'"';
         $kernel->runSQL($query);
         $query = 'DELETE FROM `'.PREFIX.'_catalog_item_props` WHERE `module_id`="'.$id_module.'"';
+        $kernel->runSQL($query);
+        $query = 'DELETE FROM `'.PREFIX.'_catalog_visible_gprops` WHERE `module_id`="'.$id_module.'"';
         $kernel->runSQL($query);
 
         //таблица товаров

@@ -483,4 +483,4 @@ $il['catalog_commerceml_offers_completed']='<b>Цены обновлены (%upd
 
 $il['catalog_no_group_template_list']='У товарной группы не определён шаблон вывода списка товаров';
 $il['catalog_show_items_list_no_items']='Нет товаров';
-?>
+$il['catalog_delete_group_alert']='Действительно удалить тов. группу';

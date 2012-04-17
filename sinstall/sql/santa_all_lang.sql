@@ -2153,8 +2153,11 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_show_items_list_no_items',
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_show_items_list_no_items',NULL,'Нет товаров');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_show_items_list_no_items',NULL,'Нет товаров');
 
-
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_delete_group_alert',NULL,'Действительно удалить тов. группу');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_delete_group_alert',NULL,'Действительно удалить тов. группу');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_delete_group_alert',NULL,'Действительно удалить тов. группу');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','news_error_incorrect_datetime',NULL,'Некорректное значение даты или времени');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','news_error_incorrect_datetime',NULL,'Некорректное значение даты или времени');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','news_error_incorrect_datetime',NULL,'Некорректное значение даты или времени');
 

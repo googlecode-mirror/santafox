@@ -55,7 +55,7 @@ class newsi extends basemodule
      */
     protected function get_action_name()
     {
-    	return $this->action_name;
+        return $this->action_name;
     }
 
     /**
@@ -90,10 +90,10 @@ class newsi extends basemodule
      *
      * @param string $name
      */
-	protected function set_action_name($name)
-	{
+    protected function set_action_name($name)
+    {
         $this->action_name = $name;
-	}
+    }
 
     /**
      * Возвращет префикс путей к шаблонам административного интерфейса
@@ -102,7 +102,7 @@ class newsi extends basemodule
      */
     protected function get_templates_admin_prefix()
     {
-    	return $this->templates_admin_prefix;
+        return $this->templates_admin_prefix;
     }
 
     /**
@@ -122,7 +122,7 @@ class newsi extends basemodule
      */
     protected function get_templates_user_prefix()
     {
-    	return $this->templates_user_prefix;
+        return $this->templates_user_prefix;
     }
 
     /**
@@ -132,7 +132,7 @@ class newsi extends basemodule
      */
     protected function set_templates_user_prefix($prefix)
     {
-    	$this->templates_user_prefix = $prefix;
+        $this->templates_user_prefix = $prefix;
     }
 
 
@@ -661,10 +661,10 @@ class newsi extends basemodule
     private function priv_item_save($item_data, $file)
     {
         global $kernel;
-        list($day, $month, $year) = explode('-', $item_data['date']);
+        list($day, $month, $year) = explode('.', $item_data['date']);
         //        if (preg_match('/^\d{1,2}:\d{1,2}:\d{1,2}$/', trim($item_data['time'])) && checkdate($month, $day, $year)) {
         $query = 'REPLACE `' . $kernel->pub_prefix_get() . '_newsi` (`id`, `module_id`, `date`, `time`, `available`, `lenta`, `delivery`, `rss`, `header`, `description_short`, `description_full`, `author`, `source_name`, `source_url`, `image`) '
-                 . ' VALUES (' . $item_data['id'] . '
+            . ' VALUES (' . $item_data['id'] . '
             ,"' . $kernel->pub_module_id_get() . '"
             ,"' . $year . '-' . $month . '-' . $day . '"
             ,"' . $item_data['time'] . '"
@@ -767,7 +767,7 @@ class newsi extends basemodule
         if (is_null($item_id))
         {
             $content = str_replace('%time%', date('H:i:s'), $content);
-            $content = str_replace('%date%', date('d-m-Y'), $content);
+            $content = str_replace('%date%', date('d.m.Y'), $content);
         }
         $content = str_replace($this->priv_get_item_data_search(), $this->priv_get_item_data_replace($item_id), $content);
         return $content;
@@ -809,7 +809,7 @@ class newsi extends basemodule
             $editor->set_content($item_data['description_full']);
 
             return array(
-                $item_data['date'],
+                str_replace('-','.',$item_data['date']),
                 $item_data['time'],
                 ($item_data['lenta'] == 1) ? ('checked') : (''),
                 ($item_data['available'] == 1) ? ('checked') : (''),
@@ -961,6 +961,9 @@ class newsi extends basemodule
      * @param integer $offset Сдвиг
      * @param string $field Поле для сортировки
      * @param string $direction НАправление сортировки
+     * @param string $start
+     * @param string $stop
+     * @param string $date
      * @return string
      */
     private function priv_show_list($limit, $offset, $field, $direction, $start = null, $stop = null, $date = null)
@@ -1206,6 +1209,8 @@ class newsi extends basemodule
      *
      * @param integer $id
      * @param string $time
+     * @param boolean $is_test
+     * @return array
      */
     function get_full_info_and_submit($id, $time, $is_test = true)
     {

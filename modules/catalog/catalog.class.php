@@ -1776,7 +1776,7 @@ class catalog extends basemodule
             $props = CatalogCommons::get_props(0, false);
 
         if (empty($filter['targetpage']))
-            $targetPage = $kernel->pub_page_current_get().".html";
+            $targetPage = $kernel->pub_page_current_get();
         else
             $targetPage = $filter['targetpage'];
         //Сформируем сначала строки с товарами

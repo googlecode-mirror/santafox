@@ -1,34 +1,34 @@
 <!-- @body -->
 <div id="mod_action_edit" class="content" style="width:100%; margin:0 auto; padding:10px 0;">
- <h3>[#action_curent_name#]</h3>
- <form action="%url_action%" method="post" id="module_action_saveform">
-  <fieldset>
-   <label for="action_name">[#modules_install_label_name_action#]</label>
-   <input type="text" name="action_name" id="action_name" value="[#action_name#]">
-  </fieldset>
+    <h3>[#action_curent_name#]</h3>
+    <form action="%url_action%" method="post" id="module_action_saveform">
+        <fieldset>
+            <label for="action_name">[#modules_install_label_name_action#]</label>
+            <input type="text" name="action_name" id="action_name" value="[#action_name#]">
+        </fieldset>
 
         <fieldset>
             %action_param_html%
         </fieldset>
 
-  <fieldset class="page_submit_field">
-   <input type="button" value="[#modules_button_save_properties#]" id="modules_button_save_properties">
-  </fieldset>
-  </form>
+        <fieldset class="page_submit_field">
+            <input type="button" value="[#modules_button_save_properties#]" id="modules_button_save_properties">
+        </fieldset>
+    </form>
 </div>
 
 
 <script>
-   $("input:button").button();
+    $("input:button").button();
 
-   $('#mod_action_edit select').selectmenu({
-      style:'dropdown',
-      maxHeight: 200
-   });
+    $('#mod_action_edit select').selectmenu({
+        style:'dropdown',
+        maxHeight: 200
+    });
 
-	var arr_actions = new Array();
+    var arr_actions = new Array();
     var fieldNames = [%fieldNames%];
-	var url_for_submit = '';
+    var url_for_submit = '';
 
 
     $('#modules_button_save_properties').click(function(){
@@ -45,7 +45,7 @@
             {
                 fID = 'ppv_'+fieldNames[j];
                 //пропускаем незачеканные чекбоксы
-                if ($('#'+fID)[0].tagName=="INPUT" &&  $('#'+fID).attr('type')=="checkbox" && !$('#'+fID).attr('checked'))
+                if ($('#'+fID)[0].tagName=="INPUT" &&  $('#'+fID).attr('type').toLowerCase()=="checkbox" && !$('#'+fID).attr('checked'))
                     continue;
                 postArr.properties[fieldNames[j]]=$('#'+fID).val();
 
@@ -68,17 +68,17 @@
 
         }
     });
-    
-   $('.prop-description b').next('ul').css({'display':'none'});
-   
-   $('.prop-description b').toggle(function(){
-      $(this).next('ul').slideDown();
-   },
-   function (){
-      $(this).parent().find('ul').slideUp();
-   });
+
+    $('.prop-description b').next('ul').css({'display':'none'});
+
+    $('.prop-description b').toggle(function(){
+                $(this).next('ul').slideDown();
+            },
+            function (){
+                $(this).parent().find('ul').slideUp();
+            });
 
 
-	%action_param_code%
+    %action_param_code%
 
 </script>

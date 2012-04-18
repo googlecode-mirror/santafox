@@ -7,39 +7,39 @@
             style:'dropdown',
             maxHeight: 200
         });
-
-        $('#incat_btn').toggle(function(){
-                    $('#incat').show();
-                },
-                function (){
-                    $('#incat').hide();
-                });
-
-        /*
-         $("#incat").dialog({
+        
+         $("#incatdialog").dialog({
          autoOpen: false,
+         closeOnEscape: false,
          height: 350,
          width: 300,
-         modal: true,
+         modal: true, 
+         title: '[#catalog_item_edit_incategories_label#]',
+         open: function(event, ui) { 
+            $(".ui-dialog-titlebar-close", ui.dialog).hide(); 
+            $(this).append($('#incat').show());
+         },
          buttons: {
          'Выбрать все': function() {
-         $(this).find(':checkbox').attr('checked', true);
+            $(this).find(':checkbox').attr('checked', true);
          },
 
          'Убрать все': function() {
-         $(this).find(':checkbox').removeAttr('checked');
+            $(this).find(':checkbox').removeAttr('checked');
          },
 
          'Готово': function() {
-         $(this).dialog( "close" );
+            $(this).dialog( "close" );
+            $(this).parent().find('#incat').appendTo($("#incatcontainer"));
          }
          }
          });
-         */
+         
 
         $("#incat_btn").button().click(function() {
-            $("#incat").dialog("open");
+            $("#incatdialog").dialog("open");
         });
+        
 
         function confirm_need_add_big_water(btn)
         {
@@ -86,9 +86,12 @@
                         <td align="left">[#catalog_item_edit_incategories_label#]</td>
                         <td align="center">
                             <span id="incat_btn">Выбрать</span>
-                            <div id="incat" title="[#catalog_item_edit_incategories_label#]" class="incat block clear" style="display:none; margin:0 auto;">
+                            <div id="incatcontainer" class="clear" style="display:none;">
+                             <div id="incat" class="incat block clear" style="margin:0 auto;">
                                 %categories%
+                             </div>
                             </div>
+                            <div id="incatdialog" style="display:none;"></div>
                         </td>
                     </tr>
 

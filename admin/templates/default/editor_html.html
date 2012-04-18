@@ -11,9 +11,8 @@
 $(function() {
 
 $(window).bind('resize', function(){
- $('#cke_content_html').css({'height':'98.5%'});
- $('.cke_wrapper').css({'height':'98.5%'});
- $('.cke_skin_kama, .cke_editor').css({'height':'98.5%'});
+   var editorIframeHeight = $('html').height() - ($('#cke_top_content_html').height()+$('#cke_bottom_content_html').height()+20);
+   $('iframe').css({'height':''+editorIframeHeight+'px'});
 });
 
 var config =
@@ -57,9 +56,8 @@ var config =
            };
 
    $('#[#name_edit#]').ckeditor(config, function(){
-      $('#cke_content_html').css({'height':'98.5%'});
-      $('.cke_wrapper').css({'height':'98.5%'});
-      $('.cke_skin_kama, .cke_editor').css({'height':'98.5%'});
+      var editorIframeHeight = $('html').height() - ($('#cke_top_content_html').height()+$('#cke_bottom_content_html').height()+20);
+      $('iframe').css({'height':''+editorIframeHeight+'px'});
    });
 });
 

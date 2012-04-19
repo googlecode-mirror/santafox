@@ -592,16 +592,21 @@ function set_metki(d)
         }
 
         //повесим обработчик на клик по чекбоксу
-        /*$("#flag_metka_"+i).change(function () {
+        $("#flag_metka_"+i).change(function () {
          var elID = new String(this.id).split("_").pop();
-         show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
-         show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
          var disAttr = $("#sel_modul_ext_"+elID).attr("disabled");
-         if (typeof  disAttr!== 'undefined' && disAttr!=false)
-         $("#sel_modul_ext_"+elID).removeAttr("disabled");
-         else
-         $("#sel_modul_ext_"+elID).attr("disabled",true);
-         });*/
+         
+            if (typeof  disAttr!== 'undefined' && disAttr!=false){
+               $("#sel_modul_ext_"+elID).removeAttr("disabled");
+               // и покажем иконки редактирования, если требуется
+               show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
+               show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
+            }
+            else
+            {
+               $("#sel_modul_ext_"+elID).attr("disabled",true);
+            }
+         });
 
 
         // прячем иконки

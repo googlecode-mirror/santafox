@@ -2244,7 +2244,7 @@ class catalog extends basemodule
         $content = str_replace("%row%", $rows, $content);
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$catid.'&'.$this->frontend_param_offset_name.'=';
-        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit,$purl,10), $content);
+        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit,$purl), $content);
         $content = str_replace('%catid%', $category['id'], $content);
         $content = $this->process_filters_in_template($content);
         $content = $this->process_variables_out($content);

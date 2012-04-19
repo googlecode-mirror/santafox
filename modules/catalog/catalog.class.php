@@ -1707,7 +1707,7 @@ class catalog extends basemodule
                 $linkParams .= "filterid=".$filter_stringid."&";
         }
         $curr_cat_id=0;
-        if (empty($filter['catids']) && $filter['catids']!=0) //показываем товары из текущей - добавляем параметр с категорией
+        if (empty($filter['catids']) && $filter['catids']!==0) //показываем товары из текущей - добавляем параметр с категорией
         {
             $curr_cat_id=$this->get_current_catid(true);
             $linkParams .= "cid=".$curr_cat_id."&";

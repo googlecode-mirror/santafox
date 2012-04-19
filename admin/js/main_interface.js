@@ -497,7 +497,8 @@ function set_propertes_main(d)
     $("#fieldPageURL").val(d.link_other_page);
     $("#fieldPageID").val(d.id_curent_page);
     $("#fieldPageOnlyAuth").val(d.only_auth);
-    $("#fieldPageTemplate").val(d.page_template);
+    $(".ui-selectmenu-status").html(d.page_template);
+
     if (d.template_naslednoe)
     {
         $('#flag_template').attr("checked", "checked");

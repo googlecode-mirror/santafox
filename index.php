@@ -1,5 +1,5 @@
 <?php
-//Проверим, если нет файла ini.php то необходимо запустить инсталятор
+//Проверим, если нет файла ini.php   то необходимо запустить инсталятор
 if (!file_exists("ini.php"))
 {
     header("Location: http://".$_SERVER['HTTP_HOST'].'/sinstall/index.php');

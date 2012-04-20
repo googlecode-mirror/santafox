@@ -947,21 +947,25 @@ class catalog extends basemodule
         $block = $this->clear_left_labels($block);
         return $block;
     }
-
     /**
      * Обрабатывает вызовы внутренних фильтров в шаблоне
      *
      * @param string $content
+     * @param string $ignored stringID фильтра, который игнорируем (базовая защита от рекурсии)
      * @return string
      */
-    private function process_filters_in_template($content)
+    private function process_filters_in_template($content,$ignored=null)
     {
         //обработаем фильтры, если они есть в шаблоне
         if (preg_match_all("/%show_selection_([a-z0-9_-]+)%/iU", $content, $matches))
         {//тип 1: %show_selection_NAME%
             foreach ($matches[1] as $filterStringID)
             {
-                $content = str_ireplace("%show_selection_".$filterStringID."%", $this->pub_catalog_show_inner_selection_results($filterStringID), $content);
+                if ($filterStringID==$ignored)
+                    $replacement='';
+                else
+                    $replacement=$this->pub_catalog_show_inner_selection_results($filterStringID);
+                $content = str_ireplace("%show_selection_".$filterStringID."%", $replacement, $content);
             }
         }
 
@@ -969,17 +973,25 @@ class catalog extends basemodule
         {//тип 2 (с параметрами) : %show_selection_NAME(param1=value1;param2=value2)%
             foreach ($matches as $match)
             {
-                $paramsStr = trim($match[2]);
-                //remove any %NNNN_value%
-                $paramsStr = preg_replace("/%([a-z0-9_-]+)_value%/i", "", $paramsStr);
-                $params = explode(";", $paramsStr);
-                $paramsKV = array();
-                foreach ($params as $pstr)
+                $filterStringID=$match[1];
+                if ($filterStringID==$ignored)
+                    $replacement='';
+                else
                 {
-                    list($pname, $pvalue) = explode("=", $pstr, 2);
-                    $paramsKV[trim($pname)] = trim($pvalue);
+                    $paramsStr = trim($match[2]);
+                    //remove any %NNNN_value%
+                    $paramsStr = preg_replace("/%([a-z0-9_-]+)_value%/i", "", $paramsStr);
+                    $params = explode(";", $paramsStr);
+                    $paramsKV = array();
+
+                    foreach ($params as $pstr)
+                    {
+                        list($pname, $pvalue) = explode("=", $pstr, 2);
+                        $paramsKV[trim($pname)] = trim($pvalue);
+                    }
+                    $replacement=$this->pub_catalog_show_inner_selection_results($filterStringID, false, $paramsKV);
                 }
-                $content = str_ireplace("%show_selection_".$match[1]."(".$match[2].")%", $this->pub_catalog_show_inner_selection_results($match[1], false, $paramsKV), $content);
+                $content = str_ireplace("%show_selection_".$filterStringID."(".$match[2].")%", $replacement, $content);
             }
         }
         return $content;
@@ -1669,6 +1681,7 @@ class catalog extends basemodule
         return $sql;
     }
 
+
     /**
      * Публичный метод для отображения выборки по внутреннему фильтру
      *
@@ -1707,22 +1720,25 @@ class catalog extends basemodule
                 $linkParams .= "filterid=".$filter_stringid."&";
         }
         $curr_cat_id=0;
-        if (empty($filter['catids']) && $filter['catids']!==0) //показываем товары из текущей - добавляем параметр с категорией
+        if (strlen($filter['catids'])==0) //показываем товары из текущей - добавляем параметр с категорией
         {
             $curr_cat_id=$this->get_current_catid(true);
-            $linkParams .= "cid=".$curr_cat_id."&";
+            if ($curr_cat_id)
+                $linkParams .= "cid=".$curr_cat_id."&";
         }
         $this->set_templates($kernel->pub_template_parse($tpl));
 
         $sql = $this->process_variables_out($filter['query']);
         $sql = $this->prepare_inner_filter_sql($sql, $params, $linkParams);
+
         if (!$sql)
-            return $this->get_template_block('list_null');
+            return $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
         $filter['query'] = $sql;
 
 
         $query = $this->convert_inner_filter_query2sql($filter, $group);
-
+        if (!$query)
+            return $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
         //обрежем и модифицируем запрос для получения общего кол-ва товаров
         $pos = mb_strpos(mb_strtolower($query), "order by");
         if ($pos === false)
@@ -1739,12 +1755,12 @@ class catalog extends basemodule
             $total = $row['count'];
         mysql_free_result($result);
 
-
-        //
-        /*Ограничения по количеству
-			Так же нужно иметь возможность ограничить получаемый результат по количеству (LIMIT в mysql).
-			К примеру, если нам нужно получить ТОП-5 товаров с низкой ценой, то мы установим значение 5.
-			Если значение не установлено – тогда в результат отдается все найденные товары*/
+        /*
+        Ограничения по количеству
+        Так же нужно иметь возможность ограничить получаемый результат по количеству (LIMIT в mysql).
+        К примеру, если нам нужно получить ТОП-5 товаров с низкой ценой, то мы установим значение 5.
+        Если значение не установлено – тогда в результат отдается все найденные товары
+        */
         if ( (!empty($filter['limit']) && intval($filter['limit'])>0)&& $total>intval($filter['limit']))
             $total = intval($filter['limit']);
 
@@ -1768,7 +1784,7 @@ class catalog extends basemodule
         $count = count($items);
 
         if ($count == 0)
-            return $this->get_template_block('list_null');
+            return $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
 
         if ($group)
             $props = CatalogCommons::get_props($group['id'], true);
@@ -1805,7 +1821,7 @@ class catalog extends basemodule
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$linkParams.$this->frontend_param_offset_name.'=';
         $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,intval($filter['maxpages'])), $content);
-        $content = $this->process_filters_in_template($content);
+        $content = $this->process_filters_in_template($content,$filter['stringid']);
         $content = $this->replace_current_page_url($content);
         if ($curr_cat_id)
         {
@@ -5643,15 +5659,15 @@ class catalog extends basemodule
 
         if ($filter['catids']!="0") //все категории
         {
-            if (empty($filter['catids'])) //показывать товары из текущей
+            if (strlen($filter['catids'])==0) //показывать товары из текущей
             {
                 $catid = $this->get_current_catid(true);
                 if ($catid==0)
                     $catid=intval($kernel->pub_httpget_get("fcid"));//доп.возможность передать фильтру айдишник категории, незаметный для других методов
-                if ($catid!=0)
-                    $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$catid." AND ".$query;
-                else
-                    $query = " WHERE (".$query;
+
+                if ($catid==0) //"выбранная категория", но категорий не передано
+                    return null;
+                $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$catid." AND ".$query;
 
             }
             else  //выбранные категории

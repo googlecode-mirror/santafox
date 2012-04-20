@@ -82,7 +82,7 @@ abstract class BaseModule
      */
     public function clear_left_labels($str)
     {
-    	return preg_replace("/\\%([a-z0-9_-]+)\\%/i","", $str);
+        return preg_replace("/\\%([a-z0-9_-]{3,})\\%/i","", $str);
     }
 
     /**

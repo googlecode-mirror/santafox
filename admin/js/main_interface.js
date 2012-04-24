@@ -407,8 +407,8 @@ function start_include_content(name_area)
            };
     //убираем предыдущий instance, если есть
     var inst = CKEDITOR.instances[name_area];
-    if (typeof inst != 'undefined')
-        inst.destroy();
+    if (inst)
+        inst.destroy(true);
     $('#'+name_area).ckeditor(config);
     return true;
 }

@@ -87,6 +87,9 @@
         var url= '/sinstall/index.php?savestep='+num_step_curent;
 
         var postArr = $('#sinstall_form').serializeArray();
+        // покажем loading картинку
+        $('#center-div').empty();
+        $('#center-div').append('<img src="../sinstall/images/sinstall_loading.gif" style="position:absolute; left:50%; top:50%; margin:-12px 0 0 -80px;" alt="Loading">');
         $.post(url, postArr,  function(data)
         {
             try
@@ -96,6 +99,8 @@
                 {
                     num_step_curent++;
                     show_curent_step();
+                    // уберём картинку загрузки
+                    $('#center-div').empty();
                     $("#center-div").load("index.php?step="+num_step_curent);
                     $('#btnPrev').removeAttr('disabled');
                 }

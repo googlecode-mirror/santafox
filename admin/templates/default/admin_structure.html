@@ -118,6 +118,8 @@
                 {
                     santaShowPopupHint("Info",post_res.info,1500);
                     run_update_metki('%leftmenu%');//обновляем метки для нового шаблона, если всё ок
+                    //обновим дерево на случай если название страницы изменилось
+                    santaUpdateRegion('west','index.php?action=get_left_menu');
                 }
                 else
                     santaShowPopupHint("Error", post_res.info,0);
@@ -130,6 +132,12 @@
 	%--str_prop_modul_code--%
     */
 	run_update_metki('%link_show_metki%');
+
+    $('#fieldPageName').change(function(){
+        if(!$('#fieldPageTitle').val()){
+            $('#fieldPageTitle').val($('#fieldPageName').val());
+        }
+    });
 </script>
 <span id="contentLoading">Loading, Please wait..</span>
 <!-- page name -->

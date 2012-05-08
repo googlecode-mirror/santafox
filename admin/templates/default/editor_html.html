@@ -13,6 +13,10 @@ $(function() {
 $(window).bind('resize', function(){
    var editorIframeHeight = $('html').height() - ($('#cke_top_content_html').height()+$('#cke_bottom_content_html').height()+20);
    $('iframe').css({'height':''+editorIframeHeight+'px'});
+   
+   if ($.browser.msie) {
+         $('#cke_content_html, .cke_wrapper').css({'height':''+$('html').height() - 20+'px'});
+   }
 });
 
 var config =
@@ -58,6 +62,10 @@ var config =
    $('#[#name_edit#]').ckeditor(config, function(){
       var editorIframeHeight = $('html').height() - ($('#cke_top_content_html').height()+$('#cke_bottom_content_html').height()+20);
       $('iframe').css({'height':''+editorIframeHeight+'px'});
+      
+      if ($.browser.msie) {
+         $('#cke_content_html, .cke_wrapper').css({'height':''+$('html').height() - 20+'px'});
+      }
    });
 });
 

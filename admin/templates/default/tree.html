@@ -179,6 +179,7 @@
 
 "[#link_orig#]":{
         "label": "[#name#]",
+        "_class" : "ic_create",
         "action": function (par) {
             var disabledForNodes = new String("[#node_exclude#]").split(",");
             if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
@@ -204,6 +205,7 @@
 <!-- @context_element_remov_click_function -->
 "delete":{
     "label" : "Удалить", // @todo use lang[]
+    "_class" : "ic_delete",
     "_disabled": node.attr('rel')=='root'|| (jQuery.inArray( node.attr("id"), (new String ("[#node_exclude#]")).split(",")))>-1,
     "action":function (par){
         [#action#]

@@ -51,12 +51,15 @@
 .jstree-classic .jstree-locked a { color:silver; cursor:default; }
 
 #vakata-contextmenu.jstree-classic-context, 
-#vakata-contextmenu.jstree-classic-context li ul { background:#fff; border:1px solid #ccc; -moz-box-shadow: 1px 1px 2px #999; -webkit-box-shadow: 1px 1px 2px #999; box-shadow: 1px 1px 2px #999; }
-#vakata-contextmenu.jstree-classic-context li { }
-#vakata-contextmenu.jstree-classic-context a { color:#333; font-size:11px; font-weight:normal; }
+#vakata-contextmenu.jstree-classic-context li ul { background:#fff; -moz-box-shadow: 1px 1px 2px #999; -webkit-box-shadow: 1px 1px 2px #999; box-shadow: 1px 1px 2px #999; }
+#vakata-contextmenu.jstree-classic-context li {  }
+#vakata-contextmenu.jstree-classic-context li.ic_create ins { background:url('/admin/templates/default/images/new_page.png') no-repeat center center; }
+#vakata-contextmenu.jstree-classic-context li.ic_delete ins { background:url('/admin/templates/default/images/trash.png') no-repeat center center; }
+#vakata-contextmenu.jstree-classic-context a { color:#000; font-size:11px; font-weight:normal; }
 #vakata-contextmenu.jstree-classic-context a:hover, 
-#vakata-contextmenu.jstree-classic-context .vakata-hover > a { padding:0 5px; background:#00addb; border:1px solid #aecff7; color:#fff; -moz-border-radius:2px; -webkit-border-radius:2px; border-radius:2px; }
+#vakata-contextmenu.jstree-classic-context .vakata-hover > a { background:#00addb; color:#fff; }
 #vakata-contextmenu.jstree-classic-context li.jstree-contextmenu-disabled a, 
-#vakata-contextmenu.jstree-classic-context li.jstree-contextmenu-disabled a:hover { color:silver; background:transparent; border:0; padding:1px 4px; }
+#vakata-contextmenu.jstree-classic-context li.jstree-contextmenu-disabled a:hover { color:silver; background:transparent; border:0; }
+#vakata-contextmenu.jstree-classic-context li.jstree-contextmenu-disabled ins { opacity:.3; filter: alpha(opacity = 30);}
 #vakata-contextmenu.jstree-classic-context li.vakata-separator { background:#ededed; margin:0; }
 #vakata-contextmenu.jstree-classic-context li ul { margin-left:-4px; }

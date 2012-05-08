@@ -1910,9 +1910,9 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_label_action_new',NULL,'С
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_lable_info',NULL,'&nbsp;Модуль: ');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_main_header',NULL,'Подключенные модули:');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_alert_sofr_reinstal',NULL,'Будут обновлены свойства модуля, доступные методы и их параметры, а так же языковые переменные. Вы хотите переинсталировать ');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_context_menu3',NULL,'&nbsp;&nbsp;Переинсталяция');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_context_menu3',NULL,'Переинсталяция');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_context_menu2',NULL,'&nbsp;&nbsp;Удалить модуль');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_context_menu1',NULL,'&nbsp;&nbsp;Добавить модуль');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_context_menu1',NULL,'Добавить модуль');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','modules_label_structur',NULL,'Подключенные модули');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_user_table_head8',NULL,'Признак рутовости');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_user_table_head7',NULL,'Хост');

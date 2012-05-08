@@ -55,6 +55,8 @@
 #vakata-contextmenu.jstree-classic-context li {  }
 #vakata-contextmenu.jstree-classic-context li.ic_create ins { background:url('/admin/templates/default/images/new_page.png') no-repeat center center; }
 #vakata-contextmenu.jstree-classic-context li.ic_delete ins { background:url('/admin/templates/default/images/trash.png') no-repeat center center; }
+#vakata-contextmenu.jstree-classic-context li.ic_modinstall ins { background:url('/admin/templates/default/images/ic_modinstall.png') no-repeat center center; }
+#vakata-contextmenu.jstree-classic-context li.ic_reinstall ins { background:url('/admin/templates/default/images/ic_reinstall.png') no-repeat center center; }
 #vakata-contextmenu.jstree-classic-context a { color:#000; font-size:11px; font-weight:normal; }
 #vakata-contextmenu.jstree-classic-context a:hover, 
 #vakata-contextmenu.jstree-classic-context .vakata-hover > a { background:#00addb; color:#fff; }

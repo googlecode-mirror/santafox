@@ -57,10 +57,10 @@ class manager_modules
         $tree->set_node_default($id_mod);
 
         //Строим котекстное меню
- 		$tree->contextmenu_action_set('[#modules_context_menu1#]','modules_add','index');
+ 		$tree->contextmenu_action_set('[#modules_context_menu1#]','modules_add','index', '', 'ic_modinstall');
         $tree->contextmenu_action_remove('[#modules_context_menu2#]','module_delet','index','[#modules_alert_del#]');
         $tree->contextmenu_delimiter();
-        $tree->contextmenu_action_set('[#modules_context_menu3#]','module_reinstall','index','[#modules_alert_sofr_reinstal#]');
+        $tree->contextmenu_action_set('[#modules_context_menu3#]','module_reinstall','index','[#modules_alert_sofr_reinstal#]','ic_reinstall');
 
         $show->set_tree($tree);
     }

@@ -36,7 +36,7 @@ class manager_structue
         $tree->set_node_default($res);
 
         //Создаём контекстное меню
-        $tree->contextmenu_action_set('Добавить страницу', 'page_add');
+        $tree->contextmenu_action_set('Добавить страницу', 'page_add', '', '', 'ic_create');
 		//$tree->contextmenu_delimiter();
         $tree->contextmenu_action_remove('Удалить страницу', 'page_remove','index', '[#structure_alert_del#]');
 

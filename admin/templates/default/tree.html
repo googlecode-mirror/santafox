@@ -179,7 +179,7 @@
 
 "[#link_orig#]":{
         "label": "[#name#]",
-        "_class" : "ic_create",
+        "_class" : "[#class#]",
         "action": function (par) {
             var disabledForNodes = new String("[#node_exclude#]").split(",");
             if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
@@ -193,7 +193,7 @@
 
 "create":{
     "label"	: "Создать",
-     "action": function (par) {
+    "action": function (par) {
             var disabledForNodes = new String("[#node_exclude#]").split(",");
             if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
             {

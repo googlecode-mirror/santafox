@@ -313,13 +313,14 @@ class data_tree
      * @param string $message_confirm Сообщение, которе должно выводиться перед тем как выполнить этот пункт меню
      */
 
-    function contextmenu_action_set($name, $link, $exclude = false, $message_confirm = '')
+    function contextmenu_action_set($name, $link, $exclude = false, $message_confirm = '', $class = '')
     {
         $this->contextmenu[] = array("type" => "context_element_normal",
                                      "name" => $name,
                                      "link" => $link,
                                      "exclude" => $exclude,
-                                     "confirm" => $message_confirm
+                                     "confirm" => $message_confirm,
+                                     "class" => $class
                                      );
     }
 
@@ -419,6 +420,7 @@ class data_tree
                 //Теперь по-любому добавляем действие
                 $str = str_replace("[#action#]", $this->template[$element['type'].'_context_action'], $str);
                 $str = str_replace("[#name#]"        , $element['name']   , $str);
+                $str = str_replace("[#class#]"        , $element['class']   , $str);
                 //Ну теперь заменим имеющиеся переменные в получившемся коде
                 //$str = str_replace("[#id_context#]"  , $i,                                            $str);
                 $str = str_replace("[#link_orig#]", $element['link'], $str);

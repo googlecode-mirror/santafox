@@ -95,9 +95,9 @@ $il['backof_user_table_head8'] 			= 'Признак рутовости';
 
 
 $il['modules_label_structur'] 			= 'Подключенные модули';
-$il['modules_context_menu1'] 			= '&nbsp;&nbsp;Добавить модуль';
+$il['modules_context_menu1'] 			= 'Добавить модуль';
 $il['modules_context_menu2'] 			= '&nbsp;&nbsp;Удалить модуль';
-$il['modules_context_menu3'] 			= '&nbsp;&nbsp;Переинсталяция';
+$il['modules_context_menu3'] 			= 'Переинсталяция';
 $il['modules_alert_sofr_reinstal']		= 'Будут обновлены свойства модуля, доступные методы и их параметры, а так же языковые переменные. Вы хотите переинсталировать ';
 $il['modules_main_header'] 				= 'Подключенные модули:';
 $il['modules_lable_info'] 				= '&nbsp;Модуль: ';

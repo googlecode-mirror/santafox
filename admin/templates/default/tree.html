@@ -127,14 +127,14 @@
         /*[#dnd_action1#]*/
 
 		"contextmenu" : {
-            "items" : {
-                "rename" : false,
-                "remove" : false,//Delete
-                "ccp" : false,
-                "create":false
-                /*[#context_menu_functions#]*/
-               
-
+            items: function (node, tree_obj) {
+                return {
+                    "rename" : false,
+                    "remove" : false,//Delete
+                    "ccp" : false,
+                    "create":false
+                    /*[#context_menu_functions#]*/
+                }
             }
 		}
 	});
@@ -204,6 +204,7 @@
 <!-- @context_element_remov_click_function -->
 "delete":{
     "label" : "Удалить", // @todo use lang[]
+    "_disabled": node.attr('rel')=='root'|| (jQuery.inArray( node.attr("id"), (new String ("[#node_exclude#]")).split(",")))>-1,
     "action":function (par){
         structTreeCurrPID = par.attr("id");
             var disabledForNodes = new String("[#node_exclude#]").split(",");

@@ -93,7 +93,12 @@ class manager_structue
             case 'view':
             	$id_page = $kernel->pub_httpget_get('id');
             	if (!empty($id_page))
+                {
+                    $mapsite=$kernel->pub_mapsite_get();
+                    if (!isset($mapsite[$id_page]))//такой страницы нет у нас в структуре
+                        return '';
                     $kernel->priv_page_current_set($id_page);
+                }
 
                 $manager    = new properties_page($kernel->pub_page_current_get());
                 //а теперь провреим, если мы передаём ещё ряд особых параметров

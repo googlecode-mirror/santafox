@@ -201,7 +201,6 @@ class kernel
     private $timer_start = 0;
     private $timer_end = 0;
     private $timer_elapsed = 0;
-    private $pub_interface;
 
     /**
      * Переменная для хранения текущей секции
@@ -235,7 +234,7 @@ class kernel
     /**
      * Массив языков, которые могут быть доступны в системе
      *
-     * @var unknown_type
+     * @var array
      */
     private $lang = array("ru" => "[#admin_lang_caption_for_ru#]",
                       "en" => "[#admin_lang_caption_for_en#]",
@@ -640,7 +639,7 @@ class kernel
      *
      * Возвращает двухбуквенный код языка, используемого текущим администратором сайта
      * @access private
-     * @return Strung
+     * @return string
      */
     function priv_langauge_current_get()
     {
@@ -655,7 +654,7 @@ class kernel
      *
      * Возвращает название текущей кодовой страницы, используемой у текущего администратора сайта
      * @access private
-     * @return strung
+     * @return string
      */
     function priv_charset_current_get()
     {
@@ -1345,9 +1344,9 @@ class kernel
      * Заменяет текстовые переменные вида [#text_label#] их текстовыми представлениями
      * @param array $full_label содержит языковые переменные в виде массива
      * @param string $text_replace текст, который будет
-     * @param HTML $html Строка, в которой происходит замена меток
+     * @param string $html Строка, в которой происходит замена меток
      * @access private
-     * @return HTML
+     * @return string
      */
     function priv_textlabels_replace($full_label, $text_replace, $html)
     {
@@ -1405,9 +1404,9 @@ class kernel
      *
      * Заменяет в переданной строке метку <i>[#set_charset#]</i> на
      * кодовую страницу, выбранную у текущего администратора сайта
-     * @param HTML $html
+     * @param string $html
      * @access private
-     * @return HTML
+     * @return string
      */
     function priv_page_charset_set($html)
     {
@@ -1539,9 +1538,9 @@ class kernel
      *
      * Функция предназначена для кодирования всех находящихся в строке
      * E-mail адресов, с тем что бы они не были "считаны" спамерами с сайта
-     * @param HTML $page
+     * @param string $page
      * @access public
-     * @return HTML
+     * @return string
      */
     function pub_page_email_encode($page)
     {
@@ -1563,9 +1562,9 @@ class kernel
      *
      * Функция предназначена для кодирования всех находящихся в строке
      * форм, с тем что бы они не были "считаны" спамерами с сайта
-     * @param HTML $page
+     * @param string $page
      * @access public
-     * @return HTML
+     * @return string
      */
     function pub_page_form_encode($page)
     {
@@ -2770,11 +2769,11 @@ class kernel
     /**
 	 * Определяет, существует ли страница с данным ID
 	 *
-	 * @param String $id_page Провреяемое ID
-	 * @access private
+	 * @param string $id_page Провреяемое ID
+	 * @access public
 	 * @return boolean
 	 */
-    function priv_page_exist($id_page)
+    public function priv_page_exist($id_page)
     {
         $row = $this->db_get_record_simple("_structure","id='".$id_page."'");
         if ($row)
@@ -2800,9 +2799,8 @@ class kernel
 	 * @param string $login
 	 * @param string $password
 	 * @param string $email
-	 * @param stirng $name
+	 * @param string $name
 	 * @return int
-	 *
 	 */
     function pub_user_add_new($login, $password, $email, $name)
     {
@@ -2824,11 +2822,11 @@ class kernel
 	 *		-3 : пользователь с таким логином(еmail-ом) не подтвердил ещё регистрацию.
 	 * @param string $login
 	 * @param string $password
-	 * @param string $unic_login Если true - то уникальность пользователя проверяется по логину, если false - то по email-у
+	 * @param boolean $unic_login Если true - то уникальность пользователя проверяется по логину, если false - то по email-у
 	 * @access public
 	 * @return int
 	 */
-    function pub_user_register($login, $password, $unic_login = true)
+    public function pub_user_register($login, $password, $unic_login = true)
     {
         $user = new manager_users();
         $res = $user->fof_user_authorization($login, $password, $unic_login);
@@ -3358,7 +3356,7 @@ class kernel
 	 * @param string $table Имя таблицы БД без префикса
 	 * @param string $cond условие выборки, возможно с ORDER BY или GROUP BY, для получения всех записей - "true"
 	 * @param string $fields поля выборки через запятую, либо все - *
-	 * @return array|false
+	 * @return mixed
 	 * @access public
 	 */
     public function db_get_record_simple($table, $cond, $fields="*")
@@ -3373,88 +3371,23 @@ class kernel
          return $ret;
     }
 
-
     /**
-     * Дополняет массив обязательными ключами
-     *
-     * Метод объединяет массив $input и $verifay таким образом, что все элементы
-     * $verifay, которых нет в $input, попадают в последний ($input). Метод
-     * используются при обработке форм, для гарантированного присутствия всех
-     * необходимых ключей в исходном массиве.
-     *
-     * Пример:
-     * <code>
-     *    global $kernel;
-     *
-     *    $in = array('name' => 'Alex', 'age'=> '27');
-     *
-     *    $verify = array();
-     *    $verify['age']     = 'Not select';
-     *    $verify['company'] = 'Not select';
-     *    $verify['text']    = '';
-     *
-     *    $in = $kernel->pub_array_keys_check_set($verify, $in);
-     * </code>
-     * В результате, массив $in будет содержать следующие данные
-     * <code>
-     *    [name]    => [Alex]
-     *    [age]     => [27]
-     *    [company] => [Not select]
-     *    [text]    => []
-     * </code>
-     * @param array $verifay Массив с обязательными ключами
-     * @param array $input Массив, проверяемый на наличие обязательных ключей
-     * @return array
-     */
-    function pub_array_keys_check_set($verify, $input)
-    {
-        foreach ($verify AS $key => $value)
-        {
-            if (!isset($input[$key]))
-                $input[$key] = $value;
-        }
-        return $input;
-    }
-
-    /**
-     * Преобразует массив для использования в HTML формах Ext`а
+     * Преобразует массив для использования в динамических формах
      *
      * Передаваемый в функцию массив преобразуются к виду:
      *  [["key","val"],["key","val"],["key","val"], ...]
-     *
-     * Такой массив используется при создании выборных полей в формах:
-     * <code>
-     *       new Ext.form.ComboBox({
-     *          fieldLabel: '[#statist_all_label_date#]',
-     *          hiddenName:'codepage',
-     *          name: 'codepage',
-     *          store: new Ext.data.SimpleStore({
-     *              fields: ['code', 'caption'],
-     *              data : Массив с данными
-     *          }),
-     *          valueField: 'code',
-     *          displayField:'caption',
-     *          typeAhead: true,
-     *          mode: 'local',
-     *          triggerAction: 'all',
-     *          emptyText:' Выберете период...',
-     *          selectOnFocus:true,
-     *          width:150
-     *      })
-     * </code>
+
      * @param array $arr Преобразуемый массив
      * @return string
      * @access public
      */
     function pub_array_convert_form($arr)
-    {//todo fix-remove?
+    {
         if (empty($arr))
             return '[]';
-
         $out = array();
         foreach ($arr as $key => $val)
 			$out[] .= '["'.$key.'","'.$val.'"]';
-
         return "[".join(",",$out)."]";
     }
 
@@ -3507,7 +3440,7 @@ class kernel
      * </code>
      * @param string $html Обрабатываемый контент
      * @param array $array Массив с переменными для замены
-     * @return html
+     * @return string
      */
     function pub_array_key_2_value($html, $array)
     {
@@ -3537,14 +3470,14 @@ class kernel
      * Если последний параметр не задан, то изменённое изображение будет выведено только на экран, и не будет сохранено
      * @param string $image Путь к файлу с картинкой
      * @param array $text_arr Массив с параметрами добавляемого текста
-     * @param string $output Имя и путь файла для записи изменённого изображения. Если не задано, то картинка будет выведена на экран
+     * @param mixed $output Имя и путь файла для записи изменённого изображения. Если не задано, то картинка будет выведена на экран
      * @access public
-     * @return void|image
+     * @return void
      */
     function pub_image_text_write($image, $text_arr, $output=false)
-    {
-        $output == false ? $output = $image : "";
-
+    {//@todo unused
+        if (!$output)
+            $output=$image;
         $image_resource = imagecreatefromgif($image);
         if ($image_resource)
         {
@@ -3677,14 +3610,17 @@ class kernel
     * @param string $ufile Путь и имя файла обрабатываемого изображения
     * @param int $id Начальная часть имени файла уже обработанного изображения, к которой будет добавлена уникальная составляющая
     * @param string $path_full_image Путь, куда будет сохранено изменённое изображение
-    * @param array $big Массив с параметрами для формирования БОЛЬШОГО изображения. Если 0, то данное изображение не формируется
-    * @param array $thumb Массив с параметрами для формирования МАЛОГО изображения. Если 0, то данное изображение не формируется
-    * @param array $watermark_image Массив с параметрами для формирования водяного знака на большом изображении.
+    * @param mixed $big Массив с параметрами для формирования БОЛЬШОГО изображения. Если 0, то данное изображение не формируется
+    * @param mixed $thumb Массив с параметрами для формирования МАЛОГО изображения. Если 0, то данное изображение не формируется
+    * @param mixed $watermark_image_b Массив с параметрами для формирования водяного знака на большом изображении.
+    * @param mixed $source
+    * @param mixed $watermark_image_s Массив с параметрами для формирования водяного знака на исходном изображении.
     * @access public
     * @return string
     */
     function pub_image_save($ufile, $id, $path_full_image, $big=0, $thumb=0, $watermark_image_b=0, $source = 0, $watermark_image_s=0)
     {
+        $newname="";
 		if (isset($ufile) && ($ufile!=""))
 		{
 		    //Перед тем, как начинать преобразование, возможно надо открыть папку для записи
@@ -4060,13 +3996,13 @@ class kernel
      */
     function priv_page_title_get($name_link)
     {
-        $str = "";
         $arr = $this->pub_page_property_get($this->pub_page_current_get(), "title_other");
         if ($arr['value'])
         {
             $arr = $this->pub_page_property_get($this->pub_page_current_get(), "name_title");
             $str = $arr['value'];
-        } else
+        }
+        else
         {
             $arr = $this->pub_page_property_get($this->pub_page_current_get(), "caption");
             $str = $arr['value'];
@@ -4078,7 +4014,6 @@ class kernel
             return $this->modul_title;
 
         return $str.$this->modul_title;
-
     }
 
     /**
@@ -4099,7 +4034,7 @@ class kernel
      * Загружает в html редактор контент из указанного файла
      *
      * @param string $name_link
-     * @return HTML
+     * @return string
      * @access private
      */
     function priv_html_editor_start($name_link)
@@ -4152,7 +4087,7 @@ class kernel
      *     /content/files/news/filedoc
      *     /content/files/news/filepdf
      * </code>
-     * @param string $dir Строка пути, который необходимо создать
+     * @param mixed $dir Строка пути, который необходимо создать
      * @param boolean $direct Если установлен в true то указанный в путь ($dir) рассматривается от корня сайта. По умолчанию, указанный путь создаётся в папке content/files
      * @return boolean
      */
@@ -4160,11 +4095,9 @@ class kernel
     {
         if (!$dir)
             return false;
-        $arr_dir = array();
         $arr_dir = preg_split('(/|\\\\|,|;)', $dir);
         if (count($arr_dir) <= 0)
             return false;
-
         //Если вызов не по прямому пути, значит обрабатываем директории в папке контент
         $str_dir = '';
         if (!$direct)
@@ -4184,7 +4117,6 @@ class kernel
     {
         if (!$dir)
             return false;
-        $arr_dir = array();
         $arr_dir = preg_split('(/|\\\\|,|;)', $dir);
         if (count($arr_dir) <= 0)
             return false;
@@ -4197,43 +4129,6 @@ class kernel
         }
         return true;
     }
-
-    /**
-     * (не используется) Устанвавливает сообщение об ошибке
-     *
-     * Если в процессе работы, возникло сообщение о ошибки, которое необходимо
-     * отобразить пользователю, должна быть вызвана эта функция.
-     * Перед формированием страницы будет выведены собранные здесь сообщения
-     * Следует учитывать что эту функцию имеет смысл применять в том случае, когда
-     * происходит обработка запроса пользователя, после которого осуществялется редирект.
-     *
-     * @access public
-     * @param string $msg Сообщенеи о ошибке
-     * @return void
-     */
-    function pub_message_errore_set($msg)
-    {
-        if ($msg === true)
-            return '';
-        if (!empty($msg))
-            $_SESSION['vars_kernel']['codepage'][] = $msg;
-        return '';
-    }
-
-    /**
-     * Вывод сообщений о ошибках
-     *
-     * Функция формирует код, для вывода администратору сайта окна с сообщением
-     * о возникших ошибках.
-     * @access private
-     * @return void
-     */
-    function priv_message_errore_show()
-    {
-
-
-    }
-
 
     /**
      * Возвращает класс строки таблицы, для использования в HTML
@@ -4381,7 +4276,7 @@ class kernel
      * Соответственно будут обработаны и выведены только те метки, которые указаны в
      * этом шаблоне.
      * @param string Путь и файл с новым шаблоном страницы.
-     * @return void
+     * @return boolean
      */
 
     public function pub_da_page_template_set($file_name)
@@ -4445,29 +4340,6 @@ class kernel
     	return $this->queriesCount;
     }
 
-    /**
-     * Функкция устарела и может быть удалена
-     *
-     * @param unknown_type $metka
-     * @param unknown_type $html
-     * @return unknown
-     */
-    function priv_check_access_for_content($metka, $html)
-    {
-        $html = str_replace($metka, '', $html);
-        return  $html;
-        /*
-    	//Проверка на возможность записи в каталоги
-    	$template = "<script>Ext.onReady(function(){Ext.Msg.alert('Информация', 'Папка <i>content</i> и всё её содержимоё должны иметь полные права (0777).<br>Если у вас заданы параметры FTP соединения, то Вы можете установить <i>стандартные права</i>, перейдя в Глобальные настройки->системные действия');});</script>";
-		if (!is_writeable('content/files') || !is_writeable('content/pages') || !is_writeable('content/images'))
-            $html = str_replace($metka, $template, $html);
-		else
-            $html = str_replace($metka, '', $html);
-
-        return  $html;
-        */
-
-    }
 
     /**
      * Подготовка ответа браузеру для форм, отправленных методом jspub_form_submit()
@@ -4481,6 +4353,7 @@ class kernel
      * без изменений.
      * @param string $message Сообщение, выводимое в случае, если не было ошибок.
      * @param string $link_reload Идентификатор левого меню, на который необходимо осуществить переход.
+     * @return string
      */
     function pub_httppost_response($message = '', $link_reload = '')
     {
@@ -4488,7 +4361,6 @@ class kernel
         $text = '';
         if (count($this->response_post_error) > 0)
         {
-            //foreach ($this->response_post_error as $number => $message_err)
             foreach ($this->response_post_error as $message_err)
             {
                 $text .= $message_err."<br>";
@@ -4826,15 +4698,15 @@ class kernel
     /**
      * Перемещение файла
      *
-     * @param unknown_type $path
-     * @param unknown_type $new_path
-     * @param unknown_type $close_dir
-     * @return unknown
+     * @param string $path
+     * @param string $new_path
+     * @param boolean $close_dir
+     * @param boolean $test_full_path
+     * @return boolean
      */
     function pub_file_copy($path, $new_path, $close_dir = true, $test_full_path = true)
     {
-        //Работа будет онологична тому, как это делается при
-        //записи контента.
+        //Работа будет аналогична тому, как это делается при записи контента.
         if ($test_full_path)
         {
             $path = $this->priv_file_full_patch($path);
@@ -4852,7 +4724,6 @@ class kernel
         if (@copy($path, $new_path))
             return true;
 
-        $ret = false;
         //Тупо не получилось, и необходимо сделать это через стандартную
         //процедуру временной смены прав на папку.
         $this->pub_ftp_dir_chmod_change($new_path);
@@ -4931,11 +4802,12 @@ class kernel
             return false;
     }
 
+
     /**
      * Если в качестве параметра передан путь до папки,
      * то функция вернёт путь до родительской папки, что бы можно было поставить на неё права
-     *
-     * @param unknown_type $path
+     * @param $path string
+     * @return string
      */
     function pub_file_dir_parent($path)
     {
@@ -5125,6 +4997,8 @@ class kernel
      * или путь вида /upload/file.txt, т.е. со слэшем вначале
      *
      * @param string $path
+     * @param boolean $need_full
+     * @return string
      */
     public function convert_path4ftp($path, $need_full = true)
     {
@@ -5178,6 +5052,7 @@ class kernel
      * а потом вызвать их закрытие
      * @param string $file
      * @param boolean $show_errore
+     * @return mixed
      */
     function pub_ftp_file_chmod_change($file, $show_errore = true)
     {
@@ -5207,6 +5082,7 @@ class kernel
      * @param string $file
      * @param boolean $change_for_parent
      * @param boolean $show_errore
+     * @return mixed
      */
     function pub_ftp_dir_chmod_change($file, $change_for_parent = false, $show_errore = true)
     {
@@ -5239,6 +5115,7 @@ class kernel
      * @param string $file путь
      * @param boolean $change_for_parent
      * @param boolean $show_errore
+     * @return mixed
      */
     public function pub_ftp_dir_chmod_open($file, $change_for_parent = false, $show_errore = true)
     {
@@ -5313,6 +5190,7 @@ class kernel
      * @param boolean $change_for_parent
      * @param number $chmod
      * @param boolean $show_errore
+     * @return mixed
      */
     public function pub_ftp_dir_chmod_close($file, $change_for_parent = false, $chmod = false, $show_errore = true)
     {
@@ -5418,7 +5296,7 @@ class kernel
      */
     function pub_dir_recurs_delete($dir, $no_delet_main = true)
     {
-        return $this->pub_file_delete($dir, $no_delet_main);
+        $this->pub_file_delete($dir, $no_delet_main);
     }
 
     function priv_path_root_set()

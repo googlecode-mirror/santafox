@@ -1039,7 +1039,6 @@ class manager_modules
 
         $template = $kernel->pub_template_parse("admin/templates/default/modules_installbase.html");
         $html = $template['body'];
-        $html = $kernel->priv_check_access_for_content("%writeable%", $html);
 
         //Посмотрим что уже проинсталированно.
 		$query = 'SELECT id, parent_id
@@ -1342,8 +1341,6 @@ class manager_modules
 
 		$template = $kernel->pub_template_parse("admin/templates/default/admin_modules.html");
 		$html = $template['body'];
-
-		$html = $kernel->priv_check_access_for_content("%writeable%", $html);
 
 		//Сначала построим название модуля во всех языках
         $id_name = mb_substr($curent_modules['full_name'],2,-2);

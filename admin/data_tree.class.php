@@ -12,8 +12,8 @@
  *
  * @name data_tree
  * @package  PublicFunction
- * @copyright ArtProm (с) 2010
- * @version 2.0
+ * @copyright ArtProm (с) 2012
+ * @version 3.0
  */
 class data_tree
 {
@@ -311,6 +311,7 @@ class data_tree
      * @param string $link Линк для действия, выполняемого по клику на этот пункт меню
      * @param string|boolean $exclude ID нод, через запятую, для которых этот пункт будет недоступен
      * @param string $message_confirm Сообщение, которе должно выводиться перед тем как выполнить этот пункт меню
+     * @param string $class CSS-класс
      */
 
     function contextmenu_action_set($name, $link, $exclude = false, $message_confirm = '', $class = '')
@@ -386,30 +387,11 @@ class data_tree
             foreach ($this->contextmenu as $element)
             {
 
-                //Если это разделитель, то просто добавим его и пойдём дальше
-                /*
-            	if ($element['type'] == 'context_empty')
-            	{
-            	   $html_elements .= $this->template['context_empty'];
-            	   continue;
-            	}
-
-                 */
-
-                /*
-            	$str_object = $this->template['context_element'];
-                $str_object = str_replace("[#name#]"        , $element['name']   , $str_object);
-                //$str_object = str_replace("[#id_context#]"  , $i                 , $str_object);
-                $str_object = str_replace("[#node_exclude#]", $element['exclude'], $str_object);
-                */
                 //Создадим функцию, которая будет обрабатывать клик по меню её шаблон
                 //зависит от типа элемента меню, так как возможно нужно выполнять разные
                 //действия
                 $str = $this->template[$element['type'].'_click_function'];
 
-                //@todo use real disabled elements - http://stackoverflow.com/questions/4559543/configuring-jstree-right-click-contextmenu-for-different-node-types
-                //or http://www.devcomments.com/jsTree-5672-Re-Disable-Specific-Context-Menu-Item-based-off-node-at290978.htm
-                
                 $str = str_replace("[#node_exclude#]", $element['exclude'], $str);
 
                 //Если нужно - вставим обвязку для вопроса, внутри которой снова появляется [#action#]
@@ -422,22 +404,17 @@ class data_tree
                 $str = str_replace("[#name#]"        , $element['name']   , $str);
                 $str = str_replace("[#class#]"        , $element['class']   , $str);
                 //Ну теперь заменим имеющиеся переменные в получившемся коде
-                //$str = str_replace("[#id_context#]"  , $i,                                            $str);
                 $str = str_replace("[#link_orig#]", $element['link'], $str);
                 $str = str_replace("[#link#]", $kernel->pub_redirect_for_form($element['link'], $this->relativ_url), $str);
 
                 $str = str_replace("[#confirm#]", $element['confirm'], $str);
                 $array_function[] = $str;
-                //$html_elements .= $str_object;
                 $i++;
             }
-            //$html_context_menu = $html_elements;
             if (count($array_function) > 0)
                 $html_context_menu_function = ",".join(',',$array_function);
 
         }
-
-         
 
         //Путь для получения данных о структуре и выполнении различных жействий
         $data_url = $kernel->pub_redirect_for_form($this->action_get_data, $this->relativ_url);
@@ -447,20 +424,16 @@ class data_tree
         {
             if (is_array($this->node_default))
             {
-                //$node = $this->node_default[(count($this->node_default)-1)];
                 $this->node_default = "'".join("','", $this->node_default)."'";
             }
             else
             {
-                //$node = $this->node_default;
                 $this->node_default = "'".$this->node_default."'";
             }
             //Это первый вызов этого интерфейса, и значит что нужно полностью
             //загрузить интерфейс формы, так как его ещё точно нет
             if ($this->is_page_structure)
             {
-            	//$def_link = $this->action_node;
-            	//$def_link = 'start_interface.link_go("'.$this->action_node.'&id="+sel_node.id);';
             	$def_link = 'start_interface.link_go("'.$this->action_node.'&id="+sel_node);';
             }
         }
@@ -492,22 +465,17 @@ class data_tree
         }
 
 
-        //$html = str_replace("[#context_menu#]"          , $html_context_menu         , $html);
         $html = str_replace("/*[#context_menu_functions#]*/", $html_context_menu_function, $html);
 
         //Обычный клик по ноде будет вызывать перегрузку сентрaльного блока
         $link = 'start_interface.link_go("'.$this->action_node.'&id=" + currNodeId);';
-        //А вот если это работа со структурой, то всё сложнее, так как нужно только обновить
-        //уже загруженную форму
+        //А вот если это работа со структурой, то всё сложнее, так как нужно только обновить уже загруженную форму
         if ($this->is_page_structure)
             $link = 'structure_tree_click_node("'.$this->action_node.'&id=" + currNodeId);';
 
         $html = str_replace("/*[#linkmenu#]*/"  , $link, $html);
-
         $html = str_replace("/*[#click_node_default#]*/" , $def_link                      , $html);
         $html = str_replace("%cookie_name_tree%"     , $this->name_for_cookie , $html);
-
-
 
         //И последнее, вставим признак необходимости выставлять дефолтную ноду, или ноду из кук
         //Это можно делать только в том случае, если текущего пункта левого меню нет вообще
@@ -530,6 +498,3 @@ class data_tree
     }
 
 }
-
-
-?>

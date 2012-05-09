@@ -33,6 +33,8 @@ class manager_structue
         foreach ($kernel->pub_waysite_get($kernel->pub_page_current_get()) as $value)
         	$res[] = $value['id'];
 
+        if (empty($res))
+            $res='index';
         $tree->set_node_default($res);
 
         //Создаём контекстное меню

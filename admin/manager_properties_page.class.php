@@ -499,7 +499,6 @@ class properties_page
 
                 //Выведем основную часть, с общими свойствами страницы
                 $html = $templates['body'];
-                $html = str_replace('%writeable%',      ''                                          , $html);
                 $html = str_replace('%page_name%',      addslashes($page_properties['caption'])                 , $html);
                 $html = str_replace('%page_title%',     addslashes($page_properties['name_title'])             , $html);
                 $html = str_replace('%page_url%',       $page_properties['link_other_page']         , $html);

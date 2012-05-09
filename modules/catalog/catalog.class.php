@@ -6254,19 +6254,18 @@ class catalog extends basemodule
     /**
      *  Удаляет категорию из БД
      *
-     *  @param $id  integer id-шник категории
-     *  @param $pid integer id-шник родительской категории
+     *  @param $cat array удаляемая категория
      *  @return void
      */
-    private function delete_category($id, $pid)
+    private function delete_category($cat)
     {
         global $kernel;
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` WHERE `id`='.$id;
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` WHERE `id`='.$cat['id'];
         $kernel->runSQL($query);
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$id;
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$cat['id'];
         $kernel->runSQL($query);
         //переносим child'ы удаляемой категории на уровень выше
-        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `parent_id`='.$pid.' WHERE `parent_id`='.$id;
+        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `parent_id`='.$cat['parent_id'].' WHERE `parent_id`='.$cat['id'];
         $kernel->runSQL($query);
         $this->regenerate_all_groups_tpls(false);
     }
@@ -8737,12 +8736,11 @@ class catalog extends basemodule
 
             //Удаление категории
             case 'category_delete':
-                $id  = $kernel->pub_httppost_get('node');
-                $pid = $kernel->pub_httppost_get('nodeparent');
-                if ($pid == 'index')
-                    $pid = 0;
-                $this->delete_category($id, $pid);
-                $kernel->pub_redirect_refresh_reload('category_edit&id='.$pid.'&selectcat='.$pid);//@tst
+                $cat=$this->get_category(intval($kernel->pub_httppost_get('node')));
+                if (!$cat)
+                    $kernel->pub_redirect_refresh_reload('show_items');
+                $this->delete_category($cat);
+                $kernel->pub_redirect_refresh_reload('category_edit&id='.$cat['parent_id'].'&selectcat='.$cat['parent_id']);
                 break;
 
             //Удаляет файл и очищает поле файл и изображения в категории

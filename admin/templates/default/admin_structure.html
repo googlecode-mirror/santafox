@@ -138,6 +138,12 @@
             $('#fieldPageTitle').val($('#fieldPageName').val());
         }
     });
+
+    if($('#structure_page_name').length)
+    {
+        $("#contentLoading").hide();
+        $("#structure_page_name").html('"<a href="/'+$('#fieldPageID').val()+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+$('#fieldPageName').val()+'</a>"');
+    }
 </script>
 
 <!-- page name -->

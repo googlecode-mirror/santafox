@@ -29,13 +29,6 @@ function santaUpdateRegion(regid, loadFrom)
           {
             $("#"+regid).html("Load error: " + xhr.status + " " + xhr.statusText);
           }
-          else if(!$('#structure_page_name').lenght)
-          {
-            $("#contentLoading").hide();
-            $("#structure_page_name").html('"<a href="/'+$('#fieldPageID').val()+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+$('#fieldPageName').val()+'</a>"');
-          }
-          else
-              $("#contentLoading").hide();
     });
 }
 

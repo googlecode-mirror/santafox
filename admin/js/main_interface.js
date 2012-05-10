@@ -29,6 +29,13 @@ function santaUpdateRegion(regid, loadFrom)
           {
             $("#"+regid).html("Load error: " + xhr.status + " " + xhr.statusText);
           }
+          else if(!$('#structure_page_name').lenght)
+          {
+            $("#contentLoading").hide();
+            $("#structure_page_name").html('"<a href="/'+$('#fieldPageID').val()+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+$('#fieldPageName').val()+'</a>"');
+          }
+          else
+              $("#contentLoading").hide();
     });
 }
 
@@ -453,7 +460,8 @@ function structure_tree_click_node(url)
     //Сначала надо получить эти данные
     var url_link_main = start_interface.global_link + url + "&type=get_main_param";//index.php?action=set_left_menu&leftmenu=view&id=about2&type=get_main_param
 
-    $('#content_header').html('');
+    $('#content_header').before('<span id="contentLoading">Loading, Please wait..</span>');
+    $('#structure_page_name').html('').parent().hide();
     $('#page_container').css({'display':'none'});
     $('#contentLoading').show();
     
@@ -464,7 +472,8 @@ function structure_tree_click_node(url)
         if (comboStore != null)
             set_propertes_main(comboStore);
         
-        $("#contentLoading").hide();
+        $("#contentLoading").remove();
+        $('#content_header').show();
         $('#page_tabs').parent().tabs({ selected: 0 });
         $('#page_container').css({'display':'block'});
     });
@@ -489,7 +498,7 @@ function run_update_metki(url)
 function set_propertes_main(d)
 {
     // название страницы
-    $('#content_header').html('Страница: <span class="black">"<a href="/'+d.id_curent_page+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+d.caption+'</a>"</span>');
+    $('#structure_page_name').html('"<a href="/'+d.id_curent_page+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+d.caption+'</a>"');
     
     //Проставляем поля формы
     $("#fieldPageName").val(d.caption);

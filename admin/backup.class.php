@@ -694,7 +694,7 @@ class backup
 				//Прежде, заменим все пустые значения значением NULL иначе всё будет глючить
 				foreach ($data as $key => $val)
 				{
-					if (gettype($val) == "NULL")
+                    if (gettype($val) == "NULL" || $val==="")
 						$data[$key] = "NULL";
 					else
 						$data[$key] = "'".mysql_real_escape_string($val)."'";

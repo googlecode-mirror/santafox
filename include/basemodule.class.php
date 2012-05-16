@@ -180,4 +180,3 @@ abstract class BaseModule
         return  str_replace('%pages_block%', implode($this->get_template_block('page_delimeter'), $pages), $pblock);
     }
 }
-?>

@@ -11,7 +11,7 @@ require 'catalog.commons.class.php';
  * @version 2.0
  *
  */
-class catalog extends basemodule
+class catalog extends BaseModule
 {
 
     /**

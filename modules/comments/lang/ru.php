@@ -23,7 +23,7 @@ $il['comments_pub_show_sorting']            = 'Показать сортиров
 $il['comments_pub_show_selection']          = 'Показать отбор';
 $il['comments_pub_show_selection_template'] = 'Шаблон';
 
-$il['comments_menu_label']                  = 'Управление';
+$il['comments_menu_label']                  = 'Комментарии';
 $il['comments_menu_show_list']              = 'Просмотреть';
 $il['comments_menu_between']                = 'За период';
 $il['comments_menu_notmoderated']           = 'Не отмодерированные';
@@ -71,3 +71,8 @@ $il['comments_pub_pages_type']          = 'Вид постраничной на�
 $il['comments_pub_pages_get_block']     = 'Блоками по N страниц';
 $il['comments_pub_pages_get_float']     = 'Тек. страница всегда в центре блока из N страниц';
 $il['comments_delete_confirm']          = 'Вы действительно хотите удалить комментарий?';
+$il['comments_list_header']             = 'Список комментариев';
+$il['comments_select_range_header']     = 'Выбрать за период';
+$il['comments_select_range_from']       = 'с';
+$il['comments_select_range_to']         = 'по';
+$il['comments_no_data_to_show']         = 'Нет данных для отображения';

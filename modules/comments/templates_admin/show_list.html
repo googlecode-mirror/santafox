@@ -11,7 +11,7 @@
 <div id="page_container">
  <div id="content_container">
   <div class="content">
-  <h3>Список комментариев</h3>
+  <h3>[#comments_list_header#]</h3>
 <form action="%form_action%" method="POST">
 <table class="admin_table" style="margin-bottom:10px;">
      <tr>
@@ -45,11 +45,33 @@
 <h3 style="margin-top:10px;">[#comments_actions_with_selected#]</h3>
 <fieldset>
 %actions%
-<input type="submit" style="margin-left:10px;" name="submit" value="[#comments_show_list_submit#]"/></p><br/>
+<input type="submit" style="margin-left:10px;" name="submit" value="[#comments_show_list_submit#]"/><br/>
 </fieldset>
 
 <p>%pages%</p>
 </form>
+
+      <h3>[#comments_select_range_header#]</h3>
+      <form action="%range_form_action%" method="post">
+          <fieldset>
+              <label for="startDate" style="width: 15px;">[#comments_select_range_from#]</label><input type="text" name="startDate" style="width:130px;" id="startDate">
+          </fieldset>
+          <fieldset>
+              <label for="endDate" style="width: 15px;">[#comments_select_range_to#]</label><input type="text" name="endDate" style="width:130px;" id="endDate">
+          </fieldset>
+
+          <fieldset class="page_submit_field" style="float: left;">
+              <input type="button" value="[#news_button_show#]" onclick="jspub_click('%range_form_action%&start='+$('#startDate').val()+'&stop='+$('#endDate').val())">
+          </fieldset>
+      </form>
+
+      <script type="text/javascript">
+          $( "input:button").button();
+          $(function() {
+              $("#startDate").datepicker({dateFormat:"yy.mm.dd"});
+              $("#endDate").datepicker({dateFormat:"yy.mm.dd"});
+          });
+      </script>
 </div>
 </div>
 </div>
@@ -58,7 +80,7 @@
 <div id="page_container">
  <div id="content_container">
   <div class="content">
-   Нет данных для отображения
+   [#comments_no_data_to_show#]
   </div>
  </div>
 </div>
@@ -66,3 +88,38 @@
 <img src="/admin/templates/default/images/24-em-check.gif" alt=""/>
 <!-- @off -->
 <!--<img src="/admin/templates/default/images/24-em-check-gray.gif" alt=""/>-->
+
+
+
+
+<!-- @pages -->
+%first% %backward% %previous% %pages_block% %next% %forward% %last%
+
+<!-- @page_first -->
+<a href="#" onclick="jspub_click('%link%')">Начало</a>
+<!-- @page_backward-->
+<a href="#" onclick="jspub_click('%link%')">&laquo;</a>
+<!-- @page_backward_disabled-->
+&laquo;
+<!-- @page_previous-->
+<a href="#" onclick="jspub_click('%link%')">&laquo;</a>
+<!-- @page_previous_disabled-->
+&laquo;
+<!-- @page_forward-->
+<a href="#" onclick="jspub_click('%link%')">&raquo;</a>
+<!-- @page_forward_disabled-->
+&raquo;
+<!-- @page_next-->
+<a href="#" onclick="jspub_click('%link%')">&raquo;</a>
+<!-- @page_next_disabled-->
+&raquo;
+<!-- @page_last -->
+<a href="#" onclick="jspub_click('%link%')">Конец</a>
+<!-- @page_active -->
+<a href="#" onclick="jspub_click('%link%')">%page%</a>
+<!-- @page_passive -->
+%page%
+<!-- @page_delimeter -->
+|
+
+<!-- @page_null -->

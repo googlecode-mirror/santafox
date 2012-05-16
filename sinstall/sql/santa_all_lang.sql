@@ -811,7 +811,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_menu_add_new',NULL,'До�
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_menu_notmoderated',NULL,'Не отмодерированные');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_menu_between',NULL,'За период');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_selection_template',NULL,'Шаблон');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_menu_label',NULL,'Управление');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_menu_label',NULL,'Комментарии');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_menu_show_list',NULL,'Просмотреть');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_sorting',NULL,'Показать сортировки');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_selection',NULL,'Показать отбор');
@@ -863,14 +863,14 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_item_id',NULL,'ID');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_show_list_action_available_off',NULL,'Пометить как немодерированные');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','feedback_modul_base_name',NULL,'Обратная связь');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_pub_show_selection_template',NULL,'Шаблон');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_menu_label',NULL,'Керування');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_menu_label',NULL,'Комментарии');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_pub_show_selection',NULL,'Показати відбір');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','search_name_modul_base_name',NULL,'Поиск');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','search_name_modul_base_name1',NULL,'Поиск');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_menu_add_new',NULL,'Добавить');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_menu_notmoderated',NULL,'Не отмодерированные');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_menu_between',NULL,'За период');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_menu_label',NULL,'Управление');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_menu_label',NULL,'Комментарии');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_menu_show_list',NULL,'Просмотреть');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_selection_template',NULL,'Шаблон');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_selection',NULL,'Показать отбор');
@@ -2164,4 +2164,24 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','news_error_incorrect_datetime',NUL
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_module_label',NULL,'Модуль');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_module_label',NULL,'Модуль');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_module_label',NULL,'Модуль');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_list_header',NULL,'Список комментариев');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_list_header',NULL,'Список комментариев');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_list_header',NULL,'Список комментариев');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_select_range_header',NULL,'Выбрать за период');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_select_range_header',NULL,'Выбрать за период');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_select_range_header',NULL,'Выбрать за период');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_select_range_from',NULL,'с');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_select_range_from',NULL,'с');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_select_range_from',NULL,'с');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_select_range_to',NULL,'по');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_select_range_to',NULL,'по');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_select_range_to',NULL,'по');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_no_data_to_show',NULL,'Нет данных для отображения');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_no_data_to_show',NULL,'Нет данных для отображения');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_no_data_to_show',NULL,'Нет данных для отображения');
 

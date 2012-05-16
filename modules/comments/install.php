@@ -144,7 +144,6 @@ $property = new properties_string();
 $property->set_caption('[#comments_pub_show_comments_httpparams#]');
 $property->set_default('');
 $property->set_id('httpparams');
-//$install->add_modul_properties($property);
 $install->add_public_metod_parametrs('pub_show_comments', $property);
 
 
@@ -158,18 +157,6 @@ $property->set_default('no');
 $property->set_id('no_parent');
 $install->add_public_metod_parametrs('pub_show_comments', $property);
 
-  /*
-$install->add_public_metod('pub_show_selection', '[#comments_pub_show_selection#]');
-$property = new properties_file();
-$property->set_caption('[#comments_pub_show_selection_template#]');
-$property->set_default('modules/comments/templates_user/arhive.html');
-$property->set_id('template');
-$property->set_mask('htm,html');
-$property->set_patch('modules/comments/templates_user');
-$install->add_public_metod_parametrs('pub_show_selection', $property);
-        */
-
-//$install->module_copy[0]['name'] = 'newsi_modul_base_name1';
 $install->module_copy[0]['name'] = 'comments_modul_base_name1';
 $install->module_copy[0]['action'][0]['caption']    = 'Комментарии по-умолчанию';
 $install->module_copy[0]['action'][0]['id_metod']   = 'pub_show_comments';
@@ -179,14 +166,3 @@ $install->module_copy[0]['action'][0]['properties']['type']     = 'new_at_top';
 $install->module_copy[0]['action'][0]['properties']['page']     = 'index';
 $install->module_copy[0]['action'][0]['properties']['httpparams']  = '';
 $install->module_copy[0]['action'][0]['properties']['no_parent']  = 'no';
-
-/*
-$install->module_copy[0]['action'][1]['caption']    = 'Вывести архив';
-$install->module_copy[0]['action'][1]['id_metod']   = 'pub_show_archive';
-$install->module_copy[0]['action'][1]['properties']['template']    = 'modules/comments/templates_user/arhive.html';
-$install->module_copy[0]['action'][1]['properties']['limit']       = '20';
-$install->module_copy[0]['action'][1]['properties']['type']        = 'past';
-$install->module_copy[0]['action'][1]['properties']['pages_type']  = 'block';
-$install->module_copy[0]['action'][1]['properties']['pages_count'] = '5';
-
-*/

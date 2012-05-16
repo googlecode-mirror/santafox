@@ -1,4 +1,5 @@
 <?php
+require_once realpath(dirname(__FILE__)."/../../")."/include/basemodule.class.php";
 /**
  * Модуль "Комментарии"
  *
@@ -8,7 +9,7 @@
  * @version 1.0 beta
  *
  */
-class comments
+class comments extends BaseModule
 {
     /**
      * Действие по умолчанию
@@ -16,6 +17,9 @@ class comments
      * @var string
      */
     private $action_default = 'form_show';
+
+
+    private $offset_name='offset';
 
     const ADMNAME = 'Админ';//добавлено aim ... админ сайта, от чьего имени будут добавлятся комменты из админки
 	                        //Измените по своему усмотрению
@@ -45,22 +49,9 @@ class comments
      *
      * @var string
      */
-    private $templates_admin_prefix = '';
+    private $templates_admin_prefix = 'modules/comments/templates_admin/';
 
-    /**
-     * Префикс путей к шаблонам пользовательского интерфейса
-     *
-     * @var string
-     */
-    private $templates_user_prefix = '';
-
-    /**
-     * Массив частей шаблона
-     * @var array
-     */
-    private $templates=array();
-
-    public function comments()
+    public function __construct()
     {
     	global $kernel;
     	if ($kernel->pub_httpget_get('flush'))
@@ -113,7 +104,7 @@ class comments
         {
             if ($no_parent == 'no')
             {
-                $http_param = $kernel -> pub_httpget_get($httpparams);
+                $http_param = $kernel->pub_httpget_get($httpparams);
                 if (empty($http_param))
                     $condition = 'hidden';
                 else
@@ -133,13 +124,14 @@ class comments
 
             case 'visible':
                 $content = $content.$this->get_template_block('header');
-                $items = $this->pub_items_get($this->pub_offset_get($limit,'comments_block', $httpparams), $type, $httpparams);
+                $offset= $this->get_offset();
+                $items = $this->pub_items_get($limit,$offset, $type, $httpparams);
                 if (empty($items))
-                   $content = $content.$this->get_template_block('no_data');
+                    $content = $content.$this->get_template_block('no_data');
                 else
                 {
-                      $content = $content.$this->get_template_block('totals');
-                      $content = str_replace('%totals%', $this->pub_comments_avaiable_get($httpparams), $content);
+                    $content = $content.$this->get_template_block('totals');
+                    $content = str_replace('%totals%', $this->pub_comments_avaiable_get($httpparams), $content);
                 }
                 $content = $content.$this->get_template_block('comment_content');
 
@@ -150,30 +142,44 @@ class comments
 	    return $content;
      }
 
-//добавлено aim
 	private function priv_show_comments($items, $limit, $httpparams)
 	{
 	    global $kernel;
 	    $this->set_templates($kernel->pub_template_parse('modules/comments/templates_user/show_comments.html'));
 		$content = '';
 		if (!empty($items))
-		    {
-		        $lines = '';
-				foreach ($items as $item)
+        {
+            $lines = '';
+            foreach ($items as $item)
+            {
+                $line = $this->get_template_block('rows');
+                $line = str_replace('%num%', $item['num'], $line);
+                $line = str_replace('%date%', $item['date'], $line);
+                $line = str_replace('%time%', $item['time'], $line);
+                $line = str_replace('%txt%', $item['txt'], $line);
+                $line = str_replace('%author%', (($item['author']==comments::ADMNAME)?('<span style="color:blue">'.$item['author'].'</span>'):($item['author'])), $line);
+                $lines .= $line;
+            }
+            $content = $content.$this->get_template_block('content');
+            $content = str_replace('%rows%', $lines, $content);
+            $content = $content.$this->get_template_block('pages');
+
+            $total = $this->pub_comments_avaiable_get($httpparams);
+            $offset=$this->get_offset();
+            $purl = $kernel->pub_page_current_get().'.html?';
+            if (strlen(trim($httpparams))>0)
+            {
+                $params = explode(',',$httpparams);
+                $page_sub_id='';
+                foreach ($params as $param)
                 {
-                    $line = $this->get_template_block('rows');
-                    $line = str_replace('%num%', $item['num'], $line);
-                    $line = str_replace('%date%', $item['date'], $line);
-                    $line = str_replace('%time%', $item['time'], $line);
-					$line = str_replace('%txt%', $item['txt'], $line);
-                    $line = str_replace('%author%', (($item['author']==comments::ADMNAME)?('<span style="color:blue">'.$item['author'].'</span>'):($item['author'])), $line);
-                    $lines .= $line;
+                    $page_sub_id .= $param.'='.urlencode($kernel->pub_httpget_get($param,false)).'&';
                 }
-				$content = $content.$this->get_template_block('content');
-				$content = str_replace('%rows%', $lines, $content);
-				$content = $content.$this->get_template_block('pages');
-		        $content = str_replace('%pages%', $this->pub_pages_get_block($this->pub_offset_get($limit,'comments_block',$httpparams), $httpparams), $content);
-		    }
+                $purl.=$page_sub_id;
+            }
+            $purl.=$this->offset_name.'=';
+            $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,0), $content);
+        }
 		return $content;
 	}
 
@@ -297,49 +303,15 @@ class comments
 	}
 
 
-//добавлено aim
-	   function priv_session_user_set($value1, $value2)
-	   {
-	     global $kernel;
-		   $sess_value = array();
-	       $sess_value['user_name'] = $value1;
-	       $sess_value['user_txt'] = $value2;
-		   $kernel->pub_session_set('cmnt', $sess_value);
-	   }
-
-//добавлено aim
-//постраничная навигация
-    function pub_pages_get_block($limit, $offset = 0, $httpparams)
+    function priv_session_user_set($value1, $value2)
     {
         global $kernel;
-        $total = $this->pub_comments_avaiable_get($httpparams);
-        if ($total <= $limit)
-            return $this->get_template_block('page_no');
-		$pages = ceil($total / $limit);
-        if ($pages == 1)
-        	return '';
-        $content = array();
-        for ($page = 0; $page < $pages; $page++)
-        {
-            if (strlen(trim($httpparams))>0)
-			{
-			    $params = explode(',',$httpparams);
-                $page_sub_id='';
-			    foreach ($params as $param)
-                {
-                    $page_sub_id = $param.'='.$kernel->pub_httpget_get($param).'&';
-                }
-			    $link = $kernel->curent_page.'.html?'.$page_sub_id.'comments_block='.$limit * $page;
-			}
-			else
-			    $link = $kernel->curent_page.'.html?comments_block='.$limit * $page;
-            $content[] = str_replace(array('%link%', '%text%'), array($link, ($page+1)), (($limit * $page == $offset)?($this->get_template_block('page_passive')):($this->get_template_block('page_active'))));
-        }
-        $content = implode($this->get_template_block('delimeter'), $content);
-        return $content;
+        $sess_value = array();
+        $sess_value['user_name'] = $value1;
+        $sess_value['user_txt'] = $value2;
+        $kernel->pub_session_set('cmnt', $sess_value);
     }
 
-//изменено aim
     function pub_items_get($limit, $offset = 0, $type = null, $httpparams='')
     {
         global $kernel;
@@ -398,16 +370,14 @@ class comments
 	    return $items;
 	}
 
-    function pub_offset_get($offset_name = 'comments_block', $httpparams)
+
+    function get_offset()
     {
         global $kernel;
-    	$offset = $kernel->pub_httpget_get($offset_name);
-    	if (!is_numeric($offset) || ($offset > ($this->pub_comments_avaiable_get($httpparams))))
-    	    $offset = 0;
+    	$offset = intval($kernel->pub_httpget_get($this->offset_name));
     	return $offset;
     }
 
-//изменено aim
     function pub_comments_avaiable_get($httpparams)
     {
         global $kernel;
@@ -443,22 +413,22 @@ class comments
         $menu->set_menu_block('[#comments_menu_label#]');
         $menu->set_menu("[#comments_menu_show_list#]","show_list", array('flush' => 1));
         $menu->set_menu("[#comments_menu_add_new#]","show_add", array('flush' => 1));
-        $menu->set_menu("[#comments_menu_between#]","select_between", array('flush' => 1));
         $menu->set_menu("[#comments_menu_notmoderated#]","select_notmoderated", array('flush' => 1));
-        $menu->set_menu_block('[#comments_menu_label1#]');
-        $menu->set_menu_plain($this->priv_show_date_picker());
+        //$menu->set_menu_block('[#comments_menu_label1#]');
+        //$menu->set_menu_plain($this->priv_show_date_picker());
         $menu->set_menu_default('show_list');
 	    return true;
 	}
 
+    /*
 	function priv_show_date_picker()
 	{
 	    global $kernel;
-	    $this->set_templates_admin_prefix('modules/comments/templates_admin/');
-        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix().'date_picker.html'));
+        $this->set_templates($kernel->pub_template_parse($this->templates_admin_prefix.'date_picker.html'));
         $content = $this->get_template_block('date_picker');
         return $content;
 	}
+    */
 
 	/**
 	 * Функция для отображаения административного интерфейса
@@ -469,25 +439,14 @@ class comments
     {
         global $kernel;
 
-        $this->set_templates_admin_prefix('modules/comments/templates_admin/');
         switch ($kernel->pub_section_leftmenu_get())
         {
             default:
         	case 'show_list':
                 return $this->priv_show_list($this->priv_get_limit_admin(), $this->priv_get_offset(), $this->priv_get_field(), $this->priv_get_direction(), $this->priv_get_start(), $this->priv_get_stop(), $this->priv_get_date());
 
-        	case 'select_between':
-                $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix().'select_between.html'));
-                $content = $this->get_template_block('form');
-                $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('test_select_between'), $content);
-                $content = str_replace('%form_action_sucsess%', 'admin/index.php?action=set_left_menu&leftmenu=show_list', $content);
-                return $content;
-
             case 'select_notmoderated':
                return $this->priv_show_list($this->priv_get_limit_admin(), $this->priv_get_offset(), $this->priv_get_field(), $this->priv_get_direction(), $this->priv_get_start(), $this->priv_get_stop(), $this->priv_get_date(),true);
-
-        	case 'test_select_between':
-        	    return '{success: true}';
 
             case 'show_edit':
                 return $this->show_item_form($kernel->pub_httpget_get('id'));
@@ -510,9 +469,6 @@ class comments
             case 'list_actions':
                 $this->priv_items_do_action($kernel->pub_httppost_get('action'), $kernel->pub_httppost_get('items'));
                 $kernel->pub_redirect_refresh_reload('show_list');
-                break;
-
-            case 'show_between':
                 break;
         }
 
@@ -566,7 +522,7 @@ class comments
     private function show_item_form($item_id = null)
     {
         global $kernel;
-        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix() . 'item_form.html'));
+        $this->set_templates($kernel->pub_template_parse($this->templates_admin_prefix.'item_form.html'));
         $content = $this->get_template_block('form');
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('item_save'), $content);
         $content = str_replace('%id%', ((is_numeric($item_id)) ? ($item_id) : ('NULL')), $content);
@@ -829,35 +785,30 @@ class comments
     private function priv_show_list($limit, $offset, $field, $direction, $start = null, $stop = null, $date = null, $only_not_moderated = false)
     {
         global $kernel;
-        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix() . 'show_list.html'));
+        $this->set_templates($kernel->pub_template_parse($this->templates_admin_prefix.'show_list.html'));
         if ($offset > 0)
             $offset = $this->priv_offset_check($limit, $offset, $field, $direction, $start, $stop, $date);
+
+        $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments`
+                  WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" ';
         if (!is_null($start) && !is_null($stop))
         {
-            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
-                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" AND `date` BETWEEN "' . $start . '" AND "' . $stop . '"'
-                . ' ORDER BY `' . $field . '` ' . $direction . ' '
-                . ' LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
+
+            $query.= 'AND `date` BETWEEN "' . $start . '" AND "' . $stop . '"
+                      ORDER BY `' . $field . '` ' . $direction . '
+                      LIMIT ' . $limit . ' OFFSET ' . $offset;
         }
         elseif (!is_null($date))
         {
-            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
-                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" AND `date` = "' . $date . '"'
-                . ' ORDER BY `' . $field . '` ' . $direction . ' ';
+            $query.= ' `date` = "' . $date . '" ORDER BY `' . $field . '` ' . $direction . ' ';
         }
         else if ($only_not_moderated == true)
         {
-            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
-                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" AND `available`=0 '
-                . ' ORDER BY `' . $field . '` ' . $direction . ' '
-                . ' LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
+            $query.= '  AND `available`=0  ORDER BY `' . $field . '` ' . $direction . '  LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
         }
         else
         {
-            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
-                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" '
-                . ' ORDER BY `' . $field . '` ' . $direction . ' '
-                . ' LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
+            $query.= ' ORDER BY `' . $field . '` ' . $direction . ' LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
         }
 
         $result = $kernel->runSQL($query);
@@ -884,6 +835,7 @@ class comments
             $line = str_replace('%action_remove%', 'item_remove', $line);
             $lines[] = $line;
         }
+        mysql_free_result($result);
 
         $header = $this->get_template_block('table_header');
         $header = str_replace('%img_sort_' . $field . '%', (($direction == 'ASC') ? ($this->get_template_block('img_sort_asc')) : ($this->get_template_block('img_sort_desc'))), $header);
@@ -924,9 +876,21 @@ class comments
             $content = str_replace('%actions%', $this->priv_show_html_select('action', $actions), $content);
         }
 
-        $content = str_replace('%pages%', (is_null($date) ? ($this->priv_show_pages($offset, $limit, $field, $direction, $date, $start, $stop)) : ('')), $content);
+        //$content = str_replace('%pages%', (is_null($date) ? ($this->priv_show_pages($offset, $limit, $field, $direction, $date, $start, $stop)) : ('')), $content);
+
+        $tQuery='SELECT COUNT(*) AS totalCount FROM `'.$kernel->pub_prefix_get().'_comments` WHERE `module_id` = "'.$kernel->pub_module_id_get().'" ';
+        if (!empty($date))
+            $tQuery .= 'AND `date` = "'.$date.'"';
+        elseif (!empty($start) && !empty($stop))
+            $tQuery .= 'AND `date` BETWEEN "'.$start.'" AND "'.$stop.'"';
+        $total = mysql_result($kernel->runSQL($tQuery), 0, 'totalCount');
+
+        $purl = 'show_listfield='.$field.'&direction='.$direction.'&'.$this->offset_name;
+        $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,0), $content);
+
         $sort_headers = $this->priv_get_sort_headers($field, $direction, $kernel->pub_httpget_get('date'), $start, $stop);
         $content = str_replace(array_keys($sort_headers), $sort_headers, $content);
+        $content = str_replace('%range_form_action%', $kernel->pub_redirect_for_form('show_list'), $content);
         return $content;
     }
 
@@ -947,36 +911,6 @@ class comments
             '%url_sort_author%' => (($field == 'author')?(str_replace(array('%direction%', '%field%'), array((strtoupper($direction) == 'ASC')?('DESC'):('ASC'), 'author'), $url)):(str_replace(array('%direction%', '%field%'), array('ASC', 'author'), $url))),
         );
         return $array;
-    }
-
-    private function priv_show_pages($offset, $limit, $field, $direction, $date = null, $start = null, $stop = null)
-    {
-        global $kernel;
-        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix().'pages.html'));
-
-        if (!empty($date))
-            $query = 'SELECT COUNT(*) AS totalCount FROM `'.$kernel->pub_prefix_get().'_comments` WHERE `module_id` = "'.$kernel->pub_module_id_get().'" AND `date` = "'.$date.'"';
-        elseif (!empty($start) && !empty($stop))
-            $query = 'SELECT COUNT(*) AS totalCount FROM `'.$kernel->pub_prefix_get().'_comments` WHERE `module_id` = "'.$kernel->pub_module_id_get().'" AND `date` BETWEEN "'.$start.'" AND "'.$stop.'"';
-        else
-            $query = 'SELECT COUNT(*) AS totalCount FROM `'.$kernel->pub_prefix_get().'_comments` WHERE `module_id` = "'.$kernel->pub_module_id_get().'"';
-        $total = mysql_result($kernel->runSQL($query), 0, 'totalCount');
-        $pages = ceil($total / $limit);
-        if ($pages == 1)
-        	return '';
-        $content = array();
-        for ($page = 0; $page < $pages; $page++)
-        {
-            $url = 'show_list&offset='.$limit * $page.'&field='.$field.'&direction='.$direction;
-
-            if (!empty($date))
-            	$url .= '&date='.$date;
-            elseif (!empty($start) && !empty($stop))
-            	$url .= '&start='.$start.'&stop='.$stop;
-            $content[] = str_replace(array('%url%', '%page%'), array($url, ($page+1)), (($limit * $page == $offset)?($this->get_template_block('page_passive')):($this->get_template_block('page'))));
-        }
-        $content = implode($this->get_template_block('delimeter'), $content);
-        return $content;
     }
 
     /**
@@ -1028,70 +962,6 @@ class comments
     }
 
     /**
-     * Возвращает указанный блок шаблона
-     *
-     * @param string $block_name Имя блока
-     * @return mixed
-     */
-    protected function get_template_block($block_name)
-    {
-        return ((isset($this->templates[$block_name]))?(trim($this->templates[$block_name])):(null));
-    }
-
-    /**
-     * Устанавливает шаблоны
-     *
-     * @param array $templates Массив распаршенных шаблонов
-     */
-    protected function set_templates($templates)
-    {
-        $this->templates = $templates;
-    }
-
-
-    /**
-     * Возвращет префикс путей к шаблонам административного интерфейса
-     *
-     * @return string
-     */
-    private function get_templates_admin_prefix()
-    {
-        return $this->templates_admin_prefix;
-    }
-
-    /**
-     * Устанавливает префикс к шаблонам админки
-     *
-     * @param string $prefix
-     */
-    private function set_templates_admin_prefix($prefix)
-    {
-        $this->templates_admin_prefix = $prefix;
-    }
-
-
-    /**
-     * Возвращет префикс путей к шаблонам пользовательского интерфейса
-     *
-     * @return string
-     */
-    private function get_templates_user_prefix()
-    {
-        return $this->templates_user_prefix;
-    }
-
-    /**
-     * Устанавливает префикс путей к шаблонам пользовательского интерфейса
-     *
-     * @param string $prefix
-     */
-    private function set_templates_user_prefix($prefix)
-    {
-        $this->templates_user_prefix = $prefix;
-    }
-
-
-    /**
      * Устанавливает действие по умолчанию
      *
      * @param string $value Имя GET параметра определяющего действие
@@ -1100,7 +970,6 @@ class comments
     {
         $this->action_default = $value;
     }
-
 
     /**
      * Возвращает название перемнной в GET запросе определяющей действие

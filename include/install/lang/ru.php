@@ -402,7 +402,4 @@ $il['show_top_pages_visits'] = 'Посещений';
 $il['show_top_pages_url'] = 'Адрес';
 
 $il['admin_label_for_show_result'] = 'Результат:';
-
-
-
-?>
+$il['admin_module_label'] = 'Модуль';

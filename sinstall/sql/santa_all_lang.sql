@@ -2161,3 +2161,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','news_error_incorrect_datetime',NUL
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','news_error_incorrect_datetime',NULL,'Некорректное значение даты или времени');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','news_error_incorrect_datetime',NULL,'Некорректное значение даты или времени');
 
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_module_label',NULL,'Модуль');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_module_label',NULL,'Модуль');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_module_label',NULL,'Модуль');
+

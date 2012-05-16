@@ -97,8 +97,10 @@ class comments
      * Публичное действие для отображения комментариев
      *
      * @param string $template Путь к файлу с шаблонами
-     * @param numeric $limit Количество выводимых комментариев
+     * @param integer $limit Количество выводимых комментариев
      * @param string $type Тип отбора комментариев для вывода
+     * @param string $httpparams
+     * @param string $no_parent
      * @return string
      *///изменено aim
      public function pub_show_comments($template, $limit, $type, $httpparams, $no_parent)
@@ -131,7 +133,7 @@ class comments
 
             case 'visible':
                 $content = $content.$this->get_template_block('header');
-                $items = $this->pub_items_get($limit, $this->pub_offset_get($limit,'comments_block', $httpparams), $type, $httpparams);
+                $items = $this->pub_items_get($this->pub_offset_get($limit,'comments_block', $httpparams), $type, $httpparams);
                 if (empty($items))
                    $content = $content.$this->get_template_block('no_data');
                 else
@@ -170,7 +172,7 @@ class comments
 				$content = $content.$this->get_template_block('content');
 				$content = str_replace('%rows%', $lines, $content);
 				$content = $content.$this->get_template_block('pages');
-		        $content = str_replace('%pages%', $this->pub_pages_get_block($limit, $this->pub_offset_get($limit,'comments_block',$httpparams), $httpparams), $content);
+		        $content = str_replace('%pages%', $this->pub_pages_get_block($this->pub_offset_get($limit,'comments_block',$httpparams), $httpparams), $content);
 		    }
 		return $content;
 	}
@@ -322,6 +324,7 @@ class comments
             if (strlen(trim($httpparams))>0)
 			{
 			    $params = explode(',',$httpparams);
+                $page_sub_id='';
 			    foreach ($params as $param)
                 {
                     $page_sub_id = $param.'='.$kernel->pub_httpget_get($param).'&';
@@ -361,18 +364,14 @@ class comments
         switch ($type)
         {
         	case 'new_at_top':
+            default:
                 $order[] = '`comments`.`date` DESC';
                 $order[] = '`comments`.`time` DESC';
         		break;
 
-          case 'new_at_bottom':
+            case 'new_at_bottom':
                 $order[] = '`comments`.`date` ASC';
                 $order[] = '`comments`.`time` ASC';
-        		break;
-
-        	default:
-                $order[] = '`comments`.`date` DESC';
-                $order[] = '`comments`.`time` DESC';
         		break;
         }
 
@@ -389,17 +388,17 @@ class comments
             $num = 1;
 	    while ($row = mysql_fetch_assoc($result))
         {
-            if ($type == "new_at_top" or $type == "default")
-                $nums = ($num--) - $offset;
-            elseif ($type == "new_at_bottom")
+            if ($type == "new_at_bottom")
                 $nums = $offset + $num++;
+            else//if ($type == "new_at_top" or $type == "default")
+                $nums = ($num--) - $offset;
             $row['num']=$nums;
             $items[] = $row;
         }
 	    return $items;
 	}
 
-    function pub_offset_get($limit, $offset_name = 'comments_block', $httpparams)
+    function pub_offset_get($offset_name = 'comments_block', $httpparams)
     {
         global $kernel;
     	$offset = $kernel->pub_httpget_get($offset_name);
@@ -448,7 +447,6 @@ class comments
         $menu->set_menu("[#comments_menu_notmoderated#]","select_notmoderated", array('flush' => 1));
         $menu->set_menu_block('[#comments_menu_label1#]');
         $menu->set_menu_plain($this->priv_show_date_picker());
-        $this->priv_show_date_picker();
         $menu->set_menu_default('show_list');
 	    return true;
 	}
@@ -477,7 +475,6 @@ class comments
             default:
         	case 'show_list':
                 return $this->priv_show_list($this->priv_get_limit_admin(), $this->priv_get_offset(), $this->priv_get_field(), $this->priv_get_direction(), $this->priv_get_start(), $this->priv_get_stop(), $this->priv_get_date());
-        		break;
 
         	case 'select_between':
                 $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix().'select_between.html'));
@@ -485,23 +482,18 @@ class comments
                 $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('test_select_between'), $content);
                 $content = str_replace('%form_action_sucsess%', 'admin/index.php?action=set_left_menu&leftmenu=show_list', $content);
                 return $content;
-                break;
 
             case 'select_notmoderated':
                return $this->priv_show_list($this->priv_get_limit_admin(), $this->priv_get_offset(), $this->priv_get_field(), $this->priv_get_direction(), $this->priv_get_start(), $this->priv_get_stop(), $this->priv_get_date(),true);
-               break;
 
         	case 'test_select_between':
         	    return '{success: true}';
-        	    break;
 
             case 'show_edit':
                 return $this->show_item_form($kernel->pub_httpget_get('id'));
-                break;
 
             case 'show_add':
                 return $this->show_item_form();
-                break;
 
             case 'item_save':
                 $values = $kernel->pub_httppost_get('values');
@@ -513,7 +505,6 @@ class comments
             case 'item_remove':
                 $this->priv_item_delete($kernel->pub_httpget_get('id'));
                 $kernel->pub_redirect_refresh('show_list');
-//                $kernel->pub_redirect_refresh_reload('show_list');
                 break;
 
             case 'list_actions':
@@ -566,72 +557,66 @@ class comments
     {
         global $kernel;
         list($day, $month, $year) = explode('-', $item_data['date']);
-//        if (preg_match('/^\d{1,2}:\d{1,2}:\d{1,2}$/', trim($item_data['time'])) && checkdate($month, $day, $year)) {
-            $query = 'REPLACE `'.$kernel->pub_prefix_get().'_comments` (`id`, `module_id`, `date`, `time`, `available`, `txt`, `author`,`page_id`,`page_sub_id`) '
-            . ' VALUES ('.$item_data['id'].',"'.$kernel->pub_module_id_get().'","'.$year.'-'.$month.'-'.$day.'","'.$item_data['time'].'","'.((isset($item_data['available']))?(1):(0)).'","'.$item_data['txt'].'","'.$item_data['author'].'","'.$item_data['page_id'].'","'.$item_data['page_sub_id'].'")';
-            $kernel->runSQL($query);
-//        }
+        $query = 'REPLACE `'.$kernel->pub_prefix_get().'_comments` (`id`, `module_id`, `date`, `time`, `available`, `txt`, `author`,`page_id`,`page_sub_id`) '
+        . ' VALUES ('.$item_data['id'].',"'.$kernel->pub_module_id_get().'","'.$year.'-'.$month.'-'.$day.'","'.$item_data['time'].'","'.((isset($item_data['available']))?(1):(0)).'","'.$item_data['txt'].'","'.$item_data['author'].'","'.$item_data['page_id'].'","'.$item_data['page_sub_id'].'")';
+        $kernel->runSQL($query);
     }
 
 
-//изменено aim
     private function show_item_form($item_id = null)
     {
-       	global $kernel;
-        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix().'item_form.html'));
+        global $kernel;
+        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix() . 'item_form.html'));
         $content = $this->get_template_block('form');
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('item_save'), $content);
-        $content = str_replace('%id%', ((is_numeric($item_id))?($item_id):('NULL')), $content);
-        $item_data = $this->get_item_data($item_id);
+        $content = str_replace('%id%', ((is_numeric($item_id)) ? ($item_id) : ('NULL')), $content);
+        //$item_data = $this->get_item_data($item_id);
         //Если это ввод новой новости, то надо добавить значение текущего времени и даты
         if ($item_id == null)
         {
-          $content = str_replace('%time%',         date('H:i:s'), $content);
-          $content = str_replace('%date%',         date('d-m-Y'), $content);
-		  $select_page = $this->priv_get_item_select_page();
-		  $res = $this->priv_select_page_id();
-		  $sub_select_page = '';
-		     while($row = mysql_fetch_assoc($res))
-              {
-		        $sub_select_page .= $this->priv_select_page_sub_id($row['page_id']);
-              }
-			  $sub_select_page = substr(trim($sub_select_page),0,-1);
+            $content = str_replace('%time%', date('H:i:s'), $content);
+            $content = str_replace('%date%', date('d-m-Y'), $content);
+            $select_page = $this->priv_get_item_select_page();
+            $pages = $this->get_all_pages();
+            $sub_select_page = '';
+            foreach ($pages as $row)
+            {
+                $sub_select_page .= $this->priv_select_page_sub_id($row['page_id']);
+            }
+            $sub_select_page = substr(trim($sub_select_page), 0, -1);
 
-		  $content = str_replace('%rows%', $this->get_template_block('select'), $content);
-		  $content = str_replace('%select_page%', $select_page, $content);
-		  $content = str_replace('%sub_select_page%', $sub_select_page, $content);
-		} else {
-		$content = str_replace('%rows%', $this->get_template_block('page_info'), $content);
-		$info = '<b style="padding-left:30px">'.'%page_id%'.'  '.'%page_sub_id%'.'<input type="hidden" name="values[page_id]" value='.'%page_id%'.'><input type="hidden" name="values[page_sub_id]" value='.'%page_sub_id%'.'>';
-		$content = str_replace('%page_info%', $info, $content);
-	   }
+            $content = str_replace('%rows%', $this->get_template_block('select'), $content);
+            $content = str_replace('%select_page%', $select_page, $content);
+            $content = str_replace('%sub_select_page%', $sub_select_page, $content);
+        }
+        else
+        {
+            $content = str_replace('%rows%', $this->get_template_block('page_info'), $content);
+            $info = '<b style="padding-left:30px">' . '%page_id%' . '  ' . '%page_sub_id%' . '<input type="hidden" name="values[page_id]" value=' . '%page_id%' . '><input type="hidden" name="values[page_sub_id]" value=' . '%page_sub_id%' . '>';
+            $content = str_replace('%page_info%', $info, $content);
+        }
         $content = str_replace($this->priv_get_item_data_search(), $this->priv_get_item_data_replace($item_id), $content);
-      return $content;
+        return $content;
     }
 
-    //добавлено aim
 	//функция по формированию 1-ого списка со страницами добавления комментов (page_id)
 	function priv_get_item_select_page()
     {
-	    global $kernel;
-		$res = $this->priv_select_page_id();
+        $pages = $this->get_all_pages();
 		$select = '';
-		while($row = mysql_fetch_assoc($res))
-          {
+		foreach ($pages as $row)
+        {
 		   $select .= '<option value="'.$row['page_id'].'">'.$row['page_id'].'</option>'."\n";
-          }
+        }
 	    return $select;
 	}
 
-	//добавлено aim
-	function priv_select_page_id()
+	private function get_all_pages()
     {
 	    global $kernel;
-		$query = 'SELECT DISTINCT `page_id` FROM `'.$kernel->pub_prefix_get().'_comments` WHERE module_id="'.$kernel->pub_module_id_get().'"';
-	    return $kernel->runSQL($query);
+        return $kernel->db_get_list_simple('_comments',"module_id='".$kernel->pub_module_id_get()."'","DISTINCT `page_id`");
 	}
 
-	//добавлено aim
 	//функция формирования куска JS-кода для вывода 2-ого связанного списка page_sub_id в шаблоне item_form.html
 	function priv_select_page_sub_id($page_id)
     {
@@ -647,7 +632,6 @@ class comments
 		return $sub_select;
 	}
 
-//
     function priv_get_item_data_replace($item_id)
     {
         $item_data = $this->get_item_data($item_id);
@@ -658,7 +642,7 @@ class comments
                 '',
                 'checked',
                 '',
-                comments::ADMNAME,//добавлено aim
+                self::ADMNAME,//добавлено aim
                 '',
                 ''
             );
@@ -702,11 +686,7 @@ class comments
         global $kernel;
         if (!is_numeric($item_id))
             return array();
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_comments` WHERE `id` = '.$item_id.' ';
-        $array = mysql_fetch_assoc($kernel->runSQL($query));
-        //Дату необходимо вернуть в формате ДД-ММ-ГГГГ
-        $array['date'] = substr($array['date'],-2,2)."-".substr($array['date'],5,2)."-".substr($array['date'],0,4);
-        return $array;
+        return $kernel->db_get_record_simple("_comments","id=".$item_id,"*, DATE_FORMAT(`date`,'%d-%m-%Y')");
     }
 
 
@@ -840,72 +820,76 @@ class comments
      * @param integer $offset Сдвиг
      * @param string $field Поле для сортировки
      * @param string $direction НАправление сортировки
+     * @param string $start дата начала выборки
+     * @param string $stop дата конца выборки
+     * @param string $date
+     * @param boolean $only_not_moderated
      * @return string
      */
-    private function priv_show_list($limit, $offset, $field, $direction, $start = null, $stop = null, $date = null, $only_not_moderated=false)
+    private function priv_show_list($limit, $offset, $field, $direction, $start = null, $stop = null, $date = null, $only_not_moderated = false)
     {
         global $kernel;
-        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix().'show_list.html'));
+        $this->set_templates($kernel->pub_template_parse($this->get_templates_admin_prefix() . 'show_list.html'));
         if ($offset > 0)
-        	$offset = $this->priv_offset_check($limit, $offset, $field, $direction, $start, $stop, $date);
+            $offset = $this->priv_offset_check($limit, $offset, $field, $direction, $start, $stop, $date);
         if (!is_null($start) && !is_null($stop))
         {
-        	$query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `'.$kernel->pub_prefix_get().'_comments` '
-        	. ' WHERE `module_id` = "'.$kernel->pub_module_id_get().'" AND `date` BETWEEN "'.$start.'" AND "'.$stop.'"'
-        	. ' ORDER BY `'.$field.'` '.$direction.' '
-        	. ' LIMIT '.$limit.' OFFSET '.$offset.' ';
+            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
+                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" AND `date` BETWEEN "' . $start . '" AND "' . $stop . '"'
+                . ' ORDER BY `' . $field . '` ' . $direction . ' '
+                . ' LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
         }
         elseif (!is_null($date))
         {
-        	$query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `'.$kernel->pub_prefix_get().'_comments` '
-        	. ' WHERE `module_id` = "'.$kernel->pub_module_id_get().'" AND `date` = "'.$date.'"'
-        	. ' ORDER BY `'.$field.'` '.$direction.' ';
+            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
+                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" AND `date` = "' . $date . '"'
+                . ' ORDER BY `' . $field . '` ' . $direction . ' ';
         }
-        else if ($only_not_moderated==true)
+        else if ($only_not_moderated == true)
         {
-         $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `'.$kernel->pub_prefix_get().'_comments` '
-         . ' WHERE `module_id` = "'.$kernel->pub_module_id_get().'" AND `available`=0 '
-         . ' ORDER BY `'.$field.'` '.$direction.' '
-         . ' LIMIT '.$limit.' OFFSET '.$offset.' ';
+            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
+                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" AND `available`=0 '
+                . ' ORDER BY `' . $field . '` ' . $direction . ' '
+                . ' LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
         }
         else
         {
-        	$query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `'.$kernel->pub_prefix_get().'_comments` '
-        	. ' WHERE `module_id` = "'.$kernel->pub_module_id_get().'" '
-        	. ' ORDER BY `'.$field.'` '.$direction.' '
-        	. ' LIMIT '.$limit.' OFFSET '.$offset.' ';
+            $query = 'SELECT *, DATE_FORMAT(`date`, "%d-%m-%Y") AS `date_rus` FROM `' . $kernel->pub_prefix_get() . '_comments` '
+                . ' WHERE `module_id` = "' . $kernel->pub_module_id_get() . '" '
+                . ' ORDER BY `' . $field . '` ' . $direction . ' '
+                . ' LIMIT ' . $limit . ' OFFSET ' . $offset . ' ';
         }
 
-    	$result = $kernel->runSQL($query);
+        $result = $kernel->runSQL($query);
 
-    	if ((mysql_num_rows($result) == 0))
+        if ((mysql_num_rows($result) == 0))
         {
             return $this->get_template_block('no_data');
-    	}
+        }
 
-    	$lines = array();
-    	$first_element_number = $offset+1;
+        $lines = array();
+        $first_element_number = $offset + 1;
         while ($row = mysql_fetch_assoc($result))
         {
             $line = $this->get_template_block('table_body');
             $line = str_replace('%number%', $first_element_number++, $line);
-			$line = str_replace('%page_id%', $row['page_id'].'&nbsp;'.substr($row['page_sub_id'],0,-1), $line);//добавлено aim
+            $line = str_replace('%page_id%', $row['page_id'] . '&nbsp;' . substr($row['page_sub_id'], 0, -1), $line); //добавлено aim
             $line = str_replace('%id%', $row['id'], $line);
             $line = str_replace('%date%', $row['date_rus'], $line);
-			$line = str_replace('%time%', $row['time'], $line);//добавлено aim
-            $line = str_replace('%author%', (($row['author']==comments::ADMNAME)?('<span style="color:blue">'.$row['author'].'</span>'):($row['author'])), $line);//добавлено aim
-            $line = str_replace('%available%', (($row['available'])?($this->get_template_block('on')):($this->get_template_block('off'))), $line);
+            $line = str_replace('%time%', $row['time'], $line); //добавлено aim
+            $line = str_replace('%author%', (($row['author'] == comments::ADMNAME) ? ('<span style="color:blue">' . $row['author'] . '</span>') : ($row['author'])), $line); //добавлено aim
+            $line = str_replace('%available%', (($row['available']) ? ($this->get_template_block('on')) : ($this->get_template_block('off'))), $line);
             $line = str_replace('%txt%', $row['txt'], $line);
             $line = str_replace('%action_edit%', 'show_edit', $line);
             $line = str_replace('%action_remove%', 'item_remove', $line);
             $lines[] = $line;
         }
 
-        $header  = $this->get_template_block('table_header');
-        $header = str_replace('%img_sort_'.$field.'%', (($direction == 'ASC')?($this->get_template_block('img_sort_asc')):($this->get_template_block('img_sort_desc'))), $header);
+        $header = $this->get_template_block('table_header');
+        $header = str_replace('%img_sort_' . $field . '%', (($direction == 'ASC') ? ($this->get_template_block('img_sort_asc')) : ($this->get_template_block('img_sort_desc'))), $header);
         $header = preg_replace('/\%img_sort_\w+%/', '', $header);
 
-        $content = $header.implode("\n", $lines).$this->get_template_block('table_footer');
+        $content = $header . implode("\n", $lines) . $this->get_template_block('table_footer');
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('list_actions'), $content);
 
         $modules = $kernel->pub_modules_get('comments');
@@ -914,7 +898,7 @@ class comments
         {
             if ($module_id != $kernel->pub_module_id_get())
             {
-        	   $array[$module_id] = $properties['caption'];
+                $array[$module_id] = $properties['caption'];
             }
         }
         if (count($modules) > 1)
@@ -940,7 +924,7 @@ class comments
             $content = str_replace('%actions%', $this->priv_show_html_select('action', $actions), $content);
         }
 
-        $content = str_replace('%pages%', (is_null($date)?($this->priv_show_pages($offset, $limit, $field, $direction, $date, $start, $stop)):('')), $content);
+        $content = str_replace('%pages%', (is_null($date) ? ($this->priv_show_pages($offset, $limit, $field, $direction, $date, $start, $stop)) : ('')), $content);
         $sort_headers = $this->priv_get_sort_headers($field, $direction, $kernel->pub_httpget_get('date'), $start, $stop);
         $content = str_replace(array_keys($sort_headers), $sort_headers, $content);
         return $content;

@@ -13,7 +13,6 @@ if (file_exists("../ini.php"))
 //}
 include('install_ftp.class.php');
 include('install_modules.class.php');
-include('parser_properties.class.php');
 
 ini_set('url_rewriter.tags', 'none');
 session_start();
@@ -31,5 +30,3 @@ if ((isset($_GET['install'])) && ($_GET['install'] == 'start'))
 header("Content-Type: text/html; charset=utf-8");
 $html = $install->start();
 print $html;
-
-?>

@@ -810,6 +810,9 @@ class comments extends BaseModule
         $item_data['date']=$year.'-'.$month.'-'.$day;
 
         $table='_comments';
+        $item_data['id']=intval($item_data['id']);
+        if ($item_data['id']==0)
+            $item_data['id']=null;
         //оставим только реальные поля, строкам - escape
         $fields=$this->get_table_fields($table);
         foreach ($item_data as $k=>&$v)
@@ -839,6 +842,9 @@ class comments extends BaseModule
             $item_data['available']=0;
         $item_data['when']=$year.'-'.$month.'-'.$day.' '.$item_data['time'];
 
+        $item_data['id']=intval($item_data['id']);
+        if ($item_data['id']==0)
+            $item_data['id']=null;
         $table='_'.$kernel->pub_module_id_get().'_reviews';
 
         //оставим только реальные поля, строкам - escape
@@ -870,11 +876,10 @@ class comments extends BaseModule
         $content = $this->get_template_block('form');
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('comment_save'), $content);
         $content = str_replace('%id%', ((is_numeric($item_id)) ? ($item_id) : ('NULL')), $content);
-        //$item_data = $this->get_item_data($item_id);
         if (!$item_id)
         {
             $content = str_replace('%time%', date('H:i:s'), $content);
-            $content = str_replace('%date%', date('d-m-Y'), $content);
+            $content = str_replace('%date%', date('d.m.Y'), $content);
             $select_page = $this->get_select_page4comments();
             $pages = $this->get_all_pages();
             $sub_select_page = '';

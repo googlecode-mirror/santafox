@@ -803,9 +803,28 @@ class comments extends BaseModule
     {
         global $kernel;
         list($day, $month, $year) = explode('.', $item_data['date']);
-        $query = 'REPLACE `'.$kernel->pub_prefix_get().'_comments` (`id`, `module_id`, `date`, `time`, `available`, `txt`, `author`,`page_id`,`page_sub_id`)
-                  VALUES ('.$item_data['id'].',"'.$kernel->pub_module_id_get().'","'.$year.'-'.$month.'-'.$day.'","'.$item_data['time'].'","'.((isset($item_data['available']))?(1):(0)).'","'.$item_data['txt'].'","'.$item_data['author'].'","'.$item_data['page_id'].'","'.$item_data['page_sub_id'].'")';
-        $kernel->runSQL($query);
+        if (isset($item_data['available']))
+            $item_data['available']=1;
+        else
+            $item_data['available']=0;
+        $item_data['date']=$year.'-'.$month.'-'.$day;
+
+        $table='_comments';
+        //оставим только реальные поля, строкам - escape
+        $fields=$this->get_table_fields($table);
+        foreach ($item_data as $k=>&$v)
+        {
+            if (!in_array($k,$fields))
+                unset($item_data[$k]);
+            else
+            {
+                if (is_string($v))
+                   $v=mysql_real_escape_string($v);
+            }
+
+        }
+        $item_data['module_id']=$kernel->pub_module_id_get();
+        $kernel->db_add_record($table,$item_data,"REPLACE");
     }
 
     private function save_review($item_data)
@@ -822,12 +841,18 @@ class comments extends BaseModule
 
         $table='_'.$kernel->pub_module_id_get().'_reviews';
 
-        //оставим только реальные поля
+        //оставим только реальные поля, строкам - escape
         $fields=$this->get_table_fields($table);
-        foreach ($item_data as $k=>$v)
+        foreach ($item_data as $k=>&$v)
         {
             if (!in_array($k,$fields))
                 unset($item_data[$k]);
+            else
+            {
+                if (is_string($v))
+                    $v=mysql_real_escape_string($v);
+            }
+
         }
         $kernel->db_add_record($table,$item_data,"REPLACE");
     }

@@ -499,7 +499,7 @@ function set_propertes_main(d)
     $("#fieldPageURL").val(d.link_other_page);
     $("#fieldPageID").val(d.id_curent_page);
     $("#fieldPageOnlyAuth").val(d.only_auth);
-    $("#pagetemplate .ui-selectmenu-status").html(d.page_template);
+    $('select#fieldPageTemplate').selectmenu("value",d.page_template);
 
     if (d.template_naslednoe)
     {

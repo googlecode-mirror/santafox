@@ -57,14 +57,13 @@
     function saveStructForm(url,isFull)
     {
         var postArr = {page_properties: {
-                        page_template:$("#fieldPageTemplate").val(),
+                        page_template:$('select#fieldPageTemplate').selectmenu("value"),
                         page_title:$("#fieldPageTitle").val(),
                         page_name:$("#fieldPageName").val(),
                         page_id:$("#fieldPageID").val(),
                         page_url:$("#fieldPageURL").val()
                        }};
 
-        // @todo замена имени ноды в дереве
         if ($('#flag_template').attr('checked'))
             postArr.page_properties.flag_template='on';
         if ($('#fieldPageOnlyAuth').attr('checked'))

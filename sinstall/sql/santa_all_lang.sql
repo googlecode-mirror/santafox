@@ -40,8 +40,8 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_categories_open_levels_sho
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_categories_build_from_depth_label',NULL,'Уровень начала построения');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_category_name_label',NULL,'Название категории');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_categories_build_from_cat_label',NULL,'Категория начала построения');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_base_name',NULL,'Коментарі');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_modul_base_name1',NULL,'Основні Коментарі');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_base_name',NULL,'Комментарии и отзывы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_modul_base_name1',NULL,'Комментарии и отзывы');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_link_details_label',NULL,'Подробнее...');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_group_namedb_label',NULL,'Название (БД)');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_group_props_label',NULL,'Свойства');
@@ -504,8 +504,8 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_add_group_label',NULL,'С�
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_menu_items',NULL,'Товары');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_menu_cat_props',NULL,'Свойства категорий');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_menu_label_cats',NULL,'Категории');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_modul_base_name1',NULL,'Основные Комментарии');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_base_name',NULL,'Комментарии');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_modul_base_name1',NULL,'Комментарии и отзывы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_base_name',NULL,'Комментарии и отзывы');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_menu_groups',NULL,'Товарные группы их свойства');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_menu_all_props',NULL,'Общие свойства групп');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_prop_type_enum_notselect',NULL,'Не выбран');
@@ -555,8 +555,8 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_targetpa
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_categories_label',NULL,'Категории');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_maxpages_label',NULL,'Макс. кол-во страниц');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_groupid_label',NULL,'Товарная группа фильтра');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_modul_base_name1',NULL,'Основные Комментарии');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_base_name',NULL,'Комментарии');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_modul_base_name1',NULL,'Комментарии и отзывы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_base_name',NULL,'Комментарии и отзывы');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_perpage_label',NULL,'Товаров на страницу');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_limit_label',NULL,'Лимит');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_template_label',NULL,'Шаблон');
@@ -822,7 +822,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_comments_type_de
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_comments_limit',NULL,'Комментариев на страницу');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_comments_httpparams',NULL,'http-параметры');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_comments_template',NULL,'Шаблон');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_comments',NULL,'Сформировать -комментарии-');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_comments',NULL,'Показать комментарии');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_property_comments_per_page_admin',NULL,'Комментариев на страницу для АИ');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_property_showcaptcha',NULL,'Показывать каптчу?');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_property_premod',NULL,'Премодерация?');
@@ -884,7 +884,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_comments_httppar
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_comments_template',NULL,'Шаблон');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','feedback_modul_base_name',NULL,'Обратная связь');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_show_list_action_available_on',NULL,'Пометить как модерированные');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_comments',NULL,'Сформировать -комментарии-');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_comments',NULL,'Показать комментарии');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_property_comments_per_page_admin',NULL,'Комментариев на страницу для АИ');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_property_showcaptcha',NULL,'Показывать каптчу?');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_property_premod',NULL,'Премодерация?');
@@ -2184,4 +2184,44 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_select_range_to',NULL,'п
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_no_data_to_show',NULL,'Нет данных для отображения');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_no_data_to_show',NULL,'Нет данных для отображения');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_no_data_to_show',NULL,'Нет данных для отображения');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_reviews',NULL,'Показать отзывы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_reviews',NULL,'Показать отзывы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_pub_show_reviews',NULL,'Показать отзывы');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_reviews_menu_block',NULL,'Отзывы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_reviews_menu_block',NULL,'Отзывы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_reviews_menu_block',NULL,'Отзывы');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_reviews_list_header',NULL,'Список отзывов');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_reviews_list_header',NULL,'Список отзывов');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_reviews_list_header',NULL,'Список отзывов');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_property_pros_label',NULL,'Достоинства');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_property_pros_label',NULL,'Достоинства');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_property_pros_label',NULL,'Достоинства');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_property_cons_label',NULL,'Недостатки');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_property_cons_label',NULL,'Недостатки');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_property_cons_label',NULL,'Недостатки');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_property_rate_label',NULL,'Оценка');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_property_rate_label',NULL,'Оценка');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_property_rate_label',NULL,'Оценка');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_error_incorrect_datetime',NULL,'Некорректная дата или время');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_error_incorrect_datetime',NULL,'Некорректная дата или время');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_error_incorrect_datetime',NULL,'Некорректная дата или время');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_comment_form_header',NULL,'Добавить/Редактировать комментарий');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_comment_form_header',NULL,'Добавить/Редактировать комментарий');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_comment_form_header',NULL,'Добавить/Редактировать комментарий');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_review_form_header',NULL,'Добавить/Редактировать отзыв');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_review_form_header',NULL,'Добавить/Редактировать отзыв');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_review_form_header',NULL,'Добавить/Редактировать отзыв');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_reviews_stat',NULL,'Статистика по отзывам');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_reviews_stat',NULL,'Статистика по отзывам');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_pub_show_reviews_stat',NULL,'Статистика по отзывам');
 

@@ -13,9 +13,9 @@
         return /^[0-2]?[0-9]:[0-5]?[0-9]:[0-5]?[0-9]$/.test(value);
     }
 
-    function validateDate(value) {
-        return /^[0-3]?[0-9]-[0-1]?[0-9]-[0-2][0-9][0-9][0-9]$/.test(value);
-    }
+     function validateDate(value) {
+         return /^[0-3]?[0-9]\.[0-1]?[0-9]\.[1-2][0-9][0-9][0-9]$/.test(value);
+     }
 
     function submitMyForm()
     {
@@ -23,7 +23,7 @@
             return form_submit_include_content();
         else
         {
-            santaShowPopupHint('[#comments_error_title#]', '[#comments_error_addnew_text#]',0);
+            santaShowPopupHint('Error', '[#comments_error_addnew_text#]',0);
             return false;
         }
     }
@@ -60,9 +60,9 @@ syncList.prototype._sync = function (firstSelectId, secondSelectId)
  <div id="content_container">
   <div class="content">
    
-   <h3>Добавить/Редактировать комментарий</h3>
+   <h3>[#comments_comment_form_header#]</h3>
   
-   <form action="%form_action%" method="POST" enctype="multipart/form-data">
+   <form action="%form_action%" method="POST">
    <input type="hidden" name="values[id]" value="%id%">
    <input type="hidden" name="values[page_sub_id]" value="%page_sub_id%">
    

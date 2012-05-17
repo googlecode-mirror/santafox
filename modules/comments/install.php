@@ -46,28 +46,48 @@ class comments_install extends install_modules
 	function uninstall($id_module)
 	{
 		global $kernel;
-		$query = 'DROP TABLE `'.$kernel->pub_prefix_get().'_comments`';
+		$query = 'DROP TABLE IF EXISTS `'.$kernel->pub_prefix_get().'_comments`';
 		$kernel->runSQL($query);
 	}
 
 	/**
      * Инсталяция дочернего модуля
      *
-     * @param string $id_module Идентификатор вновь создоваемого дочернего модуля
+     * @param string $id_module Идентификатор вновь создаваемого дочернего модуля
      */
 	function install_children($id_module)
 	{
+        global $kernel;
+        //таблица отзывов
+        $query="CREATE TABLE IF NOT EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_reviews` (
+          `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+          `name` varchar(255) NOT NULL,
+          `pageid` text NOT NULL,
+          `rate` tinyint(1) unsigned DEFAULT NULL COMMENT 'оценка 1..5',
+          `pros` text COMMENT 'достоинства',
+          `cons` text COMMENT 'недостатки',
+          `comment` text COMMENT 'комментарий',
+          `when` datetime NOT NULL COMMENT 'дата-время',
+          `available` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'показываем на сайте?',
+          PRIMARY KEY (`id`)
+          ,KEY `pageid_when` (`pageid`(200),`when`,`available`)
+          ,KEY `available_pageid_rate` (`pageid`(200),`rate`,`available`)
+          ,KEY `when_available` (`when`,`available`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+        $kernel->runSQL($query);
 	}
 
 	/**
 	 * Деинсталяция дочернего модуля
 	 *
      *
-     * @param string $id_module ID удоляемого дочернего модуля
+     * @param string $id_module ID удаляемого дочернего модуля
      */
 	function uninstall_children($id_module)
 	{
-
+        global $kernel;
+        $query = "DROP TABLE IF EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_reviews`";
+        $kernel->runSQL($query);
 	}
 }
 
@@ -106,13 +126,64 @@ $property->set_id('comments_admin_email');
 $install->add_modul_properties($property);
 
 
+// Публичный метод для отображения статистики по отзывам
+$install->add_public_metod('pub_show_reviews_stat', '[#comments_pub_show_reviews_stat#]');
+// Шаблон
+$property = new properties_file();
+$property->set_caption('[#comments_pub_show_comments_template#]');
+$property->set_default('modules/comments/templates_user/reviews_stat.html');
+$property->set_id('template');
+$property->set_mask('htm,html');
+$property->set_patch('modules/comments/templates_user');
+$install->add_public_metod_parametrs('pub_show_reviews_stat', $property);
+// http-параметры, по которым работаем
+$property = new properties_string();
+$property->set_caption('[#comments_pub_show_comments_httpparams#]');
+$property->set_default('');
+$property->set_id('httpparams');
+$install->add_public_metod_parametrs('pub_show_reviews_stat', $property);
+
+// Публичный метод для отображения отзывов и формы
+$install->add_public_metod('pub_show_reviews', '[#comments_pub_show_reviews#]');
+// Шаблон отзывов с формой
+$property = new properties_file();
+$property->set_caption('[#comments_pub_show_comments_template#]');
+$property->set_default('modules/comments/templates_user/reviews.html');
+$property->set_id('template');
+$property->set_mask('htm,html');
+$property->set_patch('modules/comments/templates_user');
+$install->add_public_metod_parametrs('pub_show_reviews', $property);
+// Количество комментариев на страницу
+$property = new properties_string();
+$property->set_caption('[#comments_pub_show_comments_limit#]');
+$property->set_default('10');
+$property->set_id('limit');
+$install->add_public_metod_parametrs('pub_show_reviews', $property);
+// Тип сортировки - новые сверху или снизу
+$property = new properties_select();
+$property->set_caption('[#comments_pub_show_comments_type#]');
+$property->set_data(array(
+    'default'   => '[#comments_pub_show_comments_type_default#]',
+    'new_at_top'      => '[#comments_pub_show_comments_type_new_at_top#]',
+    'new_at_bottom'    => '[#comments_pub_show_comments_type_new_at_bottom#]'
+));
+$property->set_default('default');
+$property->set_id('type');
+$install->add_public_metod_parametrs('pub_show_reviews', $property);
+// http-параметры, по которым работаем
+$property = new properties_string();
+$property->set_caption('[#comments_pub_show_comments_httpparams#]');
+$property->set_default('');
+$property->set_id('httpparams');
+$install->add_public_metod_parametrs('pub_show_reviews', $property);
+
+
+
 // Публичный метод для отображения комментариев и формы
 $install->add_public_metod('pub_show_comments', '[#comments_pub_show_comments#]');
-
 // Шаблон комментариев с формой
 $property = new properties_file();
 $property->set_caption('[#comments_pub_show_comments_template#]');
-//$property->set_default('modules/comments/templates_user/lenta.html');
 $property->set_default('modules/comments/templates_user/comments.html');
 $property->set_id('template');
 $property->set_mask('htm,html');
@@ -125,7 +196,6 @@ $property->set_caption('[#comments_pub_show_comments_limit#]');
 $property->set_default('10');
 $property->set_id('limit');
 $install->add_public_metod_parametrs('pub_show_comments', $property);
-
 // Тип сортировки - новые сверху или снизу
 $property = new properties_select();
 $property->set_caption('[#comments_pub_show_comments_type#]');
@@ -137,8 +207,6 @@ $property->set_data(array(
 $property->set_default('default');
 $property->set_id('type');
 $install->add_public_metod_parametrs('pub_show_comments', $property);
-
-
 // http-параметры, по которым работаем
 $property = new properties_string();
 $property->set_caption('[#comments_pub_show_comments_httpparams#]');

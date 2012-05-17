@@ -2,15 +2,15 @@
 
 $type_langauge = 'ru';
 
-$il['comments_base_name']         = 'Комментарии';
-$il['comments_modul_base_name1'] = 'Основные Комментарии';
+$il['comments_base_name']         = 'Комментарии и отзывы';
+$il['comments_modul_base_name1'] = 'Комментарии и отзывы';
 
 $il['comments_property_admin_email']             = 'Email админа';
 $il['comments_property_premod']             = 'Премодерация?';
 $il['comments_property_showcaptcha']        = 'Показывать каптчу?';
 $il['comments_property_comments_per_page_admin']      = 'Комментариев на страницу для АИ';
 
-$il['comments_pub_show_comments']              = 'Сформировать -комментарии-';   //////////////////
+$il['comments_pub_show_comments']              = 'Показать комментарии';
 $il['comments_pub_show_comments_template']     = 'Шаблон';
 $il['comments_pub_show_comments_httpparams']    = 'http-параметры';
 $il['comments_pub_show_comments_limit']        = 'Комментариев на страницу';
@@ -76,3 +76,13 @@ $il['comments_select_range_header']     = 'Выбрать за период';
 $il['comments_select_range_from']       = 'с';
 $il['comments_select_range_to']         = 'по';
 $il['comments_no_data_to_show']         = 'Нет данных для отображения';
+$il['comments_pub_show_reviews']        = 'Показать отзывы';
+$il['comments_reviews_menu_block']      = 'Отзывы';
+$il['comments_reviews_list_header']     = 'Список отзывов';
+$il['comments_property_pros_label']     = 'Достоинства';
+$il['comments_property_cons_label']     = 'Недостатки';
+$il['comments_property_rate_label']     = 'Оценка';
+$il['comments_error_incorrect_datetime']= 'Некорректная дата или время';
+$il['comments_comment_form_header']     = 'Добавить/Редактировать комментарий';
+$il['comments_review_form_header']      = 'Добавить/Редактировать отзыв';
+$il['comments_pub_show_reviews_stat']   = 'Статистика по отзывам';

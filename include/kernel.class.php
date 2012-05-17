@@ -19,7 +19,7 @@ class kernel
 	 */
     private $ftp_client = null;
 
-    private $ftp_root = false;
+    //private $ftp_root = false;
     private $santa_ftp_root = false;
 
     private $flag_can_recurs_save = true;
@@ -123,7 +123,7 @@ class kernel
      * Включенные модули
      *
      * Список модулей, которые уже прошли подключение при обработке ссылок в шаблоне
-     * @var unknown_type
+     * @var array
      * @access private
      */
     private $include_modules;
@@ -332,6 +332,7 @@ class kernel
      * Если параметр задан в <i>true</i>, то возвращается значение
      * прав в виде строки "0xxx". Если не задан, то возвращается
      * число в восьмеричной форме
+     * @param $ret_string
      * @return mixed
      * @access private
      */
@@ -354,6 +355,7 @@ class kernel
      * Если параметр задан в <i>true</i>, то возвращается значение
      * прав в виде строки "0xxx". Если не задан, то возвращается
      * число в восьмеричной форме
+     * @param $ret_string
      * @return mixed
      * @access private
      */
@@ -672,6 +674,7 @@ class kernel
      * факт наличия представления на том или ином языке для языковых переменных. Задача
      * разработчиков самостоятельно отслеживать наличие представлений языковых переменных
      * используемых ими.
+     * @param boolean $only_isset
      * @access private
      * @return array
      */
@@ -794,10 +797,10 @@ class kernel
      * и этот пункт меню запоминается в сессии для текущей секции.
      * Для получения текущего пункта меню используется функциz {@link pub_section_leftmenu_get}
      * @param string $curent
+     * @param boolean $update
      * @access private
      * @return void
      */
-
     function priv_section_leftmenu_set($curent = '', $update = false)
     {
         if (isset($_GET['leftmenu']))
@@ -1607,7 +1610,7 @@ class kernel
 
 
     /**
-     * Производит регестрацию администратора сайта в сессии
+     * Производит регистрацию администратора сайта в сессии
      *
      * Вызывается после того как был введен логин и пароль для доступа в административный
      * раздел сайта. При успешной регистрации возвращает ID администратора сайта.
@@ -1616,7 +1619,7 @@ class kernel
      *  -1: Пользователя не существует
      *      Во всех остальных случаях возвращается ID это пользователя
      * @param string $login
-     * @param string $password
+     * @param string $pass
      * @access private
      * @return string
      */
@@ -1947,9 +1950,9 @@ class kernel
      *  $arr['value'];      //Непосредственно значение
      * </code>
      *
-     * @param $id String Идентификатор страницы
-     * @param $id_prop String Идентификатор свойства
-     * @param $nasledovat Boolean Применять наследование
+     * @param $id_page string Идентификатор страницы
+     * @param $id_prop string Идентификатор свойства
+     * @param $nasledovat boolean Применять наследование
      * @access public
      * @return array
 	 */
@@ -2014,11 +2017,10 @@ class kernel
         if ((isset($id)) && (!empty($id)))
         {
             $query = 'UPDATE '.$this->pub_prefix_get().'_structure
-                      SET properties = "'.addslashes(serialize($prop)).'",
+                      SET properties = "'.mysql_real_escape_string(serialize($prop)).'",
                       	  caption = "'.$caption.'"
                       WHERE id = "'.$id.'"
                       ';
-//error_log($query);
             $this->runSQL($query);
         }
     }
@@ -2028,7 +2030,7 @@ class kernel
      *
      * Аналогично {@link priv_page_properties_set} но устанавливает только одно
      * заданное свойство
-     * @param string $id  Индентефикатор страницы
+     * @param string $id_page  Индентефикатор страницы
      * @param string $id_prop Индетефикатор свойства
      * @param string $value Значение свойства
      * @access private
@@ -2282,6 +2284,7 @@ class kernel
      * разницей, что перегружается вся страница, а не только область конента
      * @access public
      * @param string $url URL на который производится переход
+     * @param boolean $scheme
      * @return void
      */
     function pub_redirect_refresh_reload($url, $scheme = SSL_CONNECTION)
@@ -2870,7 +2873,8 @@ class kernel
 	 *
 	 * Второй параметр может использоваться в том случае, если необходимо узнать
 	 * значение свойства к пользователю сайта, добавленное другим (не текущим модулем).
-	 * @param string $name_filed Имя поля, значение которого необходимо узнать
+	 * @param string $name_field Имя поля, значение которого необходимо узнать
+	 * @param string $name_modul
 	 * @access public
 	 * @return string
 	 */
@@ -3350,6 +3354,76 @@ class kernel
          mysql_free_result($res);
          return $ret;
     }
+
+    /**
+	 * Простой метод для добавления записи в БД
+	 *
+	 * @param string $table Имя таблицы БД без префикса
+	 * @param array $rec key-value массив полей со значениями
+	 * @param string $type тип INSERT или REPLACE
+	 * @return integer
+	 * @access public
+	 */
+    public function db_add_record($table, $rec, $type="INSERT")
+    {
+        if (strtoupper($type)=="REPLACE")
+            $query = "REPLACE";
+        else
+            $query = "INSERT";
+        $query.=" INTO `".$this->pub_prefix_get().$table."` ";
+        $fnames  = array();
+        $fvalues = array();
+        foreach ($rec as $n=>$v)
+        {
+            $fnames[]  = '`'.$n.'`';
+            if (is_null($v))
+                $fvalues[] = "NULL";
+            else
+                $fvalues[] = "'".$v."'";
+        }
+        $query .= "(".implode(', ',$fnames).") VALUES ";
+        $query .= "(".implode(', ', $fvalues).")";
+
+        $res = $this->runSQL($query);
+        if (!$res)
+            return 0;
+        //PHP converts AUTO_INCREMENT values to longs. If you're using an AUTO_INCREMENT column of type BIGINT,
+        //use the MySQL function LAST_INSERT_ID() to get the accurate AUTO_INCREMENT value.
+        $lres=mysql_query ('SELECT LAST_INSERT_ID()',$this->resurs_mysql);
+        $arr=mysql_fetch_row($lres);
+        $last_insert_ID=$arr[0];
+        mysql_free_result($lres);
+        return $last_insert_ID;
+    }
+
+    /**
+	 * Простой метод для сохранения записи(записей) в БД
+	 *
+	 * @param string $table Имя таблицы БД без префикса
+	 * @param array $rec key-value массив полей со значениями
+	 * @param string $condition условие
+	 * @return integer
+	 * @access public
+	 */
+    public function db_update_record($table, $rec, $condition)
+    {
+        $query="UPDATE `".$this->pub_prefix_get().$table."` SET ";
+        $setfields  = array();
+        foreach ($rec as $n=>$v)
+        {
+            if (is_null($v))
+                $setfields[]  = "`".$n."`=NULL";
+            else
+                $setfields[]  = "`".$n."`='".$v."'";
+        }
+        $query .= implode(', ',$setfields)." WHERE ".$condition;
+
+        $res= $this->runSQL($query);
+        if (!$res)
+            return 0;
+        else
+            return mysql_affected_rows($this->resurs_mysql);
+    }
     /**
 	 * Простой метод для получения одной записи из БД
 	 *
@@ -3475,7 +3549,7 @@ class kernel
      * @return void
      */
     function pub_image_text_write($image, $text_arr, $output=false)
-    {//@todo unused
+    {//@todo not used?
         if (!$output)
             $output=$image;
         $image_resource = imagecreatefromgif($image);
@@ -3810,12 +3884,11 @@ class kernel
     * @param boolean $attach Если true, то к телу письма будут прикреплены изображения, ссылки на которые встретились в теле письма.
     * @param string $hostname Адрес хоста, где находятся изображения, которые могут
     * быть прикреплены. Если не задан или равен "", то используется имя хоста, на котором работает сайт.
-    * @param array $att_files Файлы, которые должны быть прикреплены к письму. Массив с полными путями
-    * @param string $replyto Email для Reply-To
+    * @param mixed $att_files Файлы, которые должны быть прикреплены к письму. Массив с полными путями
+    * @param mixed $replyto Email для Reply-To
     * @access public
     * @return int Количество отправленных писем
     */
-
     function pub_mail($toaddr, $toname, $fromaddr, $fromname, $subject, $message, $attach=false, $hostname="", $att_files=false, $replyto=false)
     {
         require_once dirname(__FILE__)."/class.phpmailer.php";
@@ -3914,7 +3987,7 @@ class kernel
      * Пользователь никак не может влиять на эти значения, они доступны только с помощью
      * функций ядра {@link pub_module_serial_get($idmodule)}
      * и {@link pub_module_serial_set()}
-     * @param string $idmodule
+     * @param string $id
      * @access public
      * @return array
      */
@@ -3939,7 +4012,7 @@ class kernel
      * средствам функций ядра {@link pub_module_serial_get($idmodule)}
      * и {@link pub_module_serial_set()}
      * @param array $array Записываемый массив
-     * @param string $idmodule Идентификатор модуля, чьи параметры сохраняются
+     * @param string $id Идентификатор модуля, чьи параметры сохраняются
      * @access public
      * @return void
      */
@@ -3963,7 +4036,7 @@ class kernel
      *
      * Используется в админке
      * @param string $name_file
-     * @return html
+     * @return string
      * @access private
      */
     function priv_help_html_get($name_file)
@@ -4294,7 +4367,7 @@ class kernel
 
     /**
      * Проверяет наличие подменённого шаблолна и возвращает путь к нему и имя
-     *
+     * @return mixed
      */
     function priv_page_template_get_da()
     {
@@ -4523,7 +4596,7 @@ class kernel
 
     /**
      * Возвращает путь от корня сайта до папки, где лежат файлы контента
-     *
+     * @return string
      */
     function pub_path_for_content()
     {
@@ -4537,8 +4610,8 @@ class kernel
      * @param string $content
      * @param boolean $only_ftp использовать только запись по фтп?
      * @param boolean $ignore_ftp_root_check пропустить проверку wwwroot для санты? (только для фтп)
+     * @return boolean
      */
-
     function pub_file_save($file, $content, $only_ftp=false, $ignore_ftp_root_check = false)
     {
         //Следует учитывать что таким образом у нас работает
@@ -4591,7 +4664,9 @@ class kernel
 
     /**
      * Открывает файл для записи и возвращает указатель на него
-     *
+     * @param $file string
+     * @param $mode
+     * @return mixed
      */
     function pub_file_open($file, $mode)
     {
@@ -5064,7 +5139,6 @@ class kernel
         //$parse_file       = pathinfo($file);
         //if (!isset($parse_file['extension']))
         //    return;
-        $res = false;
 	    if (isset($this->ftp_dir_chmod_temp[$curent_chmod_dir]))
 	       $res = $this->pub_ftp_dir_chmod_close($file, false, false, $show_errore);
 	    else

@@ -1161,7 +1161,7 @@ class manager_modules
             }
             else
                 $array_form[$key] = $value;
-            if (isset($array_inheritance['ppf_'.$key]))
+            if (isset($array_inheritance['ppf_'.$key]) && !empty($array_inheritance['ppf_'.$key]))
             {
                 unset($array_form[$key]);
                 continue;

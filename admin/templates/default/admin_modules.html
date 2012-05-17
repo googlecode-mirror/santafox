@@ -30,6 +30,15 @@
     $('#modulePropsSave').click(function(){
 
         var postArr = $('#module_props_lang_form').serializeArray();
+
+        /* Because serializeArray() ignores unset checkboxes and radio buttons: */
+        postArr = postArr.concat(
+            jQuery('#module_props_lang_form input[type=checkbox]:not(:checked)').map(
+                    function() {
+                        return {"name": this.name, "value": ''}
+                    }).get()
+        );
+
         $.post('%url_action%', postArr,  function(data){
             //Обрабатываем ответ
             var post_res=jQuery.parseJSON(data);

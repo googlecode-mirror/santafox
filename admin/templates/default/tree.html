@@ -222,7 +222,7 @@ if (par.attr("id")!="index")
             "Yes": function() {// @todo use lang[]
                  jspub_cookie_set("%cookie_name_tree%","");
                  $.post('[#link#]',{ node :  par.attr("id")}, function(data){
-                        document.location='/admin/';
+                        santaUpdateRegion('west','index.php?action=get_left_menu');
                     });
                 $(this).dialog( "close" );
             },

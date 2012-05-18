@@ -13,7 +13,7 @@ $('#content_container select').selectmenu({
 $("#new_module_install").click(function () {
     var postArr = {modul_install: $("#select_modul").val()};
     $.post('%url_action%', postArr,  function(data){
-       start_interface.main_menu_click('main_menu_modules', 'modules');
+        document.location='/admin/';
     });
 });
 

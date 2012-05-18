@@ -136,16 +136,17 @@ class comments extends BaseModule
                      $line = $this->get_template_block('review_row_by_admin');
                  else
                      $line = $this->get_template_block('review_row');
-                 $line = str_replace('%num%', $item['num'], $line);
-                 $line = str_replace('%when%', $item['when'], $line);
-                 $line = str_replace('%comment%', $item['comment'], $line);
                  if ($item['pros'])
                      $line = str_replace('%pros%',str_replace('%pros%',$item['pros'],$this->get_template_block('review_row_pros')), $line);
                  if ($item['cons'])
                      $line = str_replace('%cons%',str_replace('%cons%',$item['cons'],$this->get_template_block('review_row_cons')), $line);
                  if ($item['rate'])
                      $line = str_replace('%rate%',$this->get_template_block('review_row_rate_'.$item['rate']), $line);
+                 $line = str_replace('%id%', $item['id'], $line);
                  $line = str_replace('%name%', $item['name'], $line);
+                 $line = str_replace('%num%', $item['num'], $line);
+                 $line = str_replace('%when%', $item['when'], $line);
+                 $line = str_replace('%comment%', $item['comment'], $line);
                  $lines .= $line;
              }
              $reviews_rows = $this->get_template_block('reviews_header') . $lines . $this->get_template_block('reviews_footer');

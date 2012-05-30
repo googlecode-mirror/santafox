@@ -137,10 +137,10 @@ class parse_properties
 	//********************************************************************************
 
 	/**
-	 * Определяет что нужно вызвать, в зависимости от типа парметра указанного свойсвта
+	 * Возвращает html-код в зависимости от типа свойства
 	 *
 	 * @param array $in
-	 * @return HTML
+	 * @return string
 	 */
 	function create_html($in)
 	{
@@ -166,9 +166,11 @@ class parse_properties
 				case "text":
 					$html = $this->html_text($in);
 					break;
+
 				case "data":
 					$html = $this->html_data($in);
 					break;
+
 				case "page":
 					$html = $this->html_page($in);
 					break;
@@ -192,7 +194,7 @@ class parse_properties
      * то возвращается именно пустое значение, так как методу нужно передать все значения
      * @param array $value Массив со всеми свойтсвами из формы
      * @param array $dat Стандартный масив со свойством
-     * @return unknown
+     * @return mixed
      */
 	function return_normal_value($value, $dat)
 	{
@@ -215,47 +217,6 @@ class parse_properties
 				$ret = trim($value[$name]);
 		}
 		return $ret;
-	}
-
-
-
-	//********************************************************************************
-
-	/**
-	 * Возвращает кусочек JScript, отвечающий за выключение элементов, если они наследуются
-	 *
-	 * @param String $name Дополнительное, уникальное имя
-	 * @param String $name_disable
-	 * @return HTML
-	 */
-	function return_code_for_disable_element($name, $name_disable = '')
-	{
-		$html = '<script language="JavaScript">
-					function set_nasledovanie_'.$name.'()
-					{
-						var def_val = document.form_all_properties.flag_nasl_'.$name.'.checked;
-						var curent_count = document.all.text_lavel_'.$name.'.length;
-				';
-
-		if (!empty($name_disable))
-			$html .='document.form_all_properties.'.$name_disable.$name.'.disabled = def_val;';
-
-		$html .='
-						document.form_all_properties.nasleduem_'.$name.'.value = def_val;
-
-
-						if (curent_count == undefined)
-							document.all.text_lavel_'.$name.'.disabled = def_val;
-				  		else
-				  		{
-							for (var i = 0; i < curent_count; i++)
-								document.all.text_lavel_'.$name.'[i].disabled = def_val;
-				  		}
-				  	}
-				  	</script>
-				  ';
-
-		return $html;
 	}
 
 
@@ -453,25 +414,21 @@ class parse_properties
                     else
                         print "<b>Error - file ".$user_func_arr['filepath']." not found</b>";
                 }
-                //
-
             }
         }
         else
             $data = $array['data'];
-
-
-        //new
         $store_options='';
         foreach($data as $k=>$v)
         {
-            $store_options.='<option value="'.htmlspecialchars($k).'">'.htmlspecialchars($v).'</option>';
+            if ($k==$value)
+                $store_options.='<option value="'.htmlspecialchars($k).'" selected>';
+            else
+                $store_options.='<option value="'.htmlspecialchars($k).'">';
+            $store_options.=htmlspecialchars($v).'</option>';
         }
         $html = str_replace("%store_options%",$store_options, $html);
-		//$code = str_replace("%store%", $kernel->pub_array_convert_form($data), $code);
-
         return $this->array_out_create($array['name'], $html, $code, $naslednoe, $value);
-
 	}
 
 	//********************************************************************************
@@ -532,7 +489,6 @@ class parse_properties
         $code = str_replace("%name%",  $array['name'], $code);
 		$code = str_replace("%value%", $value, $code);
 
-        //new
         $store_options='';
         foreach($arr_files as $k=>$v)
         {
@@ -542,11 +498,7 @@ class parse_properties
                 $store_options.='<option value="'.htmlspecialchars($k).'">'.htmlspecialchars($v).'</option>';
         }
         $html = str_replace("%store_options%",$store_options, $html);
-        //old
-		//$code = str_replace("%store%", $kernel->pub_array_convert_form($arr_files), $code);
-
         return $this->array_out_create($array['name'], $html, $code, $naslednoe, $value);
-
 	}
 
 

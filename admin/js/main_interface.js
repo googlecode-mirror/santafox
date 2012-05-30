@@ -524,7 +524,12 @@ function set_propertes_main(d)
     //проставляем свойства страницы для модулей
     for (var i = 0; i < d.page_prop.length; i++)
     {
-        $('#' + d.page_prop[i].name).val(d.page_prop[i].value);
+
+
+        if($('#' + d.page_prop[i].name).is('select'))
+            $('#' + d.page_prop[i].name).selectmenu("value",d.page_prop[i].value);
+        else
+            $('#' + d.page_prop[i].name).val(d.page_prop[i].value);
         if (d.page_prop[i].naslednoe)//чекбокс наследования если надо
         {
             $('#' + d.page_prop[i].name_nasled).attr("checked", "checked");

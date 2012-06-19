@@ -5545,9 +5545,9 @@ class catalog extends BaseModule
         }
         else
             $content .= $this->get_template_block('no_props');
-        $html = str_replace('%groupid%', $id     , $html);
-        $html = str_replace('%table%'  , $content, $html);
 
+        $html = str_replace('%table%'  , $content, $html);
+        $html = str_replace('%groupid%', $id     , $html);
         return $html;
     }
 

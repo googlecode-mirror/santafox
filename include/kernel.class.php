@@ -3,10 +3,9 @@
  * Ядро
  *
  * Ядро CMS. С общими (публичными и приватными) функциями.
- * @package  PublicFunction
  * @name kernel
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2012
+ * @version 3.0
  */
 
 class kernel
@@ -293,23 +292,17 @@ class kernel
 
         //тепеь произведем соединеие с базой данных MySql
         $this->resurs_mysql = mysql_connect(DB_HOST, DB_USERNAME, DB_PASSWORD);
-        if (!$this->resurs_mysql) {
-            echo 'error1';
-            exit;
-        }
-        if (!mysql_select_db (DB_BASENAME, $this->resurs_mysql)) {
-            echo 'error2';
-            exit;
-        }
+        if (!$this->resurs_mysql)
+            die('mysql connect failed');
+
+        if (!mysql_select_db (DB_BASENAME, $this->resurs_mysql))
+            die('mysql select db failed');
 
         $ver_arr = false;
         preg_match("/^([\\d]\\.[\\d]+)/i", mysql_get_server_info($this->resurs_mysql), $ver_arr);
 
         if ($ver_arr[1]+0 >= 4.1)
-        {
             $this->runSQL("SET NAMES utf8");
-//            $this->debug($ver_arr[1]+0);
-        }
 
         //Функция для начала выполнения страницы
         $this->priv_timer_start();
@@ -5262,7 +5255,7 @@ class kernel
      *
      * @param string $file  путь
      * @param boolean $change_for_parent
-     * @param number $chmod
+     * @param mixed $chmod
      * @param boolean $show_errore
      * @return mixed
      */
@@ -5384,7 +5377,7 @@ class kernel
         if (function_exists("json_decode"))
             return json_decode($param);
         //Значит функции нет, и надо подключать ZEND
-        require_once("components/json/json.php");
+        require_once(dirname(dirname(__FILE__))."/components/json/json.php");
         $sf_json = new Services_JSON();
         return $sf_json->decode($param);
     }
@@ -5396,7 +5389,7 @@ class kernel
         if (function_exists("json_encode"))
             return json_encode($param);
         //Значит функции нет, и надо подключать ZEND
-        require_once("components/json/json.php");
+        require_once(dirname(dirname(__FILE__))."/components/json/json.php");
         $sf_json = new Services_JSON();
         return $sf_json->encode($param);
     }

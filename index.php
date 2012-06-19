@@ -5,7 +5,7 @@ if (!file_exists("ini.php"))
     header("Location: http://".$_SERVER['HTTP_HOST'].'/sinstall/index.php');
     die;
 }
-include ("ini.php"); // Файл с настройками
+require_once ("ini.php"); // Файл с настройками
 
 if (SHOW_INT_ERRORE_MESSAGE)
     error_reporting(E_ALL);
@@ -21,12 +21,12 @@ else
 //header("Pragma: no-cache");
 
 
-include ("include/kernel.class.php"); //Ядро
-include ("include/pub_interface.class.php");
-include ("include/frontoffice_manager.class.php"); //управление фронт офисом
-include ("admin/manager_modules.class.php"); //Менеджер управления модулями
-include ("admin/manager_users.class.php"); //Менеджер управления модулями
-include ("admin/manager_stat.class.php");
+require_once ("include/kernel.class.php"); //Ядро
+require_once ("include/pub_interface.class.php");
+require_once ("include/frontoffice_manager.class.php"); //управление фронт офисом
+require_once ("admin/manager_modules.class.php"); //Менеджер управления модулями
+require_once ("admin/manager_users.class.php"); //Менеджер управления модулями
+require_once ("admin/manager_stat.class.php");
 
 // Не дописываем сессию в урлы и формы. Всё в куках.
 ini_set('url_rewriter.tags', 'none');
@@ -48,6 +48,3 @@ if ((REDIR_WWW == true) && (!preg_match("/^www\\./", $_SERVER['HTTP_HOST'])))
 
 $front = new frontoffice_manager();
 $front->start();
-
-?>
-

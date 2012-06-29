@@ -288,12 +288,21 @@ class manager_global_properties
         $html = str_replace('[#SERVER_CAN_FTP_CONNECT#]', $result, $html);
 
         $descript = $this->update_get(SANTAFOX_VERSION);
-        if ($descript == (-2))
-            $descript = '[#admin_glob_prop_update_no_uplink#]';
-        elseif ($descript == (-1))
-            $descript = '[#admin_glob_prop_update_no_update#]';
-        else//Добавим ссылку на запуск непосредственно обновления
-            $descript = '<p><a href="#" onclick="jspub_click(\'update_step_1\'); return false;">Обновить</a></p>'.$descript;
+        switch($descript)
+        {
+            case -2:
+                $descript = '[#admin_glob_prop_update_no_uplink#]';
+                break;
+            case -1;
+                $descript = '[#admin_glob_prop_update_no_update#]';
+                break;
+            case -3;
+                $descript = '[#admin_glob_prop_modified_version_no_update#]';
+                break;
+            default:
+                $descript = '<p><a href="#" onclick="jspub_click(\'update_step_1\'); return false;">Обновить</a></p>'.$descript;
+                break;
+        }
         $html = str_replace('[#new_version_info#]', $descript, $html);
     	return $html;
     }
@@ -303,18 +312,18 @@ class manager_global_properties
      * Возвращает описание доступного обновления, если оно есть
      *
      * @param string $version Строка типа #.# ,где # - число
+     * @param boolean $only_code
      * @return string
      */
 
     function update_get($version, $only_code = false)
     {
-        global $kernel;
+        if (preg_match('~m$~i',$version))
+            return -3;
 
         if ($only_code && isset($_SESSION['vars_kernel']['need_update_santa']))
             return $_SESSION['vars_kernel']['need_update_santa'];
 
-        $files = array();
-        $root = $kernel->pub_site_root_get();
 
         $content = $this->file_get($version, "request");
 
@@ -350,7 +359,7 @@ class manager_global_properties
      * Производит процесс обновления файлов в системе
      *
      * @param string $version Текущая версия движка
-     * @return unknown
+     * @return string
      */
     function manager_update($version)
     {

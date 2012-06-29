@@ -6715,6 +6715,8 @@ class catalog extends BaseModule
      */
     public function interface_get_menu($menu)
     {
+        $menu->set_menu_block('[#catalog_menu_label_cats#]');
+        $menu->set_tree($this->create_categories_tree());
         $menu->set_menu_block('[#catalog_menu_label#]');
         $menu->set_menu("[#catalog_menu_all_props#]", "show_group_props&id=0"/*, array('flush' => 1)*/);
         $menu->set_menu("[#catalog_menu_groups#]", "show_groups", array('flush' => 1));
@@ -6728,12 +6730,7 @@ class catalog extends BaseModule
         $menu->set_menu("[#catalog_import_csv_menuitem#]", "import_csv", array('flush' => 1));
         $menu->set_menu("[#catalog_export_csv_menuitem#]", "show_csv_export", array('flush' => 1));
         $menu->set_menu("[#catalog_menu_label_import_commerceml#]", "import_commerceml", array('flush' => 1));
-
-        $menu->set_menu_block('[#catalog_menu_label_cats#]');
-        $menu->set_tree($this->create_categories_tree());
-
-        //$menu->set_menu_default('show_groups');
-        $menu->set_menu_default('show_items');
+        //$menu->set_menu_default('show_items');
         return true;
     }
 

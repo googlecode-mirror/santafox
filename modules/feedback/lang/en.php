@@ -20,8 +20,8 @@ $il['feedback_property_label_text']     = 'Простой текст';
 
 $il['feedback_property_field_yes']      = 'Да';
 $il['feedback_property_field_no']       = 'Нет';
-$il['feedback_property_label_name']     = 'Имя менеджера магазина (eng.)';
-$il['feedback_property_label_theme']    = 'Тема присылаемого сообщения (eng.)';
+$il['feedback_property_label_name']     = 'Имя менеджера магазина';
+$il['feedback_property_label_theme']    = 'Тема присылаемого сообщения';
 $il['feedback_field_label']             = 'Название поля в форме';
 $il['feedback_field_regexp']            = 'Регулярное выражение';
 $il['feedback_field_blank']             = 'Обяз.';

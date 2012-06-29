@@ -20,8 +20,8 @@ $il['feedback_property_label_text']     = 'Простий текст';
 
 $il['feedback_property_field_yes']      = 'Так';
 $il['feedback_property_field_no']       = 'Ні';
-$il['feedback_property_label_name']     = 'Ім’я менеджера (eng.)';
-$il['feedback_property_label_theme']    = 'Тема повідомлення (eng.)';
+$il['feedback_property_label_name']     = 'Ім’я менеджера';
+$il['feedback_property_label_theme']    = 'Тема повідомлення';
 $il['feedback_field_label']             = 'Назва поля у формі';
 $il['feedback_field_regexp']            = 'Регулярний вираз';
 $il['feedback_field_blank']             = 'Обов’яз.';

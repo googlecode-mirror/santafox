@@ -2225,3 +2225,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','comments_pub_show_reviews_stat',NU
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','comments_pub_show_reviews_stat',NULL,'Статистика по отзывам');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','comments_pub_show_reviews_stat',NULL,'Статистика по отзывам');
 
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_prop_saved_msg',NULL,'Свойство сохранено');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_prop_saved_msg',NULL,'Свойство сохранено');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_prop_saved_msg',NULL,'Свойство сохранено');
+

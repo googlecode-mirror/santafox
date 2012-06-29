@@ -2229,3 +2229,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_prop_saved_msg',NULL,'Св
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_prop_saved_msg',NULL,'Свойство сохранено');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_prop_saved_msg',NULL,'Свойство сохранено');
 
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_glob_prop_modified_version_no_update',NULL,'установлена модифицированная версия, обновления отлючены');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_glob_prop_modified_version_no_update',NULL,'установлена модифицированная версия, обновления отлючены');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_glob_prop_modified_version_no_update',NULL,'установлена модифицированная версия, обновления отлючены');
+

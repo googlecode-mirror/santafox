@@ -125,6 +125,7 @@ class mysql_submit
                         id_people INT NOT NULL,
                         section VARCHAR(255) NOT NULL,
                         PRIMARY KEY (id),
+                        UNIQUE `id_people_section` (`id_people`, `section`),
                         key (id_people),
                         key (section)
                 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
@@ -248,14 +249,9 @@ class mysql_submit
 	    //Если идёт обращение по коду, то нужно сначала
 	    //узнать ID, что бы удалить потом и то, на что был
 	    //подписан пользователь
-	    if ($use_code)
-	    {
-	        die("Отлаживаем");
-	    }
+
 	    $query = "DELETE FROM ".$this->table_name."
 				  WHERE id = '".$id_user."'";
-	    if ($use_code)
-	       $query .= ' AND control = "'.$code.'"';
 		$query .= " LIMIT 1";
 		$kernel->runSQL($query);
 

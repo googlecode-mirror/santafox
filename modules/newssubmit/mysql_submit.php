@@ -112,6 +112,7 @@ class mysql_submit
                         control VARCHAR(255),						   # Содержит проверочный MD5 от мыла и приставки
                         sub_time DATE NOT NULL,						   # время внесения в базу
                         PRIMARY KEY (id),
+                        UNIQUE key (mail),
                         key (submit),
                         key (off)
 

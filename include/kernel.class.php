@@ -897,7 +897,7 @@ class kernel
 //        $array_return[''] = '[#label_properties_no_select_option#]';
         while ($filename = readdir($dir))
         {
-            if (preg_match("/\\.html$/i", $filename))
+            if (preg_match("/^([a-z0-9_-]+)\\.html$/i", $filename))
             {
                 $str = htmlspecialchars($path.'/'.$filename);
                 $array_return[$str] = $str;

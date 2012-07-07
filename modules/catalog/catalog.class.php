@@ -103,6 +103,9 @@ class catalog extends BaseModule
 
     private $structure_cookie_name;
 
+    /** @var array айдишники текущих категорий, moduleid=>catid */
+    private $current_cat_IDs=array();
+
     /**
      *  Конструктор класса модуля
      *  @return catalog
@@ -872,24 +875,28 @@ class catalog extends BaseModule
 
         //Теперь ищем переменные, свойств и заменяем их
         $block = $this->process_item_props_out($idata, $props, $block, $group);
-
+        $moduleid=$kernel->pub_module_id_get();
         $catid = $this->get_current_catid(true);
         if ($catid == 0)
         {   // если не знаем точно текущую категорию,
             //находим кратчайшую дорогу в категориях к этому товару
-            $min_way = $this->get_max_catway2item($itemid);
-            if (count($min_way)>0)
-                $catid=$min_way[count($min_way)-1]['id'];
+            $max_way = $this->get_max_catway2item($itemid);
+            if (count($max_way)>0)
+            {
+                $catid=$max_way[count($max_way)-1]['id'];
+                $this->current_cat_IDs[$moduleid]=$catid;
+            }
         }
         else
         {
-            $min_way = $this->get_way2cat($catid, true);
+            $max_way = $this->get_way2cat($catid, true);
+            $this->current_cat_IDs[$moduleid]=$catid;
         }
 
         $cway = array();
 
-        $this->add_categories2waysite($min_way);
-        foreach ($min_way as $cat)
+        $this->add_categories2waysite($max_way);
+        foreach ($max_way as $cat)
         {
             if ($cat['id'] == 0)
                 continue;
@@ -903,7 +910,7 @@ class catalog extends BaseModule
         }
 
         //+сам товар в дорогу, если у нас есть шаблон
-        $way_item_tpl = $kernel->pub_modul_properties_get("catalog_property_way_item_tpl",$kernel->pub_module_id_get());
+        $way_item_tpl = $kernel->pub_modul_properties_get("catalog_property_way_item_tpl",$moduleid);
         if (empty($way_item_tpl) || !isset($way_item_tpl['value']) || empty($way_item_tpl['value']))
             $way_item_tpl = false;
         else
@@ -927,9 +934,9 @@ class catalog extends BaseModule
         $block = str_replace('%cat_way_block%', $cway_block, $block);
 
         $last_cat_block = "";
-        if (isset($_COOKIE[$kernel->pub_module_id_get().'_last_catid']))
+        if (isset($_COOKIE[$moduleid.'_last_catid']))
         {
-            $lastcat = $this->get_category(intval($_COOKIE[$kernel->pub_module_id_get().'_last_catid']));
+            $lastcat = $this->get_category(intval($_COOKIE[$moduleid.'_last_catid']));
             if ($lastcat)
             {
                 $last_cat_block = $this->get_template_block('last_cat_block');
@@ -5628,7 +5635,7 @@ class catalog extends BaseModule
         $cfields = "items.id ";
         if (count($cprops)>0)
             $cfields .= ", items.".implode(", items.", array_keys($cprops));
-
+        $moduleid=$kernel->pub_module_id_get();
         if ($group)
         {//фильтр по товарной группе
             $gprops = CatalogCommons::get_props2($group['id']);
@@ -5637,15 +5644,15 @@ class catalog extends BaseModule
             if (count($gprops)>0)
                 $gfields = ", ".$group['name_db'].".".implode(", ".$group['name_db'].".", array_keys($gprops));
 
-            $queryPrefix = "SELECT ".$cfields.$gfields." FROM ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_items AS items ".
-                "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$kernel->pub_module_id_get()."_".strtolower($group['name_db'])." AS ".$group['name_db']." ON items.ext_id = ".$group['name_db'].".id ";
+            $queryPrefix = "SELECT ".$cfields.$gfields." FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items AS items ".
+                "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($group['name_db'])." AS ".$group['name_db']." ON items.ext_id = ".$group['name_db'].".id ";
             //показываем только товары, доступные для frontend + ограничиваемся нужной нам тов. группой
             $query = " items.`available`=1 AND items.`group_id`=".$group['id'].") AND (".$query;
 
         }
         else
         {//фильтр по всем товарам (общие свойства)
-            $queryPrefix = "SELECT ".$cfields." FROM ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_items AS items ";
+            $queryPrefix = "SELECT ".$cfields." FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items AS items ";
             $query = " items.`available`=1 ) AND  (".$query;
 
         }
@@ -5656,22 +5663,27 @@ class catalog extends BaseModule
         // в текущей - определяем текущую и добавляем  LEFT JOIN sf_catalog_catalog1_cats AS cats ON cats.id =curcatid
         //   если текущая ==0, берём из всех
         // в выбранных LEFT JOIN sf_catalog_catalog1_cats AS cats ON cats.id IN (catid1,catid2,catid3)
-
         if ($filter['catids']!="0") //все категории
         {
             if (strlen($filter['catids'])==0) //показывать товары из текущей
             {
                 $catid = $this->get_current_catid(true);
                 if ($catid==0)
+                {
                     $catid=intval($kernel->pub_httpget_get("fcid"));//доп.возможность передать фильтру айдишник категории, незаметный для других методов
+
+                    if ($catid==0 && isset($this->current_cat_IDs[$moduleid])) //не нашли ранее, но есть catid, заполненный в карточке товара
+                        $catid=$this->current_cat_IDs[$moduleid];
+
+                }
 
                 if ($catid==0) //"выбранная категория", но категорий не передано
                     return null;
-                $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$catid." AND ".$query;
+                $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$catid." AND ".$query;
 
             }
             else  //выбранные категории
-                $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_item2cat AS i2c ON i2c.item_id=items.id  WHERE ( i2c.cat_id IN (".$filter['catids'].") AND ".$query;
+                $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id  WHERE ( i2c.cat_id IN (".$filter['catids'].") AND ".$query;
         }
         else
             $query = " WHERE (".$query;

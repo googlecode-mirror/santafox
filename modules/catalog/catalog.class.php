@@ -4897,18 +4897,44 @@ class catalog extends BaseModule
             }
             $content = str_replace('%list_prop_names%', $cfields_block, $content);
             $num = $offset+1;
-
+            $common_table_info = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+            $enum_props_cache = array();
             foreach ($items as $item)
             {
                 $line = $this->get_template_block('table_body');
                 $cvals = '';
                 foreach ($cprops as $cprop)
                 {
+                    $prop_value='';
                     if ($cprop['type'] == 'number' || $cprop['type'] == "string")
                     {
                         $prop_line = $this->get_template_block('list_prop_value_edit');
-                        $prop_line = str_replace("%name_db%", $cprop['name_db'], $prop_line);
                         $prop_value = htmlspecialchars($item[$cprop['name_db']]);
+                    }
+                    elseif($cprop['type']=='enum')
+                    {
+                        $prop_line = $this->get_template_block('list_prop_value_select_edit');
+                        $cache_key= $cprop['name_db'];
+                        if (isset($enum_props_cache[$cache_key]))
+                            $enum_props = $enum_props_cache[$cache_key];
+                        else
+                        {
+                            $enum_props=$this->get_enum_prop_values($common_table_info[$cprop['name_db']]['Type']);
+                            $enum_props_cache[$cache_key]=$enum_props;
+                        }
+                        $optlines='';
+                        foreach($enum_props as $enum_option)
+                        {
+                            if ($item[$cprop['name_db']]==$enum_option)
+                                $optline=$this->get_template_block('list_prop_value_select_option_selected_edit');
+                            else
+                                $optline=$this->get_template_block('list_prop_value_select_option_edit');
+
+                            $optline = str_replace('%option_value%', $enum_option,$optline);
+                            $optline = str_replace('%option_value_escaped%', htmlspecialchars($enum_option), $optline);
+                            $optlines.=$optline;
+                        }
+                        $prop_line = str_replace('%options%',$optlines,$prop_line);
                     }
                     else
                     {
@@ -4923,6 +4949,7 @@ class catalog extends BaseModule
                         }
 
                     }
+                    $prop_line = str_replace("%name_db%", $cprop['name_db'], $prop_line);
                     $prop_line = str_replace('%list_prop_value%', $prop_value, $prop_line);
                     $cvals     .= $prop_line;
                 }

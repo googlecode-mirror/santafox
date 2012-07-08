@@ -86,6 +86,17 @@
 <!-- @list_prop_value_edit -->
 <td><input type="text" name="iv[%id%][%name_db%]" value="%list_prop_value%" style="width:88%; float:none; margin:0 auto;"></td>
 
+<!-- @list_prop_value_select_edit -->
+<td>
+    <select name="iv[%id%][%name_db%]">
+        %options%
+    </select>
+</td>
+<!-- @list_prop_value_select_option_edit -->
+<option value="%option_value_escaped%">%option_value%</option>
+<!-- @list_prop_value_select_option_selected_edit -->
+<option value="%option_value_escaped%" selected>%option_value%</option>
+
 <!-- @table_body-->
         <tr>
             <td><input type="checkbox" id="icb" name="icb[%id%]"></td>

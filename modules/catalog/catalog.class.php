@@ -3839,15 +3839,26 @@ class catalog extends BaseModule
             $prop['add_param']['small']['width']  = intval($kernel->pub_httppost_get('pict_small_width'));
             $prop['add_param']['small']['height'] = intval($kernel->pub_httppost_get('pict_small_height'));
 
-
-
             //Теперь обновим и запишим этот массив в mysql
-            $query = "UPDATE `".$kernel->pub_prefix_get()."_catalog_item_props` SET ".
-                "`add_param`='".serialize($prop['add_param'])."'
-            WHERE `id`=".$pid;
+            $query = "UPDATE `".$kernel->pub_prefix_get()."_catalog_item_props` SET
+                `add_param`='".serialize($prop['add_param'])."'
+                WHERE `id`=".$pid;
 
             $kernel->runSQL($query);
+        }
 
+        if (($name_full != $prop['name_full'] || $name_db != $prop['name_db']) && in_array($prop['type'],array( 'string','text','html','number','enum')))
+        {//изменилось что-то, что требует регенерации шаблона поиска
+            if ($prop['group_id']==0)
+            {//изменилось общее свойство
+                $groups=CatalogCommons::get_groups($kernel->pub_module_id_get());
+                foreach($groups as $group)
+                {
+                    $this->generate_search_form($group['id'],array());
+                }
+            }
+            else //изменилось свойство группы
+                $this->generate_search_form($prop['group_id'],array());
         }
 
         //Перегенерацию шаблонов убираем пока, она будет ручной
@@ -4067,7 +4078,6 @@ class catalog extends BaseModule
             }
         }
         $kernel->runSQL($query);
-
         /*
         if ($group_id > 0)
             $this->regenerate_group_tpls($group_id, false);
@@ -4076,6 +4086,20 @@ class catalog extends BaseModule
             $this->regenerate_all_groups_tpls(false);
             CatalogCommons::regenerate_frontend_item_common_block($kernel->pub_module_id_get(), false);
         }*/
+
+        if (in_array($ptype,array('string','text','html','number','enum')))
+        {//тип свойства такой, который используется в шаблоне поиска
+            if ($group_id==0)
+            {//добавили общее свойство
+                $groups=CatalogCommons::get_groups($kernel->pub_module_id_get());
+                foreach($groups as $group)
+                {
+                    $this->generate_search_form($group['id'],array());
+                }
+            }
+            else //добавили свойство группы
+                $this->generate_search_form($group_id,array());
+        }
         return $namedb;
     }
 
@@ -4752,48 +4776,52 @@ class catalog extends BaseModule
         $offset = $this->get_offset_admin();
         $limit  = $this->get_limit_admin();
         $groups = CatalogCommons::get_groups();
-        if (isset($_GET['search_results']))
+        //$purl='show_items&group_id='.$group_id.'&'.$this->admin_param_offset_name.'=';
+        $purl='show_items';
+        if (isset($_GET['search_results']) && $kernel->pub_session_get("search_items_query"))
         {
             //пока без ограничения
             $offset = 0;
             $limit = 10000;
-
             $squery = $kernel->pub_session_get("search_items_query");
-            $kernel->pub_session_unset("search_items_query");
-
             $result = $kernel->runSQL($squery);
             $items=array();
             while ($row = mysql_fetch_assoc($result))
                 $items[] = $row;
             mysql_free_result($result);
-
             $total = count($items);
             $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_search_results_mainlabel#]");
-        }
-        elseif ($group_id == -1) //показываем товары без категории
-        {
-            $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
-            $items  = $this->get_items_without_cat($offset, $limit);
-            $total  = $this->get_items_without_cat_count();
+            $purl.='&search_results=1&group_id='.$group_id;
         }
         else
-        {//groupid >= 0
-            if (count($groups)==1)
-            {//если у нас только одна тов. группа, её и выберем
-                $groupsTmp = $groups;
-                $firstGroup = array_shift($groupsTmp);
-                $group_id = $firstGroup['id'];
+        {
+            $kernel->pub_session_unset("search_items_query");
+            if ($group_id == -1) //показываем товары без категории
+            {
+                $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
+                $items  = $this->get_items_without_cat($offset, $limit);
+                $total  = $this->get_items_without_cat_count();
             }
+            else
+            {//groupid >= 0
+                $purl.='&group_id='.$group_id;
+                if (count($groups)==1)
+                {//если у нас только одна тов. группа, её и выберем
+                    $groupsTmp = $groups;
+                    $firstGroup = array_shift($groupsTmp);
+                    $group_id = $firstGroup['id'];
+                }
 
-            $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
-            $total  = $this->get_items_count($group_id, false);
-            $items  = $this->get_items($offset, $limit, $group_id, false);
+                $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
+                $total  = $this->get_items_count($group_id, false);
+                $items  = $this->get_items($offset, $limit, $group_id, false);
+            }
         }
         $count  = count($items);
-
+        $purl.='&'.$this->admin_param_offset_name.'=';
+        $kernel->pub_session_set("redir_after_save_item",$purl.$offset);
 
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_list.html'));
-
         $content = '';
         // Сформируем список доступных товарных групп
         if (count($groups)>0)
@@ -4814,8 +4842,6 @@ class catalog extends BaseModule
                 $groups_vals = str_replace('%gselected%', "selected", $groups_vals);
             else
                 $groups_vals = str_replace('%gselected%', "", $groups_vals);
-
-
             foreach ($groups as $group)
             {
                 $option = $this->get_template_block('group_value');
@@ -4828,7 +4854,6 @@ class catalog extends BaseModule
                 $groups_vals .= $option;
             }
             $content = str_replace('%group_values%', $groups_vals, $content);
-
         }
 
         $search_form = "";
@@ -4841,24 +4866,7 @@ class catalog extends BaseModule
                 $search_form = file_get_contents($group_form_filename);
             else
             {
-                $genprops = array();
-                $props = CatalogCommons::get_props($curr_group['id'], true);
-                $visible_props = $this->get_group_visible_props($curr_group['id']);
-
-                foreach ($props as $prop)
-                {
-
-                    if ($prop['group_id']==0 &&  !array_key_exists($prop['name_db'], $visible_props))
-                        continue;
-
-                    if ($prop['type'] == 'string' || $prop['type'] == 'text' || $prop['type'] == 'html')
-                        $genprops[$prop['name_db']] = "like";
-                    elseif ($prop['type'] == 'number')
-                        $genprops[$prop['name_db']] = "diapazon";
-                    elseif ($prop['type'] == 'enum')
-                        $genprops[$prop['name_db']] = "select";
-                }
-                $search_form = $this->generate_search_form($curr_group['id'], $genprops);
+                $search_form = $this->generate_search_form($curr_group['id'], array());
                 //заново установим шаблон
                 $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_list.html'));
                 $search_form = str_replace("%search_form_action%",$kernel->pub_redirect_for_form('show_items'), $search_form);
@@ -4938,7 +4946,7 @@ class catalog extends BaseModule
                 $cat_lines .= $cat_line;
             }
             $content = str_replace("%category_values%", $cat_lines, $content);
-            $content = str_replace('%pages%', $this->build_pages_nav($total,$offset, $limit,'show_items&group_id='.$group_id.'&'.$this->admin_param_offset_name.'=',0,'url'), $content);
+            $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $purl, 0, 'url'), $content);
         }
 
         if (count($groups)>0)
@@ -5298,10 +5306,12 @@ class catalog extends BaseModule
         //Определим, линк для сохранения, так как там нужно ещё указать куда нужно вернуться
         //после сохранения. Либо в категорию конкртеную, либо во все товары
         $form_action = $kernel->pub_redirect_for_form('item_save');
+        /*
         if ($id_cat > 0)
         {
             $form_action = $kernel->pub_redirect_for_form('item_save&id_cat='.$id_cat);
         }
+        */
 
         $content  = str_replace('%props%'      , join("\n", $lines)     , $content);
         $content  = str_replace('%categories%' , join("\n", $categories), $content);
@@ -6124,9 +6134,11 @@ class catalog extends BaseModule
             }
             //Теперь возьмём форму самой таблицы и вставим туда эти строки
             $items_html = $this->get_template_block('cat_items');
-            $items_html = str_replace('%form_action%'   , $kernel->pub_redirect_for_form('category_items_save'), $items_html);
-            $items_html = str_replace('%cat_items_line%', join("\n", $lines)                                   , $items_html);
-            $pblock = $this->build_pages_nav($total, $offset, $limit,'category_items&id='.$id_cat.'&'.$this->admin_param_offset_name.'=',0,'url');
+            $items_html = str_replace('%form_action%', $kernel->pub_redirect_for_form('category_items_save'), $items_html);
+            $items_html = str_replace('%cat_items_line%', join("\n", $lines), $items_html);
+            $purl = 'category_items&id='.$id_cat.'&'.$this->admin_param_offset_name.'=';
+            $kernel->pub_session_set("redir_after_save_item",$purl.$offset);
+            $pblock = $this->build_pages_nav($total, $offset, $limit, $purl, 0,'url');
         }
 
 
@@ -6316,6 +6328,20 @@ class catalog extends BaseModule
 
             $this->regenerate_all_groups_tpls(false);
             //CatalogCommons::regenerate_frontend_item_common_block($kernel->pub_module_id_get(), false);
+        }
+
+        if (in_array($prop['type'],array( 'string','text','html','number','enum')))
+        {//тип свойства был такой, который используется в шаблоне поиска
+            if ($prop['group_id']==0)
+            {//это было общее свойство
+                $groups=CatalogCommons::get_groups($kernel->pub_module_id_get());
+                foreach($groups as $group)
+                {
+                    $this->generate_search_form($group['id'],array());
+                }
+            }
+            else //это было свойство группы
+                $this->generate_search_form($prop['group_id'],array());
         }
     }
 
@@ -7451,19 +7477,39 @@ class catalog extends BaseModule
 
     /**
      * Создаёт форму поиска
-     *
+     * если не указаны свойства, значит это регенерация формы для поиска из админки, используем visible props тов. группы
      * @param integer $groupid
-     * @param array $props
+     * @param array $genprops
      * @return string
      */
-    private function generate_search_form($groupid, $props)
+    private function generate_search_form($groupid, $genprops)
     {
         global $kernel;
+        if (!$genprops)
+        {
+            $genprops = array();
+            $props = CatalogCommons::get_props($groupid, true);
+            $visible_props = $this->get_group_visible_props($groupid);
+            foreach ($props as $prop)
+            {
+
+                if ($prop['group_id']==0 &&  !array_key_exists($prop['name_db'], $visible_props))
+                    continue;
+
+                if ($prop['type'] == 'string' || $prop['type'] == 'text' || $prop['type'] == 'html')
+                    $genprops[$prop['name_db']] = "like";
+                elseif ($prop['type'] == 'number')
+                    $genprops[$prop['name_db']] = "diapazon";
+                elseif ($prop['type'] == 'enum')
+                    $genprops[$prop['name_db']] = "select";
+            }
+        }
+
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'search_form_tpl.html'));
         $all_group_props = CatalogCommons::get_props2($groupid)+CatalogCommons::get_props2(0);
         $group = CatalogCommons::get_group($groupid);
         $content = $this->get_template_block("header");
-        foreach ($props as $propname=>$processtype)
+        foreach ($genprops as $propname=>$processtype)
         {
             if ($processtype == "ignore")
                 continue;
@@ -8248,7 +8294,7 @@ class catalog extends BaseModule
         $kernel->runSQL($q);
         $q="DELETE FROM  ".$prfx."_catalog_".$modid."_inner_filters WHERE groupid='".$group['id']."'";
         $kernel->runSQL($q);
-
+        $this->generate_search_form($groupid, array());
     }
 
     /**
@@ -8261,7 +8307,7 @@ class catalog extends BaseModule
         global $kernel;
         $action=$kernel->pub_section_leftmenu_get();
         //если это не работа с деревом, "забудем" куку с выделенной нодой
-        if (!in_array($action,array('category_items','category_move','category_items_save','save_selected_items')))
+        if (!in_array($action,array('category_items','category_move','category_items_save','save_selected_items','item_edit','item_save')))
             setcookie($this->structure_cookie_name,"");
         switch ($action)
         {
@@ -8827,10 +8873,11 @@ class catalog extends BaseModule
                     $squery = $this->prepare_inner_filter_sql($squery, array(), $link);
 
                     $squery = "SELECT items.* FROM ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_items AS items ".
-                        "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$kernel->pub_module_id_get()."_".strtolower($groups[$group_id]['name_db'])." AS ".strtolower($groups[$group_id]['name_db'])." ON items.ext_id = ".strtolower($groups[$group_id]['name_db']).".id ".
+                        "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$kernel->pub_module_id_get()."_".strtolower($groups[$group_id]['name_db'])." AS `".strtolower($groups[$group_id]['name_db'])."` ON items.ext_id = `".strtolower($groups[$group_id]['name_db'])."`.id ".
                         "WHERE items.`group_id`=".$group_id." AND (".$squery.")";
                     $kernel->pub_session_set("search_items_query",$squery);
                     $kernel->pub_redirect_refresh_reload('show_items&search_results=1&group_id='.$group_id);
+                    die();
                 }
                 return $this->show_items($group_id);
 
@@ -8846,7 +8893,6 @@ class catalog extends BaseModule
             //Форма редактирования товара
             case 'item_edit':
                 $id = $kernel->pub_httpget_get('id');
-                $id_cat = intval($kernel->pub_httpget_get('id_cat'));
                 $removlinkedid = $kernel->pub_httpget_get("removlinkedid");
                 if (!empty($removlinkedid))
                 {
@@ -8855,8 +8901,7 @@ class catalog extends BaseModule
                         '(itemid2='.$id.' AND itemid1='.$removlinkedid.')';
                     $kernel->runSQL($query);
                 }
-
-                return $this->show_item_form($id, 0, $id_cat);
+                return $this->show_item_form($id, 0);
 
             //Добавление товара вызывает туже строку с редактированием
             case 'item_add':
@@ -8871,13 +8916,9 @@ class catalog extends BaseModule
             //Сохраняет товар после редактирования или добавляет новый
             case 'item_save':
                 $this->save_item();
-                //Если указана ID категории, то нужно вренуться в неё
-                $id_cat = $kernel->pub_httpget_get('id_cat');
-                $id_cat = intval($id_cat);
-                if ($id_cat > 0)
-                    $kernel->pub_redirect_refresh_reload("category_items&id=".$id_cat);
-                else
-                    $kernel->pub_redirect_refresh_reload("show_items");
+                $redir2=$kernel->pub_session_get("redir_after_save_item");
+                if ($redir2)
+                    $kernel->pub_redirect_refresh_reload($redir2);
                 break;
 
             //Очистка поля с файлом в товаре

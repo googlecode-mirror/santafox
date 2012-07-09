@@ -5,6 +5,10 @@
 
     metkiCount = 0;//кол-во меток
 
+    //{"html escape":"tralala","strip_tags":"tralala2"};
+    postProcessors= %post_processors%;
+
+
     // что-то вроде  [["ppf_mapsite1_visible","ppv_mapsite1_visible"],["ppf_waysite1_visible","ppv_waysite1_visible"],["ppf_menu1_visible","ppv_menu1_visible"]]
     var modulesProps = %prop_modul_array%;
     /*
@@ -32,7 +36,7 @@
     var label3 = '[#page_prop_name_id#]'; 	   label3 = label3.ellipse(28);
     var label4 = '[#page_prop_link_page#]';    label4 = label4.ellipse(28);
     var label5 = '[#page_prop_templte_page#]'; label5 = label5.ellipse(28);
-    var label6 = 'Доступна только авторизированым'; label6 = label6.ellipse(28);// @todo move to lang vars
+    var label6 = '[#page_prop_only_auth#]';    label6 = label6.ellipse(28);
 
 
     //построение селекта с шаблонами и инициализация
@@ -74,6 +78,7 @@
             postArr.properties = {};
             postArr.page_inheritance = {};
             postArr.page_modules = {};
+            postArr.page_postprocessors = {};
             var elem,elemName;
             //свойства модулей
             for (var j=0;j<modulesProps.length;j++)
@@ -96,12 +101,13 @@
             {
                 elemName = $('#flag_metka_'+j).attr('name');
                 if ($('#flag_metka_'+j).attr('checked'))
-                {
+                { //наследное
                     postArr.page_inheritance[elemName]='on';
                 }
                 else
                 {
                     postArr.page_modules[elemName]=$('#sel_modul_ext_'+j).val();
+                    postArr.page_postprocessors[elemName]=[$('#sel_label_postprocessor_'+j).val()];
                 }
             }
         }

@@ -38,7 +38,7 @@ class manager_global_properties
         $show->set_menu("[#global_prop_label_backup_files#]","backup&backup=backup_files");
         $show->set_menu("[#global_prop_label_constant#]","sys_prop");
         $show->set_menu("[#global_prop_label_info_site#]","info_site");
-        $show->set_menu_block('[#global_prop_label_sys_action#]');
+        //$show->set_menu_block('[#global_prop_label_sys_action#]');
         $show->set_menu("[#global_prop_label_sys_action#]","glob_action");
         $show->set_menu_default('form_save');
     }
@@ -71,7 +71,7 @@ class manager_global_properties
             case 'save_sys_prop':
                 $this->save_sys_properties();
                 //$kernel->pub_redirect_refresh_reload("sys_prop");
-                $html_content = $kernel->pub_json_encode(array("info"=>"Данные успешно сохраненны.","success"=>true));//@todo use lang vars
+                $html_content = $kernel->pub_json_encode(array("info"=>"[#kernel_ajax_data_saved_ok#]","success"=>true));
             	break;
 
             //Выводит информацию о ПО используемом на сайте
@@ -87,7 +87,7 @@ class manager_global_properties
 
 			//Вызвано действие с переинсталяицей языковых переменных
 			case 'lang_reinstal':
-			    $html_content = $this->lang_reinstall();
+			    $this->lang_reinstall();
 			    $kernel->pub_redirect_refresh('glob_action');
 			    break;
 
@@ -113,7 +113,7 @@ class manager_global_properties
 			    $kernel->pub_redirect_refresh('update_step_4');
                 break;
            case 'update_step_4':
-                $html_content = $this->lang_reinstall();
+                $this->lang_reinstall();
                 $kernel->pub_redirect_refresh("info_site");
                 break;
 
@@ -124,7 +124,7 @@ class manager_global_properties
     /**
      * Формирует форму, для редактирования параметров INI файла.
      *
-     * @return HTML
+     * @return string
      */
     function show_form_global_param()
     {

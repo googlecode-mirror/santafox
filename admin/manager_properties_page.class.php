@@ -82,7 +82,7 @@ class properties_page
     /**
      * Формирует HTML код для ограниченного редактирования свойств страницы
      *
-     * @return HTML
+     * @return string
      */
 //    function show_properties_limited()
 //    {
@@ -251,9 +251,9 @@ class properties_page
 	/**
 	 * Заменяет метки с действиями "редактор контента" на содержимое HTML файла
 	 *
-	 * @param html $html_template
+	 * @param string $html_template
 	 * @param array $metki_exist Массив с метками, которые не нужно обрабатывать, так как они уже есть
-	 * @return html
+	 * @return string
 	 */
 	function generate_html_template($html_template, $metki_exist = array())
 	{
@@ -366,14 +366,10 @@ class properties_page
     function page_metka()
     {
         global $kernel;
-
         $metki = array();
-
-    	$out = $kernel->pub_page_property_get($this->id_curent_page,'template');
-
+    	$page_tpl_prop = $kernel->pub_page_property_get($this->id_curent_page,'template');
         // Берем файл шаблона
-		$html_template = @file_get_contents($out['value']);
-
+		$html_template = @file_get_contents($page_tpl_prop['value']);
 		// Добавляем метки из файлов контента
 		$html_template = $this->generate_html_template($html_template);
 		$curent_link = $kernel->priv_page_textlabels_get($html_template);
@@ -383,12 +379,10 @@ class properties_page
 
     	//Узнаем значения ссылок с учетом наследования
     	$link_in_page_real = $curent_link;
-
 		$link_in_page_real = array_flip($link_in_page_real);
 
 		//1ый проход
     	$link_in_page_real = $kernel->priv_page_real_link_get($link_in_page_real, $this->id_curent_page);
-
  	    $page_modules = array(); //модули, которые используются в метках на странице
     	$manager_modules = new manager_modules();
     	foreach ($link_in_page_real as $metka_params) //$metka_name=>
@@ -434,7 +428,6 @@ class properties_page
 
 		//2ой проход, уже с метками модулей
     	$link_in_page_real = $kernel->priv_page_real_link_get($link_in_page_real, $this->id_curent_page);
-
         $is_root = $kernel->priv_admin_is_root();
         $curr=0;
 		//Начнём перебирать метки и строить для каждой интерфейс
@@ -446,7 +439,6 @@ class properties_page
             $id_action = trim($link_in_page_real[$value]['id_action']);
 		    $id_page   = trim($link_in_page_real[$value]['page']);
 		    $full_name_file = '/'.$this->id_curent_page.'_'.$value.'.html';
-
 		    //Проверим наследуется это значение или нет
             $metki[$curr]['name'] = $value;
             //$metki[$num]['is4module'] = false;
@@ -455,6 +447,7 @@ class properties_page
             $metki[$curr]['id_action'] = $id_action;
             $metki[$curr]['main_page'] = $this->page_is_main;
             $metki[$curr]['file_edit'] = $full_name_file;
+            $metki[$curr]['postprocessors'] = $link_in_page_real[$value]['postprocessors'];
             $curr++;
 		}
         return $kernel->pub_json_encode($metki);
@@ -465,7 +458,7 @@ class properties_page
     /**
      * Формирует и выводит на экран HTML код для редаткирования свойств страницы и ссылок
      *
-     * @return HTML
+     * @return string
      */
     function show()
     {
@@ -618,6 +611,8 @@ class properties_page
                 //[["","","Действие не выбранно"],["Карта сайта","",""],["","8","Показать карту"],["Дорога","",""],["","9","Вывести дорогу"],["","10","Вывести страницу 2-ого уровня"],["Меню","",""],["","13","Вывести верхнее меню"],["","17","Вывести левое меню"],["Основные новости","",""],["","16","Вывести архив"],["","15","Вывести ленту"],["Поиск","",""],["","35","Вывести результаты поиска"],["","34","Вывести форму поиска (для главной)"],["Обратная связь","",""],["","24","Отобразить форму"],["Основные Комментарии","",""],["","40","Комментарии по-умолчанию"],["Вопросы и Ответы","",""],["","25","Показать список вопросов-ответов"],["","26","Показать список разделов вопросов-ответов"],["Каталог товаров","",""],["","37","Вывести содержимое корзины"],["","38","Вывести стикер корзины"],["","32","Название элемента"],["","39","Отобразить форму заказа"],["","30","Список категорий"],["","31","Список товаров"],["","36","Сформировать заголовок"],["Фотогалерея","",""],["","41","Показать все фото"],["","33","Сформировать список товаров"],["Ядро","",""],["","2","Вернуть заголовок страницы"],["","1","Редактор контента"]]
                 $html = str_replace('%all_modules%', '[["","","[#structure_action_blank#]"],'.$kernel->pub_array_convert_form_rec($tmp).']', $html);
 
+                $html = str_replace('%post_processors%',$kernel->pub_json_encode($kernel->get_postprocessors()),$html);
+
                 //Все метки будут строиться ява скриптом, что бы всё было едино образно
                 $html = str_replace('%link_show_metki%', $kernel->pub_section_leftmenu_get(), $html);
 
@@ -700,9 +695,7 @@ class properties_page
     function save_properties_addon($values, $inheritance)
     {
 		global $kernel;
-
         $array_properties = $this->get_properties();
-
         //Теперь нужно сохранить свойства страницы, которые установил каждый модуль
         //сначала узнаем массив всех этих свойств
 		$tmp_modul = new manager_modules();
@@ -719,7 +712,6 @@ class properties_page
         			$array_properties[$id_prop] = $values[$id_prop];
         	}
 		}
-
         $kernel->priv_page_properties_set($this->id_curent_page, $array_properties, $array_properties['caption']);
     }
 
@@ -738,17 +730,11 @@ class properties_page
 
 		if ($id_str_macros > 0)
 		{
-	    	$query = 'SELECT * FROM '.$kernel->pub_prefix_get().'_action
-					  WHERE id = "'.$id_str_macros.'"
-	   	     		 ';
-
-    	    $result = $kernel->runSQL($query);
-       		if ($result)
+            $row=$kernel->db_get_record_simple('_action',"id='".$id_str_macros."'");
+       		if ($row)
 			{
-	        	$row = mysql_fetch_assoc($result);
 				$ret_str['id_mod'] = trim($row['id_module']);
 				$ret_str['id_action'] = trim($row['id']);
-
 				$run = array();
 				$run['name'] = $row['link_str'];
 				$run['param'] = $row['param_array'];
@@ -758,11 +744,12 @@ class properties_page
     	return $ret_str;
     }
 
-    /** Сохраняет параметры линков, на ссылки для страницы
+    /** Сохраняет поле serialized для страницы
     *   @param  array $modules
     *   @param  array $inheritance
+    *   @param  array $postprocessors
     */
-    function save_link($modules, $inheritance)
+    function save_serialized($modules, $inheritance, $postprocessors)
     {
     	global $kernel;
 
@@ -776,20 +763,25 @@ class properties_page
     	}
         $is_root = $kernel->priv_admin_is_root();
     	$link_array = $modules;
-
     	$serialize = array();
-    	if (!empty($link_array))
-    	{
-    		foreach ($link_array as $key => $val)
-    		{
-                //если это не рут-админ, а метка вида ***_admin - не обрабатываем её
-                if (!$is_root && preg_match('~_admin$~',$key))
-                    continue;
-    			if ((is_numeric($val)) || (empty($val)))
-    				$serialize[$key] = $this->return_full_link($val);
-    		}
-    	}
-
+        $system_postprocessors = $kernel->get_postprocessors();
+        foreach ($link_array as $key => $val)
+        {
+            //если это не рут-админ, а метка вида ***_admin - не обрабатываем её
+            if (!$is_root && preg_match('~_admin$~',$key))
+                continue;
+            if (is_numeric($val) || empty($val))
+                $serialize[$key] = $this->return_full_link($val);
+            $serialize[$key]['postprocessors']=array();
+            if (array_key_exists($key,$postprocessors))
+            {//для этой страницы есть постпроцессоры
+                foreach($postprocessors[$key] as $pp)
+                {
+                    if (array_key_exists($pp,$system_postprocessors))
+                        $serialize[$key]['postprocessors'][]=$pp;
+                }
+            }
+        }
 
         if (!$is_root)
         {//если не рут-админ, апдейт выборочный (подставляем старые значения, где их нет в готовом массиве)
@@ -807,14 +799,12 @@ class properties_page
             }
         }
 
-    	//Теперь можно прописать весь Сериализе сразу в таблицу, так как
+    	//Теперь можно прописать весь serialize сразу в таблицу, так как
 		//в нем указаны только те ссылки, которые поставлены в соответствие
-
-		$query = 'UPDATE '.$kernel->pub_prefix_get().'_structure '
-        . ' SET serialize = "'.mysql_real_escape_string(serialize($serialize)).'"'
-        . ' WHERE id = "'.$this->id_curent_page.'"';
+		$query = 'UPDATE '.$kernel->pub_prefix_get().'_structure
+		          SET serialize = "'.mysql_real_escape_string(serialize($serialize)).'"
+		          WHERE id = "'.$this->id_curent_page.'"';
 
 		$kernel->runSQL($query);
     }
 }
-?>

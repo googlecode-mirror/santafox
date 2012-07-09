@@ -23,7 +23,7 @@ function show_action_edit(strlink, name)
 function santaUpdateRegion(regid, loadFrom)
 {
     $('#popup_div').css('display','none');
-    $("#"+regid).html('<span id="contentLoading">Loading, Please wait..</span>'); // @todo use lang[]
+    $("#"+regid).html('<span id="contentLoading">Loading...</span>');
     $("#"+regid).load(loadFrom, function(response, status, xhr) {
           if (status == "error")
           {
@@ -524,8 +524,6 @@ function set_propertes_main(d)
     //проставляем свойства страницы для модулей
     for (var i = 0; i < d.page_prop.length; i++)
     {
-
-
         if($('#' + d.page_prop[i].name).is('select'))
             $('#' + d.page_prop[i].name).selectmenu("value",d.page_prop[i].value);
         else
@@ -562,23 +560,34 @@ function set_metki(d)
 
     metkiCount = d.length;
     arr_link_content = new Array();
+    //не строим, если нет постпроцессоров
+    var hasPostprocessors = !is_empty(postProcessors);
     for (var i = 0; i < d.length; i++)
     {
         var str_content = "";
         str_content += '<fieldset>';
         //Имя метки со скрытым инпутом, куда пишется непосредственное значение
         //str_content += '<td class="name">';
-        str_content += '<label for="flag_metka_' + i + '">' + d[i].name + '</label>';
+        str_content += '<label for="flag_metka_' + i + '" class="struct_page_label">' + d[i].name + '</label>';
         //Галочка наследования
-        str_content += '<input type="checkbox" name="' + d[i].name + '" id="flag_metka_' + i + '" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_modul_ext_' +i+'\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_' + i + '\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_s_' + i + '\');">';
+        str_content += '<input type="checkbox" name="' + d[i].name + '" id="flag_metka_' + i + '" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_modul_ext_' +i+'\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_' + i + '\');';
+        if (hasPostprocessors)
+            str_content +='jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_label_postprocessor_' +i+'\');';
+        str_content += 'show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_s_' + i + '\');">';
         //Селект, который на который навешивается экстовская форма
         str_content += '<select id="sel_modul_ext_' + i + '"></select>';
-        str_content += '<span style="height: 26px; display: block;"><img class="edit_icon" title="Визуальный редактор контента" id="img_edit_' + i + '" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content[' + i + '], false)"><img class="edit_icon"  id="img_edit_s_' + i + '" title="HTML редактор контента" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content[' + i + '], true)"></span>';
+        str_content += '<span style="height: 26px; display: inline;float: left;"><img class="edit_icon" title="Визуальный редактор контента" id="img_edit_' + i + '" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content[' + i + '], false)"><img class="edit_icon"  id="img_edit_s_' + i + '" title="HTML редактор контента" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content[' + i + '], true)"></span>';
+
+        if (hasPostprocessors)
+            str_content += '<select id="sel_label_postprocessor_' + i + '"></select>';
+
         str_content += '</fieldset>';
         //Добавляем небольшими кусками, так как иначе IE глючит
         $(str_content).appendTo('#table_metki');
 
         buildMetkaActionsSelect("select#sel_modul_ext_" + i);
+        if (hasPostprocessors)
+            buildMetkaPostprocessorsSelect("select#sel_label_postprocessor_" + i);
 
 
         //при изменении селекта с действиями скроем или покажем иконки редактора контента
@@ -590,6 +599,8 @@ function set_metki(d)
         });
 
         $("#sel_modul_ext_" + i).val(d[i].id_action);//поставим в селект выбранное значение
+        if (d[i].postprocessors!=null && d[i].postprocessors.length>0)
+            $("#sel_label_postprocessor_" + i).val(d[i].postprocessors[0]);//поставим в селект выбранное значение, пока просто первый элемент, в дальнейшем возможно будет chaining из потспроцессоров
 
 
         // если унаследовано - отключим селект и поставим чекбокс наследования
@@ -597,24 +608,30 @@ function set_metki(d)
         {
             $("#flag_metka_" + i).attr("checked", "checked");
             $("#sel_modul_ext_" + i).attr("disabled", true);
+            $("#sel_label_postprocessor_" + i).attr("disabled", true);
         }
 
         //повесим обработчик на клик по чекбоксу
         $("#flag_metka_"+i).change(function () {
-         var elID = new String(this.id).split("_").pop();
-         var disAttr = $("#sel_modul_ext_"+elID).attr("disabled");
-         
-            if (typeof  disAttr!== 'undefined' && disAttr!=false){
+            var elID = new String(this.id).split("_").pop();
+            var disAttr = $("#sel_modul_ext_"+elID).attr("disabled");
+            var disAttrPP = $("#sel_label_postprocessor_"+elID).attr("disabled");
+
+            if (typeof  disAttr!== 'undefined' && disAttr!=false)
+            {
                $("#sel_modul_ext_"+elID).removeAttr("disabled");
                // и покажем иконки редактирования, если требуется
                show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
                show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
             }
             else
-            {
                $("#sel_modul_ext_"+elID).attr("disabled",true);
-            }
-         });
+
+            if (typeof  disAttrPP!== 'undefined' && disAttrPP!=false)
+               $("#sel_label_postprocessor_"+elID).removeAttr("disabled");
+            else
+               $("#sel_label_postprocessor_"+elID).attr("disabled",true);
+        });
 
 
         // прячем иконки
@@ -625,6 +642,10 @@ function set_metki(d)
         arr_link_content[i] = d[i].file_edit;
 
         $('#sel_modul_ext_' + i).selectmenu({
+            style:'dropdown',
+            maxHeight:200
+        });
+        $('#sel_label_postprocessor_' + i).selectmenu({
             style:'dropdown',
             maxHeight:200
         });
@@ -643,8 +664,40 @@ function set_metki(d)
     }
 
 }
+//via http://stackoverflow.com/questions/4994201/is-object-empty
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+function is_empty(obj)
+{
+    // Assume if it has a length property with a non-zero value
+    // that that property is correct.
+    if (obj.length && obj.length > 0)
+        return false;
+    for (var key in obj)
+    {
+        if (hasOwnProperty.call(obj, key))
+            return false;
+    }
+    return true;
+}
+
+var postProcessors = {};
+function buildMetkaPostprocessorsSelect(selector)
+{
+    var option;
+    //первый элемент - пустой (нет постпроцессора)
+    option = $(document.createElement("option")).text('').val('');
+    $(selector).append(option);
+
+    for(var key in postProcessors)
+    {
+        //option = $(document.createElement("option")).text(postProcessors[key]).val(key);
+        option = $(document.createElement("option")).text(key).val(key);
+        $(selector).append(option);
+    }
+}
+
 var allModulesActions = new Array();
-function buildMetkaActionsSelect(selectID)
+function buildMetkaActionsSelect(selector)
 {
     var elem;
     var lastOptGroup;
@@ -655,13 +708,13 @@ function buildMetkaActionsSelect(selectID)
         if (!elem[0] && !elem[1]) //Действие не выбранно
         {
             option = $(document.createElement("option")).text(elem[2]).val("");
-            $(selectID).append(option);
+            $(selector).append(option);
             continue;
         }
         if (elem[0]) //optgroup
         {
             lastOptGroup = $(document.createElement("optgroup")).attr('label', elem[0]);
-            $(selectID).append(lastOptGroup);
+            $(selector).append(lastOptGroup);
         }
         else
         {

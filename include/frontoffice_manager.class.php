@@ -10,8 +10,8 @@
  *
  * @name frontoffice_manager
  * @package Kernel
- * @copyright ArtProm (с) 2001-2011
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2012
+ * @version 3.0
  */
 
 class frontoffice_manager
@@ -19,9 +19,8 @@ class frontoffice_manager
 
 	/**
 	 * Конструктор объекта
-	 * @return void
 	 */
-	function frontoffice_manager()
+	function __construct()
     {
         $this->session_tracking_set();
     }
@@ -50,7 +49,7 @@ class frontoffice_manager
         // Устанавливаем точку входа и страницу, с которой пришли на сайт
         if (!isset($_SESSION['vars_kernel']['tracking']))
         {
-            include_once ("admin/manager_stat.class.php");
+            require_once (dirname(dirname(__FILE__))."/admin/manager_stat.class.php");
             $manager_stat = new manager_stat();
             $user_array = $manager_stat->visitor_info_get(session_id());
 
@@ -119,6 +118,7 @@ class frontoffice_manager
     	global $kernel;
     	//определим страницу, кторую запрашивают
     	$uri = $_SERVER['REQUEST_URI'];
+        $section_id=null;
 		//Проверим корректность задания страницы
         if (isset($_GET['sitepage'])) //если задан параметр, какую страницу выдать, то выставим её в первую очередь
             $section_id = $_GET['sitepage'];
@@ -127,10 +127,8 @@ class frontoffice_manager
 	    elseif (preg_match("'^/(\\?.*)?$'", $uri))
         	$section_id = "index";
        	else
-       	{
-       	    header("HTTP/1.0 404 Not Found");//@todo throw_404_error here?
-        	die;
-       	}
+           self::throw_404_error();
+
        	$section_id = strtolower($section_id);
 
        	//Сразу проставим этустраницу в текущую, так как это влияет на карту сайта
@@ -138,11 +136,8 @@ class frontoffice_manager
 
        	//Проверка на то, что эту страницу могут смотреть только авторизированные пользователи
        	$only_auth = $kernel->pub_page_property_get($section_id, 'only_auth', false);
-       	if ($only_auth['isset'] && ($only_auth['value']) && (!$kernel->pub_user_is_registred()))
-       	{//"Для просмотра необходима регестрация и (или) авторизация"
-       	    header("HTTP/1.0 404 Not Found");//@todo throw_404_error here?
-       	    die();
-       	}
+       	if ($only_auth['isset'] && $only_auth['value'] && !$kernel->pub_user_is_registred())//"Для просмотра необходима регестрация и (или) авторизация"
+            self::throw_404_error();
 
        	//Проверим, может нужно перейти на какую-то другую страницу
        	//При этом необходимо вытащить все параметры после вопроса и передать их дальше
@@ -291,34 +286,19 @@ class frontoffice_manager
                 $array_link[$key]['priority'] = $priority_array[$array_link[$key]['id_mod']] + $prioritrt_metod;
             }
             else
-            {
                 $array_link[$key]['priority'] = intval(100);
-            }
         }
         //И сортируем массив в соответствии с приоритетом
         uasort($array_link, array("frontoffice_manager", "compare_priority"));
 
-		//Обходим массив меток, и создаем выходной итоговую страницу
-		foreach ($array_link as $key => $val)
-		{
+        //Обходим массив меток, и создаем выходной итоговую страницу
+        foreach ($array_link as $key => $val)
+        {
 
-		    if (isset($val['isadditional']))
-		        continue;
-			if ((!empty($val)) && (is_array($val)))
-			{
-				if (!empty($val['id_mod']))
-				{
-					if ($val['id_mod'] == 'kernel')
-						$html_replace = $this->run_metod_kernel($key, $val);
-					else
-						$html_replace = $this->run_metod_modul($val);
-					$html = str_replace('[#'.$key.'#]',$html_replace, $kernel->priv_frontcontent_get());
-				}
-			}
-			$kernel->priv_frontcontent_set($html);
-			//Теперь необходимо обновить этот контент в переменной ядра
-			//что бы кто-то (модуль) мог иметь доступ к этому контенту и влиять на него.
-		}
+            if (isset($val['isadditional']))
+                continue;
+            $this->replace_labels_by_generated_content($key,$val);
+        }
 
         //Второй проход (только оставшиеся метки), после отработки модулей,
         //чтобы заменить метки и в контенте, созданном модулями
@@ -328,25 +308,12 @@ class frontoffice_manager
 		$array_link = $array_link[1];
 		$array_link = array_flip($array_link);
         $array_link = $kernel->priv_page_real_link_get($array_link, $section_id, true);
-		foreach ($array_link as $key => $val)
-		{
-		    if (strpos($kernel->priv_frontcontent_get(),'[#'.$key.'#]')===false)
-		        continue;
-			$html_replace = '';
-			if ((!empty($val)) && (is_array($val)))
-			{
-				if (!empty($val['id_mod']))
-				{
-					if ($val['id_mod'] == 'kernel')
-						$html_replace = $this->run_metod_kernel($key, $val);
-					else
-						$html_replace = $this->run_metod_modul($val);
-				}
-			}
-
-			$html = str_replace('[#'.$key.'#]',$html_replace, $kernel->priv_frontcontent_get());
-			$kernel->priv_frontcontent_set($html);
-		}
+        foreach ($array_link as $key => $val)
+        {
+            if (strpos($kernel->priv_frontcontent_get(),'[#'.$key.'#]')===false)
+                continue;
+            $this->replace_labels_by_generated_content($key,$val);
+        }
 
 		$html = $kernel->priv_frontcontent_get();
 
@@ -360,6 +327,38 @@ class frontoffice_manager
     	$kernel->priv_output($html, false, true);
     }
 
+    private function replace_labels_by_generated_content($label,$val)
+    {
+        global $kernel;
+        if (empty($val) || !is_array($val))
+            return;
+        $html_replace='';
+        if (!empty($val['id_mod']))
+        {
+            if ($val['id_mod'] == 'kernel')
+                $html_replace = $this->run_metod_kernel($label, $val);
+            else
+                $html_replace = $this->run_metod_modul($val);
+            if (isset($val['postprocessors']) && is_array($val['postprocessors']) && count($val['postprocessors']))
+            {
+                $system_postprocessors = $kernel->get_postprocessors();
+                foreach($val['postprocessors'] as $pp)
+                {
+                    if (!array_key_exists($pp,$system_postprocessors))//указанного постпроцессора нет в списке, возвращённом системой
+                        continue;
+                    include_once $kernel->get_postprocessors_dir()."/".$pp.".php";
+                    /** @var $ppobj postprocessor */
+                    $ppobj = new $pp;
+                    $html_replace=$ppobj->do_postprocessing($html_replace);
+                }
+            }
+        }
+        $html = str_replace('[#'.$label.'#]',$html_replace, $kernel->priv_frontcontent_get());
+        //Теперь необходимо обновить этот контент в переменной ядра
+        //что бы кто-то (модуль) мог иметь доступ к этому контенту и влиять на него.
+        $kernel->priv_frontcontent_set($html);
+    }
+
 
     /**
      * Сравнивает приоритет двух модулей (действий)
@@ -369,7 +368,7 @@ class frontoffice_manager
      * @param array $b
      * @return int
      */
-    function compare_priority($a, $b)
+    public function compare_priority($a, $b)
     {
         if ($a['priority'] == $b['priority'])
             return 0;
@@ -382,11 +381,11 @@ class frontoffice_manager
 	 *
 	 * Функция рекрсивная, а значит находит содержимое действий "редактора контента" не только
 	 * первого уровня, а всех, которые есть, как гы глубоко они не были "зарыты"
-	 * @param html $html_template
+	 * @param string $html_template
      * @param array $metki_exist Массив с метками, которые не нужно обрабатывать, так как они уже есть
-	 * @return html
+	 * @return string
 	 */
-	function generate_html_template($html_template, $metki_exist = array())
+	private function generate_html_template($html_template, $metki_exist = array())
 	{
 	    global $kernel;
 
@@ -432,15 +431,13 @@ class frontoffice_manager
         )
 
     * </code>
-    * @param Array $in Массив данных для вызова метода
-    * @return HTML
-
+    * @param array $in Массив данных для вызова метода
+    * @param boolean $direct_run
+    * @return string
     */
-    function run_metod_modul($in, $direct_run = false)
+    private function run_metod_modul($in, $direct_run = false)
     {
-
     	global $kernel;
-
     	//Прежде всего узнаем родительский модуль
     	$modul = new manager_modules();
     	$id_modul = $modul->return_info_modules($in['id_mod']);
@@ -496,9 +493,9 @@ class frontoffice_manager
      *
      * @param string $name_link Имя метода ядра, отвечающего за фомирование контенета
      * @param array $in
-     * @return HTML
+     * @return string
      */
-    function run_metod_kernel($name_link, $in)
+    private function run_metod_kernel($name_link, $in)
     {
     	global $kernel;
     	$name_metod = $in['run']['name'];
@@ -537,4 +534,3 @@ class frontoffice_manager
         return true;
     }
 }
-?>

@@ -738,3 +738,5 @@ div.buttons {
   input[type=text] {padding:6px 6px !important; height:13px !important;}
   input[type=password] {padding:6px 6px !important; height:13px !important;}
 }
+
+div.content label.struct_page_label{width: 200px;overflow: hidden;}

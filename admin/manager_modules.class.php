@@ -342,7 +342,7 @@ class manager_modules
 			$url = $kernel->pub_redirect_for_form('action_save&id_action='.$id_action);
 		}
 
-        return $kernel->pub_json_encode(array("success"=>true,"info"=>"Данные успешно сохраненны.", "newurl"=>$url));//@todo use lang vars
+        return $kernel->pub_json_encode(array("success"=>true,"info"=>"[#kernel_ajax_data_saved_ok#]", "newurl"=>$url));
     }
 
 
@@ -1089,7 +1089,7 @@ class manager_modules
             $modules_rows.=$line;
         }
         $html = str_replace("%modules_rows%", $modules_rows, $html);
-        //$html = str_replace("%store%", $kernel->pub_array_convert_form($out), $html); //@todo normal select here
+        //$html = str_replace("%store%", $kernel->pub_array_convert_form($out), $html); //
         $html = str_replace("%url_action%", $kernel->pub_redirect_for_form('modules_base_install'), $html);
 		return $html;
 
@@ -1171,7 +1171,7 @@ class manager_modules
         	      SET serialize = "'.mysql_real_escape_string(serialize($array_form)).'"
                   WHERE (id = "'.$moduleid.'")';
 		$kernel->runSQL($query);
-        return $kernel->pub_json_encode(array("success"=>true,"info"=>"Данные успешно сохраненны."));//@todo use lang vars
+        return $kernel->pub_json_encode(array("success"=>true,"info"=>"[#kernel_ajax_data_saved_ok#]"));
     }
 
 
@@ -1591,8 +1591,8 @@ class manager_modules
 			$pars->set_page($kernel->pub_page_current_get(), $page_is_main);
 
 			$array_prop = array();
-			foreach ($serialize as $val)
-			    $array_prop[] = $pars->create_html($val);
+			foreach ($serialize as $sval)
+			    $array_prop[] = $pars->create_html($sval);
 			$arr[$curent_metod['full_name']] = $array_prop;
     	}
     	return $arr;
@@ -1604,7 +1604,6 @@ class manager_modules
     */
     function return_all_properties_page_all_modules()
     {
-    	global $kernel;
     	$all_module = $this->return_modules();
     	$arr = array();
     	foreach ($all_module as $key => $val)
@@ -1617,8 +1616,8 @@ class manager_modules
 					$serialize = unserialize($curent_metod['properties_page']);
 
 				if (!empty($serialize))
-    				foreach ($serialize as $val)
-    					$arr[] = $curent_metod['id'].'_'.$val['name'];
+    				foreach ($serialize as $sval)
+    					$arr[] = $curent_metod['id'].'_'.$sval['name'];
     		}
     	}
     	return $arr;

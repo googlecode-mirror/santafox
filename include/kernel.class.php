@@ -240,6 +240,9 @@ class kernel
                       "ua" => "[#admin_lang_caption_for_ua#]"
                       );
 
+
+    /** @var список имеющихся постпроцессоров */
+    private $postprocessors=null;
     /**
      * Конструктор
      *
@@ -1019,10 +1022,8 @@ class kernel
      */
     function priv_page_textlabels_get($html)
     {
-        $out = array();
         preg_match_all("/\\[\\#([a-zA-ZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0-9_-]{1,100})\\#\\]/u",$html,$out);
         return $out;
-
     }
 
 
@@ -1063,7 +1064,7 @@ class kernel
         	// Находим текущую главную страницу
         	$mapsite = $this->pub_mapsite_get();
         	$main_page = $id;
-        	while (!empty($mapsite[$main_page]['parent_id'])) //@todo check isset
+        	while (!empty($mapsite[$main_page]['parent_id']))
         	{
         	    $main_page = $mapsite[$main_page]['parent_id'];
         	}
@@ -1830,7 +1831,7 @@ class kernel
      * Возвращает массив ссылок, с соответсвующими методами
      *
      * Значение каждой метки вытаскиваются через наследование(рекурсию),
-     * так как они могут быть относледованы от разных страниц. Просмотр
+     * так как они могут быть отнаследованы от разных страниц. Просмотр
      * идёт до страницы без родителя, но наследуется первое	указанное
      * значение
      * @param array $array_link
@@ -1843,48 +1844,44 @@ class kernel
     {
         //Будем просматривать страницы вверх от текущей до тех пор, пока весь массив
         //ссылок не будет заполнены значениями методов
-
-        if (!empty($id_page))
+        if (empty($id_page))
+            return $array_link;
+        $row = $this->db_get_record_simple("_structure","id='".$id_page."'", "id, parent_id, serialize");
+        if (!empty($row['serialize']))
         {
-            $row = $this->db_get_record_simple("_structure","id='".$id_page."'", "id, parent_id, serialize");
-            if (!empty($row['serialize']))
+            $serialize = unserialize(stripslashes($row['serialize']));
+            foreach ($serialize as $key => $val)
             {
-                $serialize = unserialize(stripslashes($row['serialize']));
-                foreach ($serialize as $key => $val)
+                if (!isset($val['postprocessors']) || !is_array($val['postprocessors']))
+                    $val['postprocessors']=array();
+                if ($serialize_all_data)
                 {
-                    if ($serialize_all_data)
+                    if (isset($array_link[$key]))
                     {
-                        if (isset($array_link[$key]))
-                        {
-                            if (!is_array($array_link[$key]))
-                            {
-                                $array_link[$key] = $val;
-                                $array_link[$key]['page'] = $id_page;
-                            }
-                        }
-                        else
+                        if (!is_array($array_link[$key]))
                         {
                             $array_link[$key] = $val;
                             $array_link[$key]['page'] = $id_page;
-                            $array_link[$key]['isadditional'] = true;
                         }
                     }
-                    else if ( (isset($array_link[$key])) && (!is_array($array_link[$key])))
+                    else
                     {
                         $array_link[$key] = $val;
-                        // Надо знать от какой страницы мы наследуем
                         $array_link[$key]['page'] = $id_page;
+                        $array_link[$key]['isadditional'] = true;
                     }
-
-
                 }
-
+                elseif (isset($array_link[$key]) && !is_array($array_link[$key]))
+                {
+                    $array_link[$key] = $val;
+                    // Надо знать от какой страницы мы наследуем
+                    $array_link[$key]['page'] = $id_page;
+                }
             }
-            if (!empty($row['parent_id']))
-                $array_link = $this->priv_page_real_link_get($array_link, $row['parent_id'] ,$serialize_all_data);
 
         }
-
+        if (!empty($row['parent_id']))
+            $array_link = $this->priv_page_real_link_get($array_link, $row['parent_id'] ,$serialize_all_data);
         return $array_link;
     }
 
@@ -1961,37 +1958,36 @@ class kernel
         else
             $search_prop = $id_prop;
 
-        if (!empty($id_page))
+        if (empty($id_page))
+            return $out;
+        $this->pub_mapsite_cashe_create();
+
+        //Данные будем брать из кэша, для ядра он сформирован линейным способом
+        if (!empty($this->mapsite_cache[$id_page]['properties']))
         {
-            $this->pub_mapsite_cashe_create();
-
-            //Данные будем брать из кэша, для ядра он сформирован линейным способом
-            if (!empty($this->mapsite_cache[$id_page]['properties']))
+            //Проверим, если запрашиваются свойства хранящиеся в колонке
+            if (mb_strtolower($search_prop) == "caption")
             {
-                //Проверим, если запрашиваются свойства хранящиеся в колонке
-                if (mb_strtolower($search_prop) == "caption")
-                {
-                    $out['isset'] = true;
-                    $out['value'] = $this->mapsite_cache[$id_page]['caption'];
-                    $out['naslednoe'] = false;
-                }
-
-                $serialize = $this->mapsite_cache[$id_page]['properties'];
-                if (isset($serialize[$search_prop]))
-                {
-                    $out['isset'] = true;
-                    $out['value'] = $serialize[$search_prop];
-                    $out['naslednoe'] = false;
-                }
-            }
-            if (($nasledovat) && (!empty($this->mapsite_cache[$id_page]['parent_id'])) && (!$out['isset']))
-            {
-                //Значит нужно узнать это свойство у родителя
-                $out = $this->pub_page_property_get($this->mapsite_cache[$id_page]['parent_id'], $id_prop, $nasledovat);
-                $out['naslednoe'] = true;
+                $out['isset'] = true;
+                $out['value'] = $this->mapsite_cache[$id_page]['caption'];
+                $out['naslednoe'] = false;
             }
 
+            $serialize = $this->mapsite_cache[$id_page]['properties'];
+            if (isset($serialize[$search_prop]))
+            {
+                $out['isset'] = true;
+                $out['value'] = $serialize[$search_prop];
+                $out['naslednoe'] = false;
+            }
         }
+        if (($nasledovat) && (!empty($this->mapsite_cache[$id_page]['parent_id'])) && (!$out['isset']))
+        {
+            //Значит нужно узнать это свойство у родителя
+            $out = $this->pub_page_property_get($this->mapsite_cache[$id_page]['parent_id'], $id_prop, $nasledovat);
+            $out['naslednoe'] = true;
+        }
+
         return $out;
     }
 
@@ -2269,6 +2265,47 @@ class kernel
         die;
     }
 
+    public function get_postprocessors_dir()
+    {
+        return dirname(__FILE__)."/postprocessors/";
+    }
+
+    /**
+     * Возвращает список имеющихся постпроцессоров
+     * @return array
+     */
+    public function get_postprocessors()
+    {
+        if (!is_null($this->postprocessors))
+            return $this->postprocessors;
+        require_once dirname(__FILE__)."/postprocessor.php";
+        $ret = array();
+        $ppdir=$this->get_postprocessors_dir();
+
+        if (!is_dir($ppdir))
+            return $ret;
+        $dh = opendir($ppdir);
+        $curr_lang=$this->priv_langauge_current_get();
+        while ($file = readdir($dh))
+        {
+            if (!is_file($ppdir.$file) || !preg_match('~\.php$~i',$file))
+                continue;
+            include_once($ppdir.$file);
+            $class_name=preg_replace('~\.php$~i','',$file);
+            if (!class_exists($class_name))
+                continue;
+            /** @var $pclass postprocessor */
+            $pclass = new $class_name;
+            //if (is_subclass_of())
+            if (!$pclass instanceof postprocessor)
+                continue;
+            $ret[$pclass->get_name($curr_lang)]= $pclass->get_description($curr_lang);
+
+        }
+        closedir($dh);
+        $this->postprocessors=$ret;
+        return $ret;
+    }
 
     /**
      * Переход на заданный URL, с указанием нижнего меню (перегрузка всей страницы)

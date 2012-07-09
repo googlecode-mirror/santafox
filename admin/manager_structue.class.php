@@ -60,14 +60,6 @@ class manager_structue
         $html = '';
         switch ($action)
         {
-        	//Вызывается для получения данных о структуре
-            /* //@todo cleanup?
-    		case 'get_tree':
-    			$node_id = (isset($_REQUEST['node'])?($_REQUEST['node']):('index'));
-                $html = $kernel->pub_json_encode($this->get_nodes($node_id));
-    			break;
-            */
-
     		//Перемещаем ноду по структуре
     	    case 'move':
     	        $html = $this->node_move($kernel->pub_httppost_get('node'), $kernel->pub_httppost_get('newParent'), $kernel->pub_httppost_get('index'));
@@ -77,19 +69,16 @@ class manager_structue
     	        $node = $kernel->pub_httppost_get('node');
     	        if ($node)
     	            $kernel->priv_page_current_set($this->node_add($node));
-
     	        break;
 
             case 'page_remove':
                 $node = $kernel->pub_httppost_get('node');
     	        if (!empty($node) && $node!="index")
     	            $this->node_remove($node);
-
     	        //Проставим в качестве текущей страницы, родителя
             	$id_parent = $kernel->pub_httppost_get('nodeparent');
             	if (!empty($id_parent))
                     $kernel->priv_page_current_set($id_parent);
-
     	        break;
 
             case 'view':
@@ -101,7 +90,6 @@ class manager_structue
                         return '';
                     $kernel->priv_page_current_set($id_page);
                 }
-
                 $manager    = new properties_page($kernel->pub_page_current_get());
                 //а теперь провреим, если мы передаём ещё ряд особых параметров
                 //значит нам нужно выдать только параметры ввиде массива
@@ -121,11 +109,6 @@ class manager_structue
                     $html       = $manager->show();
                 }
                 break;
-        	//default:
-            //    $manager    = new properties_page($kernel->pub_page_current_get());
-            //    $html       = $manager->show();
-
-        	//	break;
         }
         return $html;
     }
@@ -239,31 +222,26 @@ class manager_structue
         	//Теперь сохраним свойства модулей к странице
         	if (!empty($properties['properties']))
         	{
-                if (empty($properties['properties_cb']) || !is_array($properties['properties_cb']))
-        	    {
+                if (!isset($properties['properties_cb']) || !is_array($properties['properties_cb']))
         	    	$properties['properties_cb'] = array();
-        	    }
                 $manager->save_properties_addon($properties['properties'], $properties['properties_cb']);
             	$saved = true;
         	}
 
         	if (!empty($properties['page_modules']))
         	{
-        	    if (empty($properties['page_inheritance']) || !is_array($properties['page_inheritance']))
+        	    if (!isset($properties['page_inheritance']) || !is_array($properties['page_inheritance']))
         	    	$properties['page_inheritance'] = array();
-
-        	    //Перед тем как это делать, надо чуть обрабаотать массив, так как он содержит
-        	    //лишнию информация для того что бы работал ява скрипт
-        		$manager->save_link($properties['page_modules'], $properties['page_inheritance']);
+                if (!isset($properties['page_postprocessors']))
+                    $properties['page_postprocessors']=array();
+        		$manager->save_serialized($properties['page_modules'], $properties['page_inheritance'],$properties['page_postprocessors']);
             	$saved = true;
         	}
         }
-        //@todo use lang vars
     	if ($saved)
-            $res = $kernel->pub_json_encode(array("success"=>true,"info"=>"Данные успешно сохраненны.","oldid"=>$old_id_page));
+            $res = $kernel->pub_json_encode(array("success"=>true,"info"=>"[#kernel_ajax_data_saved_ok#]","oldid"=>$old_id_page));
         else
-    	    $res = $kernel->pub_json_encode(array("success"=>false,"info"=>"Ошибка при сохранении, попробуйте снова."));
-
+    	    $res = $kernel->pub_json_encode(array("success"=>false,"info"=>"[#kernel_ajax_data_save_failed#]"));
     	return $res;
     }
 
@@ -312,7 +290,7 @@ class manager_structue
 	    else
 		    $neworder = 1;
         $node_new_id = $node_parent_id.'_p_'.$neworder;
-        $node_new_text = "New page";//@todo use lang[]
+        $node_new_text = $kernel->pub_page_textlabel_replace('[#admin_new_struct_page_name#]');
         $query = "INSERT INTO `".$kernel->pub_prefix_get()."_structure` "
                  . " (`id` ,`parent_id` ,`caption` ,`order_number` ,`properties` ,`serialize`) "
                  . " VALUES ('".$node_new_id."', '".$node_parent_id."', '".$node_new_text."', '".$neworder."', NULL , NULL)";

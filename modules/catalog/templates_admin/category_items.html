@@ -46,6 +46,24 @@
 <!-- @not_select_cat -->
 [#catalog_list_category_not_select_cat#]
 
+<!-- @list_prop_value -->
+<td>%list_prop_value%</td>
+
+<!-- @list_prop_value_edit -->
+<td><input type="text" name="iv[%item_id%][%name_db%]" value="%list_prop_value%" style="width:88%; float:none; margin:0 auto;"></td>
+
+<!-- @list_prop_value_select_edit -->
+<td>
+ <select name="iv[%item_id%][%name_db%]">
+     %options%
+ </select>
+</td>
+<!-- @list_prop_value_select_option_edit -->
+<option value="%option_value_escaped%">%option_value%</option>
+<!-- @list_prop_value_select_option_selected_edit -->
+<option value="%option_value_escaped%" selected>%option_value%</option>
+
+
 <!-- @cat_items -->
 <script type="text/javascript">
  function selectChange()
@@ -58,7 +76,7 @@
 </script>
 
 <h3 style="margin-top:10px;">[#catalog_list_category_item_list_label#]</h3>
-<form action="%form_action%" method="POST" enctype="multipart/form-data" id="savecategoryitemsform" name="scif">
+<form action="%form_action%" method="POST" id="savecategoryitemsform" name="scif">
 <input type="hidden" name="catid" value="%cid%"/>
 <table class="admin_table">
       <tr>

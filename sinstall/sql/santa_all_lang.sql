@@ -2233,3 +2233,20 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_glob_prop_modified_version_n
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_glob_prop_modified_version_no_update',NULL,'установлена модифицированная версия, обновления отлючены');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_glob_prop_modified_version_no_update',NULL,'установлена модифицированная версия, обновления отлючены');
 
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','page_prop_only_auth',NULL,'Доступна только авторизированым');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','page_prop_only_auth',NULL,'Доступна только авторизированым');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','page_prop_only_auth',NULL,'Доступна только авторизированым');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','kernel_ajax_data_saved_ok',NULL,'Данные успешно сохраненны.');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','kernel_ajax_data_saved_ok',NULL,'Данные успешно сохраненны.');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','kernel_ajax_data_saved_ok',NULL,'Данные успешно сохраненны.');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','kernel_ajax_data_save_failed',NULL,'Ошибка при сохранении, попробуйте снова.');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','kernel_ajax_data_save_failed',NULL,'Ошибка при сохранении, попробуйте снова.');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','kernel_ajax_data_save_failed',NULL,'Ошибка при сохранении, попробуйте снова.');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_new_struct_page_name',NULL,'Новая страница');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_new_struct_page_name',NULL,'Новая страница');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_new_struct_page_name',NULL,'Новая страница');
+
+

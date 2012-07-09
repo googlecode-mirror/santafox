@@ -348,3 +348,7 @@ $il['admin_label_for_show_result'] = 'Результат:';
 $il['admin_module_label'] = 'Модуль';
 
 $il['admin_glob_prop_modified_version_no_update'] = 'установлена модифицированная версия, обновления отлючены';
+$il['page_prop_only_auth'] = 'Доступна только авторизированым';
+$il['kernel_ajax_data_saved_ok'] = 'Данные успешно сохраненны.';
+$il['kernel_ajax_data_save_failed'] = 'Ошибка при сохранении, попробуйте снова.';
+$il['admin_new_struct_page_name'] = 'Новая страница';

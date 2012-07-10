@@ -692,7 +692,7 @@ function buildMetkaPostprocessorsSelect(selector)
     for(var key in postProcessors)
     {
         //option = $(document.createElement("option")).text(postProcessors[key]).val(key);
-        option = $(document.createElement("option")).text(key).val(key);
+        option = $(document.createElement("option")).text(postProcessors[key]).val(key);
         $(selector).append(option);
     }
 }

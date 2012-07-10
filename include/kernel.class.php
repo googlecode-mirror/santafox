@@ -2296,11 +2296,9 @@ class kernel
                 continue;
             /** @var $pclass postprocessor */
             $pclass = new $class_name;
-            //if (is_subclass_of())
             if (!$pclass instanceof postprocessor)
                 continue;
-            $ret[$pclass->get_name($curr_lang)]= $pclass->get_description($curr_lang);
-
+            $ret[$class_name]= $pclass->get_name($curr_lang);
         }
         closedir($dh);
         $this->postprocessors=$ret;

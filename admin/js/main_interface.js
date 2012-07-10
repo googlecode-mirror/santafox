@@ -647,7 +647,8 @@ function set_metki(d)
         });
         $('#sel_label_postprocessor_' + i).selectmenu({
             style:'dropdown',
-            maxHeight:200
+            maxHeight:200,
+            width:150
         });
 
 

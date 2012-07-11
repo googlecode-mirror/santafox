@@ -370,7 +370,7 @@ class searchdb
     function get_all_indexed_docs()
     {
 	    global $kernel;
-	    $result = $kernel->runSQL("SELECT doc FROM ".$this->docs_table_name);
+	    $result = $kernel->runSQL("SELECT id,doc FROM ".$this->docs_table_name);
 	    $ret = array();
 	    while ($row = mysql_fetch_assoc($result))
 	    {

@@ -1,9 +1,6 @@
 <?php
-
-
-
 /**
- * Класс для получение основы из любой словоформы. Русский язык.
+ * Класс для получения основы из любой словоформы. Русский язык.
  *
  * $stem = new Lingua_Stem_Ru();
  * print $stem->stem_word("говорить");
@@ -99,10 +96,3 @@ class Lingua_Stem_Ru
         $this->Stem_Cache = array();
     }
 }
-
-/*
-$steam = new Lingua_Stem_Ru();
-print $steam->stem_word("лада");
-*/
-
-?>

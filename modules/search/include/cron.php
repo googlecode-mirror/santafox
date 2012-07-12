@@ -9,7 +9,7 @@ $santapath = realpath(dirname(__FILE__)."/../../../")."/";
 $moduleid = "search1";
 
 // URL страницы сайта, с которой начинается индексация, например http://www.webkes.info/
-$start_url = "http://урл_вашего_сайта/";
+$start_url = "http://ваш_сайт_здесь/";
 
 print "santa path: ".$santapath."\n";
 print "start url:".$start_url."\n";
@@ -43,7 +43,6 @@ require_once($santapath."modules/search/include/pdfparser/pdfparser.class.php");
 require_once($santapath."modules/search/include/pdfparser/spacepdfobject.class.php");
 require_once($santapath."modules/search/include/pdfparser/ugolpdfobject.class.php");
 
-$indexator = new Indexator(PREFIX."_".$moduleid);
+$indexator = new Indexator();
+$indexator->clear_index_data();
 $indexator->index_site($start_url);
-
-?>

@@ -1,6 +1,4 @@
 <?PHP
-
-
 /**
  * Индексатор для поискового движка.
  *
@@ -27,7 +25,7 @@ class Indexator
     var $parsed_url_keys = array();
     var $parsed_url_ids = array();
 
-    var $db;
+    /** @var HtmlParser */
     var $documentparser;
 
     var $current_url;
@@ -45,42 +43,42 @@ class Indexator
     /**
      * Конструктор.
      *
-     * @param String $prefix - префикс для таблиц поискового движка
      * @return Indexator
      */
-    function Indexator($prefix)
+    function __construct()
     {
         //setlocale (LC_ALL, array ('ru_RU.CP1251', 'rus_RUS.1251'));
-        /* @var $db SearchDb */
         mb_regex_encoding("UTF-8");
-        $this->prefix = $prefix;
-        $this->db = new searchdb($prefix);
         $this->lingua_stem_ru = new Lingua_Stem_Ru();
-        $this->stop_words = Indexator::get_stop_words();
+        $this->stop_words = self::get_stop_words();
     }
 
 
 
+
     /********************** public **************************/
+
+    public function clear_index_data()
+    {
+        $this->delete_state();
+        searchdb::clear_index();
+    }
 
     /**
      * Индексировать/переиндексировать сайт,
      * например $indexator->index_site('http://artprom.ap');
      *
      * @param String $site_root
+     * @param mixed $cookie_header
+     * @return string
      */
     function index_site($site_root, $cookie_header = false)
     {
         global $kernel;
         error_reporting(E_ALL);
-
-        //
-        /* @var $db SearchDb */
         set_time_limit(0);
-        //$start_time = time();
-
         $state = $this->load_state();
-        if ($state == false)
+        if (!$state)
             $this->urls[] = $site_root;
         else
         {
@@ -91,32 +89,14 @@ class Indexator
 
         $html = '';
         $i = 1;
-        //$kernel->pub_console_show('te"s"t');
-        //die;
-        while ((2+2 == 4))
+        while ($url=$this->get_next_url())
         {
             $i++;
-            $url = $this->get_next_url();
-
-            if ($url === false)
-                break;
-
             //Выедем, что индексируем
-
             $kernel->pub_console_show("Индексирую урл ".$url);
             flush();
-            //$time_s = time();
-
             //Собственно индексация
             $this->index_url($url, $cookie_header);
-
-            //Выведем сколько мы потратили на индексацию
-            //$time_e = time();
-            //$kernel->pub_console_show("Затрачено: ".($time_e - $time_s)." сек.");
-            //flush();
-
-            //
-            ///if (time() > $start_time + 5)
             if ($i > 1)
             {
                 $this->save_state();
@@ -124,26 +104,40 @@ class Indexator
                     $kernel->pub_redirect_refresh('start_index');
             }
         }
-        $kernel->pub_console_show("Убираем игнорируемые...");
-        $this->db->remove_ignored_from_index();
 
         $kernel->pub_console_show("Индексация завершена");
-        $this->delete_index_for_old_urls();
-        $this->delete_doubles();
-        $this->db->optimize_tables();
+        searchdb::delete_doubles();
+        searchdb::optimize_tables();
         $this->delete_state();
-        $kernel->pub_redirect_refresh('index');
+        if (isset($_SERVER['HTTP_HOST']))//только если через веб
+            $kernel->pub_redirect_refresh('index');
         return $html;
     }
 
+    private static $ignores_strings=array();
 
-    function stop_and_refresh()
+
+
+    function is_url_ignored($url)
     {
-
-        //print '<meta http-equiv="refresh" content="0">';
-        //die;
-
+        global $kernel;
+        if (!isset(self::$ignores_strings[$kernel->pub_module_id_get()]))
+        {
+            self::$ignores_strings[$kernel->pub_module_id_get()]=array();
+            foreach(searchdb::get_ignored_strings() as $isr)
+            {
+               self::$ignores_strings[$kernel->pub_module_id_get()][]=$isr['word'];
+            }
+        }
+        foreach(self::$ignores_strings[$kernel->pub_module_id_get()] as $istring)
+        {
+            if (strpos($url,$istring)!==false)
+                return true;
+        }
+        return false;
     }
+
+
 
     function save_state()
     {
@@ -153,51 +147,26 @@ class Indexator
         $state['urls'] = $this->urls;
         $state['parsed_url_ids'] = $this->parsed_url_ids;
         $state['parsed_url_keys'] = $this->parsed_url_keys;
-
         $kernel->pub_file_save($this->file_tmp, serialize($state));
-        //$kernel->pub_module_serial_set($state);
     }
 
     function load_state()
     {
-        global $kernel;
-
-
         $filename = '../..'.$this->file_tmp;
-        //$kernel->debug($filename,true);
-        //$kernel->debug("--",true);
-        //$kernel->debug(file_exists($filename),true);
-        //$kernel->debug("--",true);
-
         if (!file_exists($filename))
             return false;
-
         $file = file_get_contents($filename);
         if ($file == false)
             return false;
 
-        //$kernel->debug($file,true);
-        //die();
-
         $arr = @unserialize($file);
         return $arr;
-        /*
-        $state = $kernel->pub_module_serial_get();
-        //$kernel->debug($state, true);
-        //die;
-        if ((isset($state['urls'])) && (isset($state['parsed_url_ids'])) && (isset($state['parsed_url_keys'])))
-           return $state;
-        else
-           return false;
-        */
     }
 
-    function delete_state()
+    private function delete_state()
     {
         global $kernel;
         $kernel->pub_file_delete($this->file_tmp);
-
-        $kernel->pub_module_serial_set(array());
     }
 
 
@@ -205,7 +174,9 @@ class Indexator
      * Индексировать один конкретный урл,
      * например $indexator->index_url('http://artprom.ap/sitemap.html');
      *
-     * @param String $url
+     * @param string $url
+     * @param mixed $cookie_header
+     * @return void
      */
     function index_url($url, $cookie_header = false)
     {
@@ -217,16 +188,18 @@ class Indexator
             $curl_downloader->add_header($cookie_header);
             $result = $curl_downloader->get($url);
             $contents = $result->responsecontent->content;
-
         }
         else
             $contents = @file_get_contents($url);
-
+        if ($contents === false)
+        {
+            $kernel->pub_console_show(" get failed");
+            return;
+        }
         $contents = preg_replace("/<!--.{0,1024}?-->/", "", $contents);
 
 
-        if ($contents === false)
-            return false;
+
 
         $this->hash = md5($contents);
 
@@ -234,25 +207,15 @@ class Indexator
         $this->current_url_id = $this->get_url_id($this->current_url);
         $this->parsed_url_ids[] = $this->current_url_id;
 
-
-        //$kernel->debug($this->current_url, true);
-        //$kernel->debug($this->current_url_id, true);
-        //$kernel->debug($this->parsed_url_ids, true);
-        //$url_id   = $this->get_url_id($this->current_url);
-        //$this->parsed_url_ids[] = $url_id;
-
         $changed = true;
         if (!$this->new_doc)
         {
-            $contents_hash = $this->db->get_contents_hash($this->current_url_id);
+            $contents_hash = searchdb::get_contents_hash($this->current_url_id);
             if ($contents_hash == $this->hash)
                 $changed = false;
         }
 
-
-
         $this->stem_cache = array();
-
         if (preg_match("'\\.pdf$'", $url))
         {
             if (!$changed)
@@ -261,21 +224,17 @@ class Indexator
             $pdfparser->parse();
             if (!$pdfparser->encrypted)
             {
-                //print "Not encrypted!";
-                //print_r($pdfparser);
                 if (preg_match("'/([^/]+?)$'", $url, $matches))
                     $contents = "<title>$matches[1]</title>";
                 else
                     $contents = "";
-
                 $contents .= "<body>".htmlspecialchars($pdfparser->get_text())."</body>";
                 $format_id = Searcher::format2format_id("pdf");
-                //highlight_string($contents);
             }
             else
             {
-                print "(Encrypted!!)";
-                return false;
+                $kernel->pub_console_show("pdf is encrypted");
+                return;
             }
         }
         else
@@ -286,20 +245,13 @@ class Indexator
 
         //$this->current_url = $url;
         $links = $this->documentparser->get_links($this->current_url);
-        //$kernel->debug($links, true);
-        //$html .= "\n";
         foreach ($links as $link)
         {
             if (!in_array($link, $this->urls))
             {
-                if (preg_match("/\"/", $link))
-                {
+                if (strpos($link,'"')!==false)
                     continue;
-                }
                 $url_parts = parse_url($url);
-
-
-
                 $link_parts = @parse_url($link);
                 if (!$link_parts)
                 {
@@ -313,30 +265,18 @@ class Indexator
                         continue;
 
                     $this->urls[] = $link;
-                    //$html .= "<!-- $link -->\n";
                 }
             }
         }
-        //$html .= "\n";
-        //$kernel->debug($format_id, true);
+
+        if ($this->is_url_ignored($url))
+        {
+            $kernel->pub_console_show("ignored: ".$url);
+            return;
+        }
         if ($changed)
             $this->index_html($format_id);
-
-        return '';
     }
-
-    function add_url_to_parse($url)
-    {
-        $this->urls[] = $url;
-/*      $fp = fopen("tmp_search_state", "a");
-        flock($fp, LOCK_EX);
-        fwrite($fp, $url."\n");
-        flock($fp, LOCK_UN);
-        fclose($fp);
-*/  }
-
-
-
 
     static function get_stop_words()
     {
@@ -344,9 +284,6 @@ class Indexator
                             'a', 'an', 'is', 'are', 'there');
         return $stop_words;
     }
-
-
-
 
     /**
      * Очистить индекс для конкретного урла
@@ -356,41 +293,14 @@ class Indexator
     function empty_url_index($url)
     {
         $url_id   = $this->get_url_id($url);
-        $this->db->empty_url_data_from_index($url_id);
+        searchdb::empty_url_data_from_index($url_id);
     }
-
-
-    function is_installed()
-    {
-        /* @var $db SearchDb */
-        return $this->db->is_installed();
-    }
-
-    function install()
-    {
-        $this->db->install();
-    }
-
 
 
     /***************** private ****************************************************/
 
-    function delete_index_for_old_urls()
+    private function get_next_url()
     {
-        /* @var $db SearchDb */
-        $this->db->delete_index_for_old_urls($this->parsed_url_ids);
-    }
-
-    function delete_doubles()
-    {
-        /* @var $db SearchDb */
-        $this->db->delete_doubles();
-    }
-
-
-    function get_next_url()
-    {
-
         $url_keys = array_keys($this->urls);
 
         $non_parsed_keys = array_diff($url_keys, $this->parsed_url_keys);
@@ -407,14 +317,11 @@ class Indexator
 
 
 
-    function index_html($format_id)
+    private function index_html($format_id)
     {
         $url_id = $this->current_url_id;
 
-        /* @var $db searchdb */
         $words_and_tags = $this->documentparser->get_words_and_its_tags();
-        //global $kernel;
-//      $kernel->debug($words_and_tags, true);
         if (count($words_and_tags) == 0)
             return;
 
@@ -424,22 +331,22 @@ class Indexator
         $words = array_keys($weights);
         $word_ids = $this->get_word_ids($words);
 
-        $this->db->update_doc_data($url_id, serialize($snippeds), $this->hash, $format_id);
-        $this->db->empty_url_data_from_index($url_id);
+        searchdb::update_doc_data($url_id, serialize($snippeds), $this->hash, $format_id);
+        searchdb::empty_url_data_from_index($url_id);
 
-        $this->db->lock_index();
+        searchdb::lock_index();
         foreach ($words as $word)
         {
             $word_id = $word_ids[(string)$word];
             $weight = (int)round($weights[(string)$word]*1000);
-            $this->db->add_to_index($url_id, $word_id, $weight);
+            searchdb::add_to_index($url_id, $word_id, $weight);
         }
-        $this->db->unlock_tables();
+        searchdb::unlock_tables();
     }
 
 
 
-    function get_snippeds($words_and_tags)
+    private function get_snippeds($words_and_tags)
     {
 
         $text = "";
@@ -451,10 +358,7 @@ class Indexator
 
             $text .= " ".$word['text'];
         }
-
-
         $text = " ".$text." ";
-
         /* @var $htmlparser HtmlParser */
         $word_symbols = $this->documentparser->get_word_symbols();
         $non_word_symbols = "[^$word_symbols]";
@@ -480,34 +384,18 @@ class Indexator
 
         //Проверим, если тайт пустой, то вместо него внесём урл
         if (empty($title))
-        {
             $title = $this->current_url;
-
-            //global $kernel;
-            //$kernel->pub_console_show("Текст:".$snippeds['text']."; Тайтл:".$snippeds['title']);
-            //$kernel->pub_console_show("!!! - Пусто - !!!");
-        }
 
         $snippeds['text'] = $text;
         $snippeds['positions'] = $positions;
         $snippeds['title']  = $title;
 
-
         return $snippeds;
     }
 
-
-
-
-
-    function get_weights($words_and_tags)
+    private function get_weights($words_and_tags)
     {
-        $total_words = 0;
-
-        /* @var $lingua_stem_ru Lingua_Stem_ru */
-
         $weights = array();
-
         foreach ($words_and_tags as $word_and_tags)
         {
             $words = $word_and_tags['words'];
@@ -545,53 +433,31 @@ class Indexator
     }
 
 
-    function get_word_ids($words)
+    private function get_word_ids($words)
     {
-        /* @var $db searchdb */
-        //print "words";
-        //print_r($words);
-        $existing_word_ids = $this->db->get_word_ids($words);
+        $existing_word_ids = searchdb::get_word_ids($words);
         $existing_words = array_keys($existing_word_ids);
         $new_words = array_diff($words, $existing_words);
-        $new_word_ids = $this->db->add_words($new_words);
+        $new_word_ids = searchdb::add_words($new_words);
 
         $ids = $existing_word_ids;
         foreach ($new_word_ids as $word => $id)
             $ids[(string)$word] = $id;
-
         return $ids;
-
     }
 
 
-    function get_url_id($url)
+    private function get_url_id($url)
     {
-        /* @var $db searchdb */
-        $url_id = $this->db->get_url_id($url);
+        $url_id = searchdb::get_url_id($url);
         if ($url_id === false)
         {
-            $url_id = $this->db->add_url($url, $this->hash);
+            $url_id = searchdb::add_url($url, $this->hash);
             $this->new_doc = true;
         }
         else
             $this->new_doc = false;
-
         return $url_id;
     }
 
-    function count_pages()
-    {
-        return $this->db->count_pages();
-    }
-
-    function count_words()
-    {
-        return $this->db->count_words();
-    }
-
-
 }
-
-
-
-?>

@@ -66,12 +66,9 @@ class Thread
                 $this->url = $url;
         }
 
-        function get_id() {return $this->id;}
-
-        function get_http_error()
+        function get_id()
         {
-                if (preg_match("'HTTP/.*? (\d+?) '", $this->response_headers, $matches))
-                        return $matches[1];
+            return $this->id;
         }
 
         function get_redirect_url_if_exits_and_same_domain()
@@ -84,7 +81,7 @@ class Thread
                 $url_parser = new UrlParser($this->url);
                 $redirect_url = $url_parser->get_absolute_url($redirect_url);
 
-                if (preg_match("'^http://".$domain."(/|\?)'i", $redirect_url) || preg_match("'^http://".$domain."$'i", $redirect_url))
+                if (preg_match("'^http://".$domain."(/|\\?)'i", $redirect_url) || preg_match("'^http://".$domain."$'i", $redirect_url))
                         return $redirect_url;
                 else
                         return false;
@@ -201,14 +198,14 @@ class Thread
 
         function save_response_body()
         {
-                if (empty($this->response_body))
-                        return false;
+            if (empty($this->response_body))
+                    return;
 
-                $filename = ( isset($this->domain) ? $this->domain : "no_domain" ) .'.txt';
+            $filename = ( isset($this->domain) ? $this->domain : "no_domain" ) .'.txt';
 
-                $fp = fopen($filename, "w");
-                fwrite($fp, $this->response_body);
-                fclose($fp);
+            $fp = fopen($filename, "w");
+            fwrite($fp, $this->response_body);
+            fclose($fp);
         }
 
 

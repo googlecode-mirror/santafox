@@ -46,7 +46,7 @@ class CurlDownloader extends Downloader
 		$response = curl_exec($ch);
 		$errno = curl_errno($ch);
 		$error = curl_error($ch);
-		$info = curl_getinfo($ch);
+		curl_getinfo($ch);
 		curl_close($ch);
 
 		$result->set_errno($errno);
@@ -77,22 +77,14 @@ class CurlDownloader extends Downloader
 		$response = curl_exec($ch);
 		$errno = curl_errno($ch);
 		$error = curl_error($ch);
-		$info = curl_getinfo($ch);
+		curl_getinfo($ch);
 		curl_close($ch);
-/*
-		print_r($response);
-		print_r($info);
-		print "$errno, $error";*/
 
 		$result->set_errno($errno);
 		$result->set_error($error);
-
 		if ($errno == 0)
 			$result->set_response($response);
-
 		return $result;
 	}
 
 }
-
-?>

@@ -51,5 +51,3 @@ class SocketDownloader extends Downloader
 		return $result;
 	}
 }
-
-?>

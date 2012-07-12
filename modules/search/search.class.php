@@ -22,8 +22,6 @@ class search
 
 
 		require_once("include/searchdb.class.php");
-		if (!class_exists('ApTemplate'))
-			require_once("include/aptemplate.class.php");
 
 		require_once("include/lingua_stem_ru.class.php");
 
@@ -34,18 +32,14 @@ class search
 		require_once("include/pdfparser/pdfparser.class.php");
 		require_once("include/pdfparser/spacepdfobject.class.php");
 		require_once("include/pdfparser/ugolpdfobject.class.php");
-		include_once("cook/includes/downloader.class.php");
-        include_once("cook/includes/curldownloader.class.php");
-        include_once("cook/includes/downloaderresult.class.php");
-        include_once("cook/includes/responsecontent.class.php");
-        include_once("cook/includes/responseheaders.class.php");
+        require_once("cook/includes/downloader.class.php");
+        require_once("cook/includes/curldownloader.class.php");
+        require_once("cook/includes/downloaderresult.class.php");
+        require_once("cook/includes/responsecontent.class.php");
+        require_once("cook/includes/responseheaders.class.php");
 
-        global $kernel;
-
-		$module_id = $kernel->pub_module_id_get();
 		set_time_limit(1200);
-		$this->search_prefix = $kernel->pub_prefix_get()."_".$module_id;
-		$this->indexator 	= new Indexator($this->search_prefix);
+		$this->indexator 	= new Indexator();
     }
 
 
@@ -93,9 +87,10 @@ class search
 		$page = intval($page);
 
 		$parameters = $this->get_search_parameters();
+
 		/*************** Собственно поиск ******************/
 		/* @var $searcher Searcher */
-		$searcher = new Searcher($this->search_prefix);
+		$searcher = new Searcher();
 
 		$searcher->set_results_per_page	($parameters['results_per_page']);
 		$searcher->set_doc_format		($parameters['doc_format']);
@@ -282,7 +277,7 @@ class search
             if (intval(ini_get('memory_limit')) == $php_mem)
                 $php_mem_change = true;
         }
-
+        $html='';
         $action = $kernel->pub_section_leftmenu_get();
 	    switch ($action)
 	    {
@@ -309,8 +304,8 @@ class search
                         'User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.4) Gecko/20070515 Firefox/2.0.0.4'
                     );
                     $curl_downloader->set_headers($headers);
-                    $result = $curl_downloader->post("http://www.santafox.ru/", 'login='.$user_name.'&pass='.$user_pass);
                     /* @var $result downloaderresult */
+                    $result = $curl_downloader->post("http://www.santafox.ru/", 'login='.$user_name.'&pass='.$user_pass);
                     $cookies = $result->responseheaders->get_simple_cookies();
                     reset($cookies);
                     list($k, $v) = each($cookies);
@@ -327,7 +322,7 @@ class search
 
                 $first_time = $kernel->pub_httpget_get("firsttime");
                 if (!empty($first_time))
-                    $this->indexator->delete_state(); //удалим файл, т.к. мог остаться
+                    $this->indexator->clear_index_data();
 		        $html = $this->indexator->index_site('http://'.$_SERVER['HTTP_HOST']."/".$page_search, $cookie_header);
 				chdir($dir);
 
@@ -336,8 +331,8 @@ class search
 	        case 'index':
 				$html = file_get_contents("$this->admin_template_path/search.html");
 				$html = str_replace('%form_action%', $kernel->pub_redirect_for_form('index'), $html);
-				$html = str_replace('%index_page%', $this->indexator->count_pages(), $html);
-				$html = str_replace('%index_word%', $this->indexator->count_words(), $html);
+				$html = str_replace('%index_page%', searchdb::count_pages(), $html);
+				$html = str_replace('%index_word%', searchdb::count_words(), $html);
 			    $html = str_replace('%php_mem%', ini_get('memory_limit'), $html);
 			    if (intval(ini_get('max_execution_time')) > 0)
                     $html = str_replace('%script_life%', ini_get('max_execution_time').' s', $html);
@@ -354,8 +349,7 @@ class search
 	        case 'ignored_delete':
         	    $searchdb = new searchdb($kernel->pub_prefix_get()."_".$kernel->pub_module_id_get());
         	    $searchdb->delete_ignored_string($kernel->pub_httpget_get("id"));
-        	    return $kernel->pub_redirect_refresh("ignored");
-        	    //return $kernel->pub_httppost_response("[#search_ignored_deleted_msg#]","ignored");
+        	    $kernel->pub_redirect_refresh("ignored");
 	            break;
 	        case 'ignored_add':
         	    $searchdb = new searchdb($kernel->pub_prefix_get()."_".$kernel->pub_module_id_get());
@@ -366,8 +360,7 @@ class search
 	        case 'ignored':
 	            $ptemplate = $kernel->pub_template_parse($this->admin_template_path."/ignored.html");
 	            $html = $ptemplate['table_header'];
-	            $searchdb = new searchdb($kernel->pub_prefix_get()."_".$kernel->pub_module_id_get());
-	            $istrings = $searchdb->get_ignored_strings();
+	            $istrings = searchdb::get_ignored_strings();
 	            foreach ($istrings as $istring)
 	            {
 	                $line = $ptemplate['table_line'];
@@ -378,14 +371,9 @@ class search
 	            $html .= $ptemplate['table_footer'];
 	            $html = str_replace('%form_action%', $kernel->pub_redirect_for_form('ignored_add'), $html);
 	            break;
-            default:
-                $html='';
-                break;
 
 	    }
 	    return $html;
 
 	}
 }
-
-?>

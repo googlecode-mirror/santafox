@@ -9,6 +9,3 @@ class ResponseContent
 		$this->content = $content;
 	}
 }
-
-
-?>

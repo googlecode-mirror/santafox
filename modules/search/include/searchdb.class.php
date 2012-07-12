@@ -2,105 +2,9 @@
 
 class searchdb
 {
-	public $mysql_result;
-
-	public $docs_table_name;
-	public $words_table_name;
-	public $index_table_name;
-	public $ignored_table_name;
-	//var $hash_table_name;
-
-	function searchdb($prefix)
-	{
-		$this->docs_table_name  = $prefix."_docs";
-		$this->words_table_name = $prefix."_words";
-		$this->index_table_name = $prefix."_index";
-		$this->ignored_table_name = $prefix."_ignored";
-	//	$this->hash_table_name = $prefix."_hash";
-	}
-
-	function query($query)
-	{
-		global $kernel;
-		$this->mysql_result = $kernel->runSQL($query);
-	}
 
 
-	function install()
-	{
-
-		$query =
-		"CREATE TABLE IF NOT EXISTS $this->docs_table_name
-		(
-			id INT AUTO_INCREMENT NOT NULL,
-			doc TEXT,
-			doc_hash char(32),
-			contents_hash char(32),
-			format_id tinyint,
-			snipped MEDIUMBLOB,
-
-			primary key(id),
-			unique(doc_hash)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT = 1
-
-		";
-		$this->query($query);
-
-
-		$query =
-		"CREATE TABLE IF NOT EXISTS $this->words_table_name
-		(
-			id INT AUTO_INCREMENT NOT NULL,
-			word VARCHAR(50) BINARY,
-
-			primary key(id),
-			unique(word)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT = 1
-		";
-		$this->query($query);
-
-
-		$query =
-		"CREATE TABLE IF NOT EXISTS $this->index_table_name
-		(
-			id 			INT AUTO_INCREMENT NOT NULL,
-			doc_id 		INT,
-			word_id 	INT,
-			weight		INT, # вес, умноженный на тысячу и округлённый
-
-			primary key(id),
-			key(doc_id, word_id),
-			key(word_id)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT = 1
-		";
-		$this->query($query);
-
-		$query =
-		"CREATE TABLE IF NOT EXISTS $this->ignored_table_name
-		(
-          `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
-          `word` varchar(255) NOT NULL,
-          PRIMARY KEY (`id`),
-          UNIQUE KEY `word` (`word`)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT = 1
-		";
-		$this->query($query);
-
-
-
-	}
-
-
-	function uninstall()
-	{
-		$this->query("DROP TABLE IF EXISTS $this->docs_table_name");
-		$this->query("DROP TABLE IF EXISTS  $this->words_table_name");
-		$this->query("DROP TABLE IF EXISTS  $this->index_table_name");
-		$this->query("DROP TABLE IF EXISTS  $this->ignored_table_name");
-	}
-
-
-	function array2str($arr)
+	public static function array2str($arr)
 	{
 		$str_parts = array();
 		foreach ($arr as $value)
@@ -109,130 +13,151 @@ class searchdb
 	}
 
 
-	function delete_doubles()
+	public static function delete_doubles()
 	{
+        global $kernel;
 	    $sql = "SELECT id, count(*) as cnt
-	                   FROM $this->docs_table_name
-	                   GROUP BY contents_hash
-	                   HAVING cnt > 1";
-
-	    $this->query($sql);
+               FROM `".$kernel->pub_prefix_get()."_".$kernel->pub_module_id_get()."_docs`
+               GROUP BY contents_hash
+               HAVING cnt > 1";
+	    $res=$kernel->runSQL($sql);
 	    $ids2delete = array();
-	    while ($row = mysql_fetch_assoc($this->mysql_result))
+	    while ($row = mysql_fetch_assoc($res))
 	        $ids2delete[] = $row['id'];
+        mysql_free_result($res);
 
-	    $ids_str = $this->array2str($ids2delete);
-	    if (!empty($ids_str))
-	    {
-	    	$sql = "DELETE FROM $this->docs_table_name
-	                       WHERE id IN ($ids_str)";
-	    	$this->query($sql);
-	    }
+	    if (!$ids2delete)
+            return;
+        $sql = "DELETE FROM `".$kernel->pub_prefix_get()."_".$kernel->pub_module_id_get()."_docs`
+                       WHERE id IN (".implode(",",$ids2delete).")";
+        $kernel->runSQL($sql);
 	}
 
 
-	function get_word_ids($words)
+	public static function get_word_ids($words)
 	{
+        global $kernel;
 		if (count($words) == 0)
 			return array();
-
-		$words_str = $this->array2str($words);
-		$this->query("SELECT id, word FROM $this->words_table_name WHERE word IN ($words_str)");
-
+		$words_str = self::array2str($words);
+        $res=$kernel->runSQL("SELECT id, word FROM `".$kernel->pub_prefix_get()."_".$kernel->pub_module_id_get()."_words` WHERE word IN ($words_str)");
 		$result = array();
-		while ($row = mysql_fetch_assoc($this->mysql_result))
+		while ($row = mysql_fetch_assoc($res))
 			$result[$row['word']] = $row['id'];
-
+        mysql_free_result($res);
 		return $result;
 	}
 
-	function add_words($words)
+    public static function get_words_table_name()
+    {
+        global $kernel;
+        return "_".$kernel->pub_module_id_get()."_words";
+    }
+
+    public static function get_docs_table_name()
+    {
+        global $kernel;
+        return "_".$kernel->pub_module_id_get()."_docs";
+    }
+
+    public static function get_index_table_name()
+    {
+        global $kernel;
+        return "_".$kernel->pub_module_id_get()."_index";
+    }
+
+    public static function get_ignored_table_name()
+    {
+        global $kernel;
+        return "_".$kernel->pub_module_id_get()."_ignored";
+    }
+
+    public static function clear_index()
+    {
+        global $kernel;
+        $kernel->runSQL("TRUNCATE TABLE ".$kernel->pub_prefix_get().self::get_docs_table_name());
+        $kernel->runSQL("TRUNCATE TABLE ".$kernel->pub_prefix_get().self::get_words_table_name());
+        $kernel->runSQL("TRUNCATE TABLE ".$kernel->pub_prefix_get().self::get_index_table_name());
+    }
+
+	public static function add_words($words)
 	{
+        global $kernel;
 		if (count($words) == 0)
 			return array();
-
 		$ids = array();
-		$this->query("LOCK TABLE $this->words_table_name WRITE");
+		//$kernel->runSQL("LOCK TABLE `".$kernel->pub_prefix_get().self::get_words_table_name()."` WRITE");
 		foreach ($words as $word)
 		{
-			$this->query("INSERT INTO $this->words_table_name VALUES (NULL, '$word')");
+            $kernel->runSQL("INSERT INTO `".$kernel->pub_prefix_get().self::get_words_table_name()."` VALUES (NULL, '".mysql_real_escape_string($word)."')");
 			$ids[$word] = mysql_insert_id();
 		}
-		$this->query("UNLOCK TABLES");
-
+        //$kernel->runSQL("UNLOCK TABLES");
 		return $ids;
 	}
 
 
-	function get_url_id($url)
+	public static function get_url_id($url)
 	{
+        global $kernel;
 		$doc_hash = md5($url);
-		$this->query("SELECT id FROM $this->docs_table_name WHERE doc_hash = '$doc_hash'");
-		if (mysql_num_rows($this->mysql_result) == 0)
-			return false;
-		else
-			return mysql_result($this->mysql_result, 0);
+        $rec= $kernel->db_get_record_simple(self::get_docs_table_name(),"doc_hash='".$doc_hash."'","id");
+        if (!$rec)
+            return false;
+        return $rec['id'];
 	}
 
 
-	function add_url($url, $contents_hash)
+	public static function add_url($url, $contents_hash)
 	{
+        global $kernel;
 		$doc_hash = md5($url);
 		$url = mysql_real_escape_string($url);
-		$this->query("INSERT INTO $this->docs_table_name VALUES (NULL, '$url', '$doc_hash', '$contents_hash', -2, '')");
+        $kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get().self::get_docs_table_name()." VALUES (NULL, '$url', '$doc_hash', '$contents_hash', -2, '')");
 		return mysql_insert_id();
 	}
 
 
-	function get_contents_hash($url_id)
+	public static function get_contents_hash($url_id)
 	{
-		$this->query("SELECT contents_hash FROM $this->docs_table_name WHERE id = $url_id LIMIT 1");
-		if (mysql_num_rows($this->mysql_result) == 0)
+        global $kernel;
+        $rec=$kernel->db_get_record_simple(self::get_docs_table_name(),"id=".$url_id,"contents_hash");
+		if (!$rec)
 			return false;
-		else
-			return mysql_result($this->mysql_result, 0);
-
+        return $rec['contents_hash'];
 	}
 
 
-	function empty_url_data_from_index($url_id)
+    public static function empty_url_data_from_index($url_id)
 	{
-		$this->query("DELETE FROM $this->index_table_name WHERE doc_id = $url_id");
+        global $kernel;
+        $kernel->runSQL("DELETE FROM ".$kernel->pub_prefix_get().self::get_index_table_name()." WHERE doc_id = $url_id");
 	}
 
-	function lock_index()
+    public static function lock_index()
 	{
-		$this->query("LOCK TABLES $this->index_table_name WRITE");
+        global $kernel;
+        $kernel->runSQL("LOCK TABLES ".$kernel->pub_prefix_get().self::get_index_table_name()." WRITE");
 	}
 
-	function unlock_tables()
+	public static function unlock_tables()
 	{
-		$this->query("UNLOCK TABLES");
+        global $kernel;
+		$kernel->runSQL("UNLOCK TABLES");
 	}
 
-	function add_to_index($doc_id, $word_id, $weight)
+    public static function add_to_index($doc_id, $word_id, $weight)
 	{
-		$this->query("INSERT INTO $this->index_table_name VALUES (NULL, $doc_id, $word_id, $weight)");
+        global $kernel;
+        $kernel->runSQL("INSERT INTO ".$kernel->pub_prefix_get().self::get_index_table_name()." VALUES (NULL, $doc_id, $word_id, $weight)");
 
 	}
 
-
-	function delete_index_for_old_urls($new_url_ids)
+	public static function search($word_ids, $limit=0, $length=20, $operation='or', $format_id = false)
 	{
-		$new_url_ids_str = $this->array2str($new_url_ids);
-		$this->query("DELETE FROM $this->index_table_name WHERE doc_id NOT IN ($new_url_ids_str)");
-	}
-
-
-
-
-	function search($word_ids, $limit=0, $length=20, $operation='or', $format_id = false)
-	{
-
+        global $kernel;
 		if (count($word_ids) == 0)
 			return array();
-
-
 
 		if ($operation == 'and')
 			$addition = "HAVING kolvo = ".count($word_ids);
@@ -245,158 +170,96 @@ class searchdb
 			$addition2 = "";
 
 
-		$word_ids_str = $this->array2str($word_ids);
+		$word_ids_str = self::array2str($word_ids);
 
 		$query = "
 
 			SELECT SQL_CALC_FOUND_ROWS i.doc_id, d.doc, d.snipped, sum(i.weight) as relevance, count(*) as kolvo
-			FROM $this->index_table_name i, $this->docs_table_name d
+			FROM ".$kernel->pub_prefix_get().self::get_index_table_name()." i, ".$kernel->pub_prefix_get().self::get_docs_table_name()." d
 			WHERE i.word_id IN ($word_ids_str) AND i.doc_id = d.id  $addition2
 			GROUP BY i.doc_id
 			$addition
 			ORDER BY kolvo DESC, relevance DESC
-			LIMIT $limit, $length
-			";
-		//$time = time();
-		$this->query($query);
-
-//		print "<!-- \n\n\n\n\n$query\n ".(time()-$time)."\n\n\n-->";
+			LIMIT $limit, $length";
+		$res=$kernel->runSQL($query);
 		$result = array();
-		while ($row = mysql_fetch_assoc($this->mysql_result))
+		while ($row = mysql_fetch_assoc($res))
 			$result[] = $row;
-
+        mysql_free_result($res);
 		return $result;
 	}
 
 
 
-	function found_rows()
+	public static function found_rows()
 	{
-		$this->query("SELECT found_rows()");
-		return mysql_result($this->mysql_result, 0);
+        global $kernel;
+		return mysql_result($kernel->runSQL("SELECT found_rows()"), 0);
 	}
 
 
 
-	function is_installed()
+	public static function update_doc_data($url_id, $snipped, $contents_hash, $format_id)
 	{
-		$query = "SHOW TABLES";
-		$this->query($query);
-		//$exists = false;
-		$need_tables = array($this->docs_table_name, $this->index_table_name, $this->words_table_name);
-
-		$exist_tables = array();
-		while ($row = mysql_fetch_row($this->mysql_result))
-			$exist_tables[] = $row[0];
-
-		$difference = array_diff($need_tables, $exist_tables);
-		if (count($difference) > 0)
-			return false;
-		else
-			return true;
-	}
-
-
-
-	function update_doc_data($url_id, $snipped, $contents_hash, $format_id)
-	{
+        global $kernel;
 		$snipped = mysql_real_escape_string($snipped);
-		$query = "UPDATE $this->docs_table_name
+		$query = "UPDATE ".$kernel->pub_prefix_get().self::get_docs_table_name()."
 					SET
 						snipped = '$snipped', contents_hash='$contents_hash', format_id='$format_id'
 					WHERE
 						id = $url_id
 					LIMIT 1";
-		$this->query($query);
+		$kernel->runSQL($query);
 	}
 
 
 
-	function optimize_tables()
+	public static function optimize_tables()
 	{
-		$this->query("LOCK TABLES $this->docs_table_name WRITE, $this->index_table_name WRITE");
-		$this->query("OPTIMIZE TABLE $this->docs_table_name");
-		$this->query("OPTIMIZE TABLE $this->index_table_name");
-		$this->query("UNLOCK TABLES");
-	}
-
-	function count_pages()
-	{
-	    global $kernel;
-        $total = 0;
-	    $result = $kernel->runSQL("SELECT count(*) AS count FROM `".$this->docs_table_name."`");
-        if ($row = mysql_fetch_assoc($result))
-            $total = $row['count'];
-	    return $total;
-	}
-
-	function count_words()
-	{
-	    global $kernel;
-        $total = 0;
-	    $result = $kernel->runSQL("SELECT count(*) AS count FROM `".$this->words_table_name."`");
-        if ($row = mysql_fetch_assoc($result))
-            $total = $row['count'];
-	    return $total;
-	}
-
-	function get_ignored_strings($fulldata=true)
-	{
-	    global $kernel;
-	    $result = $kernel->runSQL("SELECT * FROM ".$this->ignored_table_name." ORDER BY `word`");
-	    $ret = array();
-	    while ($row = mysql_fetch_assoc($result))
-	    {
-	        if ($fulldata)
-	            $ret[] = $row;
-	        else
-	            $ret[] = $row['word'];
-	    }
-	    return $ret;
-	}
-
-	function delete_ignored_string($id)
-	{
-	    global $kernel;
-	    $kernel->runSQL("DELETE FROM ".$this->ignored_table_name." WHERE id=".$id);
-	}
-
-	function add_ignored_string($string)
-	{
-	    global $kernel;
-	    $kernel->runSQL("REPLACE INTO ".$this->ignored_table_name." (`word`) VALUES ('".$string."')");
-	}
-
-    function get_all_indexed_docs()
-    {
-	    global $kernel;
-	    $result = $kernel->runSQL("SELECT id,doc FROM ".$this->docs_table_name);
-	    $ret = array();
-	    while ($row = mysql_fetch_assoc($result))
-	    {
-	        $ret[] = $row;
-	    }
-        mysql_free_result($result);
-	    return $ret;
-    }
-
-    function remove_ignored_from_index()
-    {
         global $kernel;
-        $docs = $this->get_all_indexed_docs();
-        $istrings = $this->get_ignored_strings(false);
-        foreach ($docs as $doc)
-        {
-            foreach ($istrings as $istring)
-            {
-                if (strpos($doc['doc'], $istring)!==false)
-                {//этот урл - игнорируемый
-                    $kernel->runSQL("DELETE FROM ".$this->docs_table_name." WHERE id=".$doc['id']);
-                    $kernel->runSQL("DELETE FROM ".$this->index_table_name." WHERE doc_id=".$doc['id']);
-                }
-            }
-        }
-    }
-}
+        $kernel->runSQL("LOCK TABLES ".$kernel->pub_prefix_get().self::get_docs_table_name()." WRITE, ".$kernel->pub_prefix_get().self::get_index_table_name()." WRITE");
+        $kernel->runSQL("OPTIMIZE TABLE ".$kernel->pub_prefix_get().self::get_docs_table_name());
+        $kernel->runSQL("OPTIMIZE TABLE ".$kernel->pub_prefix_get().self::get_index_table_name());
+        self::unlock_tables();
+	}
 
-?>
+    public static function count_pages()
+	{
+	    global $kernel;
+        $total = 0;
+	    $result = $kernel->runSQL("SELECT count(*) AS count FROM `".$kernel->pub_prefix_get().self::get_docs_table_name()."`");
+        if ($row = mysql_fetch_assoc($result))
+            $total = $row['count'];
+        mysql_free_result($result);
+	    return $total;
+	}
+
+    public static function count_words()
+	{
+	    global $kernel;
+        $total = 0;
+	    $result = $kernel->runSQL("SELECT count(*) AS count FROM `".$kernel->pub_prefix_get().self::get_words_table_name()."`");
+        if ($row = mysql_fetch_assoc($result))
+            $total = $row['count'];
+        mysql_free_result($result);
+	    return $total;
+	}
+
+	public static function get_ignored_strings()
+	{
+	    global $kernel;
+        return $kernel->db_get_list_simple(self::get_ignored_table_name(),"true");
+	}
+
+    public static function delete_ignored_string($id)
+	{
+	    global $kernel;
+	    $kernel->runSQL("DELETE FROM `".$kernel->pub_prefix_get().self::get_ignored_table_name()."` WHERE id=".$id);
+	}
+
+    public static function add_ignored_string($string)
+	{
+	    global $kernel;
+	    $kernel->runSQL("REPLACE INTO `".$kernel->pub_prefix_get().self::get_ignored_table_name()."` (`word`) VALUES ('".$string."')");
+	}
+}

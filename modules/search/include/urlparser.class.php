@@ -59,7 +59,7 @@ class UrlParser
 
 		if ($base{0} == "?")
 		{
-			$url = preg_replace("/\?.*$/", "", $url);
+			$url = preg_replace("/\\?.*$/", "", $url);
 			return $url.$base;
 		}
 
@@ -144,16 +144,3 @@ class UrlParser
 	}
 
 }
-
-/*
-
-$page_url = "http://www.vsego.ru/";
-$basehref = "";
-$relative_url = "textus/";
-
-$url = new UrlParser($page_url, $basehref);
-print $url->get_absolute_url($relative_url);
-
-*/
-
-?>

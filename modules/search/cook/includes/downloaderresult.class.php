@@ -7,7 +7,7 @@ class DownloaderResult
 	var $error;
 
 	/**
-	 * @var ResponseHeaders
+	 * @var responseheaders
 	 */
 	var $responseheaders;
 
@@ -54,6 +54,3 @@ class DownloaderResult
 	}
 
 }
-
-
-?>

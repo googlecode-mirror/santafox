@@ -22,37 +22,52 @@
 %pages%
 
 <!-- @search_form -->
-				<h2>Результаты поиска по запросу: <span>%search_text%</span></h2>
-				<form class="search" action="%action%">
-					<div>
-						<input class="input-text" type="text" name="search" value="%search_text%" />
-						<input class="input-button" type="submit" value="" />
-					</div>
-				</form>
+				<h1>Результаты поска по запросу: <span>%search_text%</span></h1>
+				
 
+				
 <!-- @noresult -->
-				<h2>К сожалению, документов, содержащих слово <span>%search_text%</span> не найдено</h2>
+				<h1>К сожалению, документов, содержащих слово <span>%search_text%</span> не найдено</h1>
 
 <!-- @search_results -->
-				<div class="search-results">
-					%rows%
+<div class="table_catalog">
+					<table>
+						<colgroup>
+							<col width="21%" />
+							<col width="" />
+							<col width="15%" />
+						</colgroup>
+						<tr>
+							<th><a href="#">Фото</a></th>
+							<th><a href="#">Наименование</a></th>
+							<th><a href="#">Цена</a></th>
+						</tr>
+						%rows%
+					</table>
 				</div>
 
 <!-- @search_results_rows -->
-					<p><a href="%link%" title="%title%">%title%</a><br />
-					%snipped%<br />
-					<span>%link%</span></p>
+						<tr>
+							<td><a href="%link%"><img src="/design/images/img_07.jpg" width="89" height="105" alt="" /></a></td>
+							<td>
+								<h3>%title%</h3>
+								%snipped%</a>
+							</td>
+							<td><big><span></span></big></td>
+						</tr>
 
 <!-- @search_results_split -->
 
 <!-- @pages -->
-[%rows%]
+<div class="page_namber">
+%rows%
+					</div>
+			<span class="page_bg">3</span>
 
 <!-- @pages_no -->
 
 <!-- @page -->
-<a href="%link%">%num%</a>
+                            <a href="%link%">%num%</a>
 <!-- @page_activ -->
-<b>%num%</b>
+<span>%num%</span>
 <!-- @page_delimiter -->
-&nbsp;|&nbsp;

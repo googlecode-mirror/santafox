@@ -1,6 +1,6 @@
 <?php
 
-class Downloader
+abstract class Downloader
 {
 
 	var $downloaderresult = null;
@@ -13,6 +13,20 @@ class Downloader
                         );
 
 
+    /**
+     * @abstract
+     * @param $url
+     * @return DownloaderResult
+     */
+    abstract function get($url);
+
+    /**
+     * @abstract
+     * @param $url
+     * @param $post_data
+     * @return DownloaderResult
+     */
+    abstract function post($url, $post_data);
 
 	function get_instance()
 	{
@@ -90,41 +104,4 @@ class Downloader
 		$this->headers[] = $header;
 	}
 
-	function get($url)
-	{
-		//наследуется
-	}
-
-	function post($url, $data)
-	{
-		//наследуется
-	}
-
-
 }
-/*error_reporting(E_ALL);
-
-include_once("downloaderresult.class.php");
-include_once("responsecontent.class.php");
-include_once("responseheaders.class.php");
-include_once("curldownloader.class.php");
-include_once("socketdownloader.class.php");
-include_once("thread.class.php");
-
-$downloader = Downloader::get_instance();
-$headers = array("User-Agent: Mozilla");
-//$downloader->set_headers($headers);
-//$response = $downloader->get('http://www.sarafannoeradio.ru/talk');
-//$response = $downloader->get_with_301_follow('http://www.sarafannoeradio.ru/talk');
-$response = $downloader->post_with_301_follow('http://www.sarafannoeradio.ru/talk', "t=5");
-//$response = $downloader->post('http://www.sarafannoeradio.ru/talk/', "t=5");
-
-print strlen($response->responsecontent->content);
-print_r($response);
-
-*/
-
-
-
-
-?>

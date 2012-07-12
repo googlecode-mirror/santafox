@@ -53,23 +53,66 @@ class search_install extends install_modules
 	function install_children($id_module)
 	{
 		global $kernel;
-		$full_prefix = PREFIX."_".$id_module;
-		$db = new searchdb($full_prefix);
-		$db->install();
-	}
+
+        $query ="CREATE TABLE IF NOT EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_docs`
+		(
+			id INT AUTO_INCREMENT NOT NULL,
+			doc TEXT,
+			doc_hash char(32),
+			contents_hash char(32),
+			format_id tinyint,
+			snipped MEDIUMBLOB,
+			primary key(id),
+			unique(doc_hash)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+        $kernel->runSQL($query);
+
+
+        $query ="CREATE TABLE IF NOT EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_words`
+		(
+			id INT AUTO_INCREMENT NOT NULL,
+			word VARCHAR(50) BINARY,
+			primary key(id),
+			unique(word)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+        $kernel->runSQL($query);
+
+
+        $query ="CREATE TABLE IF NOT EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_index`
+		(
+			id 			INT AUTO_INCREMENT NOT NULL,
+			doc_id 		INT,
+			word_id 	INT,
+			weight		INT, # вес, умноженный на тысячу и округлённый
+			primary key(id),
+			key(doc_id, word_id),
+			key(word_id)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+        $kernel->runSQL($query);
+
+        $query ="CREATE TABLE IF NOT EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_ignored`
+		(
+          `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
+          `word` varchar(255) NOT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `word` (`word`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+        $kernel->runSQL($query);
+    }
 
    /**
-    * Методы вызывается, при деинсталяции каждого дочернего модуля, здесь необходимо
+    * Метод вызывается при деинсталяции каждого дочернего модуля, здесь необходимо
     * удалять таблицы, каталоги, или файлы используемые дочерним модулем.
     *
-    * @param string $id_module ID удоляемого дочернего модуля
+    * @param string $id_module ID удаляемого дочернего модуля
     */
 	function uninstall_children($id_module)
 	{
-		global $kernel;
-		$full_prefix = PREFIX."_".$id_module;
-		$db = new searchdb($full_prefix);
-		$db->uninstall();
+        global $kernel;
+        $kernel->runSQL("DROP TABLE IF EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_docs`");
+        $kernel->runSQL("DROP TABLE IF EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_words`");
+        $kernel->runSQL("DROP TABLE IF EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_index`");
+        $kernel->runSQL("DROP TABLE IF EXISTS `".$kernel->pub_prefix_get()."_".$id_module."_ignored`");
 	}
 
 
@@ -110,26 +153,6 @@ $param->set_caption('[#search_modul_prop_user_mem_php#]');
 $param->set_default(0);
 $install->add_modul_properties($param);
 
-//Параметры страницы, прописываемые модулем
-//$param = new properties_select();
-//$param->set_id("visible");
-//$param->set_caption("[#module_waysite_label_visible#]");
-//$param->set_data(array ("true"=>"[#module_waysite_visible_var1#]","false"=>"[#module_waysite_visible_var2#]"));
-//$install->add_page_properties($param);
-
-
-//Добавим необходимые поля к пользователю сайта
-//
-//$param = new properties_string();
-//$param->set_id("data_b");
-//$param->set_caption("Дата рождения");
-//$install->add_user_properties($param, false, true);
-//
-//$param = new properties_string();
-//$param->set_id("data_b2");
-//$param->set_caption("Дата рождения 2");
-//$install->add_user_properties($param, false, false);
-
 
 //========================================================================================
 //Опишем публичные методы со всеми возможными параметрами
@@ -156,12 +179,8 @@ $property->set_patch('modules/search/templates_user/');
 $install->add_public_metod_parametrs('pub_show_search_results', $property);
 
 
-//Уровни доступа
-//$install->add_admin_acces_label('acces_admin','Доступ в административную часть');
-//$install->add_admin_acces_label('acces_admin2','Доступ в административную часть 2');
 
-
-//То, что ставится автоматически при интсляции базового модуля пока оставим так, как есть...
+//То, что ставится автоматически при инсталяции базового модуля пока оставим так, как есть...
 //Теперь можно прописать дочерние модули, которые будут автоматически созданы при
 //инсталяции модуля а так же макросы и свойства, каждого из дочерних модулей.
 //Свойства модуля
@@ -172,4 +191,3 @@ $install->module_copy[0]['action'][0]['param']['template'] = 'modules/search/tem
 $install->module_copy[0]['action'][1]['caption'] = 'Вывести результаты поиска';
 $install->module_copy[0]['action'][1]['id_metod'] = 'pub_show_search_results';
 $install->module_copy[0]['action'][1]['param']['template'] = 'modules/search/templates_user/search.html'; //у метода нет параметров
-?>

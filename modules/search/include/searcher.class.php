@@ -2,8 +2,6 @@
 
 class Searcher
 {
-	var $db;
-
 	// Результатов на страницу
 	var $results_per_page = 20;
 
@@ -16,16 +14,6 @@ class Searcher
 	var $format_id = false;
 	var $operation = "or";
 
-	/**
-	 * Конструктор
-	 *
-	 * @param String $prefix - префикс таблиц в базе данных
-	 * @return Searcher
-	 */
-	function Searcher($prefix)
-	{
-		$this->db = new SearchDb($prefix);
-	}
 
 	function set_results_per_page($results_per_page)	{$this->results_per_page = $results_per_page;}
 	function set_operation($operation)					{$this->operation = $operation;}
@@ -75,10 +63,6 @@ class Searcher
 	 */
 	function search($text, $page=1)
 	{
-	    //global $kernel;
-
-		//print $text;
-		/* @var db SearchDb */
 		$htmlparser = new HtmlParser();
 		$words = $htmlparser->text2words($text);
 		$stems = array();
@@ -92,7 +76,7 @@ class Searcher
 
 		array_unique($stems);
 
-		$word_ids = $this->db->get_word_ids($stems);
+		$word_ids = searchdb::get_word_ids($stems);
 
 		if (count($word_ids) < count($stems) && $this->operation == 'and')
 		{
@@ -102,9 +86,8 @@ class Searcher
 
 		$limit = (int)(($page-1)*$this->results_per_page);
 
-		$docs = $this->db->search($word_ids, $limit, (int)$this->results_per_page, $this->operation, $this->format_id);
-		$this->number_of_results = $this->db->found_rows();
-		//print $found_rows;
+		$docs = searchdb::search($word_ids, $limit, (int)$this->results_per_page, $this->operation, $this->format_id);
+		$this->number_of_results = searchdb::found_rows();
 
 		$num = $limit;
 		$results = array();
@@ -245,15 +228,13 @@ class Searcher
 
 	function trim_left($text)
 	{
-		return  preg_replace("/^[^\s]+?\s/", "", $text);
+		return  preg_replace("/^[^\\s]+?\\s/", "", $text);
 	}
 
 	function trim_right($text)
 	{
-		$res = preg_replace("/\s[^\s]+?$/", "", $text);
+		$res = preg_replace("/\\s[^\\s]+?$/", "", $text);
 		return  $res;
 	}
 
 }
-
-?>

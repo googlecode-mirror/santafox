@@ -14,7 +14,7 @@ class WebContentParser
 	{
 		$word_symbols = $this->get_word_symbols();
 		$text = preg_replace("'[^".$word_symbols."]+'s", " ", $text);
-		$text = preg_replace("/\s+/", " ", $text);
+		$text = preg_replace("/\\s+/", " ", $text);
 
 		$text = trim($text);
 		$text = $this->strtolower($text);
@@ -66,5 +66,3 @@ class WebContentParser
 		return $html;
 	}
 }
-
-?>

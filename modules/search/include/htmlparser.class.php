@@ -89,15 +89,13 @@ class HtmlParser /*extends WebContentParser*/
         $this->parts = array();
         $end_position = -1;
 
-        foreach ($matches[0] as $key=>$match)
+        foreach ($matches[0] as $match)
         {
             $start_position = $match[1];
             $tag = $match[0];
 
             $this->add_text($start_position, $end_position);
             $this->add_tag($tag);
-            //$this->parts[] = array('tag' => $tag);
-            //$end_position =  $start_position + mb_strlen($tag) - 1;
             $end_position =  $start_position + strlen($tag) - 1;
         }
 

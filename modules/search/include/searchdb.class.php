@@ -34,13 +34,15 @@ class searchdb
 	}
 
 
-	public static function get_word_ids($words)
+	public static function get_word_ids($words,$moduleID=null)
 	{
         global $kernel;
 		if (count($words) == 0)
 			return array();
 		$words_str = self::array2str($words);
-        $res=$kernel->runSQL("SELECT id, word FROM `".$kernel->pub_prefix_get()."_".$kernel->pub_module_id_get()."_words` WHERE word IN ($words_str)");
+        if (!$moduleID)
+            $moduleID=$kernel->pub_module_id_get();
+        $res=$kernel->runSQL("SELECT id, word FROM `".$kernel->pub_prefix_get()."_".$moduleID."_words` WHERE word IN ($words_str)");
 		$result = array();
 		while ($row = mysql_fetch_assoc($res))
 			$result[$row['word']] = $row['id'];
@@ -168,15 +170,10 @@ class searchdb
 			$addition2 = "AND d.format_id = $format_id";
 		else
 			$addition2 = "";
-
-
-		$word_ids_str = self::array2str($word_ids);
-
 		$query = "
-
 			SELECT SQL_CALC_FOUND_ROWS i.doc_id, d.doc, d.snipped, sum(i.weight) as relevance, count(*) as kolvo
 			FROM ".$kernel->pub_prefix_get().self::get_index_table_name()." i, ".$kernel->pub_prefix_get().self::get_docs_table_name()." d
-			WHERE i.word_id IN ($word_ids_str) AND i.doc_id = d.id  $addition2
+			WHERE i.word_id IN (".implode(",",$word_ids).") AND i.doc_id = d.id  $addition2
 			GROUP BY i.doc_id
 			$addition
 			ORDER BY kolvo DESC, relevance DESC

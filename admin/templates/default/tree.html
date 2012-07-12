@@ -152,17 +152,15 @@
         }
     },
 <!-- @dnd_action2 -->
- .bind("move_node.jstree", function (e, data) {
-                    var index=data.rslt.cp;
-                    $.post("/admin/index.php?action=set_left_menu&leftmenu=move",
-                           { node :  data.rslt.o.attr("id"), newParent:data.rslt.np.attr("id"), index:index},
-                           function(data){
-                               //santaUpdateRegion('west','index.php?action=get_left_menu');
-                           }
-                    );
-
-
-            })
+.bind("move_node.jstree", function (e, data) {
+        var index=data.rslt.cp;
+        $.post("[#move_url#]",
+               { node :  data.rslt.o.attr("id"), newParent:data.rslt.np.attr("id"), index:index},
+               function(data){
+                   //santaUpdateRegion('west','index.php?action=get_left_menu');
+               }
+        );
+})
 <!-- @dnd_enabled -->
 "crrm", "dnd",
 <!-- @context_menu_not -->

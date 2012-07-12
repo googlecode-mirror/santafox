@@ -445,7 +445,7 @@ class data_tree
         $html = str_replace("[#root_name#]"   , $this->root_name,   $html);
         $html = str_replace("[#root_id#]"     , $this->root_id,     $html);
         $html = str_replace("[#data_url#]"    , $data_url,          $html);
-        $html = str_replace("[#move_url#]"    , $move_url,          $html);
+
         $html = str_replace("[#not_click#]"   , $notclick,          $html);
         $html = str_replace("true/*[#direct_click#]*/", $direct_click,      $html);
         $html = str_replace("/*[#node_default#]*/", $this->node_default, $html);
@@ -463,7 +463,7 @@ class data_tree
             $html = str_replace("/*[#dnd_action1#]*/", "", $html);
             $html = str_replace("/*[#dnd_action2#]*/", "", $html);
         }
-
+        $html = str_replace("[#move_url#]", $move_url, $html);
 
         $html = str_replace("/*[#context_menu_functions#]*/", $html_context_menu_function, $html);
 

@@ -1,14 +1,17 @@
-<?PHP
+<?php
+require_once realpath(dirname(__FILE__)."/../../")."/include/basemodule.class.php";
 
-
-class search
+class search extends BaseModule
 {
 	public $admin_template_path = "modules/search/templates_admin";
 	public $path_templates = "modules/search/templates_user"; //Путь к шаблонам модуля
 
 	public $section_id;
 
+    /** @var Indexator */
 	public $indexator;
+
+    private $offset_param_name="so";
 
 
 	function search()
@@ -37,8 +40,6 @@ class search
         require_once("cook/includes/downloaderresult.class.php");
         require_once("cook/includes/responsecontent.class.php");
         require_once("cook/includes/responseheaders.class.php");
-
-		set_time_limit(1200);
 		$this->indexator 	= new Indexator();
     }
 
@@ -51,8 +52,8 @@ class search
     function pub_show_only_form($template)
     {
         global $kernel;
-        $templ = $kernel->pub_template_parse($template);
-        $html = $templ['form'];
+        $this->set_templates($kernel->pub_template_parse($template));
+        $html = $this->get_template_block('form');
         //Узнаем на какой странице форма поиска.
         $prop = $kernel->pub_modul_properties_get('page_search');
         $prop = $prop['value'];
@@ -82,66 +83,63 @@ class search
         else
             $page_search = "";
 
-		//Определяем страницу если что
-		$page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
-		$page = intval($page);
+		$offset = intval($kernel->pub_httpget_get($this->offset_param_name));
 
 		$parameters = $this->get_search_parameters();
 
+        $perPage=$parameters['results_per_page'];
 		/*************** Собственно поиск ******************/
 		/* @var $searcher Searcher */
 		$searcher = new Searcher();
 
-		$searcher->set_results_per_page	($parameters['results_per_page']);
-		$searcher->set_doc_format		($parameters['doc_format']);
-		$searcher->set_operation		($parameters['operation']);
+		$searcher->set_results_per_page($perPage);
+		$searcher->set_doc_format($parameters['doc_format']);
+		$searcher->set_operation($parameters['operation']);
 
-		$results = $searcher->search($search_text, $page);
-		$number_of_pages = $searcher->get_number_of_pages();
-		/*************************************************/
+		$results = $searcher->search($search_text, $offset);
 
+        $this->set_templates($kernel->pub_template_parse($template_search));
 		//Теперь будем формировать результат
-		$template = $kernel->pub_template_parse($template_search);
 
         //Сформируем HTML формы поиска
-        $html_form_serch = $template['search_form'];
+        $html_form_serch = $this->get_template_block('search_form');
         $html_form_serch = str_replace('%action%', $page_search, $html_form_serch);
 
 
         //Теперь узнаем есть ли результат поиска и сформируем подготовим его для вывода
-        $html_result = $template['noresult'];
+        $html_result = $this->get_template_block('noresult');
 		if (!empty($results))
 		{
-			$html_result = $template['search_results'];
+			$html_result = $this->get_template_block('search_results');
     		$num = 0;
     		$result_parts = array();
-    		$result_template = $template['search_results_rows'];
+    		$result_template = $this->get_template_block('search_results_rows');
     		foreach ($results as $result)
     		{
     			$num++;
     			$result_html = $result_template;
     			$result_html = preg_replace("'%link%'i"    , $result['url']    , $result_html);
-    			//$result_html = preg_replace("'%linktext%'i", $result['url']    , $result_html);
     			$result_html = preg_replace("'%title%'i"   , $result['title']  , $result_html);
     			$result_html = preg_replace("'%snipped%'i" , $result['snipped'], $result_html);
     			$result_html = preg_replace("'%num%'i"     , $result['num']    , $result_html);
     			$result_parts[] = $result_html;
     		}
-		    $html_result = str_replace("%rows%", join($template['search_results_split'], $result_parts), $html_result);
+		    $html_result = str_replace("%rows%", join($this->get_template_block('search_results_split'), $result_parts), $html_result);
 		}
 
-        //Постраничная навигация
-		$pages = $this->get_page_numbers($number_of_pages, $page, $search_text, $template);
-		//Теперь пришло время всё собрать воедино
 
-		$html = $template['form'];
+		//Теперь пришло время всё собрать воедино
+		$html = $this->get_template_block('form');
 
 		$html = str_replace("%search_results%", $html_result     , $html);
 		$html = str_replace("%search_form%"   , $html_form_serch , $html);
-		$html = str_replace("%pages%"         , $pages           , $html);
 
-		//В итоговом шаблоне могла остаться переменная с поиковым словом, заменим её
-		$html = str_replace("%search_text%"   , $search_text     , $html);
+        $total = $searcher->number_of_results;
+        $purl = $kernel->pub_page_current_get().".html?search=".urlencode($search_text)."&".$this->offset_param_name."=";
+		$html = str_replace("%pages%", $this->build_pages_nav($total,$offset,$perPage,$purl,0) , $html);
+
+		//В итоговом шаблоне могла остаться переменная с поисковым словом, заменим её
+        $html = str_replace("%search_text%", htmlspecialchars($search_text), $html);
 		return $html;
     }
 
@@ -151,15 +149,14 @@ class search
     //**********************************************************************
 
 
-
     function get_search_parameters()
     {
         $parameters =
-        array(
-        'operation' => 'or',
-        'results_per_page' => 10,
-        'doc_format'	=> 'any'
-        );
+            array(
+                'operation' => 'or',
+                'results_per_page' => 10,
+                'doc_format' => 'any'
+            );
 
         if (isset($_GET['operation']) && $_GET['operation'] == 'and')
             $parameters['operation'] = 'and';
@@ -177,71 +174,8 @@ class search
     }
 
 
-
-
-    function get_page_numbers($number_of_pages, $page, $search_text, $templates_pages)
-    {
-        if ($number_of_pages == 1)
-            return "";
-
-        $html = $templates_pages['pages'];
-
-        $active_page  = $templates_pages["page_activ"];
-        $passive_page = $templates_pages["page"];
-        $parts = array();
-
-        //это для расширенного поиска
-        $url_addition = '';
-        //$url_addition = "operation=$parameters[operation]&results_per_page=$parameters[results_per_page]&doc_format=$parameters[doc_format]";
-
-        for ($i=1; $i<=$number_of_pages; $i++)
-        {
-            $url = "?search=".urlencode($search_text)."&p=$i&$url_addition";
-            if ($i==$page)
-                $page_html = $active_page;
-            else
-                $page_html = $passive_page;
-
-            $page_html = str_replace("%link%", $url, $page_html);
-            $page_html = str_replace("%num%" , $i  , $page_html);
-            $parts[] = $page_html;
-        }
-        if (!empty($parts))
-            $html = str_replace("%rows%" , join($templates_pages['page_delimiter'], $parts), $html);
-        else
-            $html = $templates_pages['pages_no'];
-
-        return $html;
-    }
-
-
-    function get_abs_template_name($template_name)
-    {
-        $dir = $this->path_templates;
-        $sect = $this->section_id;
-        $sect_file_name = "$dir/$sect/$template_name";
-        if (file_exists($sect_file_name))
-            return $sect_file_name;
-        else
-            return "$dir/$template_name";
-    }
-
-
-    /**
-     * Отображает форму расширенного поиска
-     *
-     * @param string $templates_advanced_search Путь к файлу с формой
-     * @return string
-     */
-    function advanced_search_page($templates_advanced_search)
-    {
-        $html = file_get_contents($templates_advanced_search);
-        return $html;
-    }
-
-
     //***********************************************************************
-    //	Наборы методов, для работы с админкой модуля
+    //	Наборы методов для работы с админкой модуля
     //**********************************************************************
 
 

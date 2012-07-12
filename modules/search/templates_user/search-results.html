@@ -22,52 +22,65 @@
 %pages%
 
 <!-- @search_form -->
-				<h1>Результаты поска по запросу: <span>%search_text%</span></h1>
+<h1>Результаты поска по запросу: <span>%search_text%</span></h1>
 				
 
 				
 <!-- @noresult -->
-				<h1>К сожалению, документов, содержащих слово <span>%search_text%</span> не найдено</h1>
+<h1>К сожалению, документов, содержащих слово <span>%search_text%</span> не найдено</h1>
 
 <!-- @search_results -->
 <div class="table_catalog">
-					<table>
-						<colgroup>
-							<col width="21%" />
-							<col width="" />
-							<col width="15%" />
-						</colgroup>
-						<tr>
-							<th><a href="#">Фото</a></th>
-							<th><a href="#">Наименование</a></th>
-							<th><a href="#">Цена</a></th>
-						</tr>
-						%rows%
-					</table>
-				</div>
+    <table>
+        %rows%
+    </table>
+</div>
 
 <!-- @search_results_rows -->
-						<tr>
-							<td><a href="%link%"><img src="/design/images/img_07.jpg" width="89" height="105" alt="" /></a></td>
-							<td>
-								<h3>%title%</h3>
-								%snipped%</a>
-							</td>
-							<td><big><span></span></big></td>
-						</tr>
+    <tr>
+        <td>
+            <a href="%link%">%title%</a>
+            <p>%snipped%</p>
+        </td>
+    </tr>
 
 <!-- @search_results_split -->
 
 <!-- @pages -->
 <div class="page_namber">
-%rows%
-					</div>
-			<span class="page_bg">3</span>
+        %first%
+        %backward%
+        %previous%
+        %pages_block%
+        %next%
+        %forward%
+        %last%
+</div>
 
-<!-- @pages_no -->
-
-<!-- @page -->
-                            <a href="%link%">%num%</a>
-<!-- @page_activ -->
-<span>%num%</span>
-<!-- @page_delimiter -->
+<!-- @page_first -->
+<a href="%link%">Начало</a>
+<!-- @page_backward -->
+<a href="%link%">&laquo;</a>
+<!-- @page_backward_disabled -->
+&laquo;
+<!-- @page_previous -->
+<a href="%link%">&laquo;</a>
+<!-- @page_previous_disabled -->
+&laquo;
+<!-- @page_forward -->
+<a href="%link%">&raquo;</a>
+<!-- @page_forward_disabled -->
+&raquo;
+<!-- @page_next -->
+<a href="%link%">&raquo;</a>
+<!-- @page_next_disabled -->
+&raquo;
+<!-- @page_last -->
+<a href="%link%">Конец</a>
+<!-- @page_active -->
+<a href="%link%">%page%</a>
+<!-- @page_passive -->
+%page%
+<!-- @page_delimeter -->
+&nbsp;-&nbsp;
+<!-- @page_null -->

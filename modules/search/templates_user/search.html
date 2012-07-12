@@ -15,12 +15,12 @@
 <!-- ****************************************** Шаблон результатов поиска ****************************************** -->
 
 <!-- @form -->
-		<div id="search" class="content">
-			<p class="title">Результаты поиска по запросу: <span>%search_text%</span></p>
-%search_form%
-%search_results%
-%pages%
-		</div>
+<div id="search" class="content">
+    <p class="title">Результаты поиска по запросу: <span>%search_text%</span></p>
+    %search_form%
+    %search_results%
+    %pages%
+</div>
 <!-- @search_form -->
 			<form action="%action%">
 				<input class="text" type="text" name="search" value="%search_text%" />
@@ -48,12 +48,42 @@
 					<span>%link%</span>
 				</li>
 <!-- @search_results_split -->
+
 <!-- @pages -->
-[%rows%]
-<!-- @pages_no -->
-<!-- @page -->
-<a href="%link%">%num%</a>
-<!-- @page_activ -->
-<span>%num%</span>
-<!-- @page_delimiter -->
-&nbsp;|&nbsp;
+<div class="page_namber">
+    %first%
+    %backward%
+    %previous%
+    %pages_block%
+    %next%
+    %forward%
+    %last%
+</div>
+
+<!-- @page_first -->
+<a href="%link%">Начало</a>
+<!-- @page_backward -->
+<a href="%link%">&laquo;</a>
+<!-- @page_backward_disabled -->
+&laquo;
+<!-- @page_previous -->
+<a href="%link%">&laquo;</a>
+<!-- @page_previous_disabled -->
+&laquo;
+<!-- @page_forward -->
+<a href="%link%">&raquo;</a>
+<!-- @page_forward_disabled -->
+&raquo;
+<!-- @page_next -->
+<a href="%link%">&raquo;</a>
+<!-- @page_next_disabled -->
+&raquo;
+<!-- @page_last -->
+<a href="%link%">Конец</a>
+<!-- @page_active -->
+<a href="%link%">%page%</a>
+<!-- @page_passive -->
+%page%
+<!-- @page_delimeter -->
+&nbsp;-&nbsp;
+<!-- @page_null -->

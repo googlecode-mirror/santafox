@@ -198,22 +198,28 @@ class Indexator
         }
         $contents = preg_replace("/<!--.{0,1024}?-->/", "", $contents);
 
-
+        $is_ignored=$this->is_url_ignored($url);
 
 
         $this->hash = md5($contents);
 
         $this->current_url = $url;
-        $this->current_url_id = $this->get_url_id($this->current_url);
-        $this->parsed_url_ids[] = $this->current_url_id;
-
-        $changed = true;
-        if (!$this->new_doc)
+        if (!$is_ignored)
         {
-            $contents_hash = searchdb::get_contents_hash($this->current_url_id);
-            if ($contents_hash == $this->hash)
-                $changed = false;
+            $this->current_url_id = $this->get_url_id($this->current_url);
+            $this->parsed_url_ids[] = $this->current_url_id;
+            $changed = true;
+            if (!$this->new_doc)
+            {
+                $contents_hash = searchdb::get_contents_hash($this->current_url_id);
+                if ($contents_hash == $this->hash)
+                    $changed = false;
+            }
         }
+        else
+            $changed=false;
+
+
 
         $this->stem_cache = array();
         if (preg_match("'\\.pdf$'", $url))
@@ -241,9 +247,6 @@ class Indexator
             $format_id = Searcher::format2format_id("html");
 
         $this->documentparser = new HtmlParser($contents);
-
-
-        //$this->current_url = $url;
         $links = $this->documentparser->get_links($this->current_url);
         foreach ($links as $link)
         {
@@ -261,15 +264,14 @@ class Indexator
                 }
                 if ($url_parts['host'] == $link_parts['host'])
                 {
-                    if (preg_match("'/data/content/'", $link) && !preg_match("'\\.(html|pdf|txt)$'i", $link))
+                    if (preg_match("~^/content/~i", $link) && !preg_match("~\\.(html|pdf|txt)$~i", $link))
                         continue;
-
                     $this->urls[] = $link;
                 }
             }
         }
 
-        if ($this->is_url_ignored($url))
+        if ($is_ignored)
         {
             $kernel->pub_console_show("ignored: ".$url);
             return;

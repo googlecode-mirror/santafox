@@ -131,7 +131,7 @@ class HtmlParser /*extends WebContentParser*/
             {
                 $text = $part['text'];
                 $text = $this->html_entity_decode($text);
-                $words = $this->text2words($text);
+                $words = searcher::text2words($text);
                 if (count($words) > 0)
                 {
                     if ($word_buffer === false)
@@ -154,55 +154,8 @@ class HtmlParser /*extends WebContentParser*/
     }
 
 
-    function text2words($text)
-    {
-        $word_symbols = $this->get_word_symbols();
-
-        $text = preg_replace("'[^".$word_symbols."]+'su", " ", $text);
-        $text = preg_replace("/\\s+/u", " ", $text);
-
-        $text = trim($text);
-        $text = $this->strtolower($text);
-        if (mb_strlen($text) > 0)
-            $words = explode(" ", $text);
-        else
-            $words = array();
-     
-        return $words;
-    }
 
 
-    function get_word_symbols()
-    {
-        $rus_small_letters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-        $rus_big_letters   = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
-        $word_symbols = $rus_small_letters.$rus_big_letters."a-zA-Z0-9";
-        return $word_symbols;
-    }
-
-
-    function strtolower($str)
-    {
-        /*
-        $low = "а,б,в,г,д,е,ё,ж,з,и,й,к,л,м,н,о,п,р,с,т,у,ф,х,ц,ч,ш,щ,ъ,ы,ь,э,ю,я";
-        $up  = "А,Б,В,Г,Д,Е,Ё,Ж,З,И,Й,К,Л,М,Н,О,П,Р,С,Т,У,Ф,Х,Ц,Ч,Ш,Щ,Ъ,Ы,Ь,Э,Ю,Я";
-
-        $low = explode(",", $low);
-        $up  = array_flip(explode(",", $up));
-
-        $result = "";
-        for ($i=0; $i< mb_strlen($str); $i++)
-        {
-            $char = $str{$i};
-            if (isset($up[$char]))
-                $result .= $low[$up[$char]];
-            else
-                $result .= mb_strtolower($char);
-        }
-        return $result;
-        */
-        return mb_strtolower($str);
-    }
 
 
 
@@ -219,7 +172,6 @@ class HtmlParser /*extends WebContentParser*/
         $text_length = $start_position - $end_position - 1;
         if ($text_length > 0)
         {
-            //$plain_text = trim(mb_substr($this->html, $end_position + 1, $text_length));
             $plain_text = trim(substr($this->html, $end_position + 1, $text_length));
             if (!empty($plain_text))
                 $this->parts[] = array('text' => $plain_text);
@@ -240,5 +192,3 @@ class HtmlParser /*extends WebContentParser*/
     }
 
 }
-
-?>

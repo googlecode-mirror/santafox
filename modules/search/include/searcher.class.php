@@ -31,6 +31,37 @@ class Searcher
     }
 
 
+    static function get_stop_words()
+    {
+        $stop_words = array('в', 'и', 'на', 'к', 'с', 'у', 'из', 'от', 'о', 'за', 'по', 'при', 'а', 'для', 'как',
+            'a', 'an', 'is', 'are', 'there');
+        return $stop_words;
+    }
+
+    public static function get_word_symbols()
+    {
+        $rus_small_letters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        $rus_big_letters   = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+        $word_symbols = $rus_small_letters.$rus_big_letters."a-zA-Z0-9";
+        return $word_symbols;
+    }
+
+    public static function text2words($text)
+    {
+        $word_symbols = self::get_word_symbols();
+
+        $text = preg_replace("'[^".$word_symbols."]+'su", " ", $text);
+        $text = preg_replace("/\\s+/u", " ", $text);
+        $text = trim($text);
+        $text = mb_strtolower($text);
+        if (mb_strlen($text) > 0)
+            $words = explode(" ", $text);
+        else
+            $words = array();
+        return $words;
+    }
+
+
     /**
      * Статический метод
      *
@@ -69,16 +100,13 @@ class Searcher
      */
     function search($text, $offset = 0)
     {
-        $htmlparser = new HtmlParser();
-        $words = $htmlparser->text2words($text);
+        $words = self::text2words($text);
         $stems = array();
-        $stem = new Lingua_Stem_Ru();
-
-        $stop_words = Indexator::get_stop_words();
+        $stop_words = self::get_stop_words();
 
         foreach ($words as $word)
             if (!in_array($word, $stop_words))
-                $stems[] = $stem->stem_word($word);
+                $stems[] = Lingua_Stem_Ru::stem_word($word);
 
         array_unique($stems);
 

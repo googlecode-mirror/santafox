@@ -31,7 +31,6 @@ class Indexator
     var $current_url;
     var $current_url_id;
 
-    var $lingua_stem_ru;
     var $stem_cache;
 
     var $hash;
@@ -49,8 +48,7 @@ class Indexator
     {
         //setlocale (LC_ALL, array ('ru_RU.CP1251', 'rus_RUS.1251'));
         mb_regex_encoding("UTF-8");
-        $this->lingua_stem_ru = new Lingua_Stem_Ru();
-        $this->stop_words = self::get_stop_words();
+        $this->stop_words = searcher::get_stop_words();
     }
 
 
@@ -280,12 +278,6 @@ class Indexator
             $this->index_html($format_id);
     }
 
-    static function get_stop_words()
-    {
-        $stop_words = array('в', 'и', 'на', 'к', 'с', 'у', 'из', 'от', 'о', 'за', 'по', 'при', 'а', 'для', 'как',
-                            'a', 'an', 'is', 'are', 'there');
-        return $stop_words;
-    }
 
     /**
      * Очистить индекс для конкретного урла
@@ -348,6 +340,7 @@ class Indexator
 
 
 
+
     private function get_snippeds($words_and_tags)
     {
 
@@ -361,11 +354,10 @@ class Indexator
             $text .= " ".$word['text'];
         }
         $text = " ".$text." ";
-        /* @var $htmlparser HtmlParser */
-        $word_symbols = $this->documentparser->get_word_symbols();
+        $word_symbols = searcher::get_word_symbols();
         $non_word_symbols = "[^$word_symbols]";
 
-        $low_text = $this->documentparser->strtolower($text);
+        $low_text = mb_strtolower($text);
         $positions = array();
         foreach ($this->stem_cache as $word => $stem)
         {
@@ -406,14 +398,12 @@ class Indexator
             {
                 if (in_array($word, $this->stop_words) || mb_strlen($word) > 50)
                     continue;
-
                 $koeff = 1;
                 foreach ($word_and_tags['tags'] as $tag)
                     $koeff *= $this->tag_koeffs[$tag];
-
                 if (!isset($this->stem_cache[(string)$word]))
                 {
-                    $stem = $this->lingua_stem_ru->stem_word($word);
+                    $stem = Lingua_Stem_Ru::stem_word($word);
                     $this->stem_cache[(string)$word] = $stem;
                 }
                 else
@@ -426,11 +416,9 @@ class Indexator
             }
             arsort($weights);
         }
-
         $sum = array_sum($weights);
         foreach ($weights as $stem => $weight)
             $weights[(string)$stem] /= $sum;
-
         return $weights;
     }
 
@@ -441,7 +429,6 @@ class Indexator
         $existing_words = array_keys($existing_word_ids);
         $new_words = array_diff($words, $existing_words);
         $new_word_ids = searchdb::add_words($new_words);
-
         $ids = $existing_word_ids;
         foreach ($new_word_ids as $word => $id)
             $ids[(string)$word] = $id;

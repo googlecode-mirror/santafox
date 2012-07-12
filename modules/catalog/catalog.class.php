@@ -1092,7 +1092,6 @@ class catalog extends BaseModule
             $bitems = $this->get_basket_items();
             if (count($bitems) == 0)
                 return $this->get_template_block("no_basket_items");
-            //$response = false;
             $form_ok = true;
             $user_email = false;
 
@@ -1112,7 +1111,7 @@ class catalog extends BaseModule
                     $form_ok = false;
                     break;
                 }
-                elseif (!empty($ofield['regexp']) && !preg_match($ofield['regexp'], $postvar))
+                elseif ($postvar && !empty($ofield['regexp']) && !preg_match($ofield['regexp'], $postvar))
                 {
                     $msg = $this->get_template_block("incorrect_field_value");
                     $msg = str_replace("%field_name%", $ofield['name_full'], $msg);

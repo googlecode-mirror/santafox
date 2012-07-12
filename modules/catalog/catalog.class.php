@@ -1122,9 +1122,10 @@ class catalog extends BaseModule
                 }
             }
 
-            if (!$user_email)
-                $content .= $this->get_template_block("no_email_error");
-            elseif ($form_ok)
+            //if (!$user_email)
+            //    $content .= $this->get_template_block("no_email_error");
+            //else
+            if ($form_ok)
             {//если всё ок - делаем ретурн здесь, не выводим хтмл-форму
 
                 //$block = $this->get_template_block("order_received");
@@ -1143,9 +1144,12 @@ class catalog extends BaseModule
                     'robot', $manager_mail_subj, $msg_body, false, "", "", $user_email);
 
                 //письмо юзеру
-                $msg_body = $this->process_basket_items_tpl($user_mail_tpl, $bitems, $fvalues);
-                $kernel->pub_mail(array($user_email), array($user_email), 'noreply@'.$_SERVER['HTTP_HOST'],
-                    'robot', $user_mail_subj, $msg_body, false, "", "", $manager_email);
+                if ($user_email)
+                {
+                    $msg_body = $this->process_basket_items_tpl($user_mail_tpl, $bitems, $fvalues);
+                    $kernel->pub_mail(array($user_email), array($user_email), 'noreply@'.$_SERVER['HTTP_HOST'],
+                        'robot', $user_mail_subj, $msg_body, false, "", "", $manager_email);
+                }
 
                 //обновляем запись в БД
                 $updateSQL = "UPDATE `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_basket_orders` SET ";

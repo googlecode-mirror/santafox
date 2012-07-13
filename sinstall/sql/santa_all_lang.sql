@@ -1589,7 +1589,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_field6',NULL,'В
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_field5',NULL,'Кодова сторінка інтерфейса');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_field3',NULL,'Пароль');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_field4',NULL,'Мова інтерфейса');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_field1',NULL,'Логін');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_field1',NULL,'Email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_field2',NULL,'Повне ім’я');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_labe2',NULL,'Новий адміністратор');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_admin_edit_label',NULL,'Редагування адміністратора');
@@ -1608,7 +1608,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_tab_users_7',NULL,'Є
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_tab_users_6',NULL,'Кодова сторінка');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_tab_users_5',NULL,'Мова інтерфейса');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_tab_users_4',NULL,'Ім’я');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_tab_users_2',NULL,'Логін');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_tab_users_2',NULL,'Email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_tab_users_1',NULL,'№');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_label_sel_group',NULL,'Список груп');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','backof_user_del_alert',NULL,'Ви дійсно бажаєте видалити користувача');
@@ -1633,9 +1633,9 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','top_menu_items3_main_admin',NULL,'
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','top_menu_items2_main_admin',NULL,'Модулі');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','top_menu_items1_main_admin',NULL,'Структура');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','start_password',NULL,'Пароль');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','start_login_not_exist',NULL,'Помилка в логіні чи паролі');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','start_login_failed_entered',NULL,'Користувач з таким логіном уже увійшев до системи');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','start_login',NULL,'Логін');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','start_login_not_exist',NULL,'Помилка в email чи паролі');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','start_login_failed_entered',NULL,'Користувач з таким email уже увійшев до системи');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','start_login',NULL,'Email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','small_text_pod_exit',NULL,'(з переходом на головну сторінку сайта)');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','big_text_pod_exit',NULL,'з адміністративного інтерфейса');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','main_exit',NULL,'Вихід');
@@ -1941,7 +1941,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_field5',NULL,'К
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_field4',NULL,'Язык интерфейса');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_field2',NULL,'Полное имя');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_field3',NULL,'Пароль');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_field1',NULL,'Логин');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_field1',NULL,'Email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_labe2',NULL,'Новый администратор');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_admin_edit_label',NULL,'Редактирование администратора');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_user_label_menu4',NULL,'Список работающих администраторов');
@@ -1959,7 +1959,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_tab_users_7',NULL,'С
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_tab_users_6',NULL,'Кодовая страница');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_tab_users_5',NULL,'Язык интерфейса');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_tab_users_4',NULL,'Имя');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_tab_users_2',NULL,'Логин');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_tab_users_2',NULL,'Email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_tab_users_1',NULL,'№');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_label_sel_group',NULL,'Список групп');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','backof_user_del_alert',NULL,'Вы действительно хотите удалить пользователя');
@@ -1984,9 +1984,9 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','top_menu_items3_main_admin',NULL,'
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','top_menu_items2_main_admin',NULL,'Модули');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','top_menu_items1_main_admin',NULL,'Структура');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','start_password',NULL,'Пароль');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','start_login_not_exist',NULL,'Ошибка в логине или пароле');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','start_login_failed_entered',NULL,'Пользователь с таким логином уже вошел в систему');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','start_login',NULL,'Логин');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','start_login_not_exist',NULL,'Ошибка в email или пароле');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','start_login_failed_entered',NULL,'Пользователь с таким email уже вошел в систему');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','start_login',NULL,'Email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','small_text_pod_exit',NULL,'(с переходом на главную страницу сайта)');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','big_text_pod_exit',NULL,'из административного интерфейса');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','main_exit',NULL,'Выход');
@@ -2249,4 +2249,26 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_new_struct_page_name',NULL,'
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_new_struct_page_name',NULL,'Новая страница');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_new_struct_page_name',NULL,'Новая страница');
 
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_adminstrators_label',NULL,'Администраторы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_adminstrators_label',NULL,'Администраторы');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_adminstrators_label',NULL,'Администраторы');
 
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_adminstrators_manage',NULL,'Управление администраторами');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_adminstrators_manage',NULL,'Управление администраторами');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_adminstrators_manage',NULL,'Управление администраторами');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_adminstrators_required_fields_empty',NULL,'Ошибка - email и пароль должны быть заполнены');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_adminstrators_required_fields_empty',NULL,'Ошибка - email и пароль должны быть заполнены');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_adminstrators_required_fields_empty',NULL,'Ошибка - email и пароль должны быть заполнены');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admins_save_no_groups_error',NULL,'Администратор должен принадлежать хотя бы к одной группе');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admins_save_no_groups_error',NULL,'Администратор должен принадлежать хотя бы к одной группе');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admins_save_no_groups_error',NULL,'Администратор должен принадлежать хотя бы к одной группе');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admins_save_no_rights_error',NULL,'Не выбрано прав');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admins_save_no_rights_error',NULL,'Не выбрано прав');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admins_save_no_rights_error',NULL,'Не выбрано прав');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_msg_incorrect_email',NULL,'Некорректный email');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_msg_incorrect_email',NULL,'Некорректный email');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_msg_incorrect_email',NULL,'Некорректный email');

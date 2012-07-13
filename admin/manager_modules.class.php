@@ -499,10 +499,9 @@ class manager_modules
 
 
 		//Проверим необходимость добавления к пользователю Фротнофиса новых полей базовым модулем
-		$users = new manager_users();
-		$users->add_feild_for_user($install->get_users_properties_one(), $id_modul, true);
+        manager_users::add_field_for_user($install->get_users_properties_one(), $id_modul, true);
 
-		//Обновим информацию о макрасах
+		//Обновим информацию о макросах
 		//Здесь нам нужно только убрать или добавить параметры макросов
 
 
@@ -593,8 +592,6 @@ class manager_modules
 		$mudules_del = array();
 		$mudules_del[$id_modul] = '';
 
-		$users = new manager_users();
-
 		//Проверим, может для удаления выбран базовый модуль, и это значит что
 		//нужно удалить и все его дочерние модули
 		$arr_modul = $this->return_info_modules($id_modul);
@@ -611,11 +608,11 @@ class manager_modules
 				//Для каждого дочернего модуля нужны вызвать предпредделны метод
 				//uninstalla - что бы он в случае надобности удалил всё что ему нужно.
         		@$install->uninstall_children($key);
-        		$users->delete_feild_for_user($key);
+        		manager_users::delete_field_for_user($key);
 			}
 			//Теперь вызовем деинстолятор базового модуля
 			$install->uninstall($id_modul);
-			$users->delete_feild_for_user($id_modul);
+            manager_users::delete_field_for_user($id_modul);
 		} else
 		{
 			//Удаляем только дочерний модуль
@@ -624,7 +621,7 @@ class manager_modules
 
             /** @var $install install_modules */
             $install->uninstall_children($id_modul);
-			$users->delete_feild_for_user($id_modul);
+            manager_users::delete_field_for_user($id_modul);
 		}
 
 		//Базы данных модулей, а так же возможные поля к пользователям удалены
@@ -851,8 +848,7 @@ class manager_modules
 		$lang_install->add_langauge($path.'/lang');
 
 		//Проверим необходимость добавления к пользователю Фротнофиса новых полей базовым модулем
-		$users = new manager_users();
-		$users->add_feild_for_user($install->get_users_properties_one(), $id_modul);
+        manager_users::add_field_for_user($install->get_users_properties_one(), $id_modul);
 
 		//Вызов непосредственного инсталятора для базового модуля
         //Прежде всего узнаем список существующих mysql таблиц
@@ -999,8 +995,7 @@ class manager_modules
 
 		//Проверим необходимость добавления к пользователям новых полей
 		//$arr = $install->get_users_properties_multi();
-		$users = new manager_users();
-		$users->add_feild_for_user($install->get_users_properties_multi(),$base_modul.$num_id);
+        manager_users::add_field_for_user($install->get_users_properties_multi(),$base_modul.$num_id);
 
 		//Регистрируем модуль в таблице инсталированных модулей.
     	$query = "INSERT INTO ".$kernel->pub_prefix_get()."_modules VALUES

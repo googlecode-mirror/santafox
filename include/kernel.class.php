@@ -1275,18 +1275,13 @@ class kernel
     {
         if ($this->priv_admin_is_root())
             return true;
-
-        $access = new manager_users();
-
         //Массив групп, к которым принадлежит текущий пользователь
         $agroups = $this->priv_admin_groups_curent_get();
         if (empty($id_menu))
         	$id_menu = $this->pub_module_id_get();
         if ($id_menu == "stat")
             $id_menu = "kernel";
-        return $access->admin_access_for_group_get(join(",", $agroups), intval(count($agroups)), $id_menu, $id_access);
-
-
+        return manager_users::admin_access_for_group_get(join(",", $agroups), intval(count($agroups)), $id_menu, $id_access);
     }
 
     /**
@@ -2835,8 +2830,7 @@ class kernel
 	 */
     function pub_user_add_new($login, $password, $email, $name)
     {
-        $user = new manager_users();
-        return $user->user_add_new($login, $password, $email, $name);
+        return manager_users::user_add_new($login, $password, $email, $name);
     }
 
 
@@ -2859,8 +2853,7 @@ class kernel
 	 */
     public function pub_user_register($login, $password, $unic_login = true)
     {
-        $user = new manager_users();
-        $res = $user->fof_user_authorization($login, $password, $unic_login);
+        $res = manager_users::fof_user_authorization($login, $password, $unic_login);
         if ($res < 0)
         {
             $_SESSION['vars_kernel']['user_fof'] = array();
@@ -2970,8 +2963,7 @@ class kernel
 	 */
     function pub_users_info_get($id_user = "", $tree = true, $orderby="`login`", $offset=null, $limit=null)
     {
-        $user = new manager_users();
-        return $user->users_info_get($id_user, $tree, $orderby,$offset,$limit);
+        return manager_users::users_info_get($id_user, $tree, $orderby,$offset,$limit);
     }
 
 
@@ -2981,8 +2973,7 @@ class kernel
      */
     function pub_users_total_get()
     {
-        $users = new manager_users();
-        return $users->get_total_users();
+        return manager_users::get_total_users();
     }
     
     /**
@@ -2996,8 +2987,7 @@ class kernel
      */
     function pub_users_fields_get($cond='true')
     {
-        $user = new manager_users();
-        return $user->users_fields_get($cond);
+        return manager_users::users_fields_get($cond);
     }
 
     /**
@@ -3011,9 +3001,8 @@ class kernel
 	 */
     function pub_user_login_info_get($login, $is_login = true)
     {
-        $user = new manager_users();
         $login = mysql_real_escape_string($login);
-        return $user->user_info_get($login, $is_login);
+        return manager_users::user_info_get($login, $is_login);
     }
 
     /**
@@ -3028,14 +3017,13 @@ class kernel
 	 */
     function pub_users_info_set($data, $update_curent = true)
     {
-        $user = new manager_users();
-        $ret = $user->users_info_save($data);
+        $ret = manager_users::users_info_save($data);
         if (($ret) && (count($data) == 1) && ($update_curent))
         {
 
             $id_user = each($data);
             $id_user = $id_user['key'];
-            $res = $user->fof_user_authorization('', '', '',$id_user);
+            $res = manager_users::fof_user_authorization('', '', '',$id_user);
             if ($res < 0)
             {
                 $_SESSION['vars_kernel']['user_fof'] = array();
@@ -3058,8 +3046,7 @@ class kernel
 	 */
     function pub_user_delete($id_user)
     {
-        $user = new manager_users();
-        return $user->user_delete($id_user);
+        return manager_users::user_delete($id_user);
     }
 
 
@@ -3088,8 +3075,7 @@ class kernel
 	 */
     function pub_user_verify($id_user)
     {
-        $user = new manager_users();
-        return $user->user_verify($id_user);
+        return manager_users::user_verify($id_user);
     }
 
     /**
@@ -3105,8 +3091,7 @@ class kernel
 	 */
     function pub_user_change_enabled($id_user, $enabled = true)
     {
-        $user = new manager_users();
-        return $user->user_change_enabled($id_user, $enabled);
+        return manager_users::user_change_enabled($id_user, $enabled);
     }
 
     /**
@@ -3124,8 +3109,7 @@ class kernel
      */
     function pub_users_group_get()
     {
-        $user = new manager_users();
-        return $user->users_group_get();
+        return manager_users::users_group_get();
     }
 
     /**
@@ -3139,8 +3123,7 @@ class kernel
      */
     function pub_users_group_set($id, $data)
     {
-        $user = new manager_users();
-        return $user->users_group_set($id, $data);
+        return manager_users::users_group_set($id, $data);
     }
 
     /**
@@ -3151,8 +3134,7 @@ class kernel
      */
     function pub_user_group_get($id)
     {
-        $user = new manager_users();
-        return $user->user_group_get($id, true);
+        return manager_users::user_group_get($id, true);
     }
 
     /**
@@ -5203,11 +5185,10 @@ class kernel
         if ($change_for_parent)
             $curent_chmod_dir = $this->pub_file_dir_parent($curent_chmod_dir);
 
-        $res = false;
 	    if (isset($this->ftp_dir_chmod_temp[$curent_chmod_dir]))
-	       $res = $this->pub_ftp_dir_chmod_close($file, $change_for_parent, false, $show_errore);
+	        $res = $this->pub_ftp_dir_chmod_close($file, $change_for_parent, false, $show_errore);
 	    else
-	       $res = $this->pub_ftp_dir_chmod_open($file, $change_for_parent, $show_errore);
+	        $res = $this->pub_ftp_dir_chmod_open($file, $change_for_parent, $show_errore);
 	    return $res;
     }
 

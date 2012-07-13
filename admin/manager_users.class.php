@@ -3,20 +3,15 @@
  /**
  * Управляет администраторами и пользователями сайта
  * @name manager_users
- * @copyright  ArtProm (с) 2002-2007
- * @version 1.0
+ * @copyright  ArtProm (с) 2002-2012
+ * @version 3.0
  */
 
 class manager_users
 {
-    var $symbol_delimiter = '-';
+    const symbol_delimiter = '-';
 
-	function manager_users()
-    {
-
-    }
-
-    public function get_total_users()
+    public static function get_total_users()
     {
         global $kernel;
         $total=0;
@@ -32,7 +27,6 @@ class manager_users
      * Функция орпеделяет какие элементы меню присутсвуют в меню раздела
      * @param pub_interface $show Объект класса pub_interface
      * @return void
-     * @access private
      */
 	function interface_get_menu($show)
     {
@@ -129,7 +123,6 @@ class manager_users
                 break;
 
             case 'save_access':
-
                 $html_content = $this->bof_groups_save_access();
                 //$kernel->pub_redirect_refresh_reload('group_access');
                 break;
@@ -140,8 +133,6 @@ class manager_users
             case 'active_admins':
                 $html_content = $this->bof_show_form_active_admins();
                 break;
-
-
         }
         return $html_content;
     }
@@ -150,10 +141,9 @@ class manager_users
      * Формирует таблицу администраторов, работающих с сайтом
      *
      * @return string
-     * @access private
      *
      */
-    function bof_show_form_active_admins()
+    private function bof_show_form_active_admins()
     {
         global $kernel;
         $sql = "SELECT
@@ -229,18 +219,24 @@ class manager_users
 	 * Сохраняет сразу информацию о всех отредактированных данных
 	 * @return array
 	 */
-	function bof_admin_save()
+	private function bof_admin_save()
     {
     	global $kernel;
 
     	$data = $kernel->pub_httppost_get();
     	$id_admin = $kernel->pub_httpget_get('id');
 
+        if (!isset($data['login']) || empty($data['login']) || !isset($data['pass']) || empty($data['pass']))
+            return $kernel->pub_json_encode(array("success"=>false, "info"=>"[#admin_adminstrators_required_fields_empty#]"));
         if (!isset($data['select_group']) || empty($data['select_group']))
-            return $kernel->pub_json_encode(array("success"=>false, "info"=>"Администратор должен принадлежать хотя бы к одной группе"));//@todo use lang vars
+            return $kernel->pub_json_encode(array("success"=>false, "info"=>"[#admins_save_no_groups_error#]"));
+        if (!$kernel->pub_is_valid_email($data['login']))
+            return $kernel->pub_json_encode(array("success"=>false, "info"=>"[#admin_msg_incorrect_email#]"));
     	if ($id_admin == 0)
-    	   return $kernel->pub_json_encode(array("success"=>false, "info"=>"No admin"));//@todo use lang vars
+    	   return $kernel->pub_json_encode(array("success"=>false, "info"=>"No admin"));
 
+        if (!isset($data['full_name']))
+            $data['full_name']=$data['login'];
         $enabled = 0;
         if (isset($data['enabled']))
             $enabled = 1;
@@ -315,7 +311,7 @@ class manager_users
 
         }
 
-        return $kernel->pub_json_encode(array("success"=>true, "info"=>"Данные успешно сохраненны."));//@todo use lang vars
+        return $kernel->pub_json_encode(array("success"=>true, "info"=>"[#kernel_ajax_data_saved_ok#]"));
     }
 
 
@@ -326,11 +322,10 @@ class manager_users
      * Если в качетсве логина передано пустое значение, то это форма
      * добавления.
      * @param string $login Логин администратора при редактировании
-     * @return HTML
-     * @access private
+     * @return string
      */
 
-    function bof_admin_edit_and_add($login = '')
+    private function bof_admin_edit_and_add($login = '')
     {
         global $kernel;
 
@@ -413,11 +408,9 @@ class manager_users
      * Если в качетсве логина передано пустое значение, то это форма
      * добавления.
      * @param mixed $id ID группы
-     * @return HTML
-     * @access private
+     * @return string
      */
-
-    function bof_group_edit_and_add($id = '')
+    private function bof_group_edit_and_add($id = '')
     {
         global $kernel;
 
@@ -455,10 +448,9 @@ class manager_users
 	/**
 	 * Сохраняет отредактированную (или новую) группу администраторов
 	 *
-	 * @access private
 	 * @return string
 	 */
-	function bof_group_save()
+	private function bof_group_save()
 	{
 		global $kernel;
 
@@ -491,7 +483,7 @@ class manager_users
                         ('".$data['name']."', '".mysql_real_escape_string(trim($data['full_name']))."', ".$root_admin.")";
         }
         $kernel->runSQL($query);
-        return $kernel->pub_json_encode(array("success"=>true, "info"=>"Данные успешно сохраненны."));//@todo use lang vars
+        return $kernel->pub_json_encode(array("success"=>true, "info"=>"[#kernel_ajax_data_saved_ok#]"));
 	}
 
 
@@ -503,7 +495,7 @@ class manager_users
      * @param string $name
      * @return integer
      */
-    function user_add_new($login, $password, $email, $name)
+    public static function user_add_new($login, $password, $email, $name)
     {
     	global $kernel;
 
@@ -541,7 +533,7 @@ class manager_users
      * @param integer $id_user
      * @return mixed
      */
-    function fof_user_authorization($login, $password, $unic_login = true, $id_user = 0)
+    public static function fof_user_authorization($login, $password, $unic_login = true, $id_user = 0)
     {
     	global $kernel;
 
@@ -596,11 +588,11 @@ class manager_users
 				$arr['tree']['fields'][$row['id_modul']][$row['id']]['params'] = $row['params'];
 				$arr['tree']['fields'][$row['id_modul']][$row['id']]['required'] = $row['required'];
 
-				$arr['line'][$row['id_modul'].$this->symbol_delimiter.$row['id_field']] = '';
+				$arr['line'][$row['id_modul'].self::symbol_delimiter.$row['id_field']] = '';
 
 				$modul[$row['id']] = $row['id_modul'];
-				$modul2[$row['id']] = $row['id_modul'].$this->symbol_delimiter.$row['id_field'];
-				$indexes[$row['id_modul'].$this->symbol_delimiter.$row['id_field']] = $row['id'];
+				$modul2[$row['id']] = $row['id_modul'].self::symbol_delimiter.$row['id_field'];
+				$indexes[$row['id_modul'].self::symbol_delimiter.$row['id_field']] = $row['id'];
 			}
             mysql_free_result($result);
 		}
@@ -633,9 +625,8 @@ class manager_users
      * Возвращает массив дополнительных полей у пользователя
      * @param string $cond условие
      * @return array
-     * @access private
      */
-    function users_fields_get($cond='true')
+    public static function users_fields_get($cond='true')
     {
         global $kernel;
     	$arr = array();
@@ -658,12 +649,12 @@ class manager_users
 	 * @param integer $limit лимит
      * @return array
      */
-    function users_info_get($id_user = 0, $tree = true, $orderby="`login`",$offset=null, $limit=null)
+    public static function users_info_get($id_user = 0, $tree = true, $orderby="`login`",$offset=null, $limit=null)
     {
     	global $kernel;
 
     	//сначала соберем массив всех дополнительных полей, прописанных модулями
-    	$user_fields = $this->users_fields_get();
+    	$user_fields = self::users_fields_get();
 
 		//Теперь обратимся к зарегистрированным пользователем и подготовим выходной массив
 		$query = "SELECT *, date_format(date, '%d.%m.%y') AS fdate
@@ -706,9 +697,9 @@ class manager_users
     				{
     					foreach ($val as $inf_fields)
     					{
-    						$res[$id]['fields'][$key.$this->symbol_delimiter.$inf_fields['id_field']]['value'] = '';
-    						$res[$id]['fields'][$key.$this->symbol_delimiter.$inf_fields['id_field']]['id'] = $inf_fields['id'];
-    						$res[$id]['fields'][$key.$this->symbol_delimiter.$inf_fields['id_field']]['caption'] = $inf_fields['caption'];
+    						$res[$id]['fields'][$key.self::symbol_delimiter.$inf_fields['id_field']]['value'] = '';
+    						$res[$id]['fields'][$key.self::symbol_delimiter.$inf_fields['id_field']]['id'] = $inf_fields['id'];
+    						$res[$id]['fields'][$key.self::symbol_delimiter.$inf_fields['id_field']]['caption'] = $inf_fields['caption'];
     					}
     				}
     			}
@@ -734,8 +725,8 @@ class manager_users
     		{
     			while ($row = mysql_fetch_assoc($result))
     			{
-    				$res[$row['user']]['fields'][$row['id_modul'].$this->symbol_delimiter.$row['id_field']]['value'] = $row['value'];
-    				$res[$row['user']]['fields'][$row['id_modul'].$this->symbol_delimiter.$row['id_field']]['id'] = $row['id'];
+    				$res[$row['user']]['fields'][$row['id_modul'].self::symbol_delimiter.$row['id_field']]['value'] = $row['value'];
+    				$res[$row['user']]['fields'][$row['id_modul'].self::symbol_delimiter.$row['id_field']]['id'] = $row['id'];
     			}
     		}
             mysql_free_result($result);
@@ -743,7 +734,7 @@ class manager_users
     	return $res;
     }
 
-    function user_info_get($login, $is_login = true)
+    public static function user_info_get($login, $is_login = true)
     {
     	global $kernel;
     	//Проверим существует-ли вообще такой пользователь
@@ -780,12 +771,13 @@ class manager_users
 				if (intval($row['only_admin']))
 					continue;
 
-				$arr[$row['id_modul'].$this->symbol_delimiter.$row['id_field']] = '';
+				$arr[$row['id_modul'].self::symbol_delimiter.$row['id_field']] = '';
 
 				$modul[$row['id']] = $row['id_modul'];
-				$modul2[$row['id']] = $row['id_modul'].$this->symbol_delimiter.$row['id_field'];
-				$indexes[$row['id_modul'].$this->symbol_delimiter.$row['id_field']] = $row['id'];
+				$modul2[$row['id']] = $row['id_modul'].self::symbol_delimiter.$row['id_field'];
+				$indexes[$row['id_modul'].self::symbol_delimiter.$row['id_field']] = $row['id'];
 			}
+            mysql_free_result($result);
 		}
 
 
@@ -804,12 +796,13 @@ class manager_users
 			{
 				$arr[$modul2[$row['field']]] = $row['value'];
 			}
+            mysql_free_result($result);
 		}
 		return $arr;
     }
 
 
-    function users_info_save($data)
+    public static function users_info_save($data)
 	{
 		global $kernel;
 		if (!is_array($data))
@@ -863,15 +856,12 @@ class manager_users
 
             foreach ($form_data as $tkey => $tval)
             {
-                    //if (empty($tval))
-                    //    continue;
-
                     if (preg_match('/^[0-9]+$/i', trim($tkey)))
                         $arr_fields[$tkey] = $tval;
                     else
                     {
                         //Сразу строчку для запроса подготовим
-                        $tmp = explode($this->symbol_delimiter, $tkey);
+                        $tmp = explode(self::symbol_delimiter, $tkey);
                         $arr_fields_str[] = "(id_modul = '".$tmp[0]."' and id_field = '".$tmp[1]."')";
                     }
             }
@@ -913,7 +903,7 @@ class manager_users
 		return true;
 	}
 
-	function user_verify($id_user)
+	public static function user_verify($id_user)
 	{
 		global $kernel;
 		if (empty($id_user))
@@ -930,7 +920,7 @@ class manager_users
 	}
 
 
-	function user_change_enabled($id_user, $enabled = true)
+	public static function user_change_enabled($id_user, $enabled = true)
 	{
 		global $kernel;
 
@@ -958,7 +948,7 @@ class manager_users
 	 * @param integer $id_user
 	 * @return boolean
 	 */
-	function user_delete($id_user)
+	public static function user_delete($id_user)
     {
     	global $kernel;
 
@@ -983,12 +973,12 @@ class manager_users
 
 
 	/**
-	 * Удаляет строчку с юзером из баззы данных
+	 * Удаляет админа из базы данных
 	 *
-	 * @param integer $id_str ID строки с пользователем, которого надо удалять
+	 * @param integer $id_str ID пользователя, которого надо удалять
 	 */
 
-	function bof_admin_delete($id_str)
+	private function bof_admin_delete($id_str)
     {
     	global $kernel;
     	if (empty($id_str))
@@ -1003,11 +993,10 @@ class manager_users
 
     /**
     * Удаляет выбранную группу администраторов сайта
-    * @access private
     * @param integer $id_group
     * @return Void
     */
-	function bof_group_delete($id_group)
+	private function bof_group_delete($id_group)
     {
     	global $kernel;
         //Непосредственно удалим группу
@@ -1028,37 +1017,11 @@ class manager_users
 
 
     /**
-     * Включает администратора сайта
-     *
-     * @param integer $id_user ID администратора
-     * @return boolean
-     */
-    function bof_admin_enabled($id_user)
-    {
-    	global $kernel;
-    	if (intval($id_user) < 1)
-    		return false;
-
-    	$query = "UPDATE ".$kernel->pub_prefix_get()."_admin
-        		  SET enabled = 1
-        		  WHERE id = ".$id_user;
-
-		$kernel->runSQL($query);
-		$num = mysql_affected_rows();
-		if ($num == 1)
-			return true;
-		else
-			return false;
-    }
-
-
-
-    /**
     * Выводит на экран форму с администраторами сайта, для их редактирования
-    * @return HTML
+    * @return string
     *
     **/
-	function bof_show_form_admin()
+	private function bof_show_form_admin()
     {
     	global $kernel;
 
@@ -1115,10 +1078,9 @@ class manager_users
 	*
 	* Через форму можно вызвать удаление, создание новой и редактирование
 	* сущестующей группы
-	* @access private
-	* @return HTML
+	* @return string
 	*/
-	function bof_group_show_form()
+	private function bof_group_show_form()
     {
     	global $kernel;
 
@@ -1160,20 +1122,13 @@ class manager_users
 	/**
 	 * Создаёт форму управления правами для групп
 	 *
-	 * @return HTML
-	 * @access void
+	 * @return string
 	 */
-	function bof_groups_show_form_access()
+	private function bof_groups_show_form_access()
 	{
 		global $kernel;
-
-
 		$template = $kernel->pub_template_parse('admin/templates/default/access_list_access.html');
-
 		$html = $template['main'];
-
-
-
 		//Сначала сформируем набор галочек, для всех доступных свойств
 		$modules = new manager_modules();
 		$arr_access = $modules->get_access();
@@ -1225,7 +1180,6 @@ class manager_users
                             $num++;
                         }
                     }
-
                 }
             }
             //И последнее, возможно уровни доступа есть непосредственно
@@ -1250,7 +1204,6 @@ class manager_users
         //Теперь начнём формировать список групп, с указанием id тех групп,
         //которые на данный момент отмечены в базе.
         //Эти ID будем получуть по соответствиям в массиве $array_name_cross_id
-
 		$html_group = '';
 		$arr_group = $this->get_array_groups();
 		$cbarray = array();
@@ -1280,16 +1233,15 @@ class manager_users
      *
      * Функция не совсем корректно обрабатывает права на главную страницу структуры
      * это необходимо ещё доделать
-     * @access private
      * @return string
      */
-    function bof_groups_save_access()
+    private function bof_groups_save_access()
     {
     	global $kernel;
     	$id_goup = $kernel->pub_httppost_get('selgriup');
     	$data = $kernel->pub_httppost_get('access');
     	if ($id_goup <= 0)
-    		return $kernel->pub_json_encode(array("success"=>false, "info"=>"Не выбрана группа"));//@todo use lang vars
+    		return $kernel->pub_json_encode(array("success"=>false, "info"=>"[#admins_save_no_groups_error#]"));
     	//Действем по принципу всё очистили и записали занового
     	$query = "DELETE FROM ".$kernel->pub_prefix_get()."_admin_group_access
          		  WHERE group_id = ".$id_goup;
@@ -1297,7 +1249,7 @@ class manager_users
 
         //Если массив пустой, то никакие права ставить не надо
         if (empty($data))
-            return $kernel->pub_json_encode(array("success"=>false, "info"=>"Не выбрано прав"));//@todo use lang vars
+            return $kernel->pub_json_encode(array("success"=>false, "info"=>"[#admins_save_no_rights_error#]"));
 
         $array_save = array();
         foreach ($data as $key => $val)
@@ -1313,7 +1265,7 @@ class manager_users
         }
 
     	if (empty($array_save))
-        	return $kernel->pub_json_encode(array("success"=>false, "info"=>"Не выбрано прав"));//@todo use lang vars
+        	return $kernel->pub_json_encode(array("success"=>false, "info"=>"[#admins_save_no_rights_error#]"));
 
         //Теперь запишем новые данные из поста
     	$query = "INSERT INTO `".$kernel->pub_prefix_get()."_admin_group_access`
@@ -1321,72 +1273,19 @@ class manager_users
     			 VALUES ".join(",",$array_save);
     	$kernel->runSQL($query);
 
-        return $kernel->pub_json_encode(array("success"=>true, "info"=>"Данные успешно сохраненны."));//@todo use lang vars
+        return $kernel->pub_json_encode(array("success"=>true, "info"=>"[#kernel_ajax_data_saved_ok#]"));
     }
 
-
-    /**
-     * Формирует список юзеров и групп для включения юзера в группы
-     * @return string
-     */
-    function generate_list_link()
-    {
-        $user_tmp = $this->get_array_users();
-		$group_tmp = $this->get_array_groups();
-        $users_in_group = $this->get_curent_group_for_users();
-
-		$out = '<td valign="top">[#top_menu_items3_main_admin#]:<br><br>';
-        if (!empty($user_tmp))
-        {
-			foreach ($user_tmp as $key=>$val)
-    	    {
-				$out .= '<input type="hidden" name="'.$val['login'].'" value="'.$users_in_group[$val['login']].'"><input id="sel_u'.$key.'" type="radio" name="select_user_link" value="'.$val['login'].'" onClick="select_includ_group()"><label for="sel_u'.$key.'">&nbsp;'.$val['full_name'].' ('.$val['login'].')</label><br>';
-	        }
-    	}
-        $out .= '</td>';
-		$out .= '<td width="20"></td>';
-		$out .= '<td valign="top">[#users_label_group#]:<br><br>';
-        if (!empty($group_tmp))
-        {
-			foreach ($group_tmp as $key=>$val)
-    	    {
-				$out .= '<input id="sel_g'.$key.'" type="checkbox" name="check_'.$val['id'].'" for_save="'.$val['id'].'" onClick="change_checked_link()"><label for="sel_g'.$key.'">&nbsp;'.$val['name'].' ('.$val['id'].')</label><br>';
-	        }
-    	}
-		$out .= '</td>';
-        return $out;
-    }
-
-
-
-    /**
-     * Создаёт строчку с доступными кодовыми страницами
-     *
-     * Строка представляет собой конструктор массива, для того что бы
-     * использовать его в поле ComboBox объекта Ext (jScript)
-     * @return string
-     * @access private
-     */
-    function codepage_list_prepare()
-    {
-    	global $kernel;
-        $array_codepage = $kernel->priv_codepages_get();
-        $out = array();
-        foreach ($array_codepage as $key => $val)
-			$out[] .= '["'.$key.'","'.$val.'"]';
-        return "[".join(",",$out)."]";
-	}
 
     /**
      * Определяет группы, в которые входить пользователь
      *
      * Возвращает массив групп, которым принадлежить пользователь или все пользователи
      * если не задан конкретный
-     * @access private
      * @param integer $user_id ID юзера, по кому нужна информация. если не задан  - то по всем.
      * @return array
      */
-    function get_curent_group_for_users($user_id = 0)
+    private function get_curent_group_for_users($user_id = 0)
     {
         global $kernel;
 
@@ -1420,12 +1319,12 @@ class manager_users
 
 
 	/**
-	 * возвращает массив данных на конкретного юзера либо на всех
+	 * возвращает массив данных на конкретного администратора либо на всех
 	 *
 	 * @param string $set_login Логин юзера, чьи параметры надо узнать
 	 * @return Array
 	 */
-	function get_array_users($set_login = '')
+	private function get_array_users($set_login = '')
     {
     	global $kernel;
 
@@ -1451,16 +1350,15 @@ class manager_users
         return $user_tmp;
     }
 
-       /**
+   /**
     * Возвращает массив групп администраторов
     *
     * Если используется параметр, ту будет возвращена
     * информацию только по группе с переданным ID
     * @return array
-    * @access private
     * @param integer $id ID конкретной группы
     **/
-	function get_array_groups($id = 0)
+	private function get_array_groups($id = 0)
     {
     	global $kernel;
 		$query = "SELECT `id`, `name`, `main_admin`, `full_name`
@@ -1493,15 +1391,14 @@ class manager_users
     }
 
 
-  /**
+   /**
      * Возвращает массив id элементов, на которые у группы есть права
      *
-     * @access private
      * @param integer $id_group ID группы
      * @param array $group
      * @return array
      */
-    function get_all_access_for_group($id_group = 0, $group = array())
+    private function get_all_access_for_group($id_group = 0, $group = array())
     {
     	global $kernel;
     	$query = 'SELECT *
@@ -1536,17 +1433,13 @@ class manager_users
     }
 
 
-    function admin_access_for_group_get($id_groups, $count_group, $id_modul, $id_acces = '')
+    public static function admin_access_for_group_get($id_groups, $count_group, $id_modul, $id_acces = '')
     {
     	global $kernel;
-
     	if ((empty($id_groups)) || (empty($id_modul)))
     		return false;
-
-    	$query = 'SELECT *
-    			  FROM '.$kernel->pub_prefix_get().'_admin_group_access
+    	$query = 'SELECT * FROM '.$kernel->pub_prefix_get().'_admin_group_access
     			  WHERE (group_id IN ('.$id_groups.')) && (modul_id  = "'.$id_modul.'")';
-
     	if (!empty($id_acces))
     		$query .= " && (access_id = '".$id_acces."')";
     	$result = $kernel->runSQL($query);
@@ -1570,9 +1463,8 @@ class manager_users
 	 * @param array $params Массив с парметрами полей
 	 * @param string $id_modul ID модуля, который создает поля
 	 * @param boolean $reinstall Признак того что сначала надо удалить старые значения
-	 * @access private
 	 */
-	function add_feild_for_user($params, $id_modul, $reinstall = false)
+	public static function add_field_for_user($params, $id_modul, $reinstall = false)
 	{
 		global $kernel;
 
@@ -1638,12 +1530,10 @@ class manager_users
 
 		if (count($arr_insert) > 0)
         {
-
             $query = "INSERT INTO ".$kernel->pub_prefix_get()."_user_fields
             		  (id_field, id_modul, caption, type_field, only_admin)
             		  VALUES
             		  ".join(",",$arr_insert);
-
             $kernel->runSQL($query);
         }
 	}
@@ -1654,11 +1544,9 @@ class manager_users
 	 *
 	 * @param string $id_modul ID модуля, чьи поля будут удалены
 	 */
-	function delete_feild_for_user($id_modul)
+	public static function delete_field_for_user($id_modul)
 	{
 		global $kernel;
-
-
         //удаление значений
 		$query = "DELETE FROM ".$kernel->pub_prefix_get()."_user_fields_value
 				  WHERE field IN (SELECT id FROM ".$kernel->pub_prefix_get()."_user_fields WHERE id_modul = '".$id_modul."')";
@@ -1674,15 +1562,12 @@ class manager_users
 	 * Формирует массив с группами пользователей сайта
 	 *
 	 * @return array
-	 * @access private
 	 */
-    function users_group_get()
+    public static function users_group_get()
     {
 		global $kernel;
-
     	$query = "SELECT * FROM `".$kernel->pub_prefix_get()."_user_group`";
     	$result = $kernel->runSQL($query);
-
         $group = array();
         while ($row = mysql_fetch_assoc($result))
         {
@@ -1690,7 +1575,6 @@ class manager_users
             $group[$row['id']]['name']      = $row['name'];
             $group[$row['id']]['full_name'] = $row['full_name'];
         }
-
         return $group;
     }
 
@@ -1702,7 +1586,7 @@ class manager_users
      * @return array
      */
 
-    function user_group_get($id, $invers = false)
+    public static function user_group_get($id, $invers = false)
     {
         global $kernel;
 
@@ -1727,19 +1611,15 @@ class manager_users
 	 * @param integer $id
 	 * @param array $data
 	 * @return array
-	 * @access private
 	 */
-    function users_group_set($id, $data)
+    public static function users_group_set($id, $data)
     {
 		global $kernel;
-
 		//сначала узнаем есть ли текущие группы
-	    $curent_group = $this->user_group_get($id, true);
-
+	    $curent_group = self::user_group_get($id, true);
 	    //Теперь из массива того что есть и того что должно быть
 	    //сделаем массив того что нужно удалить и добавить
     	$a_add = array();
-
     	//значит всё удалить
     	if (empty($data))
     	   $a_del = $curent_group;
@@ -1783,5 +1663,3 @@ class manager_users
     }
 
 }
-
-?>

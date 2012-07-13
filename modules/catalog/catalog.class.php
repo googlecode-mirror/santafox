@@ -5627,7 +5627,7 @@ class catalog extends BaseModule
             }
         }
         $d->close();
-        sort($array_select);
+        ksort($array_select);
         return $array_select;
     }
 

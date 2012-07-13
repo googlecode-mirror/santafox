@@ -457,20 +457,20 @@ function structure_tree_click_node(url)
     $('#structure_page_name').html('').parent().hide();
     $('#page_container').css({'display':'none'});
     $('#contentLoading').show();
-    
+
     //Загрузка данных о самой странице и свойствах модулей
     $.get(url_link_main, function (data)
     {
         var comboStore = jQuery.parseJSON(data);
         if (comboStore != null)
             set_propertes_main(comboStore);
-        
+
         $("#contentLoading").remove();
         $('#content_header').show();
         $('#page_tabs').parent().tabs({ selected: 0 });
         $('#page_container').css({'display':'block'});
     });
-    
+
     run_update_metki(url);
 }
 
@@ -492,7 +492,7 @@ function set_propertes_main(d)
 {
     // название страницы
     $('#structure_page_name').html('"<a href="/'+d.id_curent_page+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+d.caption+'</a>"');
-    
+
     //Проставляем поля формы
     $("#fieldPageName").val(d.caption);
     $("#fieldPageTitle").val(d.name_title);
@@ -555,7 +555,7 @@ var metkiCount=0;
 var arr_link_content = new Array();
 function set_metki(d)
 {
-    $('#table_metki').html('');//очистим таблицу меток
+    $('#table_metki_content').html('');//очистим таблицу меток
     var str_code = "";
 
     metkiCount = d.length;
@@ -565,25 +565,33 @@ function set_metki(d)
     for (var i = 0; i < d.length; i++)
     {
         var str_content = "";
-        str_content += '<fieldset>';
+        str_content += '<tr>';
         //Имя метки со скрытым инпутом, куда пишется непосредственное значение
-        //str_content += '<td class="name">';
+        str_content += '<td class="metka_name">';
         str_content += '<label for="flag_metka_' + i + '" class="struct_page_label">' + d[i].name + '</label>';
+        str_content += '</td>';
         //Галочка наследования
+        str_content += '<td class="nasled">';
         str_content += '<input type="checkbox" name="' + d[i].name + '" id="flag_metka_' + i + '" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_modul_ext_' +i+'\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_' + i + '\');';
+
         if (hasPostprocessors)
             str_content +='jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_label_postprocessor_' +i+'\');';
         str_content += 'show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_s_' + i + '\');">';
         //Селект, который на который навешивается экстовская форма
+        str_content += '<td>';
         str_content += '<select id="sel_modul_ext_' + i + '"></select>';
+        str_content += '</td>';
+
+        str_content += '<td>';
         str_content += '<span style="height: 26px; display: inline;float: left;"><img class="edit_icon" title="Визуальный редактор контента" id="img_edit_' + i + '" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content[' + i + '], false)"><img class="edit_icon"  id="img_edit_s_' + i + '" title="HTML редактор контента" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content[' + i + '], true)"></span>';
+        str_content += '</td>';
 
         if (hasPostprocessors)
-            str_content += '<select id="sel_label_postprocessor_' + i + '"></select>';
+            str_content += '<td><select id="sel_label_postprocessor_' + i + '"></select></td>';
 
-        str_content += '</fieldset>';
+        str_content += '</tr>';
         //Добавляем небольшими кусками, так как иначе IE глючит
-        $(str_content).appendTo('#table_metki');
+        $(str_content).appendTo('#table_metki_content');
 
         buildMetkaActionsSelect("select#sel_modul_ext_" + i);
         if (hasPostprocessors)
@@ -739,16 +747,16 @@ jQuery.fn.autoGrow = function(){
 		// Variables
 		var colsDefault = this.cols;
 		var rowsDefault = this.rows;
-		
+
 		//Functions
 		var grow = function() {
 			growByRef(this);
 		}
-		
+
 		var growByRef = function(obj) {
 			var linesCount = 0;
 			var lines = obj.value.split('\n');
-			
+
 			for (var i=lines.length-1; i>=0; --i)
 			{
 				linesCount += Math.floor((lines[i].length / colsDefault) + 1);
@@ -759,23 +767,23 @@ jQuery.fn.autoGrow = function(){
 			else
 				obj.rows = rowsDefault;
 		}
-		
+
 		var characterWidth = function (obj){
 			var characterWidth = 0;
 			var temp1 = 0;
 			var temp2 = 0;
 			var tempCols = obj.cols;
-			
+
 			obj.cols = 1;
 			temp1 = obj.offsetWidth;
 			obj.cols = 2;
 			temp2 = obj.offsetWidth;
 			characterWidth = temp2 - temp1;
 			obj.cols = tempCols;
-			
+
 			return characterWidth;
 		}
-		
+
 		// Manipulations
 		this.style.width = "auto";
 		this.style.height = "auto";

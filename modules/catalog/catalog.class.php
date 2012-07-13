@@ -5608,8 +5608,6 @@ class catalog extends BaseModule
     private function get_template_file($path = 'modules/catalog/templates_user', $hide_not_selected=false)
     {
         $array_select = array();
-        if (!$hide_not_selected)
-            $array_select[] = '[#label_properties_no_select_option#]';
         $exts   = array('html','htm');
         $d = dir($path);
         while ($entry = $d->read())
@@ -5627,6 +5625,8 @@ class catalog extends BaseModule
             }
         }
         $d->close();
+        if (!$hide_not_selected)
+            $array_select['']='[#label_properties_no_select_option#]';
         ksort($array_select);
         return $array_select;
     }

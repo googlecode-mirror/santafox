@@ -9,25 +9,27 @@
 
 
 <!-- @main -->
-<div id="[#tree_id#]"></div>
+<div id="%tree_id%"></div>
 <script type="text/javascript">
 
-    jQuery("#[#tree_id#]")
+    jQuery("#%tree_id%")
             /*[#dnd_action2#]*/
             .bind("select_node.jstree", function (e,data) {
                 var currNodeId = data.rslt.obj.attr("id");
                 var dc = true/*[#direct_click#]*/;
                 if (!dc)
                 {
-                    //var selectedNode = data.inst.data.ui.selected[0];//works!
-                    var selectedNode = data.rslt.obj;//!works!
-                    var node_way = jQuery.jstree._reference("#[#tree_id#]").get_path(selectedNode, true);//works!
+                    /*
+                    var selectedNode = data.rslt.obj;
+                    var node_way = jQuery.jstree._reference("#%tree_id%").get_path(selectedNode, true);//works!
                     //Теперь, в куках храниться дорога до текущей ноды
                     jspub_cookie_set("%cookie_name_tree%",node_way.join(","));
                     //Если надо, то уберём текущее выделение с пункта левого меню
                     start_interface.left_menu_clear_select();
                     start_interface.save_link_node_select(selectedNode);
+                    */
                     /*[#linkmenu#]*/
+
 
                 }
                 else
@@ -145,7 +147,7 @@
         "move" : {
             "default_position" : "inside",
             "check_move" : function (m) {
-                if (m.o[0].id=="index" || m.np[0].id=="[#tree_id#]")
+                if (m.o[0].id=="index" || m.np[0].id=="%tree_id%")
                     return false;//no index node drag && no drag to top
                 return true;
             }

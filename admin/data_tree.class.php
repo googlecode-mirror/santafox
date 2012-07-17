@@ -83,6 +83,8 @@ class data_tree
      */
     private $template;
 
+    private $treeID=null;
+
     /**
      * Массив действий контекстного меню
      *
@@ -100,21 +102,21 @@ class data_tree
      * @var array
      * @access private
      */
-    var $contextmenu = array();
+    private $contextmenu = array();
 
     /**
      * ID ноды, которую нужно открыть при первом фомировании списка
      *
      * @var string
      */
-    var $node_default = '';
+    private $node_default = '';
 
     /**
      * Запрещает/разрешает выполнять действие при клике по центральной ноде
      *
      * @var string
      */
-    var $not_click_main = 'false';
+    private $not_click_main = 'false';
 
     /**
      * Если параметр установлен в false, то все ссылки (id действий) должны быть указаны вместе
@@ -123,7 +125,7 @@ class data_tree
      *
      * @var boolean
      */
-    var $relativ_url = true;
+    private  $relativ_url = true;
 
     /**
      * Массив с нодами дерева
@@ -137,7 +139,19 @@ class data_tree
      *
      * @var boolean
      */
-    var $is_page_structure = false;
+    private $is_page_structure = false;
+
+    public function set_tree_ID($id)
+    {
+        $this->treeID=$id;
+    }
+
+    public function get_tree_ID()
+    {
+        if (!$this->treeID)
+            $this->treeID="tree".substr(md5(rand(1000,9999)),0,5);
+        return $this->treeID;
+    }
 
     /**
      * Устанавливает массив с данными
@@ -175,7 +189,7 @@ class data_tree
 	 * @param array $nodes ноды
 	 * @return data_tree
 	 */
-	function data_tree($root_name = "", $root_id = "", $nodes = null)
+	function __construct($root_name = "", $root_id = "", $nodes = null)
 	{
 	    global $kernel;
 
@@ -423,13 +437,9 @@ class data_tree
         if ($this->node_default !== "") //Используем именно такое сравнение, так как может быть 0
         {
             if (is_array($this->node_default))
-            {
                 $this->node_default = "'".join("','", $this->node_default)."'";
-            }
             else
-            {
                 $this->node_default = "'".$this->node_default."'";
-            }
             //Это первый вызов этого интерфейса, и значит что нужно полностью
             //загрузить интерфейс формы, так как его ещё точно нет
             if ($this->is_page_structure)
@@ -438,7 +448,7 @@ class data_tree
             }
         }
 
-        $treeID = "tree".substr(md5(rand(1000,9999)),0,5);
+        $treeID = $this->get_tree_ID();
         //Сформируем непосредственно дерево
         $html = $this->template['main'];
         $html = str_replace("[#tree_id#]"   , $treeID,   $html);

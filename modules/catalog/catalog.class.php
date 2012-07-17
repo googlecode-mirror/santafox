@@ -6797,12 +6797,14 @@ class catalog extends BaseModule
      */
     private function create_categories_tree()
     {
+        global $kernel;
         $nodes = $this->get_categories_tree(0);
 
         $tree  = new data_tree('[#catalog_menu_label_cats#]', '0', $nodes);
         $tree->set_action_click_node('category_items');
         $tree->set_action_move_node('category_move');
         $tree->set_drag_and_drop(true);
+        $tree->set_tree_ID($kernel->pub_module_id_get());
 
         //$tree->not_click_main = true;
         //$tree->set_node_default($node_default);

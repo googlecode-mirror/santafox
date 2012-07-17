@@ -451,7 +451,7 @@ class data_tree
         $treeID = $this->get_tree_ID();
         //Сформируем непосредственно дерево
         $html = $this->template['main'];
-        $html = str_replace("[#tree_id#]"   , $treeID,   $html);
+        $html = str_replace("%tree_id%"   , $treeID,   $html);
         $html = str_replace("[#root_name#]"   , $this->root_name,   $html);
         $html = str_replace("[#root_id#]"     , $this->root_id,     $html);
         $html = str_replace("[#data_url#]"    , $data_url,          $html);

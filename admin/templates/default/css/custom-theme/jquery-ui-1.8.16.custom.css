@@ -503,7 +503,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  * http://docs.jquery.com/UI/Tabs#theming
  */
 .ui-tabs { position: relative; padding: .2.3em; background:#fff; zoom: 1; border:none; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
-.ui-tabs .ui-tabs-nav { width:100%; margin: 0; padding:.2em .2em 0; position:absolute; border-bottom:1px solid #ccc; padding-top:4px; border-radius:0; }
+.ui-tabs .ui-tabs-nav { width:100%; margin: 0; padding:.2em 0 0; position:absolute; border-bottom:1px solid #ccc; padding-top:4px; border-radius:0; }
 .ui-tabs-nav { background:#ededed url('images/tabs-bg.gif') repeat-x top left; padding-top:50px; }
 .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; background:#ddd; top: 2px; border:none; border:1px solid #ddd; margin: 5px .4em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
 .ui-tabs .ui-tabs-nav li a { float: left; padding: .6em 1em; text-decoration: none; }

@@ -646,18 +646,11 @@ class catalog extends BaseModule
     private function show_import_csv_table($group_id, $file, $separator)
     {
         global $kernel;
-
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'import_csv2.html'));
-
         $content = $this->get_template_block("table_header");
-        $content = str_replace('%form_action%',$kernel->pub_redirect_for_form('import_csv3'),$content);
-
         $items = $this->parse_csv_file($file, $separator, 10); //показываем первые 10 товаров
-
         $elems = count($items[0]);
-
         $props = CatalogCommons::get_props($group_id, true);
-
         $props_select = $this->get_template_block("prop_option");
         $props_select = str_replace('%prop_name%', '', $props_select);
         $props_select = str_replace('%prop_name_full%', '[#catalog_import_ignore_column_label#]', $props_select);
@@ -706,6 +699,7 @@ class catalog extends BaseModule
         }
         $content .= $tlines;
         $content .= $this->get_template_block('table_footer');
+        $content = str_replace('%form_action%',$kernel->pub_redirect_for_form('import_csv3'),$content);
         return $content;
     }
 

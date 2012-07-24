@@ -54,14 +54,6 @@ class kernel
     private $prefix;
 
     /**
-     * Массив для конвертации
-     *
-     * @access private
-     * @var array
-     */
-    private $w8;
-
-    /**
      * Текущий модуль
      *
      * Содержит ID с модулем в котором сейчас ведется непосредственная работа в Фронт-офисе
@@ -69,6 +61,15 @@ class kernel
      * @var string
      */
     private $curent_modul;
+
+    /**
+     * ID текущего действи для фронтенда
+     *
+     * Содержит ID текущего действия, обрабатываемого во фронтенд
+     * @access private
+     * @var string
+     */
+    private $curent_actionid;
 
     /**
      * Текущая страница сайта
@@ -254,45 +255,7 @@ class kernel
     function kernel($prefix)
     {
         $this->prefix = $prefix;
-
         $this->curent_os = strtolower(PHP_OS);
-
-        //Теперь создадим переменную для декодирования UTF-8
-        $this->w8['1081']="й"; $this->w8['1094']="ц"; $this->w8['1091']="у";
-        $this->w8['1082']="к"; $this->w8['1077']="е"; $this->w8['1085']="н";
-        $this->w8['1075']="г"; $this->w8['1096']="ш"; $this->w8['1097']="щ";
-        $this->w8['1079']="з"; $this->w8['1093']="х"; $this->w8['1098']="ъ";
-        $this->w8['1092']="ф"; $this->w8['1099']="ы"; $this->w8['1074']="в";
-        $this->w8['1072']="а"; $this->w8['1087']="п"; $this->w8['1088']="р";
-        $this->w8['1086']="о"; $this->w8['1083']="л"; $this->w8['1076']="д";
-        $this->w8['1078']="ж"; $this->w8['1101']="э"; $this->w8['1103']="я";
-        $this->w8['1095']="ч"; $this->w8['1089']="с"; $this->w8['1084']="м";
-        $this->w8['1080']="и"; $this->w8['1090']="т"; $this->w8['1100']="ь";
-        $this->w8['1073']="б"; $this->w8['1102']="ю"; $this->w8['1049']="Й";
-        $this->w8['1062']="Ц"; $this->w8['1059']="У"; $this->w8['1050']="К";
-        $this->w8['1045']="Е"; $this->w8['1053']="Н"; $this->w8['1043']="Г";
-        $this->w8['1064']="Ш"; $this->w8['1065']="Щ"; $this->w8['1047']="З";
-        $this->w8['1061']="Х"; $this->w8['1066']="Ъ"; $this->w8['1060']="Ф";
-        $this->w8['1067']="Ы"; $this->w8['1042']="В"; $this->w8['1040']="А";
-        $this->w8['1055']="П"; $this->w8['1056']="Р"; $this->w8['1054']="О";
-        $this->w8['1051']="Л"; $this->w8['1044']="Д"; $this->w8['1046']="Ж";
-        $this->w8['1069']="Э"; $this->w8['1071']="Я"; $this->w8['1063']="Ч";
-        $this->w8['1057']="С"; $this->w8['1052']="М"; $this->w8['1048']="И";
-        $this->w8['1058']="Т"; $this->w8['1068']="Ь"; $this->w8['1041']="Б";
-        $this->w8['1070']="Ю"; $this->w8['1105']="ё"; $this->w8['1025']="Ё";
-
-        $this->w8['32']=" ";
-        $this->w8['48']="0";
-        $this->w8['49']="1";
-        $this->w8['50']="2";
-        $this->w8['51']="3";
-        $this->w8['52']="4";
-        $this->w8['53']="5";
-        $this->w8['54']="6";
-        $this->w8['55']="7";
-        $this->w8['56']="8";
-        $this->w8['57']="9";
-
         //тепеь произведем соединеие с базой данных MySql
         $this->resurs_mysql = mysql_connect(DB_HOST, DB_USERNAME, DB_PASSWORD);
         if (!$this->resurs_mysql)
@@ -321,6 +284,15 @@ class kernel
 
     }
 
+    public function get_current_actionid()
+    {
+        return $this->curent_actionid;
+    }
+
+    public function set_current_actionid($actionid)
+    {
+        $this->curent_actionid=$actionid;
+    }
 
     /**
      * Возвращает максимальный набор прав
@@ -3022,7 +2994,7 @@ class kernel
         {
 
             $id_user = each($data);
-            $id_user = $id_user['key'];
+            $id_user = intval($id_user['key']);
             $res = manager_users::fof_user_authorization('', '', '',$id_user);
             if ($res < 0)
             {

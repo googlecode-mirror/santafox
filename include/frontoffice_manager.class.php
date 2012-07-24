@@ -455,6 +455,8 @@ class frontoffice_manager
         //Теперь подключим класс этого модуля и установим переменную ядра с именем конкретного
         //модуля, производящего сейчас вызов
         $kernel->priv_module_for_action_set($in['id_mod']);
+
+        $kernel->set_current_actionid($in['id_action']);
         $modul = $kernel->priv_module_including_get($start_modul);
         if ($modul === false)
         {
@@ -484,6 +486,7 @@ class frontoffice_manager
         $param = unserialize(stripslashes($in['run']['param']));
         $html = call_user_func_array(array(&$modul, $name_metod), $param);
         $kernel->priv_module_for_action_set('');
+        $kernel->set_current_actionid(null);
 
         //Для прямого вызова вернём массив с флагом останвливаться или нет
         if (!$direct_run)

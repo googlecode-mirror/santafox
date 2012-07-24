@@ -52,27 +52,28 @@ class feedback
      *
      * @var string
      */
-    private $action_default = 'billing_history';
+    private $action_default;
 
     /**
      * Название перемнной в GET запросе определяющей действие
      *
      * @var string
      */
-    private $action_name = 'view';
+    //private $action_name = 'view';
 
 
 
-    /** Возвращает урл, на который произойдёт возврат
+    /**
+     * Возвращает урл, на который произойдёт возврат
      * @return string
      */
     private function get_return_url()
     {
         $url = $_SERVER['REQUEST_URI'];
-        $url = str_replace($this->get_action_name()."=form_processing", "", $url);
+        $url = preg_replace('~feedback(\d+)-(\d+)=form_processing~U', "", $url);
         if (strpos($url, "?") === false)
             $url.="?";
-        else
+        elseif (substr($url,-1)!="&")
             $url.="&";
         return $url;
     }
@@ -93,9 +94,8 @@ class feedback
 
         $this->set_action_default('form_show');
         $this->set_templates($kernel->pub_template_parse($template));
-
-        switch ($this->get_action_value($this->get_action_name())) {
-
+        switch ($this->get_action_value())
+        {
             // Отобразим форму обратной связи (Действие по умолчанию)
         	default:
         	case 'form_show':
@@ -150,7 +150,7 @@ class feedback
      * Функция по файлу настроек формирует код jscript для формы
      *
      * @param string $filename
-     * @return HTML
+     * @return string
      */
     function pub_get_js($filename)
     {
@@ -215,22 +215,22 @@ class feedback
      */
     private function get_action_name()
     {
-    	return $this->action_name;
+        global $kernel;
+    	return $kernel->pub_module_id_get()."-".$kernel->get_current_actionid();
     }
 
     /**
      * Возвращает значение указанного действия, если установленно или значение по умолчанию
-     *
-     * @param string $action_name Имя параметра в GET запросе
      * @return string
      */
-    private function get_action_value($action_name)
+    private function get_action_value()
     {
         global $kernel;
+        $action_name=$this->get_action_name();
         if ($kernel->pub_httpget_get($action_name))
             return $kernel->pub_httpget_get($action_name);
-        elseif ($kernel->pub_httppost_get('values'))
-            return "form_processing";
+        //elseif ($kernel->pub_httppost_get('values'))
+        //    return "form_processing";
         else
             return $this->get_action_default();
     }
@@ -268,11 +268,6 @@ class feedback
 
         $menu->set_menu_default('edit_ini');
 	    return true;
-	}
-
-	private function set_action_name($name)
-	{
-        $this->action_name = $name;
 	}
 
 	/**

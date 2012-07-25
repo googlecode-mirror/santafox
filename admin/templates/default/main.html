@@ -19,12 +19,37 @@
 <!-- layout js -->
 <script type="text/javascript" src="/admin/js/jquery.layout-latest-rc.js"></script>
 <!-- tree js -->
-		<script type="text/javascript" src="/admin/js/jquery.jstree.js"></script>
+<script type="text/javascript" src="/admin/js/jquery.jstree.js"></script>
 
 <!-- content editors js -->
-		<script type="text/javascript" src="/components/html_editor/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/components/syntax/edit_area_full.js"></script>
+<script type="text/javascript" src="/components/html_editor/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/components/html_editor/ckeditor/adapters/jquery.js"></script>
+
+<!-- codemirror -->
+<link rel="stylesheet" href="/components/codemirror/lib/codemirror.css" type="text/css">
+<script type="text/javascript" src="/components/codemirror/lib/codemirror.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/xml/xml.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/javascript/javascript.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/css/css.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/clike/clike.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/php/php.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<style type="text/css">
+    .CodeMirror {border-top: 1px solid #ededed; border-bottom: 1px solid #ededed; border-right:1px solid #ededed;}
+    .cm-tab:after {
+        content: "\21e5";
+        display: -moz-inline-block;
+        display: -webkit-inline-block;
+        display: inline-block;
+        width: 0px;
+        position: relative;
+        overflow: visible;
+        left: -1.4em;
+        color: #aaa;
+    }
+    .activeline {background: #e8f2ff !important;}
+</style>
 
 <!-- navigation plugins ui js -->
 <script type="text/javascript" src="/admin/js/jquery.ui.selectmenu.js"></script>

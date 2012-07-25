@@ -11,9 +11,25 @@
  
  <fieldset>
   <span class="black">&lt;php?</span><br>
-  <textarea name="code" rows="25" cols="70" style="margin:10px 0 10px 15px;">%code%</textarea><br>
+  <textarea id="code" name="code" rows="15" cols="130" style="margin:10px 0 10px 15px;">%code%</textarea><br>
   <span class="black">?&gt;</span>
  </fieldset>
+
+ <script type="text/javascript">
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+    lineNumbers: true,
+    mode: "text/x-php",
+    tabSize: 4,
+    indentUnit: 4,
+    indentWithTabs: true,
+    onCursorActivity: function() {
+        editor.setLineClass(hlLine, null, null);
+        hlLine = editor.setLineClass(editor.getCursor().line, null, "activeline");
+    }
+    });
+
+    var hlLine = editor.setLineClass(0, "activeline");
+ </script>
  
  <fieldset class="page_submit_field">
   <input type="submit" name="submit" value="Save">

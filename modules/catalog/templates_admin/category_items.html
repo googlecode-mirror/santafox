@@ -36,6 +36,20 @@
  
  <fieldset>
   <label style="width:120px; cursor:default;">[#catalog_list_category_add_item_label#]</label><select name="group_id_for_add" id="group_id_for_add">%group_values%</select>&nbsp;&nbsp;<input type="button" value="[#catalog_list_category_add_item_bt_label#]" onclick="add_new_item()">
+
+
+     <br clear="all"/>
+     <label style="width:120px; cursor:default;">[#catalog_quicksearch_label#]</label><input type="text" name="search_query" id="search_query">
+     <script type="text/javascript">
+         $("#search_query").autocomplete({
+             source: "/admin/index.php?action=set_left_menu&leftmenu=get_items_quicksearch_result&catid=%catid%" ,
+             minLength: 2,
+             select: function( event, ui ) {
+                if (ui.item)
+                    jspub_click("item_edit&id="+ui.item.value);
+             }
+         });
+     </script>
  </fieldset>
 
  %items%

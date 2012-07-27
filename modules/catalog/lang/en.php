@@ -385,3 +385,4 @@ $il['catalog_show_items_list_no_items']='Нет товаров';
 $il['catalog_delete_group_alert']='Действительно удалить тов. группу';
 
 $il['catalog_prop_saved_msg']='Свойство сохранено';
+$il['catalog_quicksearch_label']='Быстрый поиск';

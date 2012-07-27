@@ -411,3 +411,7 @@ $il['admin_adminstrators_manage'] = 'Управление администрат
 $il['admin_adminstrators_required_fields_empty'] = 'Ошибка - email и пароль должны быть заполнены';
 $il['admins_save_no_groups_error'] = 'Администратор должен принадлежать хотя бы к одной группе';
 $il['admin_msg_incorrect_email'] = 'Некорректный email';
+
+$il['common_select_all_label']='Выбрать все';
+$il['common_deselect_all_label']='Убрать все';
+$il['common_done_label']='Готово';

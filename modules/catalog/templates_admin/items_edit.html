@@ -9,30 +9,30 @@
         });
         
          $("#incatdialog").dialog({
-         autoOpen: false,
-         closeOnEscape: false,
-         height: 350,
-         width: 300,
-         modal: true, 
-         title: '[#catalog_item_edit_incategories_label#]',
-         open: function(event, ui) { 
-            $(".ui-dialog-titlebar-close", ui.dialog).hide(); 
-            $(this).append($('#incat').show());
-         },
-         buttons: {
-         'Выбрать все': function() {
-            $(this).find(':checkbox').attr('checked', true);
-         },
+             autoOpen: false,
+             closeOnEscape: false,
+             height: 350,
+             width: 300,
+             modal: true,
+             title: '[#catalog_item_edit_incategories_label#]',
+             open: function(event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog).hide();
+                $(this).append($('#incat').show());
+             },
+             buttons: {
+                 '[#common_select_all_label#]': function() {
+                    $(this).find(':checkbox').attr('checked', true);
+                 },
 
-         'Убрать все': function() {
-            $(this).find(':checkbox').removeAttr('checked');
-         },
+                 '[#common_deselect_all_label#]': function() {
+                    $(this).find(':checkbox').removeAttr('checked');
+                 },
 
-         'Готово': function() {
-            $(this).dialog( "close" );
-            $(this).parent().find('#incat').appendTo($("#incatcontainer"));
-         }
-         }
+                 '[#common_done_label#]': function() {
+                    $(this).dialog( "close" );
+                    $(this).parent().find('#incat').appendTo($("#incatcontainer"));
+                 }
+             }
          });
          
 
@@ -99,7 +99,6 @@
                 </table>
 
                 <fieldset class="page_submit_field">
-                    <!--<input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('saveitemform','/admin/index.php?action=set_left_menu&leftmenu=item_save')">-->
                     <input type="submit" name="submit" value="[#catalog_item_edit_bt_save_label#]">
                 </fieldset>
 
@@ -111,18 +110,35 @@
     </div>
 </div>
 
+
+<!-- @linked_no_main_prop_block -->
+[#catalog_no_main_prop_defined_label#]
+<!-- @linked_search_block -->
+<input type="text" id="add_linked_query">
+<script type="text/javascript">
+    $("#add_linked_query").autocomplete({
+        source: "/admin/index.php?action=set_left_menu&leftmenu=get_items_quicksearch_result&catid=0&ignored=%id%" ,
+        minLength: 2,
+        select: function( event, ui ) {
+            if (ui.item)
+            {
+                $('#add_linked_itemid').val(ui.item.value);
+                jspub_form_submit('addlinkedform','/admin/index.php?action=set_left_menu&leftmenu=add_linked_item')
+            }
+        }
+    });
+</script>
+
 <!-- @linked -->
+
 <fieldset style="border-top:1px solid #ededed; padding:10px 0;">
     <form action="" method="POST" id="addlinkedform">
-        <input type="hidden" name="itemid" value="%id%">
-
-  <span class="block clear">
-   <label style="width:170px;">[#catalog_add_linked_item_label#]</label>
-   <select name="addlinkedid">
-       %addlinked%
-   </select>
-   <input type="button" name="addlink" style="margin-left:10px;" value="[#catalog_add_linked_item_button_label#]" onclick="jspub_form_submit('addlinkedform','/admin/index.php?action=set_left_menu&leftmenu=add_linked_item')">
-  </span>
+      <input type="hidden" name="itemid" value="%id%">
+      <input type="hidden" name="addlinkedid" value="" id="add_linked_itemid">
+      <span class="block clear">
+       <label style="width:170px;">[#catalog_add_linked_item_label#]</label>
+       %linked_data%
+      </span>
     </form>
 </fieldset>
 
@@ -136,9 +152,6 @@
 
 <!-- @linked_item -->
 <tr><td colspan="2"><a href="#" onclick="form_submit_include_content_auto();jspub_click('item_edit&id=%lid%')">%namestring%</a><a href="#" onclick="form_submit_include_content_auto();jspub_click('item_edit&id=%id%&removlinkedid=%lid%')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_remove_linked_item_label#]"/></a></td></tr>
-
-<!-- @addlinked -->
-<option value="%id%">%namestring%</option>
 
 <!-- @prop_string -->
 <tr %class%>

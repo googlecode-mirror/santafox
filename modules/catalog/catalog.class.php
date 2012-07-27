@@ -805,7 +805,7 @@ class catalog extends BaseModule
     /**
      * Добавляет категории в дорогу
      * @param array $cats_way_elems категории
-     * @return
+     * @return void
      */
     private function add_categories2waysite($cats_way_elems)
     {
@@ -5264,17 +5264,7 @@ class catalog extends BaseModule
             if ($main_prop)
             {
                 $linked_items = $this->get_linked_items($id);
-                $items = $this->get_items(0, 0, 0, false);
-                $item_vals = "";
-                foreach ($items as $aitem)
-                {
-                    if (array_key_exists($aitem['id'], $linked_items) || $aitem['id'] == $id)
-                        continue;
-                    $item_val = $this->get_template_block('addlinked');
-                    $item_val = str_replace("%id%", $aitem['id'], $item_val);
-                    $item_val = str_replace("%namestring%", htmlspecialchars($aitem[$main_prop]), $item_val);
-                    $item_vals .= $item_val;
-                }
+
                 foreach ($linked_items as $litem)
                 {
                     $linked_val = $this->get_template_block('linked_item');
@@ -5282,20 +5272,14 @@ class catalog extends BaseModule
                     $linked_val = str_replace("%namestring%", htmlspecialchars($litem[$main_prop]), $linked_val);
                     $linked_vals .= $linked_val;
                 }
+                $linked_data=$this->get_template_block('linked_search_block');
             }
             else
-            {
-                $item_vals = $this->get_template_block('addlinked');
-                $item_vals = str_replace("%id%", 0, $item_vals);
-                $item_vals = str_replace("%namestring%", $kernel->pub_page_textlabel_replace("[#catalog_no_main_prop_defined_label#]"), $item_vals);
-            }
+                $linked_data=$this->get_template_block('linked_no_main_prop_block');
 
             $linked_block = $this->get_template_block('linked');
-            $linked_block = str_replace("%addlinked%", $item_vals, $linked_block);
+            $linked_block = str_replace("%linked_data%", $linked_data, $linked_block);
             $linked_block = str_replace("%linked_items%", $linked_vals, $linked_block);
-
-
-
         }
         $content = str_replace("%linked%", $linked_block, $content);
 
@@ -6231,8 +6215,8 @@ class catalog extends BaseModule
         $content = str_replace('%group_values%' , $groups_vals     , $content);
         $content = str_replace('%cats_options%' , $options         , $content);
         $content = str_replace('%numcolspan%'   , count($cprops)+2 , $content);
-        $content = str_replace('%pages%'        , $pblock           , $content);
-        //$content = str_replace('%catid%',       $cdata['id'] , $content);
+        $content = str_replace('%pages%'        , $pblock          , $content);
+        $content = str_replace('%catid%'        , $id_cat          , $content);
 
         return $content;
     }
@@ -8363,6 +8347,77 @@ class catalog extends BaseModule
         $this->generate_search_form($groupid, array());
     }
 
+    /** Возвращает результаты быстрого поиска
+     * @param string $term запрос
+     * @param integer $catid ID категории
+     * @param array $ignoreItemIds айдишники товаров, которые НЕ надо включать в результаты
+     * @return array
+     */
+    public function get_quicksearch_results($term, $catid=null, $ignoreItemIds=array())
+    {
+        global $kernel;
+        $terms = explode(" ",trim($term));
+        if (!$terms)
+            return array();
+        $moduleid = $kernel->pub_module_id_get();
+        $props = CatalogCommons::get_props(0,true);
+
+
+        $addcond="";
+        if ($catid)
+            $addcond.=" AND id IN (SELECT item_id FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat WHERE cat_id=".$catid.")";
+        if ($ignoreItemIds)
+            $addcond.=" AND id NOT IN (".implode(",",$ignoreItemIds).")";
+
+        //сначала пробуем найти товары со ВСЕМИ словами из запроса (AND-логика)
+        $cond = $this->get_like_condition_for_terms($terms,$props,"AND");
+        $results=$kernel->db_get_list_simple("_catalog_".$moduleid."_items",$cond.$addcond,"*",0,100);
+        if (!$results)
+        {//если не нашли, пробуем найти хотя бы с одним словом из запроса (OR-логика)
+            $cond = $this->get_like_condition_for_terms($terms,$props,"OR");
+            $results=$kernel->db_get_list_simple("_catalog_".$moduleid."_items",$cond.$addcond,"*",0,100);
+        }
+
+        $sep=" | ";
+        foreach($results as &$r)
+        {
+            $stringBlocks=array();
+            foreach ($props as $prop)
+            {
+                if (!$prop['showinlist'] || $prop['type']=='file' || $prop['type']=='pict')
+                    continue;
+                $strval=$r[$prop['name_db']];
+                if (mb_strlen($strval)==0)
+                    continue;
+                $stringBlocks[]=$strval;
+            }
+            $r['_string']=implode($sep,$stringBlocks);
+        }
+        return $results;
+    }
+
+
+
+    private function get_like_condition_for_terms($terms,$props,$separator="OR")
+    {
+        $tblocks=array();
+        foreach ($terms as $t)
+        {
+            $t=trim($t);
+            if (mb_strlen($t)==0)
+                continue;
+            $propsblocks=array();
+            foreach ($props as $prop)
+            {
+                if (!in_array($prop['type'],array('enum','string','number')))
+                    continue;
+                $propsblocks[]="`".$prop['name_db']."` LIKE '%".mysql_real_escape_string($t)."%'";
+            }
+            $tblocks[]="(".implode(" OR ",$propsblocks).")";
+        }
+        return "(".implode(" ".$separator." ",$tblocks).")";
+    }
+
     /**
      * Функция для отображения административного интерфейса
      *
@@ -8375,15 +8430,35 @@ class catalog extends BaseModule
         //если это не работа с деревом, "забудем" куку с выделенной нодой
         if (!in_array($action,array('category_items','category_move','category_items_save','save_selected_items','item_edit','item_save')))
             setcookie($this->structure_cookie_name,"");
+        $moduleid = $kernel->pub_module_id_get();
         switch ($action)
         {
+
+            //ajax-поиск товаров
+            case 'get_items_quicksearch_result':
+                $term=$kernel->pub_httpget_get('term',false);
+                $catid=intval($kernel->pub_httpget_get('catid',false));
+                $ignoredid=intval($kernel->pub_httpget_get('ignored',false));
+                if ($ignoredid)
+                    $ignored = array($ignoredid);
+                else
+                    $ignored = array();
+                $results=$this->get_quicksearch_results($term,$catid,$ignored);
+                $jdata=array();
+                foreach($results as $result)
+                {
+                    $jdata[]=array("label"=>$result['_string'],"value"=>$result['id']);
+                }
+                return $kernel->pub_json_encode($jdata);
+                break;
 
             //Удаление тов.группы
             case 'delete_group':
                 $this->delete_group($kernel->pub_httpget_get('id'));
-
                 $kernel->pub_redirect_refresh("show_groups");
                 break;
+
+            //импорт из 1С-формата CommerceML
             case 'import_commerceml':
                 return $this->import_commerceml();
 
@@ -8400,7 +8475,7 @@ class catalog extends BaseModule
 
             case 'variable_delete':
                 $namedb=$kernel->pub_httpget_get('name_db');
-                $kernel->runSQL("DELETE FROM `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_variables` WHERE `name_db`='".$namedb."'");
+                $kernel->runSQL("DELETE FROM `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` WHERE `name_db`='".$namedb."'");
                 $kernel->pub_redirect_refresh('show_variables');
                 break;
 
@@ -8422,11 +8497,11 @@ class catalog extends BaseModule
                 else
                 {
                     if (empty($prev_name_db))
-                        $query ="REPLACE INTO `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_variables` ".
+                        $query ="REPLACE INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` ".
                             "(`name_db`,`name_full`,`value`) VALUES ".
                             "('".$name_db."','".$name_full."','".$value."')";
                     else
-                        $query ="UPDATE `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_variables` ".
+                        $query ="UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` ".
                             "SET `name_db`='".$name_db."',`name_full`='".$name_full."',`value`='".$value."' ".
                             "WHERE `name_db`='".$prev_name_db."'";
                     $kernel->runSQL($query);
@@ -8574,9 +8649,9 @@ class catalog extends BaseModule
                 $parentNew = $kernel->pub_httppost_get("newParent");
                 $indexNew = $kernel->pub_httppost_get("index");
                 $order2replace = $this->get_last_order_in_cat($parentNew, $indexNew);
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `order`='.($order2replace+1).' WHERE `parent_id`='.$parentNew.' AND `order`='.$order2replace;
+                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `order`='.($order2replace+1).' WHERE `parent_id`='.$parentNew.' AND `order`='.$order2replace;
                 $kernel->runSQL($query);
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `parent_id`='.$parentNew.', `order`='.$order2replace.' WHERE `id`='.$cid;
+                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `parent_id`='.$parentNew.', `order`='.$order2replace.' WHERE `id`='.$cid;
                 $kernel->runSQL($query);
                 break;
 
@@ -8618,7 +8693,7 @@ class catalog extends BaseModule
                     if (mb_strlen($buffer)>0)
                     {
                         $buffer = str_replace('\r\n', "\n", $buffer);
-                        $newfilename = 'content/files/'.$kernel->pub_module_id_get().'/buffer_'.time().'.txt';
+                        $newfilename = 'content/files/'.$moduleid.'/buffer_'.time().'.txt';
                         $kernel->pub_file_save($newfilename, $buffer);
                         $need_save = true;
                     }
@@ -8796,7 +8871,7 @@ class catalog extends BaseModule
                 $enumval = $kernel->pub_httppost_get("enumval");
                 $propid  = $kernel->pub_httppost_get("id");
                 $prop    = $this->get_cat_prop($propid);
-                $table   = '_catalog_'.$kernel->pub_module_id_get().'_cats';
+                $table   = '_catalog_'.$moduleid.'_cats';
 
                 $tinfo   = $this->get_dbtable_info($table);
                 $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
@@ -8809,7 +8884,7 @@ class catalog extends BaseModule
                 $enumval = $kernel->pub_httpget_get("enumval");
                 $propid  = $kernel->pub_httpget_get("propid");
                 $prop    = $this->get_cat_prop($propid);
-                $table   = '_catalog_'.$kernel->pub_module_id_get().'_cats';
+                $table   = '_catalog_'.$moduleid.'_cats';
                 $tinfo   = $this->get_dbtable_info($table);
                 $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
                 $newevals= array();
@@ -8834,7 +8909,7 @@ class catalog extends BaseModule
                 if ($pid == 'index')
                     $pid = 0;
                 $order = $this->get_last_order_in_cat($pid)+2;
-                $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` (`parent_id`,`name`,`order`) '.
+                $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` (`parent_id`,`name`,`order`) '.
                     'VALUES ('.$pid.',"'.$kernel->pub_str_prepare_set($name).'", '.$order.')';
                 $kernel->runSQL($query);
                 $cid = mysql_insert_id();
@@ -8869,10 +8944,10 @@ class catalog extends BaseModule
                 $id    = $kernel->pub_httpget_get('id');
                 $dprop = $kernel->pub_httpget_get('field');
                 $cat   = $this->get_category($id);
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats`
+                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats`
                             SET `'.$dprop.'`=NULL WHERE `id`='.intval($id);
                 $kernel->runSQL($query);
-                $kernel->pub_file_delete('content/files/'.$kernel->pub_module_id_get().'/'.$cat[$dprop]);
+                $kernel->pub_file_delete('content/files/'.$moduleid.'/'.$cat[$dprop]);
                 $kernel->pub_redirect_refresh('category_edit&id='.$id.'&selectcat='.$id);
                 break;
 
@@ -8938,8 +9013,8 @@ class catalog extends BaseModule
                     $link ='';
                     $squery = $this->prepare_inner_filter_sql($squery, array(), $link);
 
-                    $squery = "SELECT items.* FROM ".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_items AS items ".
-                        "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$kernel->pub_module_id_get()."_".strtolower($groups[$group_id]['name_db'])." AS `".strtolower($groups[$group_id]['name_db'])."` ON items.ext_id = `".strtolower($groups[$group_id]['name_db'])."`.id ".
+                    $squery = "SELECT items.* FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items AS items ".
+                        "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($groups[$group_id]['name_db'])." AS `".strtolower($groups[$group_id]['name_db'])."` ON items.ext_id = `".strtolower($groups[$group_id]['name_db'])."`.id ".
                         "WHERE items.`group_id`=".$group_id." AND (".$squery.")";
                     $kernel->pub_session_set("search_items_query",$squery);
                     $kernel->pub_redirect_refresh_reload('show_items&search_results=1&group_id='.$group_id);
@@ -8962,7 +9037,7 @@ class catalog extends BaseModule
                 $removlinkedid = $kernel->pub_httpget_get("removlinkedid");
                 if (!empty($removlinkedid))
                 {
-                    $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items_links` WHERE '.
+                    $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items_links` WHERE '.
                         '(itemid1='.$id.' AND itemid2='.$removlinkedid.') OR '.
                         '(itemid2='.$id.' AND itemid1='.$removlinkedid.')';
                     $kernel->runSQL($query);
@@ -8994,15 +9069,15 @@ class catalog extends BaseModule
                 $id_tovar    = intval($id_tovar);
                 $item  = $this->get_item_full_data($id_tovar);
                 //определяем, common-свойство или нет
-                $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+                $tinfo = $this->get_dbtable_info('_catalog_'.$moduleid.'_items');
                 if (array_key_exists($dprop, $tinfo))
                 {
-                    $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` SET `'.$dprop.'`=NULL WHERE `id`='.$id_tovar;
+                    $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items` SET `'.$dprop.'`=NULL WHERE `id`='.$id_tovar;
                 }
                 else
                 {
                     $group = CatalogCommons::get_group($item['group_id']);
-                    $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` SET `'.$dprop.'`=NULL WHERE `id`='.$item['id'];
+                    $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_items_'.$moduleid.'_'.strtolower($group['name_db']).'` SET `'.$dprop.'`=NULL WHERE `id`='.$item['id'];
                 }
                 $kernel->runSQL($query);
                 //Теперь удаяем само изображение

@@ -241,7 +241,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_items_page',NULL,'Стра
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_inner_filter_save_msg_emptyfields',NULL,'Не заполнены необходимые поля');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_inner_filter_save_msg_stringid_exists',NULL,'Строковый ID уже существует');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_inner_filter_save_msg_error',NULL,'Ошибка при сохранении внутреннего фильтра ');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_inner_filter_selected_categories_label',NULL,'Выбрать категории');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_select_categories_label',NULL,'Выбрать категории');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_inner_filter_save_msg_ok',NULL,'Внутренний фильтр сохранён');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_inner_filter_all_categories_label',NULL,'Все категории');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_inner_filter_current_category_label',NULL,'Текущая категория');
@@ -545,7 +545,8 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_save_msg
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_save_msg_emptyfields',NULL,'Не заполнены необходимые поля');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_save_msg_error',NULL,'Ошибка при сохранении внутреннего фильтра ');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_save_msg_ok',NULL,'Внутренний фильтр сохранён');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_selected_categories_label',NULL,'Выбрать категории');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_select_categories_label',NULL,'Выбрать категории');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_select_categories_label',NULL,'Выбрать категории');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_current_category_label',NULL,'Текущая категория');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_action_save',NULL,'Сохранить фильтр');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_inner_filter_all_categories_label',NULL,'Все категории');
@@ -649,7 +650,6 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_linked_item_added_msg',NUL
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_linked_items_list_label',NULL,'Связанные товары');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_remove_linked_item_label',NULL,'Удалить из связанных');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_no_main_prop_defined_label',NULL,'Не задано основное свойство');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_add_linked_item_button_label',NULL,'Добавить');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_add_linked_item_label',NULL,'Добавить связанный товар');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_ismain',NULL,'Основное (уникальное)');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_linked_items_tpl',NULL,'Шаблон списка');
@@ -2272,3 +2272,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admins_save_no_rights_error',NULL,
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_msg_incorrect_email',NULL,'Некорректный email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_msg_incorrect_email',NULL,'Некорректный email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_msg_incorrect_email',NULL,'Некорректный email');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_quicksearch_label',NULL,'Быстрый поиск');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_quicksearch_label',NULL,'Быстрый поиск');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_quicksearch_label',NULL,'Быстрый поиск');

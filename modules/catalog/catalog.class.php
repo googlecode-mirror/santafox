@@ -8391,7 +8391,7 @@ class catalog extends BaseModule
                     continue;
                 $stringBlocks[]=$strval;
             }
-            $r['_string']=implode($sep,$stringBlocks);
+            $r['_string']=strip_tags(implode($sep,$stringBlocks));
         }
         return $results;
     }

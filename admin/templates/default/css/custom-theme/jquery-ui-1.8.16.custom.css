@@ -358,7 +358,8 @@ a.left_menu_select { margin:5px; padding:2px 5px; text-decoration:underline; col
  *
  * http://docs.jquery.com/UI/Autocomplete#theming
  */
-/*.ui-autocomplete { position: absolute; cursor: default; }	*/
+.ui-autocomplete { position: absolute; margin: 0; margin-top: -5px; padding: 0; background: #fff; list-style: none; cursor: pointer; -webkit-box-shadow: #999 0px 0px 5px; -moz-box-shadow: #999 0px 0px 5px; box-shadow: #999 0px 0px 5px; }
+.ui-autocomplete .ui-menu-item a { margin: 2px; padding: 3px 7px; display: block; }
 
 /* workarounds */
 /** html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */

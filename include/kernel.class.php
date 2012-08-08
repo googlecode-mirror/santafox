@@ -811,7 +811,7 @@ class kernel
         elseif ((!empty($name_var)) && (!isset($arr[$name_var])))
         	$arr = '';
 
-        if ((!empty($name_var)) && $prepare)
+        if (!empty($name_var) && $prepare && !is_array($arr))
 			$arr = $this->pub_str_prepare_set($arr);
 
         return $arr;

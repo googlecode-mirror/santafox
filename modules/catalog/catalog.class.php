@@ -1726,9 +1726,19 @@ class catalog extends BaseModule
         $curr_cat_id=0;
         if (strlen($filter['catids'])==0) //показываем товары из текущей - добавляем параметр с категорией
         {
-            $curr_cat_id=$this->get_current_catid(true);
+            $curr_cat_id=$this->get_current_catIDs();
             if ($curr_cat_id)
-                $linkParams .= "cid=".$curr_cat_id."&";
+            {
+                if (is_array($curr_cat_id))
+                {
+                    foreach($curr_cat_id as $ccid)
+                    {
+                        $linkParams .= "cid[".$ccid."]=on&";
+                    }
+                }
+                else
+                    $linkParams .= "cid=".$curr_cat_id."&";
+            }
         }
         $this->set_templates($kernel->pub_template_parse($tpl));
 
@@ -1827,7 +1837,7 @@ class catalog extends BaseModule
         $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,intval($filter['maxpages'])), $content);
         $content = $this->process_filters_in_template($content,$filter['stringid']);
         $content = $this->replace_current_page_url($content);
-        if ($curr_cat_id)
+        if ($curr_cat_id && is_numeric($curr_cat_id))
         {
             $cat = $this->get_category($curr_cat_id);
             if ($cat)
@@ -9491,4 +9501,45 @@ class catalog extends BaseModule
         $content = $this->clear_left_labels($content);
         return $content;
     }
+
+
+    private function get_current_catIDs()
+    {
+        if (isset($_GET[$this->frontend_param_cat_id_name]))
+        {
+            if (is_numeric($_GET[$this->frontend_param_cat_id_name]))
+                return intval($_GET[$this->frontend_param_cat_id_name]);
+            if (is_array($_GET[$this->frontend_param_cat_id_name]))
+            {
+                $arr=array();
+                foreach (array_keys($_GET[$this->frontend_param_cat_id_name]) as $cid)
+                {
+                    $cid=intval($cid);
+                    if ($cid>0)
+                        $arr[]=$cid;
+                }
+                if ($arr)
+                    return $arr;
+            }
+        }
+        if (isset($_POST[$this->frontend_param_cat_id_name]))
+        {
+            if (is_numeric($_POST[$this->frontend_param_cat_id_name]))
+                return intval($_POST[$this->frontend_param_cat_id_name]);
+            if (is_array($_POST[$this->frontend_param_cat_id_name]))
+            {
+                $arr=array();
+                foreach (array_keys($_POST[$this->frontend_param_cat_id_name]) as $cid)
+                {
+                    $cid=intval($cid);
+                    if ($cid>0)
+                        $arr[]=$cid;
+                }
+                if ($arr)
+                    return $arr;
+            }
+        }
+        return 0;
+    }
+
 }

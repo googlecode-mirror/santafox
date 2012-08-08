@@ -2276,3 +2276,15 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_msg_incorrect_email',NULL,'�
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_quicksearch_label',NULL,'Быстрый поиск');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_quicksearch_label',NULL,'Быстрый поиск');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_quicksearch_label',NULL,'Быстрый поиск');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','common_done_label',NULL,'Готово');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','common_done_label',NULL,'Готово');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','common_done_label',NULL,'Готово');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','common_deselect_all_label',NULL,'Убрать все');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','common_deselect_all_label',NULL,'Убрать все');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','common_deselect_all_label',NULL,'Убрать все');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','common_select_all_label',NULL,'Выбрать все');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','common_select_all_label',NULL,'Выбрать все');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','common_select_all_label',NULL,'Выбрать все');

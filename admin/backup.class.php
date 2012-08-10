@@ -322,9 +322,12 @@ class backup
             $zip_archive = "backup/".$real_archive_name;
             if (!$ftpshnik->putFile($zip_archive, $real_archive_name, true))
             {
-                $this->error_last_set("FTP: ".$ftpshnik->getLastError());
-                $ftpshnik->disconnect();
-                return false;
+                if (!$ftpshnik->putFile($zip_archive, $real_archive_name, true,true))
+                {
+                    $this->error_last_set("FTP: ".$ftpshnik->getLastError()."\ndebug trace:".implode("\n",$ftpshnik->debugMessages));
+                    $ftpshnik->disconnect();
+                    return false;
+                }
             }
             $ftpshnik->disconnect();
         }

@@ -28,6 +28,4 @@
      if ($backup->backup_run_save($rule, $rule['needcontent'], $rule['needsystem'], $rule['needtables'], $rule['needdesign'], "made by cron"))
          print "backup created\n";
      else
-         print "failed to create backup\n";
-
-?>
+         print "failed to create backup: ".$backup->error_last_get()."\n";

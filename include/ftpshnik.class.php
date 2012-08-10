@@ -7,9 +7,9 @@ class ftpshnik
     private $pass;
     private $path = "";
     private $currDir = "";
-    private $handler = false;
+    private $handler;
     private $lastError = false;
-    private $debugMessages = array();
+    public $debugMessages = array();
 
     public function ftpshnik($host, $login, $pass, $path="")
     {
@@ -59,7 +59,8 @@ class ftpshnik
      * Устанавливает права на файл или папку
      *
      * @param string $path путь
-     * @param number $octalMode права в восьмеричном виде
+     * @param string $octalMode права в восьмеричном виде
+     * @return boolean
      */
     public function chmod($path, $octalMode)
     {
@@ -71,7 +72,7 @@ class ftpshnik
             if (strlen($octalMode)==3)
                 $octalMode = '0'.$octalMode;
             //надо сконвертировать по-хитрому - http://php.net/manual/en/function.ftp-chmod.php
-            $octalMode = eval("return({$octalMode});");
+            $octalMode = eval("return(".$octalMode.");");
         }
         $this->debugMessages[] = "chmod '".sprintf("%o",$octalMode)."' on file ".$path;
 
@@ -87,6 +88,7 @@ class ftpshnik
      * Удаляет файл на фтп
      *
      * @param string $filename
+     * @return boolean
      */
     public function deleteFile($filename)
     {
@@ -102,8 +104,8 @@ class ftpshnik
 
     /**
      * Удаляет папку на фтп
-     *
      * @param string $path
+     * @return boolean
      */
     public function deleteDir($path)
     {
@@ -123,6 +125,7 @@ class ftpshnik
      * по имени файла и размеру
      *
      * @param boolean $byDefaultIni если true, будет искать ini.default.php вместо ini.php
+     * @return boolean
      */
     public function findSantaRootByIni($byDefaultIni = false)
     {
@@ -165,6 +168,11 @@ class ftpshnik
      *
      * проверяет ini.php по DB_HOST, DB_BASENAME, DB_USERNAME, PREFIX
      * @param string $fc содержимое файла ini.php
+     * @param string $dbhost
+     * @param string $dbbase
+     * @param string $dbuser
+     * @param string $dbprefix
+     * @return boolean
      */
     public function isMySantaIni($fc, $dbhost, $dbbase, $dbuser, $dbprefix)
     {
@@ -347,13 +355,13 @@ class ftpshnik
      * Всё-в-одном для скачивания файла по фтп
      *
      * @param string $filename имя файла на сервере
-     * @param string $remoteDir папка на фтп (если пусто, то берём из текущей
+     * @param mixed $remoteDir папка на фтп (если пусто, то берём из текущей
      * @return string
      */
     public function getFileContentsComplete($filename, $remoteDir = false)
     {
         if (!$this->init($remoteDir, false))
-                return false;
+            return false;
         //chdir уже в init
         return $this->getFileContents($filename);
     }
@@ -398,6 +406,7 @@ class ftpshnik
      * Возвращает нужный transfer mode для указанного расширения
      *
      * @param string $ext
+     * @return integer
      */
     private function getTransferModeByExt($ext)
     {
@@ -426,45 +435,36 @@ class ftpshnik
      * @param string $fullPath локальный путь к файлу
      * @param string $storeName имя файла для сохранения на фтп
      * @param boolean $aggressivePut удалять существующий файл с таким именем, если просто upload не получается?
+     * @param boolean $passiveMode использовать passive mode для FTP?
      * @return boolean
      */
-    public function putFile($fullPath, $storeName, $aggressivePut=true)
+    public function putFile($fullPath, $storeName, $aggressivePut=true,$passiveMode=false)
     {
         if (!$this->checkConnectionHandler())
             return false;
-        $filehandler = @fopen($fullPath, 'r');
-        if ($filehandler === false)
-        {
-            $this->lastError = "Read local file '".$fullPath." failed";
-            return false;
-        }
         $transferType = $this->getTransferModeByExt(@pathinfo($fullPath, PATHINFO_EXTENSION));
-        if (!@ftp_fput($this->handler, $storeName, $filehandler, $transferType))
+        $this->debugMessages[] = "putFile(".$fullPath.", ".$storeName.($aggressivePut?"true":"false").",".($passiveMode?"true":"false");
+        ftp_pasv($this->handler,$passiveMode);
+        if (!@ftp_put($this->handler, $storeName, $fullPath, $transferType))
         {
+            $this->lastError = "put file '".$storeName."' failed (storeName: ".$storeName.", ttype: ".$transferType.")";
             if (!$aggressivePut)
-            {
-                $this->lastError = "put file '".$storeName."' failed";
-                @fclose($filehandler);
                 return false;
-            }
             else
             {
                 $this->debugMessages[] = "Trying aggressive mode...";
                 if (!$this->deleteFile($storeName))
                 {
                     $this->lastError = "delete file '".$storeName."' in aggressive put failed";
-                    @fclose($filehandler);
                     return false;
                 }
-                if (!@ftp_fput($this->handler, $storeName, $filehandler, $transferType))
+                if (!@ftp_put($this->handler, $storeName, $fullPath, $transferType))
                 {
                     $this->lastError = "put file '".$storeName."' (after delete) failed";
-                    @fclose($filehandler);
                     return false;
                 }
             }
         }
-        @fclose($filehandler);
         return true;
     }
 
@@ -542,8 +542,9 @@ class ftpshnik
      * Рекурсивно ищет файл
      *
      * @param string $filename имя файла
-     * @param string $dir папка, откуда начинать искать
-     * @return array
+     * @param mixed $filesize
+     * @param mixed $dir папка, откуда начинать искать
+     * @return mixed
      */
     public function findFileRecursive($filename, $filesize=false, $dir=false)
     {
@@ -583,6 +584,7 @@ class ftpshnik
      * Возвращает в удобном виде результат getFullDirectoryListing()
      *
      * @param array $dirlist
+     * @return string
      */
     public function formatFullDirectoryListingOut($dirlist)
     {
@@ -694,7 +696,7 @@ class ftpshnik
     /**
      * Выполняет инициализацию при необходимости (connect, login, chdir)
      *
-     * @param string $path папка, в которую сделать chdir
+     * @param mixed $path папка, в которую сделать chdir
      * @param boolean $createDirs создавать папки, указанные в пути, если их не существует?
      * @return boolean
      */
@@ -803,10 +805,10 @@ class ftpshnik
      *
      * @param string $fullPath локальный путь к файлу
      * @param string $storeName имя файла для сохранения на ФТП
-     * @param string $remoteDir папка на ФТП, куда сохранять файл
+     * @param mixed $remoteDir папка на ФТП, куда сохранять файл
      * @param boolean $createDirs создавать папки на ФТП, если их не существует?
      * @param boolean $aggressivePut удалять существующий файл с таким именем, если просто upload не получается?
-     * @return unknown
+     * @return boolean
      */
     public function putFileComplete($fullPath, $storeName, $remoteDir=false, $createDirs = true, $aggressivePut = true)
     {
@@ -825,7 +827,7 @@ class ftpshnik
      * @param string $fullFtpPath полный путь на ФТП (с папкой от корня), куда сохранять файл
      * @param boolean $createDirs создавать папки на ФТП, если их не существует?
      * @param boolean $aggressivePut удалять существующий файл с таким именем, если просто upload не получается?
-     * @return unknown
+     * @return boolean
      */
     public function putFileContentsComplete($contents, /*$storeName, $remoteDir=false,*/ $fullFtpPath, $createDirs = true, $aggressivePut = true)
     {
@@ -841,11 +843,10 @@ class ftpshnik
            $storeName = substr($fullFtpPath, $lastSlashPos+1);
         }
         if (!$this->init($remoteDir, $createDirs))
-                return false;
+            return false;
         //chdir уже в init
         if (!$this->putFileContents($contents, $storeName, $aggressivePut))
             return false;
         return true;
     }
 }
-?>

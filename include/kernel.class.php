@@ -4408,9 +4408,10 @@ class kernel
      * без изменений.
      * @param string $message Сообщение, выводимое в случае, если не было ошибок.
      * @param string $link_reload Идентификатор левого меню, на который необходимо осуществить переход.
+     * @param integer $timeout таймаут в секундах (сколько будет висеть сообщение)
      * @return string
      */
-    function pub_httppost_response($message = '', $link_reload = '')
+    function pub_httppost_response($message = '', $link_reload = '', $timeout=3)
     {
         //Прежде надо проверить, есть ли ошибки.
         $text = '';
@@ -4429,12 +4430,15 @@ class kernel
         $label = $this->priv_page_textlabels_replace("[#admin_label_for_show_result#]");
         //Заменим возможные языковые переменные в массиве
 
+        $errors_count=count($this->response_post_error);
         $return = array();
-        $return['errore_count']    = count($this->response_post_error);
+        $return['errore_count']    = $errors_count;
         $return['errore_text']     = $text;
         $return['result_message']  = $message;
         $return['redirect']        = $link_reload;
         $return['result_label']    = $label;
+        if ($errors_count==0)
+            $return['msg_timeout'] = $timeout;
 
         return $this->pub_json_encode($return);
     }

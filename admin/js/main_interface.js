@@ -183,8 +183,11 @@ function jspub_form_submit(formID, url)
                 //Значит ошибок небыло и нужно вывести сообщение с результатом...
                 var msg_label = post_res.result_label;
                 var msg = post_res.result_message;
+                var timeout=3;//по-умолчанию таймаут 3 секунды
+                if (post_res.hasOwnProperty('msg_timeout'))
+                    timeout=post_res.msg_timeout;
                 if (msg != "")
-                    santaShowPopupHint(msg_label, msg,3000);
+                    santaShowPopupHint(msg_label, msg,timeout*1000);
                 //...и возможно перейти на другой пункт меню
                 var id_link =  post_res.redirect;
                 if (id_link != "")

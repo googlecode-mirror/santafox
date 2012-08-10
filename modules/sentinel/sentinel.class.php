@@ -154,7 +154,7 @@ class sentinel extends basemodule
                         }
                     }
                 }
-                return $kernel->pub_httppost_response($resp);
+                return $kernel->pub_httppost_response($resp,'',0);
 
             case 'recalc_hashes':
                 $this->set_templates($kernel->pub_template_parse("modules/sentinel/templates_admin/recalc_hashes.html"));

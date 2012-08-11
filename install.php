@@ -1,24 +1,16 @@
 <?php
 
-include ("ini.php"); // Файл с настройками
+require_once("ini.php"); // Файл с настройками
 
 if (SHOW_INT_ERRORE_MESSAGE)
     error_reporting(E_ALL);
 else
     error_reporting(0);
 
-//tmp
-//ini_set("display_errors","1");
-//ini_set("display_startup_errors","1");
-
-
-include ("include/kernel.class.php"); //Ядро
-include ("include/pub_interface.class.php");
-include ("include/mysql_table.class.php"); //Ядро
-include ("admin/manager_modules.class.php"); //Менеджер управления модулями
-include ("admin/manager_users.class.php"); //Менеджер управления модулями
-include ("admin/manager_stat.class.php");
-include ("components/pclzip/pclzip.lib.php");
+require_once ("include/kernel.class.php"); //Ядро
+require_once ("include/pub_interface.class.php");
+require_once ("include/mysql_table.class.php");
+require_once ("components/pclzip/pclzip.lib.php");
 
 ini_set('url_rewriter.tags', 'none');
 session_cache_expire(60*60*24*7);
@@ -41,13 +33,8 @@ $arr_files["modules"]    = "modules.zip";
 
 foreach ($arr_files as $dir_name => $file_name)
 {
-
-
-    //chdir($dir_name);
-    //$full_name = $kernel->priv_file_full_patch($dir_name."/".$file_name);
     $full_path = $kernel->priv_file_full_patch($dir_name."/");
     //Дадаим права на запись и на папку и на сам файл,
-    //что то ZIP библиотека хочет там обновлять.
     $kernel->pub_ftp_dir_chmod_open($dir_name."/".$file_name);
     $kernel->pub_ftp_file_chmod_change($dir_name."/".$file_name);
     //print "unpacking ".$full_path.$file_name." to ".$full_path."...<br>\n";
@@ -102,8 +89,3 @@ foreach ($arr_files as $dir_mane => $file_name)
 {
     $kernel->pub_file_delete($dir_mane."/".$file_name);
 }
-
-//if (!@unlink('install.php'))
-//    echo '<br><br><font color="red"><b>Внимание, невозможно автоматически удалить файл install.php</b><br>Это необходимо сделать вручную, пока существует этот файл, сайт может в любой момент быть переинсталирован!</font>'
-
-?>

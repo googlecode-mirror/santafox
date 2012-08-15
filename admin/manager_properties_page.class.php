@@ -22,7 +22,7 @@ class properties_page
 
         $this->id_curent_page = trim($id);
         $query = 'SELECT id, parent_id
-            	  FROM '.$kernel->pub_prefix_get().'_structure
+            	  FROM `'.$kernel->pub_prefix_get().'_structure`
                   WHERE id = "'.$this->id_curent_page.'"
                  ';
 
@@ -801,7 +801,7 @@ class properties_page
 
     	//Теперь можно прописать весь serialize сразу в таблицу, так как
 		//в нем указаны только те ссылки, которые поставлены в соответствие
-		$query = 'UPDATE '.$kernel->pub_prefix_get().'_structure
+		$query = 'UPDATE `'.$kernel->pub_prefix_get().'_structure`
 		          SET serialize = "'.mysql_real_escape_string(serialize($serialize)).'"
 		          WHERE id = "'.$this->id_curent_page.'"';
 

@@ -1972,7 +1972,7 @@ class kernel
     {
         if ((isset($id)) && (!empty($id)))
         {
-            $query = 'UPDATE '.$this->pub_prefix_get().'_structure
+            $query = 'UPDATE `'.$this->pub_prefix_get().'_structure`
                       SET properties = "'.mysql_real_escape_string(serialize($prop)).'",
                       	  caption = "'.$caption.'"
                       WHERE id = "'.$id.'"
@@ -2009,7 +2009,7 @@ class kernel
             $serialize[$search_prop] = $value;
 
             //Теперь запишем это свойство в таблицу и заново заполним кэш
-            $query = 'UPDATE '.$this->pub_prefix_get().'_structure
+            $query = 'UPDATE `'.$this->pub_prefix_get().'_structure`
                       SET properties = "'.addslashes(serialize($serialize)).'"
                       WHERE id = "'.$id_page.'"
                       ';
@@ -2738,7 +2738,7 @@ class kernel
         }
 
         //теперь сразу заменим все упоминания старого id в таблице структуры у подчинённых страниц...
-        $query = 'UPDATE '.$this->pub_prefix_get().'_structure
+        $query = 'UPDATE `'.$this->pub_prefix_get().'_structure`
         	      SET parent_id = "'.$new_id.'"
                   WHERE (parent_id = "'.$old_id.'")
 				  ';
@@ -2746,7 +2746,7 @@ class kernel
         $this->runSQL($query);
 
         //... и собственно у непосредственно самой страницы
-        $query = 'UPDATE '.$this->pub_prefix_get().'_structure
+        $query = 'UPDATE `'.$this->pub_prefix_get().'_structure`
         	      SET id = "'.$new_id.'"
                   WHERE (id = "'.$old_id.'")
 				  ';

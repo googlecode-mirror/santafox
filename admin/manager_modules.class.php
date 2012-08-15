@@ -264,7 +264,7 @@ class manager_modules
 
     	//Зачитаем сначала все страницы с индификаторами и serializ-ами в массив
         $query = 'SELECT id, serialize
-                  FROM '.$kernel->pub_prefix_get().'_structure ';
+                  FROM `'.$kernel->pub_prefix_get().'_structure` ';
         $page = array();
         $result = $kernel->runSQL($query);
     	while ($row = mysql_fetch_assoc($result))
@@ -288,7 +288,7 @@ class manager_modules
     	//Теперь нужно провести обдейт нужных строк
     	foreach ($page as $key => $val)
     	{
-        	$query = 'UPDATE '.$kernel->pub_prefix_get().'_structure
+        	$query = 'UPDATE `'.$kernel->pub_prefix_get().'_structure`
         	      	  SET serialize = "'.$val.'"
                       WHERE id = "'.$key.'"';
 			$kernel->runSQL($query);
@@ -363,7 +363,7 @@ class manager_modules
 		//чтобы удалить оттуда ссылки на удаляемые макросы
 		$pages = array();
 		$query = 'SELECT id,serialize
-				  FROM '.$kernel->pub_prefix_get().'_structure
+				  FROM `'.$kernel->pub_prefix_get().'_structure`
 				 ';
 		$result = $kernel->runSQL($query);
 		while ($row = mysql_fetch_assoc($result))
@@ -394,7 +394,7 @@ class manager_modules
 		{
 			foreach ($pages as $key => $val)
 			{
-		    	$query = 'UPDATE '.$kernel->pub_prefix_get().'_structure
+		    	$query = 'UPDATE `'.$kernel->pub_prefix_get().'_structure`
         	    		  SET serialize = "'.mysql_real_escape_string(serialize($val)).'"
                       	  WHERE id = "'.$key.'"';
 				$kernel->runSQL($query);
@@ -634,7 +634,7 @@ class manager_modules
 		//Определим те свойства, которые возможно модуль прописал к страницам
 		$pages = array();
 		$query = 'SELECT id, properties
-				  FROM '.$kernel->pub_prefix_get().'_structure
+				  FROM `'.$kernel->pub_prefix_get().'_structure`
 				 ';
 		$result = $kernel->runSQL($query);
 		while ($row = mysql_fetch_assoc($result))
@@ -664,7 +664,7 @@ class manager_modules
 		{
 			foreach ($pages as $key => $val)
 			{
-		    	$query = 'UPDATE '.$kernel->pub_prefix_get().'_structure
+		    	$query = 'UPDATE `'.$kernel->pub_prefix_get().'_structure`
         	    		  SET properties = "'.addslashes(serialize($val)).'"
                       	  WHERE id = "'.$key.'"';
 				$kernel->runSQL($query);

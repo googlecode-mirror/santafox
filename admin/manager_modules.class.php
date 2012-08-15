@@ -483,7 +483,7 @@ class manager_modules
         	    if (isset($curent_prop[$val['name']]))
         	       $new_prop[$val['name']] = $curent_prop[$val['name']];
         	}
-            $query = "UPDATE ".$kernel->pub_prefix_get()."_modules SET
+            $query = "UPDATE `".$kernel->pub_prefix_get()."_modules` SET
                         type_admin = ".$install->get_admin_interface().",
                         properties = '".serialize($install->get_modul_properties())."',
                         properties_page = '".serialize($install->page_properties_get())."',
@@ -692,8 +692,7 @@ class manager_modules
 
 
        	//ВСЁ удалили, теперь можно удалять модули непосредственно из таблицы модулей
-		$query = "DELETE FROM ".$kernel->pub_prefix_get()."_modules
-				 ";
+		$query = "DELETE FROM `".$kernel->pub_prefix_get()."_modules` ";
         if (count($temp) > 1)
         	$query .= "WHERE id IN ('".join("','",$temp)."')";
         else
@@ -828,7 +827,7 @@ class manager_modules
         //и параметры, которые модулю необходимы для каждой страницы
     	$this->set_admin_metods($id_modul, $install);
 
-        $query = "INSERT INTO ".$kernel->pub_prefix_get()."_modules VALUES
+        $query = "INSERT INTO `".$kernel->pub_prefix_get()."_modules` VALUES
 						(
                             '".$id_modul."',
                             NULL,
@@ -887,7 +886,7 @@ class manager_modules
 				{
         			$serialize = addslashes(serialize($val['properties']));
 
-        			$query = 'UPDATE '.$kernel->pub_prefix_get().'_modules
+        			$query = 'UPDATE `'.$kernel->pub_prefix_get().'_modules`
         	      			  SET serialize = "'.$serialize.'"
                   			  WHERE (id = "'.$id_new_modul.'")';
 
@@ -943,7 +942,7 @@ class manager_modules
         $num_id = 1;
         while (true)
         {
-        	$query = 'SELECT * FROM '.$kernel->pub_prefix_get().'_modules
+        	$query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_modules`
                   	  WHERE id = "'.$base_modul.$num_id.'"';
         	$result = $kernel->runSQL($query);
         	if (mysql_num_rows($result) == 0 )
@@ -999,7 +998,7 @@ class manager_modules
         manager_users::add_field_for_user($install->get_users_properties_multi(),$base_modul.$num_id);
 
 		//Регистрируем модуль в таблице инсталированных модулей.
-    	$query = "INSERT INTO ".$kernel->pub_prefix_get()."_modules VALUES
+    	$query = "INSERT INTO `".$kernel->pub_prefix_get()."_modules` VALUES
 						(
                             '".$base_modul.$num_id."',
                             '".$base_modul."',
@@ -1038,7 +1037,7 @@ class manager_modules
 
         //Посмотрим что уже проинсталированно.
 		$query = 'SELECT id, parent_id
-        	      FROM '.$kernel->pub_prefix_get().'_modules
+        	      FROM `'.$kernel->pub_prefix_get().'_modules`
                   WHERE parent_id is NULL';
 
 		$result = $kernel->runSQL($query);
@@ -1163,7 +1162,7 @@ class manager_modules
                 continue;
             }
         }
-        $query = 'UPDATE '.$kernel->pub_prefix_get().'_modules
+        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_modules`
         	      SET serialize = "'.mysql_real_escape_string(serialize($array_form)).'"
                   WHERE (id = "'.$moduleid.'")';
 		$kernel->runSQL($query);
@@ -1214,7 +1213,7 @@ class manager_modules
     	global $kernel;
     	$arr = array();
     	$query = 'SELECT acces_label, parent_id, id, full_name, type_admin
-                  FROM '.$kernel->pub_prefix_get().'_modules';
+                  FROM `'.$kernel->pub_prefix_get().'_modules` ';
 
     	if (!empty($id))
     		$query .= 'WHERE (id = '.$id.')';
@@ -1520,7 +1519,7 @@ class manager_modules
     	global $kernel;
 
 		$query = " SELECT id, parent_id, full_name
-        		   FROM ".$kernel->pub_prefix_get()."_modules
+        		   FROM `".$kernel->pub_prefix_get()."_modules`
         		   WHERE
         		   `id` != 'kernel'
         		   AND `id` != 'structure'
@@ -1799,7 +1798,7 @@ class manager_modules
     function priv_modules_admin_interface_count()
     {
         global $kernel;
-    	$query = "SELECT * FROM ".$kernel->pub_prefix_get()."_modules
+    	$query = "SELECT * FROM `".$kernel->pub_prefix_get()."_modules`
                   WHERE
                   (parent_id is NULL)
                   AND (type_admin > 0)

@@ -4006,7 +4006,7 @@ class kernel
 
         $array = serialize($array);
 
-        $sql = "UPDATE ".$this->pub_prefix_get()."_modules
+        $sql = "UPDATE `".$this->pub_prefix_get()."_modules`
                 SET module_setings='$array'
                 WHERE id='$idmodule'";
 

@@ -43,7 +43,7 @@ class top_menu
     	//Узнаем какие модули надо вывести
     	//Будем выводить только те, у которых есть админки
     	$query = "SELECT *
-        	      FROM ".$kernel->pub_prefix_get()."_modules
+        	      FROM `".$kernel->pub_prefix_get()."_modules`
                   WHERE
                   (parent_id is NULL)
                   AND (type_admin > 0)

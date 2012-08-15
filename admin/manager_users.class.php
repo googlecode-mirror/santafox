@@ -152,8 +152,8 @@ class manager_users
                 b.full_name,
                 b.id AS user_id
                 FROM
-                ".$kernel->pub_prefix_get()."_admin_trace a,
-                ".$kernel->pub_prefix_get()."_admin b
+                `".$kernel->pub_prefix_get()."_admin_trace` a,
+                `".$kernel->pub_prefix_get()."_admin` b
                 WHERE
                 (
                 a.time

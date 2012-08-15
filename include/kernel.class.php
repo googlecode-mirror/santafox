@@ -1630,7 +1630,7 @@ class kernel
         $sql = "SELECT
                 id_admin AS admin
                 FROM
-                ".$this->prefix."_admin_trace
+                `".$this->prefix."_admin_trace`
                 WHERE
                 (
                 time

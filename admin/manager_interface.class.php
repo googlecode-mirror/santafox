@@ -73,7 +73,7 @@ class manager_interface
     function exit_backofice()
     {
         global $kernel;
-        $sql = "UPDATE ".$kernel->pub_prefix_get()."_admin_trace SET time = '' WHERE id_admin='".$kernel->priv_admin_id_current_get()."'";
+        $sql = "UPDATE `".$kernel->pub_prefix_get()."_admin_trace` SET time = '' WHERE id_admin='".$kernel->priv_admin_id_current_get()."'";
         $kernel->runSQL($sql);
 
         $kernel->priv_session_empty();
@@ -494,7 +494,7 @@ class manager_interface
     /**
      * Обновляет информацию о том кто сейчас работает в адмике
      *
-     * @return void
+     * @return integer
      * @access private
      */
     function admin_trace()
@@ -503,7 +503,7 @@ class manager_interface
 
         // Запишем перемещения админа в систему слежения
         $sql = "UPDATE
-                ".$kernel->pub_prefix_get()."_admin_trace
+                `".$kernel->pub_prefix_get()."_admin_trace`
                 SET
                 time = NOW(),
                 place='".$kernel->pub_section_current_get()."',
@@ -515,7 +515,7 @@ class manager_interface
         $kernel->runSQL($sql);
 
         $sql = 'SELECT count(id_admin) AS count '
-        . ' FROM '.$kernel->pub_prefix_get().'_admin_trace '
+        . ' FROM `'.$kernel->pub_prefix_get().'_admin_trace` '
         . ' WHERE (time BETWEEN DATE_ADD(NOW(), INTERVAL -5 MINUTE) AND NOW())';
         $result = $kernel->runSQL($sql);
         $data = mysql_fetch_assoc($result);

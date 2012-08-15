@@ -1983,27 +1983,44 @@ class catalog extends BaseModule
             //Здесь нужно будит обработать доп. переменные для блоков
             //И теперь, если это картинка, то нужно ещё обработать доп переменные на большое/маленькое изображение
             //и на размеры изображения
-            switch ($cp['type'])
+            if ($cp['type']=='pict' && !empty($value))
             {
-                case 'pict':
-                    if (empty($value) || !file_exists($value))
-                    {
-                        $block = str_replace("%".$cp['name_db']."%", $this->get_template_block($cp['name_db']."_null"), $block);
-                        break;
-                    }
-                    //Сначала размеры большого изображения
+                //Сначала размеры большого изображения
+                if (file_exists($kernel->pub_site_root_get().'/'.$value))
+                {
                     $size = @getimagesize($value);
-                    if ($size === false)
-                        break;
-                    $block = str_replace('%'.$cp['name_db'].'_width%' , $size[0], $block);
-                    $block = str_replace('%'.$cp['name_db'].'_height%', $size[1], $block);
-                    //кроме этого надо добавить переменные для малого и исходного изображения
-                    $path_parts  = pathinfo($value);
-                    $path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
-                    $path_source = $path_parts['dirname'].'/source/'.$path_parts['basename'];
+                    if ($size)
+                    {
+                        $block = str_replace('%'.$cp['name_db'].'_width%' , $size[0], $block);
+                        $block = str_replace('%'.$cp['name_db'].'_height%', $size[1], $block);
+                    }
+                }
+                //кроме этого надо добавить переменные для малого и исходного изображения
+                $path_parts  = pathinfo($value);
+                $path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
+                $path_source = $path_parts['dirname'].'/source/'.$path_parts['basename'];
+
+                if (file_exists($path_small))
+                {//размеры маленького изображения, если есть
+                    $size = @getimagesize($path_small);
+                    if ($size)
+                    {
+                        $block = str_replace('%'.$cp['name_db'].'_small_width%' , $size[0], $block);
+                        $block = str_replace('%'.$cp['name_db'].'_small_height%', $size[1], $block);
+                    }
                     $block = str_replace('%'.$cp['name_db'].'_small%', $path_small, $block);
+                }
+
+                if (file_exists($path_source))
+                {//размеры исходного изображения, если есть
+                    $size = @getimagesize($path_source);
+                    if ($size)
+                    {
+                        $block = str_replace('%'.$cp['name_db'].'_source_width%' , $size[0], $block);
+                        $block = str_replace('%'.$cp['name_db'].'_source_height%', $size[1], $block);
+                    }
                     $block = str_replace('%'.$cp['name_db'].'_source%', $path_source, $block);
-                    break;
+                }
             }
         }
         if (isset($item['commonid']))

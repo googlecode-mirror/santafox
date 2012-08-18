@@ -1054,10 +1054,10 @@ class backup
 		                                $my_post['needdesign']==1,
 		                                $my_post['description']);
 		        if ($backup_res)
-		            return $kernel->pub_httppost_response("[#admin_backup_rule_finished_ok_msg#]","/admin");
+		            return $kernel->pub_httppost_response("[#admin_backup_rule_finished_ok_msg#]","/admin",0);
 		        else
-		            return $kernel->pub_httppost_response($this->error_last_get());
-        		//$kernel->pub_redirect_refresh_global("/admin");
+		            return $kernel->pub_httppost_errore($this->error_last_get(),true);
+
 		        break;
 
 		    //удаление бэкапа

@@ -1046,6 +1046,7 @@ class backup
 		        break;
 
 		    case 'run_save':
+                set_time_limit(300);
 		        $ruleid = $my_post['ruleid'];
 		        $rule = $this->get_backup_rule($ruleid);
 		        $backup_res = $this->backup_run_save($rule, $my_post['needcontent']==1,

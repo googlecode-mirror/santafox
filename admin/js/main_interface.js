@@ -450,30 +450,46 @@ jQuery(function($){
 });
 
 //Отдельная функция
+var pageInfoblocksLoaded=0;
+
+//вызывается когда загружен блок данных для страницы
+function onPageInfoblockLoad()
+{
+    pageInfoblocksLoaded++;
+    if (pageInfoblocksLoaded==2)
+    {//если загрузилось всё - показываем
+        $('#page_container').css({'display':'block'});
+        $("#contentLoading").remove();
+        $('#content_header').show();
+        $('#page_tabs').parent().tabs({ selected: 0 });
+    }
+
+}
+function beforeStructureChange()
+{
+    $('#content_header').before('<span id="contentLoading">Loading, Please wait..</span>');
+    $('#structure_page_name').html('').parent().hide();
+    $('#page_container').css({'display':'none'});
+    $('#contentLoading').show();
+}
+
 function structure_tree_click_node(url)
 {
     //Самое простое - заполним поля с основными данными страницами новыми значениями.
     //Сначала надо получить эти данные
     var url_link_main = start_interface.global_link + url + "&type=get_main_param";//index.php?action=set_left_menu&leftmenu=view&id=about2&type=get_main_param
 
-    $('#content_header').before('<span id="contentLoading">Loading, Please wait..</span>');
-    $('#structure_page_name').html('').parent().hide();
-    $('#page_container').css({'display':'none'});
-    $('#contentLoading').show();
+    beforeStructureChange();
 
+    pageInfoblocksLoaded=0;
     //Загрузка данных о самой странице и свойствах модулей
     $.get(url_link_main, function (data)
     {
         var comboStore = jQuery.parseJSON(data);
         if (comboStore != null)
             set_propertes_main(comboStore);
-
-        $("#contentLoading").remove();
-        $('#content_header').show();
-        $('#page_tabs').parent().tabs({ selected: 0 });
-        $('#page_container').css({'display':'block'});
+        onPageInfoblockLoad();
     });
-
     run_update_metki(url);
 }
 
@@ -486,6 +502,7 @@ function run_update_metki(url)
         var comboStore = jQuery.parseJSON(data);
         if (comboStore != null)
             set_metki(comboStore);
+        onPageInfoblockLoad();
     });
 
 }

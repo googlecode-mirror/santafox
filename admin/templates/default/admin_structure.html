@@ -111,7 +111,6 @@
                 }
             }
         }
-
         $.post(url, postArr,  function(data){
             //Обрабатываем ответ
             var post_res=jQuery.parseJSON(data);
@@ -244,4 +243,5 @@
         style:'dropdown',
         maxHeight: 200
     });
+    beforeStructureChange();
 </script>

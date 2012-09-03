@@ -332,11 +332,7 @@ class feedback
     function save_ini_file($array, $filename)
     {
         global $kernel;
-
         $config = array();
-        if (isset($array['allowBlank']))
-            $array['allowBlank'] = "0";
-
         foreach ($array as $name => $properties)
         {
             $config[] = '['.$name.']';
@@ -344,12 +340,9 @@ class feedback
             {
                 $value = trim($value);
                 if ($value != '')
-                {
                     $config[] = $property.' = "'.$value.'"';
-                }
             }
         }
-
         $kernel->pub_file_save($filename, implode("\n", $config));
     }
 
@@ -409,7 +402,7 @@ class feedback
 
 
             //Вставка обязательности заполнения
-            if ((isset($properties['allowBlank'])) && (intval($properties['allowBlank']) == 0))
+            if ((isset($properties['allowBlank'])) && (intval($properties['allowBlank']) == 1))
             {
                 $line = str_replace('%allow_value%', "checked", $line);
                 //$line = str_replace('%regexp_disabe%', "false", $line);

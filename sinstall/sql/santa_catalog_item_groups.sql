@@ -6,8 +6,8 @@ CREATE TABLE `%PREFIX%_catalog_item_groups` (
   `name_full` varchar(255) NOT NULL,
   `front_tpl_md5` varchar(32) default NULL,
   `back_tpl_md5` varchar(32) default NULL,
-  `template_items_list` varchar(255) NOT NULL,
-  `template_items_one` varchar(255) NOT NULL,
+  `template_items_list` varchar(255) default NULL,
+  `template_items_one` varchar(255) default NULL,
   `defcatids` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
   KEY `module_id` (`module_id`)

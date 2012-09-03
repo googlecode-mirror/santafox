@@ -2291,7 +2291,7 @@ class catalog extends BaseModule
         $content = str_replace("%row%", $rows, $content);
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$catid.'&'.$this->frontend_param_offset_name.'=';
-        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit,$purl), $content);
+        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit,$purl,15), $content);
         $content = str_replace('%catid%', $category['id'], $content);
         $content = $this->process_filters_in_template($content);
         $content = $this->process_variables_out($content);
@@ -2649,6 +2649,9 @@ class catalog extends BaseModule
         $list_items = $kernel->pub_httppost_get('list_items');
         $one_items  = $kernel->pub_httppost_get('one_items');
 
+        if ($namedb=='items')//это название зарезервировано, т.к. используется как алиас в выборках
+           $namedb='gitems';
+
         $n=1;
         while ($this->is_group_exists($namedb))
             $namedb.=$n++;
@@ -2718,6 +2721,8 @@ class catalog extends BaseModule
             $n=1;
             while ($this->is_group_exists($namedb))
                 $namedb.=$n++;
+            if ($namedb=='items')//это название зарезервировано, т.к. используется как алиас в выборках
+                $namedb='gitems';
             $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db'].'` '.
                 'RENAME `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.$namedb.'` ';
             $kernel->runSQL($query);
@@ -3924,7 +3929,6 @@ class catalog extends BaseModule
                 '`name_db`="'.$kernel->pub_str_prepare_set($name_db).'" WHERE `id`='.$pid;
             $kernel->runSQL($query);
 
-
             $values = null;
             if ($prop['type'] == 'enum')
             {
@@ -3932,7 +3936,7 @@ class catalog extends BaseModule
                 $values = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
             }
             $db_type = $this->convert_field_type_2_db($prop['type'], $values);
-            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE COLUMN `'.$prop['name_db'].'` `'.$name_db.'` '.$db_type;
+            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` CHANGE COLUMN `'.$prop['name_db'].'` `'.$name_db.'` '.$db_type;
             $kernel->runSQL($query);
         }
 

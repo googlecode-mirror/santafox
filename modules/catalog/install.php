@@ -14,6 +14,7 @@ class catalog_install extends install_modules
 	 * Инсталяция базового модуля
 	 *
 	 * @param string $id_module Идентификатор создаваемого базового модуля
+	 * @param boolean $reinstall
 	 */
 
 	function install($id_module, $reinstall = false)
@@ -29,8 +30,8 @@ class catalog_install extends install_modules
         . ' `name_full` varchar(255) NOT NULL, '
         . ' `front_tpl_md5` varchar(32) default NULL, '
         . ' `back_tpl_md5` varchar(32) default NULL, '
-        . ' `template_items_list` varchar(255) NOT NULL, '
-        . ' `template_items_one` varchar(255) NOT NULL, '
+        . ' `template_items_list` varchar(255) default NULL, '
+        . ' `template_items_one` varchar(255) default NULL, '
         . ' `defcatids` varchar(255) default NULL, '
         . ' PRIMARY KEY  (`id`), '
         . ' KEY `module_id` (`module_id`) '

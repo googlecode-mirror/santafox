@@ -9563,4 +9563,136 @@ class catalog extends BaseModule
         return 0;
     }
 
+
+
+    public function pub_catalog_show_compare($tpl,$max_items)
+    {
+        global $kernel;
+        $post_cb_name='additems2compare';//параметр для чекбоксов
+        $single_param_name='add2compare';//параметр при единичном добавлении
+        $remove_param_name='remove_from_compare';//параметр для удаления
+        $groupID=null;
+        $moduleid = $kernel->pub_module_id_get();
+        $session_name=$moduleid.'_compared_items';
+        if (isset($_SESSION[$session_name]) && $_SESSION[$session_name])
+        {
+            $items2compare=$_SESSION[$session_name];
+            $groupID=$items2compare[key($items2compare)]['group_id'];
+        }
+        else
+            $items2compare=array();
+
+
+        $is_modifed_list=false;
+        if (count($items2compare)<$max_items && isset($_POST[$post_cb_name]) && is_array($_POST[$post_cb_name]))
+        {//чекбоксы
+            foreach($_POST[$post_cb_name] as $id)
+            {
+                if (!CatalogCommons::is_valid_itemid($id))
+                    continue;
+                $idata = $this->get_item_full_data($id);
+                if (!$idata || ($groupID && $idata['group_id']!=$groupID))
+                    continue;
+
+                $items2compare[$idata['commonid']]=$idata;
+                $groupID=$idata['group_id'];
+                if (count($items2compare)==$max_items)
+                    break;
+            }
+            $is_modifed_list=true;
+        }
+        //добавление единичного товара
+        if (count($items2compare)<$max_items && isset($_REQUEST[$single_param_name]) && CatalogCommons::is_valid_itemid($_REQUEST[$single_param_name]))
+        {
+            $idata = $this->get_item_full_data($_REQUEST[$single_param_name]);
+            if ($idata && (!$groupID || $groupID==$idata['group_id']))
+            {
+                $items2compare[$idata['commonid']]=$idata;
+                $groupID=$idata['group_id'];
+            }
+            $is_modifed_list=true;
+        }
+
+        //удаление из сравнения
+        if (isset($_POST[$remove_param_name]) && is_array($_POST[$remove_param_name]))
+        {//чекбоксами
+            foreach($_POST[$remove_param_name] as $riid)
+            {
+                if (isset($items2compare[$riid]))
+                    unset($items2compare[$riid]);
+            }
+            $is_modifed_list=true;
+        }
+        elseif (isset($_REQUEST[$remove_param_name]) && isset($items2compare[$_REQUEST[$remove_param_name]]))//единичный товар
+        {
+            unset($items2compare[$_REQUEST[$remove_param_name]]);
+            $is_modifed_list=true;
+        }
+
+        //добавим в сессию
+        $_SESSION[$session_name]=$items2compare;
+
+        //редирект назад если надо
+        if ($is_modifed_list)
+        {
+            if (isset($_REQUEST['redir2']) && !empty($_REQUEST['redir2']))
+            {
+                $redirURL = $_REQUEST['redir2'];
+                if (substr($redirURL,0,1)!="/")
+                    $redirURL = "/".$redirURL;
+            }
+            else
+                $redirURL = "/".$kernel->pub_page_current_get().".html";
+            $kernel->pub_redirect_refresh_global($redirURL);
+        }
+
+        //отображение
+        $this->set_templates($kernel->pub_template_parse($tpl));
+        if (!$items2compare)
+            return $this->get_template_block('list_null');
+        if (count($items2compare)==1)
+            return $this->get_template_block('less_than_two');
+        $content = $this->get_template_block('content');
+        $props = CatalogCommons::get_props($groupID, true);
+        foreach($props as $prop)
+        {
+            $is_same_value=true;
+            $val=null;
+            $inum=0;
+            $pvalues=array();
+            foreach($items2compare as $item)
+            {
+                $inum++;
+                if ($inum==1)
+                    $val=$item[$prop['name_db']];
+                elseif ($val!=$item[$prop['name_db']])
+                    $is_same_value=false;
+                $pvalue = $this->get_template_block('prop_value');
+                $pvalue = str_replace('%value%',$item[$prop['name_db']],$pvalue);
+                $pvalues[]=$pvalue;
+            }
+            //различные блоки для одинаковых и разных значений свойств
+            if ($is_same_value)
+                $pline = $this->get_template_block('same_value_line');
+            else
+                $pline = $this->get_template_block('diff_value_line');
+            $pline = str_replace('%name_full%',$prop['name_full'],$pline);
+            $pline = str_replace('%prop_values%',implode($this->get_template_block('prop_values_separator'),$pvalues),$pline);
+            $content=str_replace('%'.$prop['name_db'].'_line%',$pline,$content);
+        }
+        //в заголовке - вывод информации о сравниваемых товарах (название, фото)
+        $iheaders = array();
+        foreach($items2compare as $item)
+        {
+            $iheader = $this->get_template_block('item_header');
+            $iheader=$this->process_item_props_out($item,$props,$iheader);
+            $iheaders[]=$iheader;
+        }
+        $content = str_replace('%items_headers%',implode($this->get_template_block('iheaders_separator'),$iheaders),$content);
+
+        $content = $this->clear_left_labels($content);
+        return $content;
+
+    }
+
 }

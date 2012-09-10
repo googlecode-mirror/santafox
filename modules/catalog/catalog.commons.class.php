@@ -507,4 +507,15 @@ class CatalogCommons
     {
         return self::$templates_admin_prefix;
     }
+
+
+    public static function is_valid_itemid($id)
+    {
+        if (!is_numeric($id))
+            return false;
+        $id=intval($id);
+        if ($id<1)
+            return false;
+        return $id;
+    }
 }

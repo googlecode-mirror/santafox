@@ -235,6 +235,14 @@ class manager_users
     	if ($id_admin == 0)
     	   return $kernel->pub_json_encode(array("success"=>false, "info"=>"No admin"));
 
+        //проверка уникальности логина
+        $cond="`login`='".$kernel->pub_httppost_get('login')."'";
+        if ($id_admin>0)
+            $cond.=" AND id<>".$id_admin;
+        $exrec=$kernel->db_get_record_simple("_admin",$cond);
+        if ($exrec)
+            return $kernel->pub_json_encode(array("success"=>false, "info"=>"[#admin_msg_not_unique_email#]"));
+
         if (!isset($data['full_name']))
             $data['full_name']=$data['login'];
         $enabled = 0;
@@ -288,20 +296,25 @@ class manager_users
         			   '".mysql_real_escape_string(trim($data['full_name']))."', '".$data['lang']."', 'utf-8')";
         	$kernel->runSQL($query);
 
-        	//Теперь в таблицу тросировщика
+        	//Теперь в таблицу трассировщика
         	$id = mysql_insert_id();
-        	$sql = "INSERT INTO `".$kernel->pub_prefix_get()."_admin_trace`  (`id_admin`) VALUES ('".$id."')";
+        	$sql = "INSERT INTO `".$kernel->pub_prefix_get()."_admin_trace`
+        	        (`id_admin`,`time`,`place`,`ip`,`host`)
+        	        VALUES
+        	        ('".$id."','','','','')";
         	$kernel->runSQL($sql);
 
         	//И теперь надо поработать с группами
-            //теперь добавим всю информацию из формы
+            //добавим всю информацию из формы
             $query = "DELETE FROM `".$kernel->pub_prefix_get()."_admin_cross_group`  WHERE user_id = ".$id;
 
             $kernel->runSQL($query);
 
             $groups_insert = array();
             foreach ($data['select_group'] as $key => $val)
+            {
                 $groups_insert[] = '(NULL, "'.$id.'","'.$key.'")';
+            }
 
             if (!empty($groups_insert))
             {

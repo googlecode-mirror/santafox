@@ -590,6 +590,24 @@ $property->set_data_user_func("modules/catalog/catalog.commons.class.php", array
 $install->add_public_metod_parametrs('pub_catalog_show_export', $property);
 
 
+// Публичный метод для сравнения товаров
+$install->add_public_metod('pub_catalog_show_compare', '[#catalog_pub_compare#]');
+// Шаблон
+$property = new properties_file();
+$property->set_caption('[#catalog_tpl#]');
+$property->set_default(CatalogCommons::get_templates_user_prefix().'compare.xml');
+$property->set_id('tpl');
+$property->set_mask('htm,html,xml');
+$property->set_patch(CatalogCommons::get_templates_user_prefix());
+$install->add_public_metod_parametrs('pub_catalog_show_compare', $property);
+//макс. кол-во товаров в сравнении
+$property = new properties_string();
+$property->set_caption('[#catalog_compare_max_items#]');
+$property->set_default(5);
+$property->set_id('max_items');
+$install->add_public_metod_parametrs('pub_catalog_show_compare', $property);
+
+
 $install->module_copy[0]['name'] = 'catalog_modul_base_name1';
 
 $install->module_copy[0]['action'][0]['caption']    = 'Список категорий';

@@ -2288,3 +2288,15 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','common_deselect_all_label',NULL,'�
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','common_select_all_label',NULL,'Выбрать все');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','common_select_all_label',NULL,'Выбрать все');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','common_select_all_label',NULL,'Выбрать все');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_pub_compare',NULL,'Сравнение товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_pub_compare',NULL,'Сравнение товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_pub_compare',NULL,'Сравнение товаров');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_compare_max_items',NULL,'Макс. кол-во сравниваемых товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_compare_max_items',NULL,'Макс. кол-во сравниваемых товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_compare_max_items',NULL,'Макс. кол-во сравниваемых товаров');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_msg_not_unique_email',NULL,'Неуникальный email');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_msg_not_unique_email',NULL,'Неуникальный email');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_msg_not_unique_email',NULL,'Неуникальный email');

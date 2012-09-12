@@ -1130,18 +1130,18 @@ class catalog extends BaseModule
 
                 $fvalues['id'] = $currOrder['id'];
 
+                $from_email=$manager_email;
 
                 //письмо менеджеру
                 $msg_body = $this->process_basket_items_tpl($manager_mail_tpl, $bitems, $fvalues);
-                $kernel->pub_mail(array($manager_email), array($manager_email), 'noreply@'.$_SERVER['HTTP_HOST'],
-                    'robot', $manager_mail_subj, $msg_body, false, "", "", $user_email);
+                $kernel->pub_mail(array($manager_email), array($manager_email), $from_email, 'robot', $manager_mail_subj, $msg_body, false, "", "", $user_email);
+
 
                 //письмо юзеру
                 if ($user_email)
                 {
                     $msg_body = $this->process_basket_items_tpl($user_mail_tpl, $bitems, $fvalues);
-                    $kernel->pub_mail(array($user_email), array($user_email), 'noreply@'.$_SERVER['HTTP_HOST'],
-                        'robot', $user_mail_subj, $msg_body, false, "", "", $manager_email);
+                    $kernel->pub_mail(array($user_email), array($user_email), $from_email, 'robot', $user_mail_subj, $msg_body, false, "", "", $manager_email);
                 }
 
                 //обновляем запись в БД

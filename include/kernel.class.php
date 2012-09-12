@@ -3874,11 +3874,10 @@ class kernel
     function pub_mail($toaddr, $toname, $fromaddr, $fromname, $subject, $message, $attach=false, $hostname="", $att_files=false, $replyto=false)
     {
         require_once dirname(__FILE__)."/class.phpmailer.php";
+        $fromaddr = preg_replace('~@www\.~i','@',$fromaddr);//уберём www. из email отправителя
         $sended = 0;
-        $ar = array();
-        if (!preg_match_all("/^[a-z0-9][a-z0-9_\\.-]*@[a-z0-9\\.-]+\\.[a-z]{2,6}$/i", $fromaddr ,$ar))
+        if (!$this->pub_is_valid_email($fromaddr))
             return 0;
-        $fromaddr = $ar[0][0];
         foreach ($toaddr AS $key => $email)
         {
             if (!$this->pub_is_valid_email($email))

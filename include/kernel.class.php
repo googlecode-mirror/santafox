@@ -1393,8 +1393,11 @@ class kernel
      */
     function priv_output($html = "", $for_edit = false, $js_encode=false)
     {
-
         $is_xml_data = false;
+        if (preg_match("/^\\/admin\\//",$_SERVER['REQUEST_URI']))
+            $is_backoffice=true;
+        else
+            $is_backoffice=false;
         //Заменим значения переменных на страницах
         //нужными значениями в зависимости от языка.
         if (!$this->header_is_sent && isset($_SERVER['HTTP_HOST']))
@@ -1409,12 +1412,12 @@ class kernel
             $this->header_is_sent = true;
         }
 
-        if (!$for_edit && !$is_xml_data)
+        if (!$for_edit && !$is_xml_data && !$is_backoffice)
         {
             $html = $this->priv_page_charset_set($html);
             $html = $this->priv_page_textlabels_replace($html);
 
-            if (defined('TIME_CREAT') && TIME_CREAT && !preg_match("/^\\/admin\\//",$_SERVER['REQUEST_URI']))
+            if (defined('TIME_CREAT') && TIME_CREAT)
             {
                 $this->priv_timer_stop();
                 $elapsed = $this->priv_timer_elapsed();
@@ -1451,7 +1454,7 @@ class kernel
                 }
             }
             //если требуется, HTTP-запрос и не-ajax запрос и не в админке, то добавим stat.php
-            if (defined("GENERATE_STATISTIC") && GENERATE_STATISTIC && isset($_SERVER['HTTP_HOST']) && !$this->pub_is_ajax_request() && !$is_xml_data && !preg_match("/^\\/admin\\//",$_SERVER['REQUEST_URI']))
+            if (defined("GENERATE_STATISTIC") && GENERATE_STATISTIC && isset($_SERVER['HTTP_HOST']) && !$this->pub_is_ajax_request() && !$is_xml_data)
             {
                 //если нашли </body>, то перед ним
                 if (mb_strpos($html, "</BODY>")!==false)
@@ -1463,7 +1466,7 @@ class kernel
             }
 
         }
-        if ($js_encode && !$is_xml_data)
+        if ($js_encode && !$is_xml_data && !$is_backoffice)
         {
             if ((defined('WEBFORM_CODING')) && (WEBFORM_CODING))
             {
@@ -1473,7 +1476,7 @@ class kernel
             $html = $this->priv_page_textlabels_replace($html);
         }
 
-        if (preg_match_all("|\\%html_escape\\[(.*)\\]\\%|isU",$html, $matches, PREG_SET_ORDER))
+        if (!$is_backoffice && preg_match_all("|\\%html_escape\\[(.*)\\]\\%|isU",$html, $matches, PREG_SET_ORDER))
         {
             foreach ($matches as $match)
             {

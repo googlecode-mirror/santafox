@@ -1746,7 +1746,12 @@ class catalog extends BaseModule
         $sql = $this->prepare_inner_filter_sql($sql, $params, $linkParams);
 
         if (!$sql)
-            return $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
+        {
+            $content= $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
+            if ($curr_cat_id && is_numeric($curr_cat_id))
+                $content=$this->cats_props_out($curr_cat_id,$content);
+            return $content;
+        }
         $filter['query'] = $sql;
 
 
@@ -1798,7 +1803,12 @@ class catalog extends BaseModule
         $count = count($items);
 
         if ($count == 0)
-            return $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
+        {
+            $content= $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
+            if ($curr_cat_id && is_numeric($curr_cat_id))
+                $content=$this->cats_props_out($curr_cat_id,$content);
+            return $content;
+        }
 
         if ($group)
             $props = CatalogCommons::get_props($group['id'], true);
@@ -1835,26 +1845,11 @@ class catalog extends BaseModule
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$linkParams.$this->frontend_param_offset_name.'=';
         $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,intval($filter['maxpages'])), $content);
+        if ($curr_cat_id && is_numeric($curr_cat_id))
+            $content=$this->cats_props_out($curr_cat_id,$content);
         $content = $this->process_filters_in_template($content,$filter['stringid']);
         $content = $this->replace_current_page_url($content);
-        if ($curr_cat_id && is_numeric($curr_cat_id))
-        {
-            $cat = $this->get_category($curr_cat_id);
-            if ($cat)
-            {
-                $content = str_replace("%catid%",$cat['id'],$content);
-                $cats_props = CatalogCommons::get_cats_props();
-                foreach ($cats_props as $cprop)
-                {
-                    if (strpos($content, '%category_'.$cprop['name_db'].'%')!==false)
-                    {
-                        $content = str_replace('%category_'.$cprop['name_db'].'%', $this->get_template_block('category_'.$cprop['name_db']),$content);
-                        $content = str_replace('%category_'.$cprop['name_db'].'_value%', $cat[$cprop['name_db']], $content);
-                        $content = str_replace('%category_'.$cprop['name_db'].'_name%',  $cprop['name_full'], $content);
-                    }
-                }
-            }
-        }
+
         if ($need_postprocessing)
         {
             $content = $this->process_variables_out($content);
@@ -2154,18 +2149,20 @@ class catalog extends BaseModule
                 {
                     $tpl = CatalogCommons::get_templates_user_prefix().$custom_template;
                     $this->set_templates($kernel->pub_template_parse($tpl));
-                    return $this->get_template_block('list_null');
+                    $content = $this->get_template_block('list_null');
                 }
                 else
                 {
                     if (!empty($multi_group_tpl))
                     {
                         $this->set_templates($kernel->pub_template_parse($multi_group_tpl));
-                        return $this->get_template_block('list_null');
+                        $content = $this->get_template_block('list_null');
                     }
                     else
-                        return $kernel->priv_page_textlabels_replace("[#catalog_show_items_list_no_items#]");
+                        $content = $kernel->priv_page_textlabels_replace("[#catalog_show_items_list_no_items#]");
                 }
+                $content=$this->cats_props_out($category['id'],$content);
+                return $content;
             }
         }
 
@@ -2277,24 +2274,13 @@ class catalog extends BaseModule
             $curr++;
         }
         $content = $this->get_template_block('list');
-        $cats_props = CatalogCommons::get_cats_props();
-
-        foreach ($cats_props as $cprop)
-        {
-            if (mb_strpos($content, '%category_'.$cprop['name_db'].'%')!==false)
-            {
-                $content = str_replace('%category_'.$cprop['name_db'].'%', $this->get_template_block('category_'.$cprop['name_db']),$content);
-                $content = str_replace('%category_'.$cprop['name_db'].'_value%', $category[$cprop['name_db']], $content);
-                $content = str_replace('%category_'.$cprop['name_db'].'_name%',  $cprop['name_full'], $content);
-            }
-        }
         $content = str_replace("%row%", $rows, $content);
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$catid.'&'.$this->frontend_param_offset_name.'=';
         $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit,$purl,15), $content);
-        $content = str_replace('%catid%', $category['id'], $content);
-        $content = $this->process_filters_in_template($content);
+        $content=$this->cats_props_out($category['id'],$content);
         $content = $this->process_variables_out($content);
+        $content = $this->process_filters_in_template($content);
         $content = $this->replace_current_page_url($content);
         //очистим оставшиеся метки
         $content = $this->clear_left_labels($content);
@@ -9693,6 +9679,25 @@ class catalog extends BaseModule
         $content = $this->clear_left_labels($content);
         return $content;
 
+    }
+
+    private function cats_props_out($catid,$content)
+    {
+        $cat = $this->get_category($catid);
+        if (!$cat)
+            return $content;
+        $content = str_replace("%catid%",$cat['id'],$content);
+        $cats_props = CatalogCommons::get_cats_props();
+        foreach ($cats_props as $cprop)
+        {
+            if (mb_strpos($content, '%category_'.$cprop['name_db'].'%')!==false)
+            {
+                $content = str_replace('%category_'.$cprop['name_db'].'%', $this->get_template_block('category_'.$cprop['name_db']),$content);
+                $content = str_replace('%category_'.$cprop['name_db'].'_value%', $cat[$cprop['name_db']], $content);
+                $content = str_replace('%category_'.$cprop['name_db'].'_name%',  $cprop['name_full'], $content);
+            }
+        }
+        return $content;
     }
 
 }

@@ -2507,22 +2507,8 @@ class catalog extends BaseModule
         {
             if (isset($curr_cat['name']))
                 $content = str_replace("%curr_category_name%", $curr_cat['name'], $content);
-
-            $cats_props = CatalogCommons::get_cats_props();
-            foreach ($cats_props as $cprop)
-            {
-                if (mb_strpos($content, '%category_'.$cprop['name_db'].'%')!==false)
-                {
-                    $content = str_replace('%category_'.$cprop['name_db'].'%', $this->get_template_block('category_'.$cprop['name_db']),$content);
-                    $content = str_replace('%category_'.$cprop['name_db'].'_value%', $curr_cat[$cprop['name_db']], $content);
-                    $content = str_replace('%category_'.$cprop['name_db'].'_name%',  $cprop['name_full'], $content);
-                }
-            }
+            $content = $this->cats_props_out($curr_cat['id'],$content);
         }
-
-
-        //if (!$first) // как минимум одна категория была
-        //$content .= $this->get_template_block_with_depth('end', 0);
         $content = $this->process_variables_out($content);
         //очистим оставшиеся метки
         $content = $this->clear_left_labels($content);

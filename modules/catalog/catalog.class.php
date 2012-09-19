@@ -1559,19 +1559,6 @@ class catalog extends BaseModule
     }
 
     /**
-     * Удаляет все товары заказа из корзины
-     * @param string $sessionid IDшник сессии
-     * @return void
-     */
-    private function clear_basket_items($sessionid)
-    {
-        global $kernel;
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` '.
-            'WHERE `sessionid` = "'.$sessionid.'"';
-        $kernel->runSQL($query);
-    }
-
-    /**
      * Заменяет в шаблоне %current_page_url%
      * на урл текущей страницы c учётом ТОЛЬКО параметра cid (catid)
      *
@@ -5703,19 +5690,24 @@ class catalog extends BaseModule
         {
             if (strlen($filter['catids'])==0) //показывать товары из текущей
             {
-                $catid = $this->get_current_catid(true);
-                if ($catid==0)
+                $curr_cat_id=$this->get_current_catIDs();
+                if ($curr_cat_id)
+                {
+                    if (is_array($curr_cat_id))
+                        $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id  WHERE ( i2c.cat_id IN (".implode(",",$curr_cat_id).") AND ".$query;
+                    else
+                        $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$curr_cat_id." AND ".$query;
+                }
+                else
                 {
                     $catid=intval($kernel->pub_httpget_get("fcid"));//доп.возможность передать фильтру айдишник категории, незаметный для других методов
 
                     if ($catid==0 && isset($this->current_cat_IDs[$moduleid])) //не нашли ранее, но есть catid, заполненный в карточке товара
                         $catid=$this->current_cat_IDs[$moduleid];
-
+                    if ($catid==0) //"выбранная категория", но категорий ни в каком виде не передано
+                        return null;
+                    $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$catid." AND ".$query;
                 }
-
-                if ($catid==0) //"выбранная категория", но категорий не передано
-                    return null;
-                $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$catid." AND ".$query;
 
             }
             else  //выбранные категории
@@ -6053,11 +6045,6 @@ class catalog extends BaseModule
 
 
         return $content;
-    }
-
-    private function prepare_value4db_enum($s)
-    {
-        return str_replace("'","'",$s);
     }
 
     /**

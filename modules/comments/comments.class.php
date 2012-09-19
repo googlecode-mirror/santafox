@@ -421,6 +421,12 @@ class comments extends BaseModule
                     $body=str_replace('%link%',$this->get_template_block('email2admin_link'),$body);
                     $body=str_replace('%link%',$httpLink,$body);
 
+                    $body = str_replace('%name%', htmlspecialchars($name), $body);
+                    $body = str_replace('%comment%', htmlspecialchars($comment), $body);
+                    $body = str_replace('%pros%', htmlspecialchars($pros), $body);
+                    $body = str_replace('%cons%', htmlspecialchars($cons), $body);
+                    $body = str_replace('%rate%', $rate, $body);
+
                 }
                 $this->send_admin_email($subj,$body);
                 $redirUrl=$_SERVER["REQUEST_URI"];

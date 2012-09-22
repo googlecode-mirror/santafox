@@ -1198,9 +1198,7 @@ class comments extends BaseModule
         $result = $kernel->runSQL($query);
 
         if ((mysql_num_rows($result) == 0))
-        {
             return $this->get_template_block('no_data');
-        }
 
         $lines = array();
         $first_element_number = $offset + 1;
@@ -1238,7 +1236,7 @@ class comments extends BaseModule
 
         $total = $this->get_total_reviews(array($cond));
 
-        $purl = 'show_list&field='.$field.'&direction='.$direction.'&'.$this->offset_name;
+        $purl = 'show_reviews_list&field='.$field.'&direction='.$direction.'&'.$this->offset_name.'=';
         $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,0), $content);
 
         $sort_headers = $this->get_reviews_sort_headers($field, $direction, $date, $start_date, $end_date);

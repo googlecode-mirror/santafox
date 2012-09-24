@@ -21,4 +21,4 @@ CREATE TABLE `%PREFIX%_stat_host` (
   KEY `tstc` (`tstc`),
   KEY `IDSess` (`IDSess`),
   KEY `f_people` (`f_people`)
-) ENGINE=MyISAM AUTO_INCREMENT=854 DEFAULT CHARSET=utf8 COMMENT='Статистика - хосты';
+) ENGINE=MyISAM AUTO_INCREMENT=854 DEFAULT CHARSET=utf8 COMMENT='Статистика хостов';

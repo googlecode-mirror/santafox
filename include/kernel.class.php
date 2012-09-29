@@ -1415,8 +1415,6 @@ class kernel
         if (!$for_edit && !$is_xml_data && !$is_backoffice)
         {
             $html = $this->priv_page_charset_set($html);
-            $html = $this->priv_page_textlabels_replace($html);
-
             if (defined('TIME_CREAT') && TIME_CREAT)
             {
                 $this->priv_timer_stop();
@@ -1466,14 +1464,11 @@ class kernel
             }
 
         }
-        if ($js_encode && !$is_xml_data && !$is_backoffice)
+
+        if ($js_encode && !$is_xml_data && defined('WEBFORM_CODING') && WEBFORM_CODING && !$is_backoffice)
         {
-            if ((defined('WEBFORM_CODING')) && (WEBFORM_CODING))
-            {
-                $html = $this->pub_page_email_encode($html);
-                $html = $this->pub_page_form_encode($html);
-            }
-            $html = $this->priv_page_textlabels_replace($html);
+            $html = $this->pub_page_email_encode($html);
+            $html = $this->pub_page_form_encode($html);
         }
 
         if (!$is_backoffice && preg_match_all("|\\%html_escape\\[(.*)\\]\\%|isU",$html, $matches, PREG_SET_ORDER))
@@ -1484,6 +1479,8 @@ class kernel
             }
         }
 
+        if ($is_backoffice)
+            $html = $this->priv_page_textlabels_replace($html);
         print $html;
     }
 

@@ -327,6 +327,7 @@ a:focus {
 
 #faq li {
 	margin-bottom:0;
+    list-style-type:disc;
 }
 
 #faq a {

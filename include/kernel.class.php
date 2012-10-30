@@ -3942,7 +3942,8 @@ class kernel
 
                 }
                 $mail->emptyAltBody = true;
-                $mail->MsgHTML($message);
+                $message = str_replace("\r\n", "\n", $message);
+                $mail->MsgHTML(nl2br($message));
                 if (is_array($att_files))
                 {
                     foreach ($att_files as $att_file)
@@ -3956,7 +3957,10 @@ class kernel
                     $sended++;
             }
             catch (Exception $e)
-            {}
+            {
+                if (defined("SHOW_INT_ERRORE_MESSAGE") && SHOW_INT_ERRORE_MESSAGE)
+                    print "Error: ".$e->getMessage()."\n\n";
+            }
         }
         return $sended;
     }

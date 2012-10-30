@@ -109,31 +109,28 @@ class feedback
             // Обработаем данные введенные пользователем
         	case 'form_processing':
         	    $input_values = $kernel->pub_httppost_get('values');
-        	    switch ($type)
-                {
-        	    	case 'html':
-                        $message = $this->get_template_block('email_html');
-        	    		break;
-        	    	default:
-        	    	case 'text':
-                        $message = $this->get_template_block('email_text');
-        	    		break;
-        	    }
+
+                if ($type=='html')
+                    $message = $this->get_template_block('email_html');
+                else
+                    $message = $this->get_template_block('email_text');
 
         	    $message = str_replace(array_map(array('feedback', 'array_map_marks'), array_keys($input_values)), $input_values, $message);
         	    $message = preg_replace('/\%[a-zA-Z0-9]+\%/', '[#feedback_property_field_no#]', $message);
         	    $message = preg_replace('/\&[a-zA-Z0-9]+\&/', '[#feedback_property_field_yes#]', $message);
         	    $message = $kernel->priv_page_textlabels_replace($message);
 
-        	    $sended = @$kernel->pub_mail(array($email), array($name), 'noreply@'.$_SERVER['HTTP_HOST'], 'Module: FeedBack', $theme, $message);
+        	    $sended = $kernel->pub_mail(array($email), array($name), 'noreply@'.$_SERVER['HTTP_HOST'], 'Module: FeedBack', $theme, $message);
+                $rurl=$this->get_return_url().$this->get_action_name().'=';
         	    if ($sended > 0)
-        	    	$kernel->pub_redirect_refresh_global($this->get_return_url().$this->get_action_name().'=processing_succses');
+                    $rurl.='processing_success';
         	    else
-        	    	$kernel->pub_redirect_refresh_global($this->get_return_url().$this->get_action_name().'=processing_fail');
+                    $rurl.='processing_fail';
+                $kernel->pub_redirect_refresh_global($rurl);
         	    break;
 
         	// Выведем собщение об успешной отправке данных
-        	case 'processing_succses':
+        	case 'processing_success':
         	    $content = $this->get_template_block('processing_succses');
         	    break;
 

@@ -7,8 +7,7 @@ CREATE TABLE `%PREFIX%_catalog_catalog2_cats` (
   `name` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `is_default` (`is_default`),
-  KEY `order` (`order`),
-  KEY `parent_id` (`parent_id`)
+  KEY `parent_id_order` (`parent_id`,`order`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_catalog2_cats` VALUES ('2','0','3','0','ЖК телевизоры');
 INSERT INTO `%PREFIX%_catalog_catalog2_cats` VALUES ('3','0','5','0','Плазменные телевизоры');

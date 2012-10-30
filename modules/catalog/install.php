@@ -116,8 +116,7 @@ class catalog_install extends install_modules
         . ' `name` varchar(255) NOT NULL, '
         . ' PRIMARY KEY  (`id`), '
         . ' KEY `is_default` (`is_default`), '
-        . ' KEY `order` (`order`), '
-        . ' KEY `parent_id`  (`parent_id`) '
+        . ' KEY `parent_id_order` (`parent_id`,`order`) '
         . ' ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1';
         $kernel->runSQL($query);
 

@@ -1076,6 +1076,9 @@ class catalog extends BaseModule
             setcookie($this->basketid_cookie_name, "", time() - $this->basketid_cookie_days*24*60*60);
             return $block;
         }
+        $bitems = $this->get_basket_items();
+        if (count($bitems) == 0)
+            return $this->get_template_block("no_basket_items");
 
         $ofields = CatalogCommons::get_order_fields2();
         $content = "";
@@ -1083,9 +1086,6 @@ class catalog extends BaseModule
         $process_order = $kernel->pub_httppost_get("process_order");
         if (!empty($process_order))
         {//обрабатываем форму
-            $bitems = $this->get_basket_items();
-            if (count($bitems) == 0)
-                return $this->get_template_block("no_basket_items");
             $form_ok = true;
             $user_email = false;
 

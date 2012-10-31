@@ -312,13 +312,13 @@ class comments extends BaseModule
                 }
 
                 $sql = 'INSERT INTO `'.$kernel->pub_prefix_get().'_comments` (page_id,page_sub_id,module_id,txt,author,available,`date`,`time`)'.
-                      ' VALUES ("'.$kernel->pub_page_current_get().'",'.$page_sub_id.', "'.$kernel->pub_module_id_get().'","'.mysql_real_escape_string(htmlspecialchars($cmnt_txt)).'","'.mysql_real_escape_string(htmlspecialchars($cmnt_name)).'",'.$aval.',CURDATE(),CURTIME());';
+                      ' VALUES ("'.$kernel->pub_page_current_get().'",'.$page_sub_id.', "'.$kernel->pub_module_id_get().'","'.mysql_real_escape_string(nl2br(htmlspecialchars($cmnt_txt))).'","'.mysql_real_escape_string(htmlspecialchars($cmnt_name)).'",'.$aval.',CURDATE(),CURTIME());';
                 $kernel->runSQL($sql);
 
                 $subj = "Новый комментарий";
                 if ($aval!=1)
                     $subj.= " требующий модерации";
-                $body = "<html><body><a href='".$httpLink."'>Ссылка</a><br>Имя: ".htmlspecialchars($cmnt_name)."<br>Текст: ".htmlspecialchars($cmnt_txt)."</body></html>";
+                $body = "<html><body><a href='".$httpLink."'>Ссылка</a><br>Имя: ".htmlspecialchars($cmnt_name)."<br>Текст: ".nl2br(htmlspecialchars($cmnt_txt))."</body></html>";
                 $this->send_admin_email($subj,$body);
                 $redirUrl=$_SERVER["REQUEST_URI"];
                 if (strpos($redirUrl,"?")===FALSE)
@@ -403,9 +403,9 @@ class comments extends BaseModule
                     $rate=null;
                 $rec=array(
                     'name'=>mysql_real_escape_string(htmlspecialchars($name)),
-                    'pros'=>mysql_real_escape_string(htmlspecialchars($pros)),
-                    'cons'=>mysql_real_escape_string(htmlspecialchars($cons)),
-                    'comment'=>mysql_real_escape_string(htmlspecialchars($comment)),
+                    'pros'=>mysql_real_escape_string(nl2br(htmlspecialchars($pros))),
+                    'cons'=>mysql_real_escape_string(nl2br(htmlspecialchars($cons))),
+                    'comment'=>mysql_real_escape_string(nl2br(htmlspecialchars($comment))),
                     'when'=>date("Y-m-d H:i:s"),
                     'rate'=>$rate,
                     'pageid'=>$this->get_pageid_for_reviews($httpparams),
@@ -420,14 +420,13 @@ class comments extends BaseModule
                     $httpLink = "http://".$_SERVER['HTTP_HOST']."/".$this->create_page_url($httpparams);
                     $body=str_replace('%link%',$this->get_template_block('email2admin_link'),$body);
                     $body=str_replace('%link%',$httpLink,$body);
-
-                    $body = str_replace('%name%', htmlspecialchars($name), $body);
-                    $body = str_replace('%comment%', htmlspecialchars($comment), $body);
-                    $body = str_replace('%pros%', htmlspecialchars($pros), $body);
-                    $body = str_replace('%cons%', htmlspecialchars($cons), $body);
-                    $body = str_replace('%rate%', $rate, $body);
-
                 }
+                $body = str_replace('%name%', htmlspecialchars($name), $body);
+                $body = str_replace('%comment%', nl2br(htmlspecialchars($comment)), $body);
+                $body = str_replace('%pros%', nl2br(htmlspecialchars($pros)), $body);
+                $body = str_replace('%cons%', nl2br(htmlspecialchars($cons)), $body);
+                $body = str_replace('%rate%', $rate, $body);
+
                 $this->send_admin_email($subj,$body);
                 $redirUrl=$_SERVER["REQUEST_URI"];
                 if (strpos($redirUrl,"?")===FALSE)

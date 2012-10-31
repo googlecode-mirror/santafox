@@ -64,8 +64,11 @@ class faq
     /**
      * Метод управления выводом FAQ
      *
-     * @param integer $form false - не выводить форму вопроса для посетителя; true - выводить
-     * @return HTML
+     * @param boolean $form false - не выводить форму вопроса для посетителя; true - выводить
+     * @param string $template
+     * @param integer $limit
+     * @param string $page
+     * @return string
      */
     function pub_faq($form = false, $template='', $limit=0, $page='')
     {
@@ -94,7 +97,6 @@ class faq
         else
             $get_values['b'] = intval($get_values['b']);
 
-        $html='';
     	switch ($get_values['a'])
     	{
             /*
@@ -128,7 +130,8 @@ class faq
     /**
      * Возвращает форму для задания вопроса
      *
-     * @return HTML
+     * @param string $template
+     * @return string
      */
     function pub_form($template='')
     {
@@ -148,7 +151,7 @@ class faq
         $postvars = $kernel->pub_httppost_get();
         $user = htmlspecialchars($kernel->pub_httppost_get('faq_user_name',false));
         $mail = htmlspecialchars($kernel->pub_httppost_get('faq_user_email',false));
-        $quest = htmlspecialchars($kernel->pub_httppost_get('faq_user_question',false));
+        $quest = nl2br(htmlspecialchars($kernel->pub_httppost_get('faq_user_question',false)));
 
         if (isset($postvars['faq_user_button']) && !empty($user) && !empty($quest))
         {
@@ -178,10 +181,7 @@ class faq
                 foreach ($emails as $email)
                 {
                     $email = trim($email);
-                    if ($kernel->pub_is_valid_email($email))
-                    {
-                        $kernel->pub_mail(array($email), array($email), $email, 'admin', $subj, $mail_body, false);
-                    }
+                    $kernel->pub_mail(array($email), array($email), $email, 'admin', $subj, $mail_body, false);
                 }
             }
 
@@ -204,7 +204,7 @@ class faq
     /**
      * Формирует список разделов
      *
-     * @return HTML
+     * @return string
      */
     function create_form_partition()
     {
@@ -260,7 +260,7 @@ class faq
      * @param integer $pid
      * @param string $page
      * @param integer $limit
-     * @return HTML
+     * @return string
      */
 
     function create_form_questions($pid, $page, $limit)
@@ -315,7 +315,7 @@ class faq
      *
      * @param array $get_values массив переменных _GET
      * @param string $page
-     * @return HTML
+     * @return string
      */
     function create_form_question($get_values, $page='')
     {
@@ -392,7 +392,7 @@ class faq
     /**
      * Предопределйнный метод, используется для вызова административного интерфейса модуля
      *
-     * @return HTML
+     * @return string
      */
     function start_admin()
     {
@@ -581,7 +581,7 @@ class faq
      * Выводит форму для управления разделами
      *
      * @access private
-     * @return HTML
+     * @return string
      */
     function priv_create_list_partition()
     {
@@ -642,7 +642,7 @@ class faq
      * формирует форму для добавления или редактирования раздела
      *
      * @param integer|string $id ID
-     * @return HTML
+     * @return string
      */
     function priv_form_add_partition($id = "")
     {
@@ -860,4 +860,3 @@ class faq
         return true;
     }
 }
-?>

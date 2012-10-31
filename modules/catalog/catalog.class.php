@@ -1090,10 +1090,12 @@ class catalog extends BaseModule
             $user_email = false;
 
             $fvalues = array();
+            $fvalues_orig = array();
             foreach ($ofields as $db_field=>$ofield)
             {
-                $postvar = $kernel->pub_httppost_get($db_field, false);
-                $fvalues[$db_field] = $kernel->pub_httppost_get($db_field); //сохраним сразу и заэскейпленное значение
+                $postvar = nl2br(htmlspecialchars($kernel->pub_httppost_get($db_field, false)));
+                $fvalues_orig[$db_field] = $postvar;
+                $fvalues[$db_field] = nl2br(htmlspecialchars($kernel->pub_httppost_get($db_field))); //сохраним сразу и заэскейпленное значение
                 if ($kernel->pub_is_valid_email($postvar))
                     $user_email = $postvar;
 
@@ -1133,14 +1135,14 @@ class catalog extends BaseModule
                 $from_email=$manager_email;
 
                 //письмо менеджеру
-                $msg_body = $this->process_basket_items_tpl($manager_mail_tpl, $bitems, $fvalues);
+                $msg_body = $this->process_basket_items_tpl($manager_mail_tpl, $bitems, $fvalues_orig);
                 $kernel->pub_mail(array($manager_email), array($manager_email), $from_email, 'robot', $manager_mail_subj, $msg_body, false, "", "", $user_email);
 
 
                 //письмо юзеру
                 if ($user_email)
                 {
-                    $msg_body = $this->process_basket_items_tpl($user_mail_tpl, $bitems, $fvalues);
+                    $msg_body = $this->process_basket_items_tpl($user_mail_tpl, $bitems, $fvalues_orig);
                     $kernel->pub_mail(array($user_email), array($user_email), $from_email, 'robot', $user_mail_subj, $msg_body, false, "", "", $manager_email);
                 }
 

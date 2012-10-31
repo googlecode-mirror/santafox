@@ -3943,7 +3943,7 @@ class kernel
                 }
                 $mail->emptyAltBody = true;
                 $message = str_replace("\r\n", "\n", $message);
-                $mail->MsgHTML(nl2br($message));
+                $mail->MsgHTML($message);
                 if (is_array($att_files))
                 {
                     foreach ($att_files as $att_file)

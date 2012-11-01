@@ -109,7 +109,8 @@ class feedback
             // Обработаем данные введенные пользователем
         	case 'form_processing':
         	    $input_values = $kernel->pub_httppost_get('values');
-
+                if (isset($input_values['message']))
+                    $input_values['message']=nl2br(htmlspecialchars($input_values['message']));
                 if ($type=='html')
                     $message = $this->get_template_block('email_html');
                 else
@@ -118,7 +119,6 @@ class feedback
         	    $message = str_replace(array_map(array('feedback', 'array_map_marks'), array_keys($input_values)), $input_values, $message);
         	    $message = preg_replace('/\%[a-zA-Z0-9]+\%/', '[#feedback_property_field_no#]', $message);
         	    $message = preg_replace('/\&[a-zA-Z0-9]+\&/', '[#feedback_property_field_yes#]', $message);
-                $message = nl2br($message);
         	    $message = $kernel->priv_page_textlabels_replace($message);
 
         	    $sended = $kernel->pub_mail(array($email), array($name), 'noreply@'.$_SERVER['HTTP_HOST'], 'Module: FeedBack', $theme, $message);

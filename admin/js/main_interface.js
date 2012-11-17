@@ -5,6 +5,7 @@ var curent_action_confirm = "";
 function show_action_edit(strlink, name)
 {
     var popup=$("#popup_div");
+    popup.html('');
     popup.load(start_interface.global_link + strlink);
     popup.dialog({
         resizable: true,

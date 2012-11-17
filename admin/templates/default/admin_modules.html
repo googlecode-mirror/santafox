@@ -53,23 +53,16 @@
         });
 
         return false;
-        /*
-        $(form[0].elements).each(function() {
-                var field = $(this);
-                // We're only interested in fields with a validation attribute
-                if(field.attr('validation') !== undefined) {
-                    fields.push(new Field(field));
-                }
-            });
-            */
+
     });
 
     //tabs
-   $('#page_tabs').parent().tabs();
+   var page_tabs=$('#page_tabs');
+   page_tabs.parent().tabs();
    // button ui
-   $("input:button").button();
+   $("#content_container").find("input:button").button();
    // select
-   $('#content_container select').selectmenu({
+   $('#content_container').find('select').selectmenu({
       style:'dropdown',
       maxHeight: 200
    });
@@ -86,7 +79,7 @@
    
    // content таба пустой ? прячем
    if($('#mod_props').children('fieldset').length == 0)
-      $('#page_tabs').find('a[href=#mod_props]').parent().css({'display':'none'});
+       page_tabs.find('a[href=#mod_props]').parent().css({'display':'none'});
 
 </script>
 
@@ -96,37 +89,44 @@
 
  <div id="page_tabs">
   <ul>
+   <li><a href="#mod_action_list">[#modules_legend_action_modul#]</a></li>
    <li><a href="#mod_all_lang_name">[#modules_legend_name_all_lang#]</a></li>
    <li><a href="#mod_props">[#modules_legend_all_modul#]</a></li>
-   <li style="display:none;"><a href="#mod_action_list">[#modules_legend_action_modul#]</a></li>
+
   </ul>
  </div>
 
-            <form id="module_props_lang_form">
+<form id="module_props_lang_form">
+
+<div id="mod_action_list" class="content">
+
+    <div id="module_actions_container" style="padding:0;">
+        <label style="width:170px;">[#modules_label_action_new#]</label>
+        <select id="moduleNewActionSelect" style="width:330px;"></select>
+        <input type="button" style="margin-left:15px;" id="button_add_action" value="Создать"> <!-- // @todo move 2 lang vars  -->
+    </div>
+
+    <div id="actions_list_table">
+        <img src="/admin/templates/default/images/content-loading.gif" />
+    </div>
+</div>
 
  <div id="mod_all_lang_name" class="content">
-                    [#modules_form_edit_all_name#]
-            </div>
+    [#modules_form_edit_all_name#]
+ </div>
 
  <div id="mod_props" class="content">%str_prop_modul%</div>
 
- <div id="mod_action_list" class="content">
-  <div id="module_actions_container" style="padding:none; display:none;">
-     <label style="width:170px;">[#modules_label_action_new#]</label>
-     <select id="moduleNewActionSelect" style="width:330px;"></select>
-     <input type="button" style="margin-left:15px;" id="button_add_action" value="Создать"> <!-- // @todo move 2 lang vars  -->
-                    </div>
 
-                    <div id="actions_list_table"></div>
-  </div>
 
   <fieldset class="page_submit_field">
    <input type="button" value="[#modules_button_save_properties#]" id="modulePropsSave">
-    </fieldset>
-    </div>
-            </form>
+  </fieldset>
+</form>
+</div>
 
-        </div>
+
+</div>
 
 <!-- @names_module -->
 <fieldset>
@@ -146,7 +146,7 @@ update_action_list();
 <!-- @str_action_begin -->
 <table class="admin_table">
 	<tr>
-  <th colspan="2" align="center" class="first last">[#modules_legend_action_exist#]</td>
+        <th colspan="2" align="center" class="first last">[#modules_legend_action_exist#]</th>
     </tr>
     [#html_action#]
 

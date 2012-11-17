@@ -18,36 +18,37 @@
 </div>
 
 
-<script>
-    $("input:button").button();
+<script type="text/javascript">
+    var mblock=$('#mod_action_edit');
+    mblock.find("input:button").button();
 
-    $('#mod_action_edit select').selectmenu({
+    mblock.find('select').selectmenu({
         style:'dropdown',
         maxHeight: 200
     });
 
-    var arr_actions = new Array();
+    var arr_actions = [];
     var fieldNames = [%fieldNames%];
     var url_for_submit = '';
 
 
     $('#modules_button_save_properties').click(function(){
-        if ($('#action_name').val()=="")
-        {
+        var action_name=$('#action_name');
+        if (action_name.val()=="")
             santaShowPopupHint('Error','Не заполнено имя действия',0);// @todo move to lang vars
-        }
         else
         {
-            var postArr={action_name:$('#action_name').val()};
+            var postArr={action_name:action_name.val()};
             postArr.properties = {};
-            var fID, val, fieldName;
+            var fID, val, fieldName, elem;
             for (var j=0;j<fieldNames.length;j++)
             {
                 fID = 'ppv_'+fieldNames[j];
+                elem=$('#'+fID);
                 //пропускаем незачеканные чекбоксы
-                if ($('#'+fID)[0].tagName=="INPUT" &&  $('#'+fID).attr('type').toLowerCase()=="checkbox" && !$('#'+fID).attr('checked'))
+                if (elem[0].tagName=="INPUT" &&  elem.attr('type').toLowerCase()=="checkbox" && !elem.attr('checked'))
                     continue;
-                postArr.properties[fieldNames[j]]=$('#'+fID).val();
+                postArr.properties[fieldNames[j]]=elem.val();
 
             }
             $.post('%url_action%',postArr,  function(data){

@@ -1337,6 +1337,19 @@ class manager_modules
 		$template = $kernel->pub_template_parse("admin/templates/default/admin_modules.html");
 		$html = $template['body'];
 
+        if ($curent_modules['parent_id'])
+        {
+            $module_actions_block = $template['module_actions_block'];
+            $module_actions_header = $template['module_actions_header'];
+        }
+        else
+        {
+            $module_actions_block = '';
+            $module_actions_header = '';
+        }
+        $html = str_replace('%module_actions_block%', $module_actions_block, $html);
+        $html = str_replace('%module_actions_header%',$module_actions_header,$html);
+
 		//Сначала построим название модуля во всех языках
         $id_name = mb_substr($curent_modules['full_name'],2,-2);
 		$array_text = $kernel->priv_textlabel_values_get($id_name);
@@ -1346,14 +1359,14 @@ class manager_modules
 		foreach ($array_text as $lang_code => $lang_name)
         {
             $line = $template['names_module'];
-            $line = str_replace ("[#code#]", $lang_code, $line);
-            $line = str_replace ("[#value#]", $lang_name, $line);
-            $line = str_replace ("%num%", $i, $line);
-            $line = str_replace ("%id_name%", $id_name, $line);
+            $line = str_replace("[#code#]", $lang_code, $line);
+            $line = str_replace("[#value#]", $lang_name, $line);
+            $line = str_replace("%num%", $i, $line);
+            $line = str_replace("%id_name%", $id_name, $line);
 			$arr[] = $line;
 			$i++;
         }
-        $html = str_replace ("[#modules_form_edit_all_name#]", join("",$arr), $html);
+        $html = str_replace("[#modules_form_edit_all_name#]", join("",$arr), $html);
         $html = str_replace('%id_modul%', $kernel->pub_module_id_get(), $html);
 
         // ============================================================

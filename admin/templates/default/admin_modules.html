@@ -89,7 +89,7 @@
 
  <div id="page_tabs">
   <ul>
-   <li><a href="#mod_action_list">[#modules_legend_action_modul#]</a></li>
+   %module_actions_header%
    <li><a href="#mod_all_lang_name">[#modules_legend_name_all_lang#]</a></li>
    <li><a href="#mod_props">[#modules_legend_all_modul#]</a></li>
 
@@ -100,15 +100,8 @@
 
 <div id="mod_action_list" class="content">
 
-    <div id="module_actions_container" style="padding:0;">
-        <label style="width:170px;">[#modules_label_action_new#]</label>
-        <select id="moduleNewActionSelect" style="width:330px;"></select>
-        <input type="button" style="margin-left:15px;" id="button_add_action" value="Создать"> <!-- // @todo move 2 lang vars  -->
-    </div>
+    %module_actions_block%
 
-    <div id="actions_list_table">
-        <img src="/admin/templates/default/images/content-loading.gif" />
-    </div>
 </div>
 
  <div id="mod_all_lang_name" class="content">
@@ -126,6 +119,19 @@
 </div>
 
 
+</div>
+
+<!-- @module_actions_header -->
+<li><a href="#mod_action_list">[#modules_legend_action_modul#]</a></li>
+<!-- @module_actions_block -->
+<div id="module_actions_container" style="padding:0;">
+    <label style="width:170px;">[#modules_label_action_new#]</label>
+    <select id="moduleNewActionSelect" style="width:330px;"></select>
+    <input type="button" style="margin-left:15px;" id="button_add_action" value="Создать"> <!-- // @todo move 2 lang vars  -->
+</div>
+
+<div id="actions_list_table">
+    <img src="/admin/templates/default/images/content-loading.gif" />
 </div>
 
 <!-- @names_module -->

@@ -79,13 +79,14 @@ class frontoffice_manager
                 $word = $mstat->get_word_by_referer($idSearch, $_SERVER["HTTP_REFERER"]);
                 if ($word)
                 {
-                    if (file_exists('modules/search/include/searcher.class.php'))
+                    $webroot = dirname(dirname(__FILE__))."/";
+                    if (file_exists($webroot.'modules/search/include/searcher.class.php'))
                     { //модуль поиска существует, подключаем необходимые классы
-                        require_once 'modules/search/include/searcher.class.php';
-                        require_once 'modules/search/include/searchdb.class.php';
-                        require_once 'modules/search/include/htmlparser.class.php';
-                        require_once 'modules/search/include/lingua_stem_ru.class.php';
-                        require_once 'modules/search/include/indexator.class.php';
+                        require_once $webroot.'modules/search/include/searcher.class.php';
+                        require_once $webroot.'modules/search/include/searchdb.class.php';
+                        require_once $webroot.'modules/search/include/htmlparser.class.php';
+                        require_once $webroot.'modules/search/include/lingua_stem_ru.class.php';
+                        require_once $webroot.'modules/search/include/indexator.class.php';
                         $searcher = new Searcher($kernel->pub_prefix_get() . "_search1");
 
                         $searcher->set_results_per_page(1);
@@ -456,7 +457,8 @@ class frontoffice_manager
         //модуля, производящего сейчас вызов
         $kernel->priv_module_for_action_set($in['id_mod']);
 
-        $kernel->set_current_actionid($in['id_action']);
+        if (isset($in['id_action']))
+            $kernel->set_current_actionid($in['id_action']);
         $modul = $kernel->priv_module_including_get($start_modul);
         if ($modul === false)
         {

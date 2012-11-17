@@ -79,15 +79,7 @@
 
 
 <!-- @cat_items -->
-<script type="text/javascript">
- function selectChange()
- {
-     if ($('#withselected').val()=='move2')
-         $('#catsdiv').css('display','block');
-     else
-         $('#catsdiv').css('display','none');
- }
-</script>
+
 
 <h3 style="margin-top:10px;">[#catalog_list_category_item_list_label#]</h3>
 <form action="%form_action%" method="POST" id="savecategoryitemsform" name="scif">
@@ -104,7 +96,7 @@
 </table>
 
 <fieldset style="text-align:center;">
- <input type="submit" name="saveorder" value="[#catalog_list_category_item_table_action_change_sord#]">
+ <input type="button" value="[#catalog_list_category_item_table_action_change_sord#]" onclick="saveOrder()">
 </fieldset>
 
 %pages%
@@ -126,11 +118,36 @@
    %cats_options%
   </select>
  </div>
- 
- <input type="submit" class="fLeft" style="margin-left:5px;" name="saveselected" value="[#catalog_list_category_item_table_action_run#]">
- <input type="submit" class="fLeft" style="margin-left:5px;" name="change_items" value="Сохранить поля">
+ <input type="hidden" id="hidden_catitems_field" name="" value="1">
+ <input type="button" class="fLeft" style="margin-left:5px;" value="[#catalog_list_category_item_table_action_run#]" onclick="saveSelected();">
+ <input type="button" class="fLeft" style="margin-left:5px;" value="Сохранить поля" onclick="saveFields();">
 </fieldset>
 </form>
+ <script type="text/javascript">
+     function saveOrder()
+     {
+         $('#hidden_catitems_field').attr("name","saveorder");
+         jspub_form_submit('savecategoryitemsform','%form_action%');
+     }
+     function saveSelected()
+     {
+         $('#hidden_catitems_field').attr("name","saveselected");
+         jspub_form_submit('savecategoryitemsform','%form_action%');
+     }
+     function saveFields()
+     {
+         $('#hidden_catitems_field').attr("name","change_items");
+         jspub_form_submit('savecategoryitemsform','%form_action%');
+
+     }
+     function selectChange()
+     {
+         if ($('#withselected').val()=='move2')
+             $('#catsdiv').css('display','block');
+         else
+             $('#catsdiv').css('display','none');
+     }
+ </script>
 
 <!-- @cat_items_line -->
 <tr>

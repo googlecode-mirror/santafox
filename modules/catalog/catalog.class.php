@@ -8934,9 +8934,6 @@ class catalog extends BaseModule
             case 'category_items':
                 return $this->show_category_items();
 
-            //Групповые дейсвтий над товарами
-
-            //Включает товары в выбранную категорию
             case 'category_items_save':
                 $catid = $kernel->pub_httppost_get("catid");
                 $change_items = $kernel->pub_httppost_get('change_items');
@@ -8944,8 +8941,7 @@ class catalog extends BaseModule
                     $this->save_category_items($catid);
                 else
                     $this->change_selected_items();
-                $kernel->pub_redirect_refresh_reload('category_edit&id='.$catid.'&selectcat='.$catid);
-                break;
+                return $kernel->pub_httppost_response('[#catalog_variable_save_msg_ok#]','category_items&id='.$catid);
 
             //Выводит форму всех товаров, с фильтром по товарной группе
             case 'show_items':
@@ -9176,19 +9172,6 @@ class catalog extends BaseModule
             return 20;
     }
 
-    /**
-     * Возвращает максимальное кол-во товаров на страницу во фронтэнд
-     *
-     * @return integer
-     */
-    private function get_limit_user()
-    {
-        global $kernel;
-        $limit = intval($kernel->pub_httpget_get($this->frontend_param_limit_name));
-        if ($limit <= 0)
-            $limit = 20;
-        return $limit;
-    }
 
     /**
      * Возвращает текущий сдвиг во фронтэнде
@@ -9534,7 +9517,7 @@ class catalog extends BaseModule
         $post_cb_name='additems2compare';//параметр для чекбоксов
         $single_param_name='add2compare';//параметр при единичном добавлении
         $remove_param_name='remove_from_compare';//параметр для удаления
-        $groupID=null;
+        $groupID=0;
         $moduleid = $kernel->pub_module_id_get();
         $session_name=$moduleid.'_compared_items';
         if (isset($_SESSION[$session_name]) && $_SESSION[$session_name])

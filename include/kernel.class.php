@@ -3314,7 +3314,7 @@ class kernel
     }
 
     /**
-	 * Простой метод для получения массива записей из БД
+	 * Простой метод для получения массива записей из таблицы БД
 	 *
 	 * @param string $table Имя таблицы БД без префикса
 	 * @param string $cond условие выборки, возможно с ORDER BY или GROUP BY, для получения всех записей - "true"
@@ -3327,6 +3327,20 @@ class kernel
     public function db_get_list_simple($table, $cond, $fields="*", $offset=null, $limit=null)
     {
          $query = "SELECT ".$fields." FROM `".$this->pub_prefix_get().$table."` WHERE ".$cond;
+         return $this->db_get_list($query,$offset,$limit);
+    }
+
+    /**
+	 * Метод для получения массива записей из БД
+	 *
+	 * @param string $query sql-запрос
+	 * @param integer $offset смещение для LIMIT
+	 * @param integer $limit лимит для LIMIT
+	 * @return array
+	 * @access public
+	 */
+    public function db_get_list($query, $offset=null, $limit=null)
+    {
          if (!is_null($offset) && !is_null($limit))
              $query .= " LIMIT ".$offset.", ".$limit;
          $res = $this->runSQL($query);

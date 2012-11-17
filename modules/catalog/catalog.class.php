@@ -1019,36 +1019,6 @@ class catalog extends BaseModule
     }
 
     /**
-     * Обновляет кол-во товара в корзине
-     *
-     * @param integer $itemid айдишник товара
-     * @param integer $new_qty новое кол-во
-     */
-    /*
-    private function recalc_basket_item_fields($itemid, $new_qty)
-    {
-        //$order = $this->get_basket_order_by_sid($this->get_current_basket_sessionid());
-        $basketsid = $this->get_current_basket_sessionid();
-    	$new_qty = abs($new_qty);//не может быть отрицательного кол-ва
-    	$bitems = $this->get_basket_items($basketsid);
-
-    	$item = $this->get_item($itemid);
-    	if (!$item)
-    		return ;
-    	$sum_arr = array();
-    	foreach ($item as $fname=>$fvalue)
-    	{
-    		if ($fname == "id")
-    			continue;
-    		if (is_numeric($fvalue))
-    			$sum_arr[$fname] = $new_qty*floatval($fvalue);
-    	}
-    	$bitems[$itemid] = array("qty"=>$new_qty, "sum"=>$sum_arr, "single"=>$item);
-    }
-    */
-
-
-    /**
      * Публичный метод для отображения и обработки формы оформления заказа
      *
      * @param $template string HTML-шаблон формы
@@ -3282,11 +3252,11 @@ class catalog extends BaseModule
             {
                 if (is_numeric($order))
                 {
-                    $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` SET `order`='.$order.' WHERE '.
-                        '`cat_id`='.$catid.' AND `item_id`='.$itemid;
+                    $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` SET `order`='.$order.' WHERE `cat_id`='.$catid.' AND `item_id`='.$itemid;
                     $kernel->runSQL($query);
                 }
             }
+            $this->refresh_items_order_in_cat($catid);
         }
 
         $val = $kernel->pub_httppost_get("saveselected");

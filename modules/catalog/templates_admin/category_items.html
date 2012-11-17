@@ -1,30 +1,28 @@
 <!-- @header -->
 <script type="text/javascript">
- $("input:submit, input:button, button").button();
- 
- $('.checkallbtn').button({
-   icons: { primary: "ui-icon-check" }
- });
- 
- $('div.content select').selectmenu({
-   style:'dropdown',
-   maxHeight: 200
- });
- 
- function add_new_item()
- {
- 	jspub_click('item_add&id_cat=%cid%&group_id='+document.getElementById('group_id_for_add').value);
- }
+    var ccontainer = $('#content_container');
+    ccontainer.find("input:submit, input:button, button").button();
 
- function checkall()
- {
-     $('form#savecategoryitemsform input[type=checkbox]').attr('checked','checked');
- }
+    ccontainer.find('.checkallbtn').button({
+        icons:{ primary:"ui-icon-check" }
+    });
 
- function uncheckall()
- {
-      $('form#savecategoryitemsform input[type=checkbox]').removeAttr('checked');
- }
+    ccontainer.find('select').selectmenu({
+        style:'dropdown',
+        maxHeight: 200
+    });
+
+    function add_new_item() {
+        jspub_click('item_add&id_cat=%cid%&group_id=' + document.getElementById('group_id_for_add').value);
+    }
+
+    function checkall() {
+        $('form#savecategoryitemsform input[type=checkbox]').attr('checked', 'checked');
+    }
+
+    function uncheckall() {
+        $('form#savecategoryitemsform input[type=checkbox]').removeAttr('checked');
+    }
 </script>
 
 <span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#catalog_base_name#]</span></span>

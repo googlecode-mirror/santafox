@@ -1,15 +1,17 @@
 <!-- @header -->
 <script type="text/javascript">
- $("input:submit, input:button, button").button();
- $('.searchbtn').button({
+ var ccontainer=$('#content_container');
+ ccontainer.find("input:submit, input:button, button").button();
+
+ ccontainer.find('.searchbtn').button({
    icons: { primary: "ui-icon-search" }
  });
- 
- $('.checkallbtn').button({
+
+ ccontainer.find('.checkallbtn').button({
    icons: { primary: "ui-icon-check" }
  });
- 
- $('div.content select').selectmenu({
+
+ ccontainer.find('select').selectmenu({
    style:'dropdown',
    maxHeight: 200
  });

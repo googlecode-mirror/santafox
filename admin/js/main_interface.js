@@ -4,8 +4,9 @@ var curent_action_confirm = "";
 //Открывает окно для редактирования или создания нового действия модуля
 function show_action_edit(strlink, name)
 {
-    $("#popup_div").load(start_interface.global_link + strlink);
-    $("#popup_div").dialog({
+    var popup=$("#popup_div");
+    popup.load(start_interface.global_link + strlink);
+    popup.dialog({
         resizable: true,
         height:400,
         width:600,
@@ -23,12 +24,11 @@ function show_action_edit(strlink, name)
 function santaUpdateRegion(regid, loadFrom)
 {
     $('#popup_div').css('display','none');
-    $("#"+regid).html('<span id="contentLoading">Loading...</span>');
-    $("#"+regid).load(loadFrom, function(response, status, xhr) {
+    var reg=$("#"+regid);
+    reg.html('<span id="contentLoading">Loading...</span>');
+    reg.load(loadFrom, function(response, status, xhr) {
           if (status == "error")
-          {
-            $("#"+regid).html("Load error: " + xhr.status + " " + xhr.statusText);
-          }
+              $("#"+regid).html("Load error: " + xhr.status + " " + xhr.statusText);
     });
 }
 
@@ -46,8 +46,9 @@ function jspub_confirm(dialog_action, dialog_message)
 {
 	//curent_action_confirm = dialog_action;
     //$( "#ext_layout:ui-dialog" ).dialog( "destroy" );
-    $("#popup_msg_div").html('<p>'+dialog_message+'</p>');
-    $("#popup_msg_div").dialog({
+    var popup=$("#popup_msg_div");
+    popup.html('<p>'+dialog_message+'</p>');
+    popup.dialog({
         resizable: false,
         height:180,
         modal: true,
@@ -127,19 +128,21 @@ function jspub_click(lnk)
  */
 function jspub_disabled_change(elem1ID,elem2ID)
 {
-   if($('#'+elem2ID).is('select'))
+    var el1=$('#'+elem1ID),el2=$('#'+elem2ID);
+
+   if(el2.is('select'))
    {
-      if ($('#'+elem1ID).attr('checked'))
-         $('#'+elem2ID).selectmenu('disable');
+      if (el1.attr('checked'))
+          el2.selectmenu('disable');
       else
-         $('#'+elem2ID).selectmenu('enable');
+          el2.selectmenu('enable');
    }
    else
    {
-      if ($('#'+elem1ID).attr("checked"))
-         $('#'+elem2ID).attr("disabled",true);
+      if (el1.attr("checked"))
+          el2.attr("disabled",true);
       else
-         $('#'+elem2ID).removeAttr("disabled");
+          el2.removeAttr("disabled");
    }
 }
 
@@ -153,9 +156,8 @@ function jspub_disabled_change(elem1ID,elem2ID)
 function jspub_form_submit(formID, url)
 {
     //different variants: http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
-	var parameters = new Object();
+	var parameters = {};
     $('#'+formID+" :input").each(function(){
-
         if ($(this).attr('type')=="checkbox")
         {
             if ($(this).attr('checked'))
@@ -191,9 +193,7 @@ function jspub_form_submit(formID, url)
                 //...и возможно перейти на другой пункт меню
                 var id_link =  post_res.redirect;
                 if (id_link != "")
-                {
                     jspub_click(id_link);
-                }
             }
         }
         catch (e)
@@ -210,9 +210,10 @@ function jspub_form_submit(formID, url)
 //отображает всплывающее сообщение
 function santaShowPopupHint(header, text,timeout)
 {
-    $("#popup_msg_div").html('<p>'+text+'</p>');
+    var popup=$("#popup_msg_div");
+    popup.html('<p>'+text+'</p>');
     //$("#popup_msg_div").dialog( "destroy" );
-    $("#popup_msg_div").dialog({
+    popup.dialog({
         resizable: false,
         height:180,
         width:300,
@@ -231,19 +232,14 @@ function santaShowPopupHint(header, text,timeout)
         setTimeout(function(){ $("#popup_msg_div").dialog("close"); }, timeout);
 }
 
-
-
-/* Функции, используемые только в административном интерфейсе*/
-
-
-
 //Функция открывает слой для выбора страницы сайта
 //во всех свойствах с типом (страница сайта)
 //function get_properes_page(EventElement, Object)
 function get_properes_page(e, fieldID)
 {
-    $('#popup_sitemap_div').html('');
-    $("#popup_sitemap_div").load("index.php?action=select_page", function(response, status, xhr) {
+    var popup=$('#popup_sitemap_div');
+    popup.html('');
+    popup.load("index.php?action=select_page", function(response, status, xhr) {
           if (status == "error")
           {
               $("#popup_sitemap_div").html("Load error: " + xhr.status + " " + xhr.statusText);
@@ -292,14 +288,16 @@ function go_edit_content(name_file, no_redactor)
 		newWin.focus();
 }
 
-//Скрывает или показывает иконку возможности редактирования
-//контента у определённой метки
-function show_icon_go_edit_content(selectID, id_image)
+
+//Скрывает или показывает иконки  редактирования контента и html у определённой метки
+function show_icons_go_edit_content(elID)
 {
-    if (!$('#'+selectID).attr("disabled") && $('#'+selectID).val()==1)
-        $('#'+id_image).css('display','inline');
+    var sele=$('#sel_modul_ext_'+elID);
+    var iblock=$('#html_icons_block_'+elID);
+    if (!sele.attr("disabled") && sele.val()==1)
+        iblock.css('display','inline');
     else
-        $('#'+id_image).css('display','none');
+        iblock.css('display','none');
 }
 
 //Обновляет список выбранных текущих действий при редактировании настроек модуля
@@ -309,9 +307,7 @@ function update_action_list()
           $('#module_actions_container').css("display","block");
           $('#page_tabs').find('a[href=#mod_action_list]').parent().show();
           if (status == "error")
-          {
-            $("#actions_list_table").html("Load error: " + xhr.status + " " + xhr.statusText);
-          }
+              $("#actions_list_table").html("Load error: " + xhr.status + " " + xhr.statusText);
     });
 }
 
@@ -521,21 +517,22 @@ function set_propertes_main(d)
     $("#fieldPageOnlyAuth").val(d.only_auth);
     $('select#fieldPageTemplate').selectmenu("value",d.page_template);
 
+    var flag_tpl= $('#flag_template'),fieldPageTpl=$('#fieldPageTemplate'),el,el_nasled;
     if (d.template_naslednoe)
     {
-        $('#flag_template').attr("checked", "checked");
-        $('#fieldPageTemplate').selectmenu('disable');
+        flag_tpl.attr("checked", "checked");
+        fieldPageTpl.selectmenu('disable');
     }
     else
     {
-        $('#flag_template').removeAttr('checked');
-        $('#fieldPageTemplate').selectmenu('enable');
+        flag_tpl.removeAttr('checked');
+        fieldPageTpl.selectmenu('enable');
     }
 
     if (d.page_is_main)
-        $('#flag_template').attr("disabled", true);
+        flag_tpl.attr("disabled", true);
     else
-        $('#flag_template').removeAttr("disabled");
+        flag_tpl.removeAttr("disabled");
 
     //Заполняем остальные вспомогательные элементы
     $('#main_label_name_page').html(d.caption);
@@ -544,44 +541,42 @@ function set_propertes_main(d)
     //проставляем свойства страницы для модулей
     for (var i = 0; i < d.page_prop.length; i++)
     {
-        if($('#' + d.page_prop[i].name).is('select'))
-            $('#' + d.page_prop[i].name).selectmenu("value",d.page_prop[i].value);
+        el=$('#' + d.page_prop[i].name);
+        el_nasled=$('#' + d.page_prop[i].name_nasled);
+        if(el.is('select'))
+            el.selectmenu("value",d.page_prop[i].value);
         else
-            $('#' + d.page_prop[i].name).val(d.page_prop[i].value);
+            el.val(d.page_prop[i].value);
         if (d.page_prop[i].naslednoe)//чекбокс наследования если надо
         {
-            $('#' + d.page_prop[i].name_nasled).attr("checked", "checked");
-            if($('#' + d.page_prop[i].name).is('select'))
-               $('#' + d.page_prop[i].name).selectmenu("disable");
+            el_nasled.attr("checked", "checked");
+            if(el.is('select'))
+                el.selectmenu("disable");
             else
-               $('#' + d.page_prop[i].name).attr("disabled", true);
+                el.attr("disabled", true);
         }
         else
         {
-            $('#' + d.page_prop[i].name_nasled).removeAttr('checked');
-            if($('#' + d.page_prop[i].name).is('select'))
-               $('#' + d.page_prop[i].name).selectmenu("enable");
+            el_nasled.removeAttr('checked');
+            if(el.is('select'))
+                el.selectmenu("enable");
             else
-               $('#' + d.page_prop[i].name).removeAttr("disabled");
+                el.removeAttr("disabled");
         }
-
         if (d.page_is_main)//если главная - отключим чекбокс
-            $('#' + d.page_prop[i].name_nasled).attr("disabled", true);
+            el_nasled.attr("disabled", true);
         else
-            $('#'+d.page_prop[i].name_nasled).removeAttr("disabled");
+            el_nasled.removeAttr("disabled");
     }
 }
 var metkiCount=0;
-var arr_link_content = new Array();
+var arr_link_content = [];
 function set_metki(d)
 {
-    $('#table_metki_content').html('');//очистим таблицу меток
-    var str_code = "";
-
+    var ctable=$('#table_metki_content'),str_code = "", table_metki_content= "",hasPostprocessors = !is_empty(postProcessors);
+    ctable.html('');//очистим таблицу меток
     metkiCount = d.length;
-    arr_link_content = new Array();
-    //не строим, если нет постпроцессоров
-    var hasPostprocessors = !is_empty(postProcessors);
+    arr_link_content = [];
     for (var i = 0; i < d.length; i++)
     {
         var str_content = "";
@@ -592,105 +587,100 @@ function set_metki(d)
         str_content += '</td>';
         //Галочка наследования
         str_content += '<td class="nasled">';
-        str_content += '<input type="checkbox" name="' + d[i].name + '" id="flag_metka_' + i + '" onclick="jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_modul_ext_' +i+'\');show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_' + i + '\');';
+        str_content += '<input type="checkbox" name="' + d[i].name + '" id="flag_metka_' + i + '" data-elid="'+i+'">';
 
-        if (hasPostprocessors)
-            str_content +='jspub_disabled_change(\'flag_metka_'+i+'\', \'sel_label_postprocessor_' +i+'\');';
-        str_content += 'show_icon_go_edit_content(arr_link_select[' + i + '],\'img_edit_s_' + i + '\');">';
-        //Селект, который на который навешивается экстовская форма
         str_content += '<td>';
-        str_content += '<select id="sel_modul_ext_' + i + '"></select>';
+        str_content += '<select id="sel_modul_ext_' + i + '" class="select_module_action" data-elid="'+i+'">';
+        str_content += buildMetkaActionsSelect();
+        str_content += '</select>';
         str_content += '</td>';
 
         str_content += '<td>';
-        str_content += '<span style="height: 26px; display: inline;float: left;"><img class="edit_icon" title="Визуальный редактор контента" id="img_edit_' + i + '" src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content[' + i + '], false)"><img class="edit_icon"  id="img_edit_s_' + i + '" title="HTML редактор контента" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content[' + i + '], true)"></span>';
+        str_content += '<span style="height: 26px; display: inline;float: left;" id="html_icons_block_'+i+'"><img class="edit_icon" title="Визуальный редактор контента"  src="/admin/templates/default/images/icon_edit.gif" onclick="go_edit_content(arr_link_content[' + i + '], false)"><img class="edit_icon" title="HTML редактор контента" src="/admin/templates/default/images/icon_edit_textarea.gif"  onclick="go_edit_content(arr_link_content[' + i + '], true)"></span>';
         str_content += '</td>';
 
         if (hasPostprocessors)
-            str_content += '<td><select id="sel_label_postprocessor_' + i + '"></select></td>';
-
-        str_content += '</tr>';
-        //Добавляем небольшими кусками, так как иначе IE глючит
-        $(str_content).appendTo('#table_metki_content');
-
-        buildMetkaActionsSelect("select#sel_modul_ext_" + i);
-        if (hasPostprocessors)
-            buildMetkaPostprocessorsSelect("select#sel_label_postprocessor_" + i);
-
-
-        //при изменении селекта с действиями скроем или покажем иконки редактора контента
-        $("select#sel_modul_ext_" + i).change(function ()
         {
-            var elID = new String(this.id).split("_").pop();
-            show_icon_go_edit_content("sel_modul_ext_" + elID, 'img_edit_' + elID);
-            show_icon_go_edit_content("sel_modul_ext_" + elID, 'img_edit_s_' + elID);
+            str_content += '<td><select id="sel_label_postprocessor_' + i + '" class="select_postprocessor">';
+            str_content += buildMetkaPostprocessorsSelect();
+            str_content += '</select></td>';
+        }
+        str_content += '</tr>';
+        table_metki_content+=str_content;
+    }
+    ctable.append(table_metki_content);
+
+    //теперь отдельным циклом повесим обработчики
+    var flag_nasled,sel_modul_ext,sel_pp;
+    for (i = 0; i < d.length; i++)
+    {
+        sel_modul_ext=$("#sel_modul_ext_" + i);
+        sel_pp=$("#sel_label_postprocessor_" + i);
+        //при изменении селекта с действиями скроем или покажем иконки редактора контента
+        sel_modul_ext.change(function (){
+            var elID = $(this).attr('data-elid');
+            show_icons_go_edit_content(elID);
         });
 
-        $("#sel_modul_ext_" + i).val(d[i].id_action);//поставим в селект выбранное значение
+        sel_modul_ext.val(d[i].id_action);//поставим в селект выбранное значение
         if (d[i].postprocessors!=null && d[i].postprocessors.length>0)
-            $("#sel_label_postprocessor_" + i).val(d[i].postprocessors[0]);//поставим в селект выбранное значение, пока просто первый элемент, в дальнейшем возможно будет chaining из потспроцессоров
+            sel_pp.val(d[i].postprocessors[0]);//поставим в селект выбранное значение, пока просто первый элемент, в дальнейшем возможно будет chaining из потспроцессоров
 
-
+        flag_nasled=$("#flag_metka_" + i);
         // если унаследовано - отключим селект и поставим чекбокс наследования
         if (d[i].naslednoe)
         {
-            $("#flag_metka_" + i).attr("checked", "checked");
-            $("#sel_modul_ext_" + i).attr("disabled", true);
-            $("#sel_label_postprocessor_" + i).attr("disabled", true);
+            flag_nasled.attr("checked", "checked");
+            sel_modul_ext.attr("disabled", true);
+            sel_pp.attr("disabled", true);
         }
 
-        //повесим обработчик на клик по чекбоксу
-        $("#flag_metka_"+i).change(function () {
-            var elID = new String(this.id).split("_").pop();
-            var disAttr = $("#sel_modul_ext_"+elID).attr("disabled");
-            var disAttrPP = $("#sel_label_postprocessor_"+elID).attr("disabled");
+        //повесим обработчик на клик по чекбоксу наследования
+        flag_nasled.change(function () {
+            var elID = $(this).attr('data-elid');
+            var sel_modul_ext=$("#sel_modul_ext_"+elID);
+            var sel_label_pp=$("#sel_label_postprocessor_"+elID);
+            var disAttr = sel_modul_ext.attr("disabled");
+            var disAttrPP = sel_label_pp.attr("disabled");
 
             if (typeof  disAttr!== 'undefined' && disAttr!=false)
             {
-               $("#sel_modul_ext_"+elID).removeAttr("disabled");
-               // и покажем иконки редактирования, если требуется
-               show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_'+elID);
-               show_icon_go_edit_content("sel_modul_ext_"+elID,'img_edit_s_'+elID);
+                sel_modul_ext.removeAttr("disabled");
+                // и покажем иконки редактирования, если требуется
+                show_icons_go_edit_content(elID);
             }
             else
-               $("#sel_modul_ext_"+elID).attr("disabled",true);
+                sel_modul_ext.attr("disabled",true);
 
             if (typeof  disAttrPP!== 'undefined' && disAttrPP!=false)
-               $("#sel_label_postprocessor_"+elID).removeAttr("disabled");
+                sel_label_pp.removeAttr("disabled");
             else
-               $("#sel_label_postprocessor_"+elID).attr("disabled",true);
+                sel_label_pp.attr("disabled",true);
+
+            jspub_disabled_change(this.id, 'sel_modul_ext_' +elID);
+
+            //иконки для визуального редактора и html
+            show_icons_go_edit_content(elID);
+
+            if (hasPostprocessors)
+                jspub_disabled_change(this.id, 'sel_label_postprocessor_' +elID);
         });
-
-
         // прячем иконки
-        show_icon_go_edit_content("sel_modul_ext_" + i, 'img_edit_' + i);
-        show_icon_go_edit_content("sel_modul_ext_" + i, 'img_edit_s_' + i);
-
+        show_icons_go_edit_content(i);
         //сохраняем название файла для редактирования контента
         arr_link_content[i] = d[i].file_edit;
-
-        $('#sel_modul_ext_' + i).selectmenu({
-            style:'dropdown',
-            maxHeight:200
-        });
-        $('#sel_label_postprocessor_' + i).selectmenu({
-            style:'dropdown',
-            maxHeight:200,
-            width:150
-        });
-
-
-        // показываем иконки редактирования контента
-        $("#flag_metka_" + i).bind('click', function ()
-        {
-            var elID = new String(this.id).split("_").pop();
-            if(!$(this).attr('checked'))
-            {
-                show_icon_go_edit_content("sel_modul_ext_" + elID, 'img_edit_' + elID);
-                show_icon_go_edit_content("sel_modul_ext_" + elID, 'img_edit_s_' + elID);
-            }
-        });
     }
+
+    //украсим селекты с помощью selectmenu
+    ctable.find('select.select_module_action').selectmenu({
+        style:'dropdown'
+        ,maxHeight:200
+    });
+    ctable.find('select.select_postprocessor').selectmenu({
+        style:'dropdown'
+        ,maxHeight:200
+        ,width:150
+    });
 
 }
 //via http://stackoverflow.com/questions/4994201/is-object-empty
@@ -710,47 +700,42 @@ function is_empty(obj)
 }
 
 var postProcessors = {};
-function buildMetkaPostprocessorsSelect(selector)
+function buildMetkaPostprocessorsSelect()
 {
-    var option;
-    //первый элемент - пустой (нет постпроцессора)
-    option = $(document.createElement("option")).text('').val('');
-    $(selector).append(option);
-
+    var res="<option value=''></option>";//первый элемент - пустой (нет постпроцессора)
     for(var key in postProcessors)
     {
-        //option = $(document.createElement("option")).text(postProcessors[key]).val(key);
-        option = $(document.createElement("option")).text(postProcessors[key]).val(key);
-        $(selector).append(option);
+        res+="<option value='"+key+"'>"+postProcessors[key]+"</option>";
     }
+    return res;
 }
 
-var allModulesActions = new Array();
-function buildMetkaActionsSelect(selector)
+var allModulesActions = [];
+function buildMetkaActionsSelect()
 {
-    var elem;
-    var lastOptGroup;
-    var option;
+    var elem, res="",lastOptGroup="";
     for (var j = 0; j < allModulesActions.length; j++)
     {
         elem = allModulesActions[j];
         if (!elem[0] && !elem[1]) //Действие не выбранно
         {
-            option = $(document.createElement("option")).text(elem[2]).val("");
-            $(selector).append(option);
+            res+="<option value=''>"+elem[2]+"</option>";
             continue;
         }
+
         if (elem[0]) //optgroup
         {
-            lastOptGroup = $(document.createElement("optgroup")).attr('label', elem[0]);
-            $(selector).append(lastOptGroup);
+            if (lastOptGroup)
+                res+=lastOptGroup+"</optgroup>";
+            lastOptGroup="<optgroup label='"+elem[0]+"'>";
         }
         else
-        {
-            option = $(document.createElement("option")).text(elem[2]).val(elem[1]);
-            $(lastOptGroup).append(option);
-        }
+            lastOptGroup+="<option value='"+elem[1]+"'>"+elem[2]+"</option>";
     }
+    if (lastOptGroup)
+        res+=lastOptGroup+"</optgroup>";
+    return res;
+
 }
 
 
@@ -771,7 +756,7 @@ jQuery.fn.autoGrow = function(){
 		//Functions
 		var grow = function() {
 			growByRef(this);
-		}
+		};
 
 		var growByRef = function(obj) {
 			var linesCount = 0;
@@ -786,7 +771,7 @@ jQuery.fn.autoGrow = function(){
 				obj.rows = linesCount + 1;
 			else
 				obj.rows = rowsDefault;
-		}
+		};
 
 		var characterWidth = function (obj){
 			var characterWidth = 0;
@@ -802,7 +787,7 @@ jQuery.fn.autoGrow = function(){
 			obj.cols = tempCols;
 
 			return characterWidth;
-		}
+		};
 
 		// Manipulations
 		this.style.width = "auto";

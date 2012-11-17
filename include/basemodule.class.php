@@ -98,7 +98,7 @@ abstract class BaseModule
     public function build_pages_nav($total, $offset, $perpage, $q, $maxpages=0, $linkLabelName="link")
     {
         //Строим постраничную навигацию только тогда, когда это нужно
-        if ($total<=$perpage)
+        if (!$perpage || $total<=$perpage)
             return $this->get_template_block('pages_null');
         $pages_count = ceil($total/$perpage);
         $currpage = ceil($offset/$perpage)+1;

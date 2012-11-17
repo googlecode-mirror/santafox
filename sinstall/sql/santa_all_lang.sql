@@ -2300,3 +2300,15 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_compare_max_items',NULL,'�
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','admin_msg_not_unique_email',NULL,'Неуникальный email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','admin_msg_not_unique_email',NULL,'Неуникальный email');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','admin_msg_not_unique_email',NULL,'Неуникальный email');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_groups_list',NULL,'Список товарных групп');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_groups_list',NULL,'Список товарных групп');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_groups_list',NULL,'Список товарных групп');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_list_group_items_count_label',NULL,'Товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_list_group_items_count_label',NULL,'Товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_list_group_items_count_label',NULL,'Товаров');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_groups_list_delete_only_empty',NULL,'Удалить возможно только товарную группу без товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_groups_list_delete_only_empty',NULL,'Удалить возможно только товарную группу без товаров');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_groups_list_delete_only_empty',NULL,'Удалить возможно только товарную группу без товаров');

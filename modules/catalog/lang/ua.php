@@ -102,3 +102,6 @@ $il['catalog_prop_saved_msg']='Свойство сохранено';
 $il['catalog_quicksearch_label']='Быстрый поиск';
 $il['catalog_pub_compare']='Сравнение товаров';
 $il['catalog_compare_max_items']='Макс. кол-во сравниваемых товаров';
+$il['catalog_groups_list']='Список товарных групп';
+$il['catalog_groups_list_delete_only_empty']='Удалить возможно только товарную группу без товаров';
+$il['catalog_list_group_items_count_label']='Товаров';

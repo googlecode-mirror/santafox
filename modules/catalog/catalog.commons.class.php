@@ -364,20 +364,29 @@ class CatalogCommons
 	/**
      * Возвращает все товарные группы для текущего модуля из БД
      * @param string $moduleid
+     * @param boolean $with_items_count результат с кол-вом товаров в каждой группе?
      * @return array
      */
-    public static function get_groups($moduleid=null)
+    public static function get_groups($moduleid=null,$with_items_count=false)
     {
         global $kernel;
-        $items = array();
         if (!$moduleid)
             $moduleid=$kernel->pub_module_id_get();
-        $query = 'SELECT * FROM `'.PREFIX.'_catalog_item_groups` WHERE `module_id` = "'.$moduleid.'"  ORDER BY `id` DESC';
-        $result = $kernel->runSQL($query);
-        while ($row = mysql_fetch_assoc($result))
-            $items[$row['id']] = $row;
-        mysql_free_result($result);
-        return $items;
+        if ($with_items_count)
+        $query = 'SELECT groups.*, COUNT(items.id) AS _items_count FROM `'.PREFIX.'_catalog_item_groups` AS groups
+            LEFT JOIN `'.PREFIX.'_catalog_'.$moduleid.'_items` AS items ON items.group_id=groups.id
+            WHERE groups.`module_id` = "'.$moduleid.'"
+            GROUP BY groups.id
+            ORDER BY groups.id';
+        else
+            $query = 'SELECT * FROM `'.PREFIX.'_catalog_item_groups` WHERE `module_id` = "'.$moduleid.'"  ORDER BY `id`';
+        $ret=array();
+        $groups = $kernel->db_get_list($query);
+        foreach($groups as $g)
+        {
+            $ret[$g['id']]=$g;
+        }
+        return $ret;
     }
 
 

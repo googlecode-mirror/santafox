@@ -1,12 +1,12 @@
 <!-- @header -->
 <script type="text/javascript">
- $("button").button();
+ $("#content_container").find("button").button();
 </script>
 <span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#catalog_base_name#]</span></span>
 <div id="page_container">
  <div id="content_container">
  <div class="content">
- <h3>Список товарных групп</h3>
+ <h3>[#catalog_groups_list#]</h3>
  %table%
  <fieldset class="page_submit_field">
   <button onclick="jspub_click('show_group_form&id=-1')">[#catalog_add_group_label#]</button>
@@ -15,6 +15,8 @@
  </div>
 </div>
 
+<!-- @delete_block -->
+<a href="#" onclick="jspub_confirm('delete_group&id=%id%','[#catalog_delete_group_alert#] %name% ?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="delete"/></a>&nbsp;&nbsp;
 <!-- @table_header -->
 <form action="%form_action%" method="post">
 <table class="admin_table">
@@ -22,33 +24,30 @@
   <th class="first">[#catalog_list_group_number_label#]</th>
   <th>[#catalog_list_group_name_label#]</th>
   <th>[#catalog_list_group_id_label#]</th>
+  <th>[#catalog_list_group_items_count_label#]</th>
   <th class="last">[#catalog_list_group_id_action#]</th>
  </tr>
 <!-- @table_body-->
  <tr>
- <!-- <td><input type="checkbox" name="gcb[%id%]"></td> -->
   <td>%number%</td>
-  <td>%name%</td>
+  <td>%name_full%</td>
   <td>%name_db%</td>
+  <td>%_items_count%</td>
   <td valign="middle">
-   <a href="#" onclick="jspub_confirm('delete_group&id=%id%','[#catalog_delete_group_alert#] %name% ?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="delete"/></a>&nbsp;&nbsp;
+   %delete_block%
    <a href="#" onclick="jspub_click('show_group_form&id=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" style="vertical-align:middle;" alt="[#catalog_list_group_action_edit#]"></a>
    <!--<a href="#" onclick="jspub_confirm('generate_admin_templ&id=%id%','[#catalog_list_group_action_create_amin_template_alert#]')">[#catalog_list_group_action_create_amin_template#]</a>&nbsp;&nbsp;-->
    <a href="#" onclick="jspub_click('show_group_props&id=%id%')">[#catalog_list_group_action_add_prop#]</a>&nbsp;&nbsp;
    <!-- Пока это уберём -->
    <!-- <a href="#" onclick="jspub_click('show_items&group_id=%id%')">[#catalog_list_group_action_add_item#]</a>-->
-
-
   </td>
  </tr>
+
+
 <!-- @table_footer -->
-	<!--<tr class="admin_table_wstring"><td colspan="5">[#catalog_list_group_new_tpls_main_label#]&nbsp;<input type="submit" name="regentpls" value="[#catalog_list_group_new_tpls_items#]" alt="[#catalog_list_group_new_tpls_items_alt#]">&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="regentpls" value="[#catalog_list_group_new_tpls_group#]" alt="[#catalog_list_group_new_tpls_group_alt#]"></td></tr>-->
 </table>
 </form>
-<!--
-<form action="%form_action%" method="post">
+<p>[#catalog_groups_list_delete_only_empty#]</p>
 
-</form>
--->
 
 <!-- @no_data -->

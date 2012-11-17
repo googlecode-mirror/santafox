@@ -5069,7 +5069,7 @@ class catalog extends BaseModule
     private function show_groups()
     {
         global $kernel;
-        $groups = CatalogCommons::get_groups();
+        $groups = CatalogCommons::get_groups(null,true);
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'groups_list.html'));
 
         $html = $this->get_template_block('header');
@@ -5082,9 +5082,12 @@ class catalog extends BaseModule
             foreach ($groups as $group)
             {
                 $line = $this->get_template_block('table_body');
-                $line = str_replace('%name_db%', $group['name_db'], $line);
-                $line = str_replace('%name%', $group['name_full'], $line);
-                $line = str_replace('%id%', $group['id'], $line);
+                if ($group['_items_count']==0)
+                    $delete_block=$this->get_template_block('delete_block');
+                else
+                    $delete_block='';
+                $line = str_replace('%delete_block%',$delete_block,$line);
+                $line = $kernel->pub_array_key_2_value($line,$group);
                 $line = str_replace('%number%', $num++, $line);
                 $content .= $line;
             }
@@ -8333,23 +8336,16 @@ class catalog extends BaseModule
         if (!$group)
             return;
         $modid=$kernel->pub_module_id_get();
+        $crec = $kernel->db_get_record_simple("_catalog_".$modid."_items","group_id=".$group['id'],"COUNT(*) AS count");
+        //не удаляем, если есть товары в группе
+        if ($crec['count']>0)
+            return;
         $prfx=$kernel->pub_prefix_get();
         $q="DELETE FROM ".$prfx."_catalog_item_props WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
         $kernel->runSQL($q);
         $q="DELETE FROM ".$prfx."_catalog_visible_gprops WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
         $kernel->runSQL($q);
         $q="DELETE FROM ".$prfx."_catalog_item_groups WHERE id='".$group['id']."'";
-        $kernel->runSQL($q);
-        $q="DROP TABLE ".$prfx."_catalog_items_".$modid."_".strtolower($group['name_db']);
-        $kernel->runSQL($q);
-
-        $selectItemIDsQuery="(SELECT id FROM ".$prfx."_catalog_".$modid."_items WHERE group_id='".$group['id']."')";
-
-        $q="DELETE FROM ".$prfx."_catalog_".$modid."_item2cat WHERE item_id IN ".$selectItemIDsQuery;
-        $kernel->runSQL($q);
-        $q="DELETE FROM ".$prfx."_catalog_".$modid."_items_links WHERE itemid1 IN ".$selectItemIDsQuery." OR itemid2 IN ".$selectItemIDsQuery;
-        $kernel->runSQL($q);
-        $q="DELETE FROM  ".$prfx."_catalog_".$modid."_items WHERE group_id='".$group['id']."'";
         $kernel->runSQL($q);
         $q="DELETE FROM  ".$prfx."_catalog_".$modid."_inner_filters WHERE groupid='".$group['id']."'";
         $kernel->runSQL($q);

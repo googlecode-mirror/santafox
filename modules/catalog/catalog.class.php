@@ -2120,8 +2120,13 @@ class catalog extends BaseModule
                         $noStatItems[]=$aitem;
                 }
                 ksort($allitems,SORT_NUMERIC);
+
                 $allitems = array_merge($allitems, $noStatItems);
-                $items=array_slice($allitems, $offset, $limit);
+                if ($limit>0)
+                    $items=array_slice($allitems, $offset, $limit);
+                else
+                    $items=$allitems;
+
             }
             else
                 $items  = $this->get_cat_items($catid, $offset, $limit, true);
@@ -2448,9 +2453,6 @@ class catalog extends BaseModule
             else
                 $cblock .= $this->get_template_block_with_depth('link', $cat['depth']);
 
-            $cblock = str_replace('%link%', $items_pagename.'?'.$this->frontend_param_cat_id_name.'='.$cat['id'], $cblock);
-            $cblock = str_replace('%id%', $cat['id'], $cblock);
-
 
             foreach ($cats_props as $cat_prop)
             {
@@ -2484,6 +2486,21 @@ class catalog extends BaseModule
                 $cblock = str_replace('%'.$cat_prop['name_db'].'_name%' , $cat_prop['name_full'] , $cblock);
 
             }
+
+            //проверим, осталось ли в шаблоне чтото вида %aaaaa_value%
+            //пример использование - alt в img
+            $matches = false;
+            if (preg_match_all("/\\%([a-z0-9_-]+)_value\\%/iU", $cblock, $matches))
+            {
+                foreach ($matches[1] as $prop)
+                {
+                    if (isset($cat[$prop]))
+                        $cblock = str_ireplace("%".$prop."_value%", $cat[$prop],$cblock);
+                }
+            }
+
+            $cblock = str_replace('%link%', $items_pagename.'?'.$this->frontend_param_cat_id_name.'='.$cat['id'], $cblock);
+            $cblock = str_replace('%id%', $cat['id'], $cblock);
 
             //experimental
             $match = false;
@@ -4587,7 +4604,7 @@ class catalog extends BaseModule
             while ($row = mysql_fetch_assoc($query))
             {
                 $array = array(
-                    'data'  => htmlentities($row['name'], ENT_QUOTES, 'UTF-8'),
+                    'data'  => htmlentities($row['name'], ENT_NOQUOTES, 'UTF-8'),
                     'attr'=>array("id"=>$row['id'],'rel'=>'default'),
                 );
 

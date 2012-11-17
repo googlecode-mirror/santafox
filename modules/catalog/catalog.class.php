@@ -9153,20 +9153,40 @@ class catalog extends BaseModule
     private function delete_item($id)
     {
         global $kernel;
-        $item = $this->get_item($id);
+        $item = $this->get_item_full_data($id);
         if (!$item)
             return false;
-
-        //@todo удаление картинок и файлов
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` WHERE `id`='.$id;
-        $kernel->runSQL($query);
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `item_id`='.$id;
-        $kernel->runSQL($query);
-
         $group = CatalogCommons::get_group($item['group_id']);
         if (!$group)
             return false;
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` WHERE `id`='.$item['ext_id'];
+
+        $modid=$kernel->pub_module_id_get();
+
+        //удаление картинок и файлов
+        $props=CatalogCommons::get_props($item['group_id'],true);
+        foreach($props as $prop)
+        {
+            if (!in_array($prop['type'],array('file','pict')) || !$item[$prop['name_db']])
+                continue;
+            $kernel->pub_file_delete($item[$prop['name_db']]);
+            if ($prop['type']=='pict')
+            {
+                //надо также удалить source и tn изображения
+                $kernel->pub_file_delete(str_replace($modid.'/',$modid.'/tn/',$item[$prop['name_db']]));
+                $kernel->pub_file_delete(str_replace($modid.'/',$modid.'/source/',$item[$prop['name_db']]));
+            }
+        }
+        //из общей таблицы товаров
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_items` WHERE `id`='.$id;
+        $kernel->runSQL($query);
+        //из таблицы связанных товаров
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_items_links` WHERE `itemid1`='.$id.' OR `itemid2`='.$id;
+        $kernel->runSQL($query);
+        //из таблицы принадлежности к категориям
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_item2cat` WHERE `item_id`='.$id;
+        $kernel->runSQL($query);
+        //из таблицы тов. группы
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_items_'.$modid.'_'.strtolower($group['name_db']).'` WHERE `id`='.$item['ext_id'];
         $kernel->runSQL($query);
         return true;
     }
@@ -9305,52 +9325,47 @@ class catalog extends BaseModule
         //сначала клонируем запись в общей таблице товаров
         $olditem = $this->get_item($id);
         if (!$olditem)
-        {
             return false;
-        }
         $newitem = array();
         foreach ($olditem as $k=>$v)
         {
             if ($k=="id")
                 continue;
-            if ($k=="ext_id")
+            elseif ($k=="ext_id")
                 $v = 0;
-            if ($k == "name")
+            elseif ($k == "name")
                 $v.=" копия";
-            if ($k!="ext_id" && empty($v))
-                $newitem["`".$k."`"]="NULL";
+            if ($k!="ext_id" && mb_strlen($v)==0)
+                $newitem[$k]=null;
             else
-                $newitem["`".$k."`"]="'".mysql_real_escape_string($v)."'";
+                $newitem[$k]=mysql_real_escape_string($v);
         }
 
-        $query  = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` ('.implode(",",array_keys($newitem)).') VALUES ('.implode(",", $newitem).')';
-        $kernel->runSQL($query);
-        $newID = mysql_insert_id();
+        if (!$newitem)
+            $newitem=array("id"=>null);
+        $newID=$kernel->db_add_record('_catalog_'.$kernel->pub_module_id_get().'_items',$newitem);
+
         //теперь в таблице товарной группы
         $group = CatalogCommons::get_group($olditem['group_id']);
         $olditem = $this->get_item_group_fields($olditem['ext_id'], $group['name_db']);
         if (!$olditem)
-        {
             return false;
-        }
         $newitem = array();
         foreach ($olditem as $k=>$v)
         {
             if ($k=="id")
                 continue;
-            if (empty($v))
-                $newitem["`".$k."`"]="NULL";
+            if (mb_strlen($v)==0)
+                $newitem[$k]=null;
             else
-                $newitem["`".$k."`"]="'".mysql_real_escape_string($v)."'";
+                $newitem[$k]=mysql_real_escape_string($v);
         }
-
-        $query  = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` ('.implode(",",array_keys($newitem)).') VALUES ('.implode(",", $newitem).')';
-        $kernel->runSQL($query);
-        $newExtID = mysql_insert_id();
+        if (!$newitem)
+            $newitem=array("id"=>null);
+        $newExtID=$kernel->db_add_record('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']),$newitem);
 
         $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` SET `ext_id`='.$newExtID.' WHERE id='.$newID;
         $kernel->runSQL($query);
-
 
         //скопируем принадлежность к категориям
         $catIDs = $this->get_item_catids_with_order($id);

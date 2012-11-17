@@ -316,22 +316,11 @@ class CatalogCommons
     public static function get_props($gid, $need_common = false)
     {
         global $kernel;
-        $items = array();
-        $query = 'SELECT * FROM `'.PREFIX.'_catalog_item_props` '.
-        ' WHERE `module_id` = "'.$kernel->pub_module_id_get().'" AND (`group_id`='.$gid;
+        $cond = '`module_id` = "'.$kernel->pub_module_id_get().'" AND (`group_id`='.$gid;
         if ($need_common)
-            $query .= ' OR `group_id`=0';
-        $query .= ') ORDER BY `order`,`name_full`';   //чтобы сначала шли common-свойства
-
-        $result = $kernel->runSQL($query);
-        if ($result)
-        {
-            while ($row = mysql_fetch_assoc($result))
-                $items[] = $row;
-
-            mysql_free_result($result);
-        }
-        return $items;
+            $cond .= ' OR `group_id`=0';
+        $cond .= ') ORDER BY `order`,`name_full`';   //чтобы сначала шли common-свойства
+        return $kernel->db_get_list_simple("_catalog_item_props",$cond);
     }
 
     /**

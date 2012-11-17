@@ -6169,7 +6169,10 @@ class catalog extends BaseModule
             $purl = 'category_items&id='.$id_cat.'&'.$this->admin_param_offset_name.'=';
             $kernel->pub_session_set("redir_after_save_item",$purl.$offset);
             $pblock = $this->build_pages_nav($total, $offset, $limit, $purl, 0,'url');
+            $search_block=$this->get_template_block('search_block');
         }
+        else
+            $search_block='';
 
 
         //$content .= $lines;
@@ -6199,6 +6202,7 @@ class catalog extends BaseModule
         $content = str_replace('%numcolspan%'   , count($cprops)+2 , $content);
         $content = str_replace('%pages%'        , $pblock          , $content);
         $content = str_replace('%catid%'        , $id_cat          , $content);
+        $content = str_replace('%search_block%' , $search_block    , $content);
 
         return $content;
     }

@@ -596,8 +596,8 @@ class catalog extends BaseModule
                 }
             }
         }
-
-        @unlink('content/files/'.$kernel->pub_module_id_get().'/'.$file);
+        @unlink($file);
+      //@unlink('content/files/'.$kernel->pub_module_id_get().'/'.$file);
     }
 
     /**

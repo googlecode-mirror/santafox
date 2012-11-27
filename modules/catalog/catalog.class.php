@@ -597,7 +597,7 @@ class catalog extends BaseModule
             }
         }
         @unlink($file);
-      //@unlink('content/files/'.$kernel->pub_module_id_get().'/'.$file);
+        //@unlink('content/files/'.$kernel->pub_module_id_get().'/'.$file);
     }
 
     /**
@@ -2598,11 +2598,12 @@ class catalog extends BaseModule
         $one_items  = $kernel->pub_httppost_get('one_items');
 
         if ($namedb=='items')//это название зарезервировано, т.к. используется как алиас в выборках
-           $namedb='gitems';
+            $namedb='gitems';
 
-        $n=1;
+        $n=2;
+        $namedb0=$namedb;
         while ($this->is_group_exists($namedb))
-            $namedb.=$n++;
+            $namedb=$namedb0.$n++;
 
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_item_groups`'.
             ' (`module_id`,`name_db`,`name_full`, `template_items_list`, `template_items_one`) '.
@@ -2706,7 +2707,7 @@ class catalog extends BaseModule
             $res[0] = 'Не выбран';
 
         foreach ($elems as $el)
-            $res[] = str_replace("''","'",mb_substr($el,1,-1));
+            $res[] = str_replace("''","'",mb_substr(stripslashes($el),1,-1));
         $res = array_unique($res);
         return $res;
     }
@@ -3107,9 +3108,7 @@ class catalog extends BaseModule
             $ret = '"'.$dvals[2].'-'.$dvals[1].'-'.$dvals[0].'"';
         }
         elseif ($type == 'enum' && empty($val))
-        {
             $ret = 'NULL';
-        }
         else
             $ret = '"'.$kernel->pub_str_prepare_set($ret).'"';
         return $ret;
@@ -3891,18 +3890,14 @@ class catalog extends BaseModule
         //изменилось название?
         if ($name_full != $prop['name_full'])
         {
-            $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET '.
-                '`name_full`="'.$kernel->pub_str_prepare_set($name_full).'" '.
-                'WHERE `id`='.$pid;
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `name_full`="'.$kernel->pub_str_prepare_set($name_full).'" WHERE `id`='.$pid;
             $kernel->runSQL($query);
         }
-
 
         //Если это изображение, то обновим информацию по изображениям
         if ($prop['type'] == 'pict')
         {
-
-            $prop['add_param']['pict_path']           = $kernel->pub_httppost_get('pict_path');
+            $prop['add_param']['pict_path'] = $kernel->pub_httppost_get('pict_path');
 
             //Исходное изображение
             if ($kernel->pub_httppost_get('pict_source_isset'))
@@ -3918,9 +3913,9 @@ class catalog extends BaseModule
 
             // большое изображение
             if ($kernel->pub_httppost_get('pict_big_isset'))
-                $prop['add_param']['big']['isset']          = true;
+                $prop['add_param']['big']['isset'] = true;
             else
-                $prop['add_param']['big']['isset']         = false;
+                $prop['add_param']['big']['isset'] = false;
 
             $prop['add_param']['big']['width']          = intval($kernel->pub_httppost_get('pict_big_width'));
             $prop['add_param']['big']['height']         = intval($kernel->pub_httppost_get('pict_big_height'));
@@ -3939,9 +3934,7 @@ class catalog extends BaseModule
 
 
             //Теперь обновим и запишим этот массив в mysql
-            $query = "UPDATE `".$kernel->pub_prefix_get().$table."` SET ".
-                "`add_param`='".serialize($prop['add_param'])."'
-            WHERE `id`=".$pid;
+            $query = "UPDATE `".$kernel->pub_prefix_get().$table."` SET `add_param`='".serialize($prop['add_param'])."' WHERE `id`=".$pid;
             $kernel->runSQL($query);
         }
     }
@@ -3955,7 +3948,6 @@ class catalog extends BaseModule
     private function add_prop_in_group()
     {
         global $kernel;
-
         //Взяли параметры из формы
         $pvalues  = $kernel->pub_httppost_get('enum_values', false);
         $pname    = $kernel->pub_httppost_get('name_full');
@@ -3965,7 +3957,6 @@ class catalog extends BaseModule
         $inlist   = $kernel->pub_httppost_get('inlist');
         $sorted   = $kernel->pub_httppost_get('sorted');
         $ismain   = $kernel->pub_httppost_get('ismain');
-
         $group_id = intval($group_id);
         if (empty($inlist))
             $inlist = 0;
@@ -3981,13 +3972,11 @@ class catalog extends BaseModule
         $group  = CatalogCommons::get_group($group_id);
         if (mb_strlen($pnamedb) == 0)
             $pnamedb = $pname;
-
-
         $namedb = $this->translate_string2db($pnamedb);
-
-        $n      = 1;
+        $n = 2;
+        $namedb0=$namedb;
         while ($this->is_prop_exists($group_id, $namedb) || $this->is_prop_exists(0, $namedb))
-            $namedb .= $n++;
+            $namedb = $namedb0.$n++;
 
         if (empty($pvalues))
             $values = "NULL";
@@ -3999,15 +3988,10 @@ class catalog extends BaseModule
             {
                 $v = trim($v);
                 if (mb_strlen($v) != 0)
-                    //$values[] = mysql_real_escape_string($v);
-                    $values[] = $kernel->pub_str_prepare_set($v);
+                    $values[] = $v;
             }
-
             if (count($values) == 0)
                 $values = "NULL";
-            //else
-            //$values = '"'.$kernel->pub_str_prepare_set(implode("\n",$values)).'"';
-            //$values = '"'.$kernel->pub_str_prepare_set($pvalues).'"';
         }
 
         //узнаем order у последнего св-ва в этой группе и добавим 10
@@ -4043,9 +4027,8 @@ class catalog extends BaseModule
         }
         else
         {//common-свойство
-            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` '
-                . ' ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
-
+            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items`
+                      ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
             //по-умолчанию добавляем как видимое для всех тов. групп
             $groups = CatalogCommons::get_groups();
             foreach ($groups as $agroup)
@@ -4096,7 +4079,7 @@ class catalog extends BaseModule
         if (mb_strlen($pnamedb) == 0)
             $pnamedb = $pname;
         $namedb = $this->translate_string2db($pnamedb);
-        $n      = 1;
+        $n = 1;
         while ($this->is_cat_prop_exists($namedb))
             $namedb .= $n++;
         if (empty($pvalues))
@@ -4107,22 +4090,22 @@ class catalog extends BaseModule
             $values = array();
             foreach ($pva as $v)
             {
-                $v = trim(stripslashes($v));
+                $v = trim($v);
                 if (mb_strlen($v) != 0)
                     $values[] = $v;
             }
-
             if (count($values) == 0)
                 $values = "NULL";
         }
 
-        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props`'.
-            ' (`name_db`,`name_full`,`type`)'.
-            ' VALUES ("'.$namedb.'","'.$kernel->pub_str_prepare_set($pname).'","'.$ptype.'")';
+        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props`
+                 (`name_db`,`name_full`,`type`)
+                 VALUES
+                 ("'.$namedb.'","'.mysql_real_escape_string($pname).'","'.$ptype.'")';
         $kernel->runSQL($query);
 
-        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` '
-            . ' ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats`
+                  ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
         $kernel->runSQL($query);
         return $namedb;
     }
@@ -4729,7 +4712,7 @@ class catalog extends BaseModule
             case 'enum':
                 $arr = array();
                 foreach ($values as $val)
-                    $arr[] = "'".$val."'";
+                    $arr[] = "'".mysql_real_escape_string($val)."'";
                 return 'enum ('.implode(',',array_unique($arr)).')';
             case 'number':
                 return 'decimal(12,2)';
@@ -5394,16 +5377,23 @@ class catalog extends BaseModule
             $num = 1;
             foreach ($props as $prop)
             {
-                $line  = $this->get_template_block('property');
+                if ($prop['type'] == 'enum')
+                {
+                    $line  = $this->get_template_block('property_enum');
+                    $property_enum_values=array();
+                    $enum_vals = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                    foreach($enum_vals as $ev)
+                    {
+                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
+                    }
+                    $line = str_replace('%property_enum_values%',implode($this->get_template_block('property_enum_sep'),$property_enum_values),$line);
+                }
+                else
+                    $line  = $this->get_template_block('property');
                 $line  = str_replace('%property_name%', $prop['name_full'], $line);
                 $line  = str_replace('%property_dbname%', $prop['name_db'], $line);
                 $line  = str_replace('%num%', $num, $line);
-
-                $type  = $prop['type'];
-                $stype = $kernel->pub_page_textlabel_replace("[#catalog_prop_type_".$type."#]");
-                if ($type == 'enum')
-                {$stype .= '<br/>'.implode(';',$this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']));}
-                $line = str_replace('%property_type%', $stype, $line);
+                $line = str_replace('%property_type%', "[#catalog_prop_type_".$prop['type']."#]", $line);
 
                 if ($prop['name_db']=='name')
                     $line = str_replace('%actions%', '', $line);
@@ -5479,7 +5469,6 @@ class catalog extends BaseModule
             $tinfo_group = $this->get_dbtable_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
             $html = str_replace('%label_table%', $this->get_template_block('label_table_group'), $html);
             $html = str_replace('%name%'       , $group['name_full']                           , $html);
-
             $gvisprops = $this->get_group_visible_props($id);
         }
 
@@ -5493,23 +5482,31 @@ class catalog extends BaseModule
             $num = 1;
             foreach ($props as $prop)
             {
-
-                //Провреим, общее это свойство или нет и поменяем заголовки и
-                //параметры таблицы
-                $is_global = $this->get_template_block('property_is_global');
-                $tinfo = $tinfo_global;
+                //Проверим, общее это свойство или нет и поменяем заголовки и параметры таблицы
                 if (intval($prop['group_id']) > 0)
                 {
                     $is_global = $this->get_template_block('property_is_no_global');
                     $tinfo = $tinfo_group;
                 }
+                else
+                {
+                    $is_global = $this->get_template_block('property_is_global');
+                    $tinfo = $tinfo_global;
+                }
 
-
-                //Определим тип свойства
-                $type  = $prop['type'];
-                $stype = "[#catalog_prop_type_".$type."#]";
-                if ($type == 'enum')
-                    $stype .= '<br/>'.implode(';', $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']));
+                if ($prop['type']=='enum')
+                {//для enum - спецобработка
+                    $line  = $this->get_template_block('property_enum');
+                    $property_enum_values=array();
+                    $enum_vals = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                    foreach($enum_vals as $ev)
+                    {
+                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
+                    }
+                    $line = str_replace('%property_enum_values%',implode($this->get_template_block('property_enum_sep'),$property_enum_values),$line);
+                }
+                else
+                    $line = $this->get_template_block('property');
 
                 //Добавим возможные действия
                 $actions = $this->get_template_block('property_del_link').$this->get_template_block('property_edit_link');
@@ -5520,11 +5517,10 @@ class catalog extends BaseModule
                 //что бы было понятно куда возвращаться после того как было вызвано редактирование
                 //или удаление свойства.
                 $actions = str_replace('%idg_control%', $id , $actions);
-                //Сформируем строчку со свойством
-                $line = $this->get_template_block('property');
+
 
                 if ($prop['group_id'] == 0 && $id!=0)
-                {//выводим чекбокс только для общих свойств и при редактировании какойто товарной группы
+                {//выводим чекбокс только для общих свойств и при редактировании какой-либо товарной группы
                     $viscb = $this->get_template_block('visible_in_group_checkbox');
                     if(array_key_exists($prop['name_db'], $gvisprops))
                         $viscb = str_replace("%grprop_checked%", " checked", $viscb);
@@ -5540,7 +5536,7 @@ class catalog extends BaseModule
                 $line = str_replace('%property_dbname%', $prop['name_db']  , $line);
                 $line = str_replace('%property_global%', $is_global        , $line);
                 $line = str_replace('%num%'            , $num              , $line);
-                $line = str_replace('%property_type%'  , $stype            , $line);
+                $line = str_replace('%property_type%'  , "[#catalog_prop_type_".$prop['type']."#]", $line);
                 $line = str_replace('%actions%'        , $actions          , $line);
                 $line = str_replace('%order%'          , $prop['order'], $line);
                 $line = str_replace('%property_id%'    , $prop['id'], $line);
@@ -6873,7 +6869,19 @@ class catalog extends BaseModule
             $content .= $this->get_template_block('table_header');
             foreach ($fields as $field)
             {
-                $line = $this->get_template_block('line');
+                if ($field['type']=='enum')
+                {
+                    $line = $this->get_template_block('line_enum');
+                    $property_enum_values=array();
+                    $enum_vals = $this->get_enum_prop_values($tinfo[$field['name_db']]['Type']);
+                    foreach($enum_vals as $ev)
+                    {
+                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
+                    }
+                    $line = str_replace('%property_enum_values%',implode($this->get_template_block('property_enum_sep'),$property_enum_values),$line);
+                }
+                else
+                    $line = $this->get_template_block('line');
                 $line = str_replace('%name_db%', $field['name_db'], $line);
                 $line = str_replace('%name_full%', $field['name_full'], $line);
                 $line = str_replace('%order%', $field['order'], $line);
@@ -6882,20 +6890,11 @@ class catalog extends BaseModule
                     $line = str_replace('%property_required%', $this->get_template_block('property_is_required'), $line);
                 else
                     $line = str_replace('%property_required%', $this->get_template_block('property_is_not_required'), $line);
-
-                //Определим тип свойства
-                $type  = $field['type'];
-                $stype = "[#catalog_prop_type_".$type."#]";
-                if ($type == 'enum')
-                    $stype .= '<br/>'.implode(';', $this->get_enum_prop_values($tinfo[$field['name_db']]['Type']));
-
-                $line = str_replace('%property_type%', $stype, $line);
-
+                $line = str_replace('%property_type%', "[#catalog_prop_type_".$field['type']."#]", $line);
                 //Добавим возможные действия
                 $actions = $this->get_template_block('property_del_link').$this->get_template_block('property_edit_link');
                 $actions = str_replace('%id%'  , $field['id']       , $actions);
                 $actions = str_replace('%name_full%', $field['name_full'], $actions);
-
                 $line = str_replace('%actions%', $actions, $line);
                 $line = str_replace('%num%', $num, $line);
                 $content .= $line;
@@ -6910,11 +6909,9 @@ class catalog extends BaseModule
         return $html;
     }
 
-
-
     /**
      *	Форма редактирования и добавления поля
-     *   корзины (заказа) в админке
+     *  корзины (заказа) в админке
      *
      * 	@param $id integer - id-шник поля
      *	@return string
@@ -7076,11 +7073,10 @@ class catalog extends BaseModule
         if (mb_strlen($name_db) == 0)
             $name_db = $name_full;
         $namedb = $this->translate_string2db($name_db);
-        $n = 1;
+        $n = 2;
+        $namedb0=$namedb;
         while (CatalogCommons::is_order_field_exists($namedb))
-            $namedb .= $n++;
-
-
+            $namedb = $namedb0.$n++;
         if (empty($value))
             $values = "NULL";
         else
@@ -7091,7 +7087,7 @@ class catalog extends BaseModule
             {
                 $v = trim($v);
                 if (mb_strlen($v) != 0)
-                    $values[] = $kernel->pub_str_prepare_set($v);
+                    $values[] = $v;
             }
             if (count($values) == 0)
                 $values = "NULL";
@@ -7106,14 +7102,14 @@ class catalog extends BaseModule
             $order = $gprops[$props_count-1]['order']+10;
 
         //Собственно запросы по добавлению
-        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_order_fields`'.
-            ' (`name_db`,`name_full`,`type`, `order`, `isrequired`, `regexp`)'.
-            ' VALUES ("'.$namedb.'","'.$kernel->pub_str_prepare_set($name_full).'","'.
-            $ptype.'", '.$order.', '.$req.', "'.$kernel->pub_str_prepare_set($regexp).'")';
+        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_order_fields`
+                  (`name_db`,`name_full`,`type`, `order`, `isrequired`, `regexp`)
+                  VALUES
+                  ("'.$namedb.'","'.$kernel->pub_str_prepare_set($name_full).'","'.$ptype.'", '.$order.', '.$req.', "'.$kernel->pub_str_prepare_set($regexp).'")';
         $kernel->runSQL($query);
 
-        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_orders` '
-            . ' ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_orders`
+                  ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
         $kernel->runSQL($query);
 
         return $namedb;
@@ -8833,7 +8829,7 @@ class catalog extends BaseModule
 
             //Добавляет новое свойство к категории
             case 'cat_prop_add':
-                $values  = $kernel->pub_httppost_get('values');
+                $values  = $kernel->pub_httppost_get('values',false);
                 $pname   = $kernel->pub_httppost_get('pname');
                 $ptype   = $kernel->pub_httppost_get('ptype');
                 $pnamedb = $kernel->pub_httppost_get('pnamedb');

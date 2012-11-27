@@ -51,6 +51,24 @@
   <th>[#catalog_order_prop_list_table_label_order#]</th>
   <th>[#catalog_order_prop_list_table_label_actions#]</th>
  </tr>
+
+<!-- @property_enum_sep -->
+;
+<!-- @property_enum_value -->
+%val%
+<!-- @line_enum -->
+<tr>
+    <td>%num%</td>
+    <td>%name_db%</td>
+    <td>%name_full%</td>
+    <td>%property_required%</td>
+    <td>
+        %property_type%<br>
+        %property_enum_values%
+    </td>
+    <td width="35"><input type="text" name="porder[%id%]" value="%order%" style="width:30px; margin:0 auto; text-align:center;"></td>
+    <td>%actions%</td>
+</tr>
 <!-- @line -->
  <tr>
   <td>%num%</td>

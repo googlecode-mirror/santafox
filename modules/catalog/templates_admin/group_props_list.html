@@ -46,6 +46,26 @@
  <td>%actions%</td>
 </tr>
 
+
+<!-- @property_enum_sep -->
+;
+<!-- @property_enum_value -->
+%val%
+<!-- @property_enum -->
+<tr>
+ <td width="15">%num%</td>
+ <td>%property_name%</td>
+ <td style="max-width:125px; word-wrap:break-word;">%property_dbname%</td>
+ <td>%property_global%</td>
+ <td style="max-width:125px; word-wrap:break-word;">
+     %property_type%<br>
+     %property_enum_values%
+ </td>
+ <td><input type="text" name="porder[%property_id%]" value="%order%" style="width:25px; margin:0 auto; float:none;"></td>
+ <td> %visible_in_group_checkbox%</td>
+ <td>%actions%</td>
+</tr>
+
 <!-- @visible_in_group_checkbox -->
 <input type="checkbox" name="grprop[%prop%]" style="float:none; margin:0 auto;" %grprop_checked%>
 

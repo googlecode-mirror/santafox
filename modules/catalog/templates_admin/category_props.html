@@ -22,6 +22,21 @@
     <td style="max-width:150px; word-wrap:break-word;">%property_type%</td>
     <td>%actions%</td>
 </tr>
+<!-- @property_enum_sep -->
+;
+<!-- @property_enum_value -->
+%val%
+<!-- @property_enum -->
+<tr>
+	<td>%num%</td>
+    <td>%property_name%</td>
+    <td>%property_dbname%</td>
+    <td style="max-width:150px; word-wrap:break-word;">
+        %property_type%<br>
+        %property_enum_values%
+    </td>
+    <td>%actions%</td>
+</tr>
 
 <!-- @property_del_link -->
  <a href="#" onclick="jspub_confirm('cat_prop_delete&id=%property_id%','[#catalog_edit_property_cat_action_alert_del#] %property_name%?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_edit_property_cat_action_alert_del#]"/></a>
@@ -36,25 +51,26 @@
 
 <!-- @add_prop_form -->
 <script type="text/javascript">
- $("input:button").button();
+ $("#content_container").find("input:button").button();
  
- $('div.content select').selectmenu({
+ $('#content_container').find('select').selectmenu({
    style:'dropdown',
    maxHeight: 200
  });
 
  function selectChange()
  {
-  if ($('#stype').val()=='enum')
-  {
-  	   $('#prop_addon').html($('#enum_for_add').html());
-       $('#prop_addon').css('display','block');
-  }
-  else
-  {
-      $('#prop_addon').css('display','none');
-      $('#prop_addon').html('');
-  }
+      var pa=$('#prop_addon');
+      if ($('#stype').val()=='enum')
+      {
+          pa.html($('#enum_for_add').html());
+          pa.css('display','block');
+      }
+      else
+      {
+          pa.css('display','none');
+          pa.html('');
+      }
  }
 </script>
 

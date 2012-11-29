@@ -232,7 +232,6 @@ class gallery  extends basemodule
     function process_image($image_path)
     {
         global $kernel;
-        $source_image_size = getimagesize($image_path);
         $img_big_width    = $kernel->pub_modul_properties_get('img_big_width');
         $img_big_height   = $kernel->pub_modul_properties_get('img_big_height');
         $img_small_width  = $kernel->pub_modul_properties_get('img_small_width');
@@ -246,20 +245,16 @@ class gallery  extends basemodule
                            'height' => $img_big_height['value']);
         $thumb_image = array('width' => $img_small_width['value'],
                              'height' => $img_small_height['value']);
-        $source_image = array('width' => $source_image_size[0],
-                              'height' => $source_image_size[1]);
+
 
         if(intval($kernel->pub_httppost_get('copyright'))>0)
-        {
-
             $watermark_image = array('path' => $watermark_path['value'],
                                      'place' => $watermark_place['value'],
                                      'transparency' => $watermark_transparency['value']);
-        }
         else
             $watermark_image = 0;
         $path_to_save = 'content/images/'.$kernel->pub_module_id_get();
-        $filename = $kernel->pub_image_save($image_path, 'img'.rand(1000,9999), $path_to_save, $big_image, $thumb_image, $watermark_image, $source_image);
+        $filename = $kernel->pub_image_save($image_path, 'img'.rand(1000,9999), $path_to_save, $big_image, $thumb_image, $watermark_image);
         return $filename;
     }
 

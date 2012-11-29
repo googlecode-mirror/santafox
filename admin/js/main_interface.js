@@ -455,9 +455,9 @@ function onPageInfoblockLoad()
     pageInfoblocksLoaded++;
     if (pageInfoblocksLoaded==2)
     {//если загрузилось всё - показываем
-        $('#page_container').css({'display':'block'});
         $("#contentLoading").remove();
         $('#content_header').show();
+        $('#page_container').css({'display':'block'});
         $('#page_tabs').parent().tabs({ selected: 0 });
     }
 
@@ -485,7 +485,7 @@ function structure_tree_click_node(url)
         var comboStore = jQuery.parseJSON(data);
         if (comboStore != null)
             set_propertes_main(comboStore);
-        onPageInfoblockLoad();
+
     });
     run_update_metki(url);
 }
@@ -499,7 +499,7 @@ function run_update_metki(url)
         var comboStore = jQuery.parseJSON(data);
         if (comboStore != null)
             set_metki(comboStore);
-        onPageInfoblockLoad();
+
     });
 
 }
@@ -569,6 +569,7 @@ function set_propertes_main(d)
         else
             el_nasled.removeAttr("disabled");
     }
+    onPageInfoblockLoad();
 }
 var metkiCount=0;
 var arr_link_content = [];
@@ -682,8 +683,9 @@ function set_metki(d)
         ,maxHeight:200
         ,width:150
     });
-
+    onPageInfoblockLoad();
 }
+
 //via http://stackoverflow.com/questions/4994201/is-object-empty
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 function is_empty(obj)

@@ -1142,7 +1142,7 @@ class catalog extends BaseModule
         }
 
         $form = $this->get_template_block("form");
-        $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
+        $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
         //заполним ранее введённые поля
         foreach ($ofields as $db_field=>$ofield)
         {
@@ -3745,7 +3745,7 @@ class catalog extends BaseModule
             $values = null;
             if ($prop['type'] == 'enum')
             {
-                $tinfo = $this->get_dbtable_info($table);
+                $tinfo = $kernel->db_get_table_info($table);
                 $values = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
             }
             $db_type = $this->convert_field_type_2_db($prop['type'], $values);
@@ -3879,7 +3879,7 @@ class catalog extends BaseModule
             $values = null;
             if ($prop['type'] == 'enum')
             {
-                $tinfo = $this->get_dbtable_info($table);
+                $tinfo = $kernel->db_get_table_info($table);
                 $values = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
             }
             $db_type = $this->convert_field_type_2_db($prop['type'], $values);
@@ -4369,23 +4369,7 @@ class catalog extends BaseModule
         return $kernel->db_get_record_simple('_catalog_item_groups','`name_db` = "'.$name.'"'.' AND `module_id` = "'.$kernel->pub_module_id_get().'"');
     }
 
-    /**
-     * Возвращает информацию о таблице из БД
-     *
-     * @param string $tname имя таблицы
-     * @return array
-     */
-    private function get_dbtable_info($tname)
-    {
-        global $kernel;
-        $query  = "DESCRIBE `".$kernel->pub_prefix_get().strtolower($tname)."`";
-        $result = $kernel->runSQL($query);
-        $res = array();
-        while ($row = mysql_fetch_assoc($result))
-            $res[$row['Field']] = $row;
-        mysql_free_result($result);
-        return $res;
-    }
+
 
     /**
      * Проверяет, существует ли свойство с БД-именем $pname для категорий
@@ -4856,7 +4840,7 @@ class catalog extends BaseModule
             }
             $content = str_replace('%list_prop_names%', $cfields_block, $content);
             $num = $offset+1;
-            $common_table_info = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+            $common_table_info = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
             $enum_props_cache = array();
             foreach ($items as $item)
             {
@@ -5084,8 +5068,8 @@ class catalog extends BaseModule
             $item_catids = explode(",",$group['defcatids']);
         }
 
-        $tinfo = $this->get_dbtable_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
-        $tinfo = $tinfo + $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+        $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
+        $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
         $props = CatalogCommons::get_props($group['id'], true);
 
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
@@ -5367,7 +5351,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'category_props.html'));
-        $tinfo   = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
+        $tinfo   = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
 
         $props = CatalogCommons::get_cats_props();
         $content = $this->get_template_block('header');
@@ -5454,7 +5438,7 @@ class catalog extends BaseModule
         $content = '';
 
         //При вызове из общих свойстов $id=0, и значит мы покажем только общие свойтва
-        $tinfo_global = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+        $tinfo_global = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
         if ($id == 0)
         {
             //Если формируется только общий список свойств
@@ -5466,7 +5450,7 @@ class catalog extends BaseModule
         {
             //Список свойств формируется из категории
             $group       = CatalogCommons::get_group($id);
-            $tinfo_group = $this->get_dbtable_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
+            $tinfo_group = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
             $html = str_replace('%label_table%', $this->get_template_block('label_table_group'), $html);
             $html = str_replace('%name%'       , $group['name_full']                           , $html);
             $gvisprops = $this->get_group_visible_props($id);
@@ -6088,7 +6072,7 @@ class catalog extends BaseModule
         {
             //Сначала формируем массив с достпными строками товара
             $lines = array();
-            $common_table_info = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+            $common_table_info = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
             $enum_props_cache = array();
             foreach ($items as $item)
             {
@@ -6223,7 +6207,7 @@ class catalog extends BaseModule
         else
             $content = str_replace('%isdefaultchecked%', '', $content);
         $props = CatalogCommons::get_cats_props();
-        $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
+        $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
         $lines = '';
         foreach ($props as $prop)
         {
@@ -6412,7 +6396,7 @@ class catalog extends BaseModule
         switch ($prop['type'])
         {
             case 'enum':
-                $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
+                $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
                 $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
                 $lines = '';
                 foreach ($vals as $val)
@@ -6627,11 +6611,11 @@ class catalog extends BaseModule
             //Если это поле "списко значений, получим уже введённые значения
             //$tinfo = $this->get_dbtable_info('_catalo')
             if ($prop['group_id'] == 0)
-                $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+                $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
             else
             {
                 $group = CatalogCommons::get_group($prop['group_id']);
-                $tinfo = $this->get_dbtable_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
+                $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
             }
 
             $addons_param = $this->get_template_block('enum_vals');
@@ -6861,7 +6845,7 @@ class catalog extends BaseModule
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'order_fields_list.html'));
         $html = $this->get_template_block('header');
         $content = '';
-        $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
+        $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
         $html = str_replace('%form_action%',$kernel->pub_redirect_for_form('save_order_fields_order'),$html);
         $num = 1;
         if (count($fields)>0)
@@ -6959,7 +6943,7 @@ class catalog extends BaseModule
         if ($prop['type'] == 'enum')
         {
             //Если это поле "список значений", получим уже введённые значения
-            $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
+            $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
 
             $addons_param = $this->get_template_block('enum_vals');
             $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
@@ -7031,7 +7015,7 @@ class catalog extends BaseModule
             $values = null;
             if ($prop['type'] == 'enum')
             {
-                $tinfo = $this->get_dbtable_info($table);
+                $tinfo = $kernel->db_get_table_info($table);
                 $values = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
             }
             $db_type = $this->convert_field_type_2_db($prop['type'], $values);
@@ -7145,11 +7129,9 @@ class catalog extends BaseModule
         global $kernel;
         $enumval = $kernel->pub_httpget_get("enumval");
         $prop = CatalogCommons::get_order_field($id);
-
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
-        $tinfo   = $this->get_dbtable_info($table);
+        $tinfo   = $kernel->db_get_table_info($table);
         $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
-
         $newevals= array();
         foreach ($evals as $eval)
         {
@@ -7159,7 +7141,6 @@ class catalog extends BaseModule
         $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL '.
             'WHERE `'.$prop['name_db'].'`="'.$kernel->pub_str_prepare_set($enumval).'"';
         $kernel->runSQL($query);
-
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
         $kernel->runSQL($query);
     }
@@ -7177,7 +7158,7 @@ class catalog extends BaseModule
         $enumval = $kernel->pub_httppost_get("enumval");
         $prop = CatalogCommons::get_order_field($id);
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
-        $tinfo   = $this->get_dbtable_info($table);
+        $tinfo   = $kernel->db_get_table_info($table);
         $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
         $evals[] = $enumval;
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
@@ -7261,7 +7242,7 @@ class catalog extends BaseModule
             return ;
         $outfilename = CatalogCommons::get_templates_user_prefix().$out_filename;
 
-        $tinfo = $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
+        $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
 
         $props = CatalogCommons::get_order_fields();
         $blank_tpl = $kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'frontend_templates/blank_order.html');
@@ -7566,8 +7547,8 @@ class catalog extends BaseModule
                 case 'enum':
                     //processtype = select | radio | checkbox
                     $block = $this->get_template_block($processtype);
-                    $tinfo = $this->get_dbtable_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
-                    $tinfo = $tinfo + $this->get_dbtable_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+                    $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
+                    $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
                     if ($processtype == "checkbox")
                         $enum_vals  = $this->get_enum_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], false);
                     else
@@ -8848,7 +8829,7 @@ class catalog extends BaseModule
                 $prop    = $this->get_cat_prop($propid);
                 $table   = '_catalog_'.$moduleid.'_cats';
 
-                $tinfo   = $this->get_dbtable_info($table);
+                $tinfo   = $kernel->db_get_table_info($table);
                 $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
                 $evals[] = $enumval;
                 $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
@@ -8860,7 +8841,7 @@ class catalog extends BaseModule
                 $propid  = $kernel->pub_httpget_get("propid");
                 $prop    = $this->get_cat_prop($propid);
                 $table   = '_catalog_'.$moduleid.'_cats';
-                $tinfo   = $this->get_dbtable_info($table);
+                $tinfo   = $kernel->db_get_table_info($table);
                 $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
                 $newevals= array();
                 foreach ($evals as $eval)
@@ -9040,7 +9021,7 @@ class catalog extends BaseModule
                 $id_tovar    = intval($id_tovar);
                 $item  = $this->get_item_full_data($id_tovar);
                 //определяем, common-свойство или нет
-                $tinfo = $this->get_dbtable_info('_catalog_'.$moduleid.'_items');
+                $tinfo = $kernel->db_get_table_info('_catalog_'.$moduleid.'_items');
                 if (array_key_exists($dprop, $tinfo))
                 {
                     $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items` SET `'.$dprop.'`=NULL WHERE `id`='.$id_tovar;
@@ -9205,11 +9186,9 @@ class catalog extends BaseModule
     function enum_prop_add()
     {
         global $kernel;
-
         $enumval = $kernel->pub_httppost_get("enumval");
         $propid  = $kernel->pub_httppost_get("id");
         $prop    = $this->get_prop($propid);
-
         if ($prop['group_id'] == 0)
             $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
         else
@@ -9217,10 +9196,8 @@ class catalog extends BaseModule
             $group = CatalogCommons::get_group($prop['group_id']);
             $table = '_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']);
         }
-
-        $tinfo   = $this->get_dbtable_info($table);
+        $tinfo   = $kernel->db_get_table_info($table);
         $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
-
         $evals[] = $enumval;
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
         $kernel->runSQL($query);
@@ -9235,7 +9212,6 @@ class catalog extends BaseModule
         global $kernel;
         $enumval = $kernel->pub_httpget_get("enumval");
         $propid  = $kernel->pub_httpget_get("propid");
-
         $prop    = $this->get_prop($propid);
         if ($prop['group_id'] == 0)
             $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
@@ -9244,20 +9220,16 @@ class catalog extends BaseModule
             $group = CatalogCommons::get_group($prop['group_id']);
             $table = '_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']);
         }
-
-        $tinfo   = $this->get_dbtable_info($table);
-        $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
-
+        $tinfo = $kernel->db_get_table_info($table);
+        $evals = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
         $newevals= array();
         foreach ($evals as $eval)
         {
             if ($eval != $enumval)
                 $newevals[] = $eval;
         }
-
         $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL WHERE `'.$prop['name_db'].'`="'.$kernel->pub_str_prepare_set($enumval).'"';
         $kernel->runSQL($query);
-
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
         $kernel->runSQL($query);
     }

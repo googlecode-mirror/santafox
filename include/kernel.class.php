@@ -5777,6 +5777,22 @@ class kernel
         return strtr($str, $chars);
     }
 
+    /**
+     * Возвращает информацию о таблице из БД
+     *
+     * @param string $tname имя таблицы (без префикса)
+     * @return array
+     */
+    public function db_get_table_info($tname)
+    {
+        global $kernel;
+        $query  = "DESCRIBE `".$kernel->pub_prefix_get().strtolower($tname)."`";
+        $result = $kernel->runSQL($query);
+        $res = array();
+        while ($row = mysql_fetch_assoc($result))
+            $res[$row['Field']] = $row;
+        mysql_free_result($result);
+        return $res;
+    }
 
 }
-?>

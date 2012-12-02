@@ -1100,7 +1100,7 @@ class catalog extends BaseModule
                 $manager_mail_subj = str_replace("%orderid%", $currOrder['id'], $manager_mail_subj);
                 $user_mail_subj    = str_replace("%orderid%", $currOrder['id'], $user_mail_subj);
 
-                $fvalues['id'] = $currOrder['id'];
+                $fvalues_orig['id'] = $fvalues['id'] = $currOrder['id'];
 
                 $from_email=$manager_email;
 

@@ -1484,6 +1484,7 @@ class kernel
         print $html;
     }
 
+
     /**
      * Определяет, является ли текущий запрос ajax-запросом
      * @return bool
@@ -2221,7 +2222,7 @@ class kernel
      * области контента. В этом случае $url должен начинаться с идентификатора действия,
      * которое будет доступно через метод {@link pub_section_leftmenu_get()}, после этого могут
      * идти дополнительные параметры. Пример передаваемого в таком случае URL-а:
-     * <code>$kernel-> pub_redirect_refresh (“myaction&param1=value1&param2=value2”);</code>
+     * <code>$kernel-> pub_redirect_refresh ("myaction&param1=value1&param2=value2");</code>
      * @access public
      * @param string $url URL на который производится редирект
      * @return void
@@ -3197,7 +3198,6 @@ class kernel
     * Array
     * (
     *     [begin] => Начало
-
     *
     *     [line] => Array
     *               (
@@ -3431,6 +3431,7 @@ class kernel
 	 */
     public function db_get_record_simple($table, $cond, $fields="*")
     {
+
          $query = "SELECT ".$fields." FROM `".$this->pub_prefix_get().$table."` WHERE ".$cond." LIMIT 1";
 
          $res = $this->runSQL($query);
@@ -3446,7 +3447,6 @@ class kernel
      *
      * Передаваемый в функцию массив преобразуются к виду:
      *  [["key","val"],["key","val"],["key","val"], ...]
-
      * @param array $arr Преобразуемый массив
      * @return string
      * @access public
@@ -3594,16 +3594,16 @@ class kernel
     * В качестве параметра для формирования большого изображения передаётся массив
     * следующего вида:
     * <code>
-    *   $big[‘width’] = 400;
-    *   $big[‘height’] = 300;
+    *   $big['width'] = 400;
+    *   $big['height'] = 300;
     * </code>
     *
     * В массиве указываются значения длины и ширины, к которым должно быть приведено
     * большое изображение. Аналогичным образом указывается массив параметров для
     * создания маленького изображения:
     * <code>
-    *   $big[‘width’] = 100;
-    *   $big[‘height’] = 75;
+    *   $big['width'] = 100;
+    *   $big['height'] = 75;
     * </code>
     *
     * Следует учитывать, что ширина и высота обработанных изображений может отличаться,
@@ -3613,9 +3613,9 @@ class kernel
     * Для добавления водяного знака необходимо определить массив его настроек и передать его
     * в метод. Массив выглядит следующим образом:
     * <code>
-    *   $watermark_image[‘path’] = ‘content/files/fatermark.gif’;
-    *   $watermark_image[‘place’] = 0;
-    *   $watermark_image[‘transparency’] = 30;
+    *   $watermark_image['path'] = 'content/files/fatermark.gif';
+    *   $watermark_image['place'] = 0;
+    *   $watermark_image['transparency'] = 30;
     * </code>
     *
     * Ключ path указывает путь и имя файла водяного изображения. Ключ place определяет
@@ -3632,8 +3632,8 @@ class kernel
     *
     * После выполнения метода будет создано два (или одно) изображения, которые будут
     * помещены в папку $path_full_image, при этом большое изображение непосредственно
-    * помещается в эту папку, а маленькое помещается во вложенную папку с именем ‘tn’
-    * ($path_full_image.’/tn’). Имена файлов большого и маленького изображения будут
+    * помещается в эту папку, а маленькое помещается во вложенную папку с именем 'tn'
+    * ($path_full_image.'/tn'). Имена файлов большого и маленького изображения будут
     * одинаковы.
     *
     * Пример:
@@ -3655,8 +3655,8 @@ class kernel
     *
     *       //Параметры водяной марки
     *       $watermark_image = array(
-    *           ‘path’ => ‘content/files/fatermark.gif’,
-    *           ‘place’ => 3,
+    *           'path' => 'content/files/fatermark.gif',
+    *           'place' => 3,
     *           'transparency' => 25
     *       );
     *
@@ -3667,7 +3667,7 @@ class kernel
     *
     * </code>
     *
-    * Если взять в качестве идентификатора модуля значение ‘news’, то будут
+    * Если взять в качестве идентификатора модуля значение 'news', то будут
     * созданы следующие файлы:
     * <code>
     *   content/images/news/img_345222534.jpg   //большое изображение
@@ -4092,7 +4092,7 @@ class kernel
      * Добавляет текст к строке, возвращаемой методом ядра "вернуть тайтл".
      *
      * С помощью этой функции добавляется дополнительная информация к тайтлу
-     * страницы. Между уже существующем тайтлом и вновь добавляемым добавляется символ “-“.
+     * страницы. Между уже существующем тайтлом и вновь добавляемым добавляется символ "-".
      * @param string $text Текст, который добавляется к тайтлу
      * @access public
      * @return void
@@ -4915,7 +4915,7 @@ class kernel
      * то сама директория так же будет удалена, иначе, будет удалено только её содержимое.
      * @return bool
      */
-    function pub_file_delete($path, $delet_parent_dir = true)
+	function pub_file_delete($path, $delet_parent_dir = true)
     {
         $status = false;
 
@@ -4931,17 +4931,20 @@ class kernel
 		if (is_dir($path))
 		{
 		    //Проверим, а есть ли что удалить внутри этой дериктории
-            $handle = opendir($path);
-            while ($subdir = readdir($handle))
-            {
-                if (($subdir != ".") && ($subdir != ".."))
-                {
-                    if (!$this->pub_file_delete($path.$subdir, true))
-                    {
-                        return false;
-                    }
-                }
-            }
+            if($handle = opendir($path))
+			{
+				while (false !== ($subdir = readdir($handle)))
+				{
+					if (($subdir != ".") && ($subdir != ".."))
+					{
+						if (!$this->pub_file_delete($path."/".$subdir, true))
+						{
+							return false;
+						}
+					}
+				}
+				closedir($handle);
+			}
 
             //Непосредственно удаление директории, если мы этого хотим
             if ($delet_parent_dir)

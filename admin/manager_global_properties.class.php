@@ -378,9 +378,10 @@ class manager_global_properties
 
         //Получаем имена файлов, которые нужно переписать
         unset($temp_files[0], $content);
-
+		
         foreach ($temp_files AS $file)
         {
+			
             preg_match("/\{\@(.*?)\@\}(.*)/is", $file, $result);
             $filename = $result[1];
             $files[$filename] = $result[2];
@@ -438,7 +439,10 @@ class manager_global_properties
 
         $update = new site_update();
         $update->start();
-
+			
+			$del_file_array[] = "/_update.php";
+			$del_file_array[] = "/_description.html";
+			
         unset($files["/_update.php"], $files["/_description.html"]);
         reset($files);
 
@@ -487,8 +491,52 @@ class manager_global_properties
         }
         else
             $html .= $this->error_message_get('Отсутствует файл ini.php');
-        //$kernel->pub_dir_recurs_delete($upd_temp_dir, true);
-        $kernel->pub_file_delete($upd_temp_dir, false);
+
+		// Копируем в отдельную папку файлы бекапа и удаляем из основной
+		$new_upd_dir = "/upload/update_".$version;
+		// создали новую папку
+        $kernel->pub_file_dir_create($root.$new_upd_dir);
+		// сoздали в ней структуру папок
+		$this->update_dir_create($files, $new_upd_dir);
+		// копируем в новую папку
+		$errore_copy = false;
+        foreach ($files AS $path => $content)
+        {
+            if (!$kernel->pub_file_copy($root.$upd_temp_dir.$path, $new_upd_dir.$path))
+            {
+                $errore_copy = true;
+                $html .= "Ошибка копирования <i>".$root.$upd_temp_dir.$path."</i> в <i>".$new_upd_dir.$path."</i><br>";
+            }
+        }
+		//создадаим список уникальных директорий и файлов в корне
+		//$del_dirr_array = array();
+    	foreach ($files as $key => $val)
+    	{
+			// отдельно собираем файлы, лежашие в корне
+			if(strpos($key, '/', 1) === false)
+			{
+				$del_file_array[] = $key;
+				continue;
+			}
+			$path = pathinfo($key);
+			$path = $path['dirname'];
+			// берем папки только верхнего уровня
+			preg_match('~^/([^/]+)~', $path, $matches);
+	        	$del_dirr_array[$matches[0]]= $matches[0];
+    	}
+
+		// удаляем папки со всем содержимым
+		 foreach ($del_dirr_array as $del_val)
+        {
+            if (!$kernel->pub_file_delete($upd_temp_dir.$del_val, true))
+                $html .= "Error delete dir <i>".$upd_temp_dir.$del_val."</i><br>";
+        }
+		// удаляем файлы из корня
+		 foreach ($del_file_array as $del_val)
+        {
+            if (!$kernel->pub_file_delete($upd_temp_dir.$del_val, true))
+                $html .= "Error delete file <i>".$upd_temp_dir.$del_val."</i><br>";
+        }
 
         return $html;
     }

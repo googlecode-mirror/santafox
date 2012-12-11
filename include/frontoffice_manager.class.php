@@ -331,17 +331,14 @@ class frontoffice_manager
     private function replace_labels_by_generated_content($label, $val)
     {
         global $kernel;
-        if (empty($val) || !is_array($val))
-            return;
         $html_replace = '';
-        if (!empty($val['id_mod']))
+        if (isset($val['id_mod']) && $val['id_mod'])
         {
             if ($val['id_mod'] == 'kernel')
                 $html_replace = $this->run_metod_kernel($label, $val);
             else
                 $html_replace = $this->run_metod_modul($val);
             $html_replace = $this->do_postprocessing($val, $html_replace);
-
         }
         $html = str_replace('[#' . $label . '#]', $html_replace, $kernel->priv_frontcontent_get());
         //Теперь необходимо обновить этот контент в переменной ядра

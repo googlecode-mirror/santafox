@@ -11,7 +11,7 @@ class HtmlParser /*extends WebContentParser*/
     function HtmlParser($html="")
     {
         $this->html = $html;
-        $this->html = preg_replace("'<script([^>]*)>(.{0,200})</script>'isU", "", $this->html);
+        $this->html = preg_replace("~<script([^>]*)>(.+)</script>~isU", "", $this->html);
         $this->html = preg_replace("'<style([^>]*)>(.+)</style>'isU", "", $this->html);
         $this->html = preg_replace("|<noindex>(.+)</noindex>|isU", "", $this->html);
         $this->html = preg_replace("'<!--(.+)-->'isU", "", $this->html);

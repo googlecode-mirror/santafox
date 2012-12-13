@@ -3546,17 +3546,16 @@ class catalog extends BaseModule
     private function save_item()
     {
         global $kernel;
-
         $itemid = $kernel->pub_httppost_get("id");
-        //Если $itemid равен 0, тогда это новый товар и сначала его просто добавим
+        //Если $itemid равен 0, то это новый товар и сначала его просто добавим
         //а потом вызовем стандартную функцию сохранения
-
         if (intval($itemid) == 0)
         {
             $itemid  = $this->add_item();
+            if (!$itemid)
+                return;
         }
-
-        $item   = $this->get_item_full_data($itemid);
+        $item  = $this->get_item_full_data($itemid);
 
         //сначала сохраним common-свойства
         $props  = CatalogCommons::get_common_props($kernel->pub_module_id_get());
@@ -3609,7 +3608,6 @@ class catalog extends BaseModule
                             $val = $this->process_pict_upload($_FILES[$prop['name_db']], $prop);
                         else
                             $val = $this->process_file_upload($_FILES[$prop['name_db']]);
-
                     }
                     elseif (!empty($item[$prop['name_db']]))
                         $val = $item[$prop['name_db']];
@@ -3617,9 +3615,7 @@ class catalog extends BaseModule
                         $val = '';
                 }
                 else
-                {
                     $val = $kernel->pub_httppost_get($prop['name_db'], false);
-                }
                 $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val,$prop['type']);
 
                 if ($i != count($props)-1)
@@ -3628,8 +3624,6 @@ class catalog extends BaseModule
             $query .= ' WHERE `id`='.$item['ext_id'];
             $kernel->runSQL($query);
         }
-
-
 
         //...и категории
         $item_catids = $this->get_item_catids_with_order($itemid);
@@ -3673,13 +3667,12 @@ class catalog extends BaseModule
     private function add_item()
     {
         global $kernel;
-
-        $groupid   = intval($kernel->pub_httppost_get("group_id"));
-        $group     = CatalogCommons::get_group($groupid);
-
+        $groupid = intval($kernel->pub_httppost_get("group_id"));
+        if (!$groupid)
+            return 0;
+        $group = CatalogCommons::get_group($groupid);
         //сохраним в кукисах ID-шник товарной группы, чтобы сделать её активной при след. добавлении
         setcookie("last_add_item_groupid", $groupid);
-
         $query = 'INSERT INTO '.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).
             ' (`id`) VALUES (NULL)';
         $kernel->runSQL($query);
@@ -8996,11 +8989,15 @@ class catalog extends BaseModule
                 }
                 return $this->show_item_form($id, 0);
 
-            //Добавление товара вызывает туже строку с редактированием
+            //Добавление товара вызывает ту же строку с редактированием
             case 'item_add':
-                $group_id = $kernel->pub_httpget_get('group_id');
-                if (empty($group_id))
-                    $group_id = $kernel->pub_httppost_get('group_id');
+                $group_id = $kernel->pub_httppost_get('group_id');
+                if (!$group_id)
+                {
+                    $group_id = $kernel->pub_httpget_get('group_id');
+                    if (!$group_id)
+                        return '';
+                }
                 $id_cat = $kernel->pub_httpget_get('id_cat');
                 if (empty($id_cat))
                     $id_cat = $kernel->pub_httppost_get('id_cat');
@@ -9023,9 +9020,7 @@ class catalog extends BaseModule
                 //определяем, common-свойство или нет
                 $tinfo = $kernel->db_get_table_info('_catalog_'.$moduleid.'_items');
                 if (array_key_exists($dprop, $tinfo))
-                {
                     $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items` SET `'.$dprop.'`=NULL WHERE `id`='.$id_tovar;
-                }
                 else
                 {
                     $group = CatalogCommons::get_group($item['group_id']);

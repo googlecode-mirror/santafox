@@ -4006,11 +4006,15 @@ class catalog extends BaseModule
             $kernel->runSQL($query);
         }
 
+        if ($ptype=='pict')
+            $add_param='"'.mysql_real_escape_string(serialize(self::make_default_pict_prop_addparam())).'"';
+        else
+            $add_param="NULL";
         //Собственно запросы по добавлению
-        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_item_props`'.
-            ' (`module_id`,`group_id`,`name_db`,`name_full`,`type`, `showinlist`, `sorted`,`order`, `ismain`)'.
-            ' VALUES ("'.$kernel->pub_module_id_get().'",'.$group_id.',"'.$namedb.'","'.$kernel->pub_str_prepare_set($pname).'","'.
-            $ptype.'",'.$inlist.','.$sorted.', '.$order.', '.$ismain.')';
+        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_item_props`
+                 (`module_id`,`group_id`,`name_db`,`name_full`,`type`, `showinlist`, `sorted`,`order`, `ismain`,`add_param`)
+                 VALUES
+                 ("'.$kernel->pub_module_id_get().'",'.$group_id.',"'.$namedb.'","'.$pname.'","'.$ptype.'",'.$inlist.','.$sorted.', '.$order.', '.$ismain.','.$add_param.')';
         $kernel->runSQL($query);
 
         if ($group_id > 0)
@@ -4255,30 +4259,7 @@ class catalog extends BaseModule
             if (isset($res['add_param']) && !empty($res['add_param']))
                 $res['add_param'] = @unserialize($res['add_param']);
             else
-            {
-                $res['add_param'] = array();
-                $res['add_param']['pict_path']			      = '';
-
-                $res['add_param']['source']['isset']          = true;
-                $res['add_param']['source']['width']          = '800';
-                $res['add_param']['source']['height']         = '600';
-                $res['add_param']['source']['water_add']      = '0';
-                $res['add_param']['source']['water_path']     = '';
-                $res['add_param']['source']['water_position'] = '0';
-
-                $res['add_param']['big']['isset']          = true;
-                $res['add_param']['big']['width']          = '400';
-                $res['add_param']['big']['height']         = '300';
-                $res['add_param']['big']['water_add']      = '1';
-                $res['add_param']['big']['water_path']     = '';
-                $res['add_param']['big']['water_position'] = '3';
-
-                // Маленькое изображение без знаков
-                $res['add_param']['small']['isset']          = false;
-                $res['add_param']['small']['width']          = '100';
-                $res['add_param']['small']['height']         = '';
-            }
-
+                $res['add_param']=self::make_default_pict_prop_addparam();
         }
         return $res;
     }
@@ -9623,4 +9604,30 @@ class catalog extends BaseModule
         return $content;
     }
 
+
+    private static function make_default_pict_prop_addparam()
+    {
+        $ret = array();
+        $ret['pict_path']			      = '';
+
+        $ret['source']['isset']          = true;
+        $ret['source']['width']          = 800;
+        $ret['source']['height']         = 600;
+        $ret['source']['water_add']      = '0';
+        $ret['source']['water_path']     = '';
+        $ret['source']['water_position'] = '0';
+
+        $ret['big']['isset']          = true;
+        $ret['big']['width']          = 400;
+        $ret['big']['height']         = 300;
+        $ret['big']['water_add']      = '1';
+        $ret['big']['water_path']     = '';
+        $ret['big']['water_position'] = '3';
+
+        // Маленькое изображение без знаков
+        $ret['small']['isset']          = false;
+        $ret['small']['width']          = '100';
+        $ret['small']['height']         = '';
+        return $ret;
+    }
 }

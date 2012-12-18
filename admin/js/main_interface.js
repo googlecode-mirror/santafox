@@ -22,15 +22,22 @@ function show_action_edit(strlink, name)
     });
 }
 
-function santaUpdateRegion(regid, loadFrom)
+function santaUpdateRegion(regid, loadFrom,opts)
 {
+    if (typeof  opts === "undefined")
+        opts={};
+    opts.url=loadFrom;
+    opts.error=function(err) {reg.html("Load error: "+err)};
+    opts.success=function(result) {reg.empty().html(result)};
     $('#popup_div').css('display','none');
     var reg=$("#"+regid);
     reg.html('<span id="contentLoading">Loading...</span>');
-    reg.load(loadFrom, function(response, status, xhr) {
-          if (status == "error")
-              $("#"+regid).html("Load error: " + xhr.status + " " + xhr.statusText);
-    });
+    $.ajax(opts);
+}
+
+function santaUpdateRegionSynchron(regid, loadFrom)
+{
+    santaUpdateRegion(regid, loadFrom,{async:false});
 }
 
 /**
@@ -45,7 +52,7 @@ function santaUpdateRegion(regid, loadFrom)
 
 function jspub_confirm(dialog_action, dialog_message)
 {
-	//curent_action_confirm = dialog_action;
+    //curent_action_confirm = dialog_action;
     //$( "#ext_layout:ui-dialog" ).dialog( "destroy" );
     var popup=$("#popup_msg_div");
     popup.html('<p>'+dialog_message+'</p>');
@@ -63,7 +70,7 @@ function jspub_confirm(dialog_action, dialog_message)
             }
         }
     });
-	return false;
+    return false;
 }
 
 /**
@@ -72,12 +79,12 @@ function jspub_confirm(dialog_action, dialog_message)
  */
 function jspub_cookie_set(cookieName, cookieValue, expires, path, domain, secure)
 {
-	document.cookie =
-		encodeURIComponent(cookieName) + '=' + encodeURIComponent(cookieValue)
-		+ (expires ? '; expires=' + expires.toGMTString() : '')
-		+ (path ? '; path=' + path : '')
-		+ (domain ? '; domain=' + domain : '')
-		+ (secure ? '; secure' : '');
+    document.cookie =
+        encodeURIComponent(cookieName) + '=' + encodeURIComponent(cookieValue)
+            + (expires ? '; expires=' + expires.toGMTString() : '')
+            + (path ? '; path=' + path : '')
+            + (domain ? '; domain=' + domain : '')
+            + (secure ? '; secure' : '');
 }
 
 /**
@@ -87,19 +94,19 @@ function jspub_cookie_set(cookieName, cookieValue, expires, path, domain, secure
 
 function jspub_cookie_get(cookieName)
 {
-	var cookieValue = '';
-	var posName = document.cookie.indexOf(encodeURIComponent(cookieName) + '=');
+    var cookieValue = '';
+    var posName = document.cookie.indexOf(encodeURIComponent(cookieName) + '=');
 
-	if (posName != -1)
-	{
-		var posValue = posName + (encodeURIComponent(cookieName) + '=').length;
-		var endPos = document.cookie.indexOf(';', posValue);
-		if (endPos != -1)
-			cookieValue = decodeURIComponent(document.cookie.substring(posValue, endPos));
-		else
-			cookieValue = decodeURIComponent(document.cookie.substring(posValue));
-	}
-	return (cookieValue);
+    if (posName != -1)
+    {
+        var posValue = posName + (encodeURIComponent(cookieName) + '=').length;
+        var endPos = document.cookie.indexOf(';', posValue);
+        if (endPos != -1)
+            cookieValue = decodeURIComponent(document.cookie.substring(posValue, endPos));
+        else
+            cookieValue = decodeURIComponent(document.cookie.substring(posValue));
+    }
+    return (cookieValue);
 }
 
 
@@ -115,8 +122,8 @@ function jspub_cookie_get(cookieName)
 
 function jspub_click(lnk)
 {
-	start_interface.link_go(lnk);
-	return false;
+    start_interface.link_go(lnk);
+    return false;
 }
 
 /**
@@ -131,20 +138,20 @@ function jspub_disabled_change(elem1ID,elem2ID)
 {
     var el1=$('#'+elem1ID),el2=$('#'+elem2ID);
 
-   if(el2.is('select'))
-   {
-      if (el1.attr('checked'))
-          el2.selectmenu('disable');
-      else
-          el2.selectmenu('enable');
-   }
-   else
-   {
-      if (el1.attr("checked"))
-          el2.attr("disabled",true);
-      else
-          el2.removeAttr("disabled");
-   }
+    if(el2.is('select'))
+    {
+        if (el1.attr('checked'))
+            el2.selectmenu('disable');
+        else
+            el2.selectmenu('enable');
+    }
+    else
+    {
+        if (el1.attr("checked"))
+            el2.attr("disabled",true);
+        else
+            el2.removeAttr("disabled");
+    }
 }
 
 /**
@@ -157,7 +164,7 @@ function jspub_disabled_change(elem1ID,elem2ID)
 function jspub_form_submit(formID, url)
 {
     //different variants: http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
-	var parameters = {};
+    var parameters = {};
     $('#'+formID+" :input").each(function(){
         if ($(this).attr('type')=="checkbox")
         {
@@ -226,7 +233,7 @@ function santaShowPopupHint(header, text,timeout)
             }
         },
         show: "scale",
-	    hide: "scale"//"explode"
+        hide: "scale"//"explode"
     });
     //autoclose
     if (timeout!=0)
@@ -241,15 +248,15 @@ function get_properes_page(e, fieldID)
     var popup=$('#popup_sitemap_div');
     popup.html('');
     popup.load("index.php?action=select_page", function(response, status, xhr) {
-          if (status == "error")
-          {
-              $("#popup_sitemap_div").html("Load error: " + xhr.status + " " + xhr.statusText);
-          }
-          else
-          {
-              //$('#popup_sitemap_div').css('position','absolute').css('top',e.clientY).css('left',e.clientX);
-              //$('#popup_sitemap_div').css('display','block');
-          }
+        if (status == "error")
+        {
+            $("#popup_sitemap_div").html("Load error: " + xhr.status + " " + xhr.statusText);
+        }
+        else
+        {
+            //$('#popup_sitemap_div').css('position','absolute').css('top',e.clientY).css('left',e.clientX);
+            //$('#popup_sitemap_div').css('display','block');
+        }
     });
 
     $("#popup_sitemap_div").dialog({
@@ -264,7 +271,7 @@ function get_properes_page(e, fieldID)
 
     });
     start_interface.select_element = fieldID;
-	//start_interface.dialog.addKeyListener(27, start_interface.dialog.hide, start_interface.dialog);
+    //start_interface.dialog.addKeyListener(27, start_interface.dialog.hide, start_interface.dialog);
     return true;
 }
 
@@ -274,19 +281,19 @@ function get_properes_page(e, fieldID)
 //Используется в свойствах страницы, для вызова редактора контента для конкретной
 function go_edit_content(name_file, no_redactor)
 {
-		var name_edit = 'edit_';
-		var left=parseInt(100);
-		var top=parseInt(1);
-		var width = parseInt(screen.width / 3 );
-		var height = parseInt(screen.height / 2);
-		if (width < 700)
-			width = 700;
-        var newWin;
-		if (no_redactor)
-			newWin=window.open('/admin/index.php?action=edit_content&file='+name_file+'&edit='+name_edit+'&no_redactor=1', '_blank', 'alwaysRaised=yes,dependent=yes,resizable=yes,titlebar=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=no,left=' + left + ',top=' + top + ',width=' + width +',height='+height,'Content');
-		else
-			newWin=window.open('/admin/index.php?action=edit_content&file='+name_file+'&edit='+name_edit, '_blank', 'alwaysRaised=yes,dependent=yes,resizable=yes,titlebar=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=no,left=' + left + ',top=' + top + ',width=' + width +',height='+height,'Content');
-		newWin.focus();
+    var name_edit = 'edit_';
+    var left=parseInt(100);
+    var top=parseInt(1);
+    var width = parseInt(screen.width / 3 );
+    var height = parseInt(screen.height / 2);
+    if (width < 700)
+        width = 700;
+    var newWin;
+    if (no_redactor)
+        newWin=window.open('/admin/index.php?action=edit_content&file='+name_file+'&edit='+name_edit+'&no_redactor=1', '_blank', 'alwaysRaised=yes,dependent=yes,resizable=yes,titlebar=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=no,left=' + left + ',top=' + top + ',width=' + width +',height='+height,'Content');
+    else
+        newWin=window.open('/admin/index.php?action=edit_content&file='+name_file+'&edit='+name_edit, '_blank', 'alwaysRaised=yes,dependent=yes,resizable=yes,titlebar=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=no,left=' + left + ',top=' + top + ',width=' + width +',height='+height,'Content');
+    newWin.focus();
 }
 
 
@@ -305,10 +312,10 @@ function show_icons_go_edit_content(elID)
 function update_action_list()
 {
     $("#actions_list_table").load(start_interface.global_link + 'action_update_list', function(response, status, xhr) {
-          $('#module_actions_container').css("display","block");
-          $('#page_tabs').find('a[href=#mod_action_list]').parent().show();
-          if (status == "error")
-              $("#actions_list_table").html("Load error: " + xhr.status + " " + xhr.statusText);
+        $('#module_actions_container').css("display","block");
+        $('#page_tabs').find('a[href=#mod_action_list]').parent().show();
+        if (status == "error")
+            $("#actions_list_table").html("Load error: " + xhr.status + " " + xhr.statusText);
     });
 }
 
@@ -321,7 +328,7 @@ function admin_form_submit(url, id_insert, formID)
 {
     var postArr = $('#'+formID).serializeArray();
     $.post(url, postArr,  function(data){
-       $("#"+id_insert).html(data);
+        $("#"+id_insert).html(data);
     });
 }
 
@@ -330,10 +337,10 @@ function admin_form_submit(url, id_insert, formID)
 //used in admin_modules.html only
 function mouse_select_element(obj, del_class)
 {
-	if (del_class)
-		$(obj).removeClass('table_action_select');
-	else
-		$(obj).addClass('table_action_select');
+    if (del_class)
+        $(obj).removeClass('table_action_select');
+    else
+        $(obj).addClass('table_action_select');
 }
 
 
@@ -351,60 +358,60 @@ function form_submit_include_content_auto()
     {
         CKEDITOR.instances[i].destroy();
     }
-	return false;
+    return false;
 }
 
 //Вызвается в старых модулях, для сабмита формы с редактором контента
 function form_submit_include_content(name_area)
 {
-	if (!name_area)
-		name_area = 'content_html';
-	//Закрываем редактор контента в этой области, после чего всё и сабмитится
+    if (!name_area)
+        name_area = 'content_html';
+    //Закрываем редактор контента в этой области, после чего всё и сабмитится
     var inst = CKEDITOR.instances[name_area];
     if (typeof inst != 'undefined')
         inst.destroy();
-	return true;
+    return true;
 }
 
 // Функция используется в шаблоне main.html активации редактора контента
 function start_include_content(name_area)
 {
-	if (!name_area)
-		name_area = 'content_html';
+    if (!name_area)
+        name_area = 'content_html';
     var config =
-           {
-               skin : 'kama',
-               autoUpdateElement:true,
-               filebrowserBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
-               filebrowserImageBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=images',
-               filebrowserFlashBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
-               filebrowserUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=files',
-               filebrowserImageUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=images',
-               filebrowserFlashUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=files',
-               LinkBrowserWindowHeight:440,
-               ImageBrowserWindowHeight:440,
-               FlashBrowserWindowHeight:440,
-               LinkUpload:false,
-               ImageUpload:false,
-               FlashUpload:false,
-               language:'ru',
-               toolbar_Full: [
-                ['Source','-','Preview'],
-                ['Cut','Copy','Paste','PasteText','PasteFromWord'],
-                ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
-                '/',
-                ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-                ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
-                ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-                ['Link','Unlink','Anchor'],
-                ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
-                '/',
-                ['Styles','Format','Font','FontSize'],
-                ['TextColor','BGColor'],
-                ['Maximize', 'ShowBlocks']
-            ]
-            //close_on_save:[#close_on_save#]
-           };
+    {
+        skin : 'kama',
+        autoUpdateElement:true,
+        filebrowserBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
+        filebrowserImageBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=images',
+        filebrowserFlashBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
+        filebrowserUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=files',
+        filebrowserImageUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=images',
+        filebrowserFlashUploadUrl : '/components/html_editor/ckeditor/plugins/kcfinder/upload.php?type=files',
+        LinkBrowserWindowHeight:440,
+        ImageBrowserWindowHeight:440,
+        FlashBrowserWindowHeight:440,
+        LinkUpload:false,
+        ImageUpload:false,
+        FlashUpload:false,
+        language:'ru',
+        toolbar_Full: [
+            ['Source','-','Preview'],
+            ['Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
+            '/',
+            ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
+            ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
+            ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+            ['Link','Unlink','Anchor'],
+            ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
+            '/',
+            ['Styles','Format','Font','FontSize'],
+            ['TextColor','BGColor'],
+            ['Maximize', 'ShowBlocks']
+        ]
+        //close_on_save:[#close_on_save#]
+    };
     //убираем предыдущий instance, если есть
     var inst = CKEDITOR.instances[name_area];
     if (inst)
@@ -425,25 +432,25 @@ String.prototype.ellipse = function(maxLength){
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
 jQuery(function($){
-	$.datepicker.regional['ru'] = {
-		closeText: 'Закрыть',
-		prevText: '&#x3c;Пред',
-		nextText: 'След&#x3e;',
-		currentText: 'Сегодня',
-		monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь',
-		'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-		monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн',
-		'Июл','Авг','Сен','Окт','Ноя','Дек'],
-		dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
-		dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
-		dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
-		weekHeader: 'Не',
-		dateFormat: 'dd.mm.yy',
-		firstDay: 1,
-		isRTL: false,
-		showMonthAfterYear: false,
-		yearSuffix: ''};
-	$.datepicker.setDefaults($.datepicker.regional['ru']);
+    $.datepicker.regional['ru'] = {
+        closeText: 'Закрыть',
+        prevText: '&#x3c;Пред',
+        nextText: 'След&#x3e;',
+        currentText: 'Сегодня',
+        monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь',
+            'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+        monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн',
+            'Июл','Авг','Сен','Окт','Ноя','Дек'],
+        dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
+        dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
+        dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+        weekHeader: 'Не',
+        dateFormat: 'dd.mm.yy',
+        firstDay: 1,
+        isRTL: false,
+        showMonthAfterYear: false,
+        yearSuffix: ''};
+    $.datepicker.setDefaults($.datepicker.regional['ru']);
 });
 
 //Отдельная функция
@@ -455,10 +462,11 @@ function onPageInfoblockLoad()
     pageInfoblocksLoaded++;
     if (pageInfoblocksLoaded==2)
     {//если загрузилось всё - показываем
-        $("#contentLoading").remove();
+
         $('#content_header').show();
-        $('#page_container').css({'display':'block'});
         $('#page_tabs').parent().tabs({ selected: 0 });
+        $('#page_container').css({'display':'block'});
+        $("#contentLoading").remove();
     }
 
 }
@@ -575,14 +583,12 @@ var metkiCount=0;
 var arr_link_content = [];
 function set_metki(d)
 {
-    var ctable=$('#table_metki_content'),str_code = "", table_metki_content= "",hasPostprocessors = !is_empty(postProcessors);
-    ctable.html('');//очистим таблицу меток
+    var ctable=$('#table_metki_content'),str_code = "", table_metki_content= "",hasPostprocessors = !is_empty(postProcessors),str_content;
     metkiCount = d.length;
     arr_link_content = [];
     for (var i = 0; i < d.length; i++)
     {
-        var str_content = "";
-        str_content += '<tr>';
+        str_content = '<tr>';
         //Имя метки со скрытым инпутом, куда пишется непосредственное значение
         str_content += '<td class="metka_name">';
         str_content += '<label for="flag_metka_' + i + '" class="struct_page_label">' + d[i].name + '</label>';
@@ -610,8 +616,7 @@ function set_metki(d)
         str_content += '</tr>';
         table_metki_content+=str_content;
     }
-    ctable.append(table_metki_content);
-
+    ctable.empty().html(table_metki_content);
     //теперь отдельным циклом повесим обработчики
     var flag_nasled,sel_modul_ext,sel_pp;
     for (i = 0; i < d.length; i++)
@@ -751,55 +756,55 @@ function buildMetkaActionsSelect()
  * Date: March 13, 2011
  */
 jQuery.fn.autoGrow = function(){
-	return this.each(function(){
-		// Variables
-		var colsDefault = this.cols;
-		var rowsDefault = this.rows;
+    return this.each(function(){
+        // Variables
+        var colsDefault = this.cols;
+        var rowsDefault = this.rows;
 
-		//Functions
-		var grow = function() {
-			growByRef(this);
-		};
+        //Functions
+        var grow = function() {
+            growByRef(this);
+        };
 
-		var growByRef = function(obj) {
-			var linesCount = 0;
-			var lines = obj.value.split('\n');
+        var growByRef = function(obj) {
+            var linesCount = 0;
+            var lines = obj.value.split('\n');
 
-			for (var i=lines.length-1; i>=0; --i)
-			{
-				linesCount += Math.floor((lines[i].length / colsDefault) + 1);
-			}
+            for (var i=lines.length-1; i>=0; --i)
+            {
+                linesCount += Math.floor((lines[i].length / colsDefault) + 1);
+            }
 
-			if (linesCount >= rowsDefault)
-				obj.rows = linesCount + 1;
-			else
-				obj.rows = rowsDefault;
-		};
+            if (linesCount >= rowsDefault)
+                obj.rows = linesCount + 1;
+            else
+                obj.rows = rowsDefault;
+        };
 
-		var characterWidth = function (obj){
-			var characterWidth = 0;
-			var temp1 = 0;
-			var temp2 = 0;
-			var tempCols = obj.cols;
+        var characterWidth = function (obj){
+            var characterWidth = 0;
+            var temp1 = 0;
+            var temp2 = 0;
+            var tempCols = obj.cols;
 
-			obj.cols = 1;
-			temp1 = obj.offsetWidth;
-			obj.cols = 2;
-			temp2 = obj.offsetWidth;
-			characterWidth = temp2 - temp1;
-			obj.cols = tempCols;
+            obj.cols = 1;
+            temp1 = obj.offsetWidth;
+            obj.cols = 2;
+            temp2 = obj.offsetWidth;
+            characterWidth = temp2 - temp1;
+            obj.cols = tempCols;
 
-			return characterWidth;
-		};
+            return characterWidth;
+        };
 
-		// Manipulations
-		this.style.width = "auto";
-		this.style.height = "auto";
-		this.style.overflow = "hidden";
-		this.style.width = ((characterWidth(this) * this.cols) + 6) + "px";
-		this.onkeyup = grow;
-		this.onfocus = grow;
-		this.onblur = grow;
-		growByRef(this);
-	});
+        // Manipulations
+        this.style.width = "auto";
+        this.style.height = "auto";
+        this.style.overflow = "hidden";
+        this.style.width = ((characterWidth(this) * this.cols) + 6) + "px";
+        this.onkeyup = grow;
+        this.onfocus = grow;
+        this.onblur = grow;
+        growByRef(this);
+    });
 };

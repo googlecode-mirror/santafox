@@ -32,20 +32,20 @@ class data_tree
      */
     private $name_for_cookie = "treecookie";
 
-	/**
-	 * Действие для загрузки дерева
-	 *
-	 * Определяет название действия, которое бужет передаваться в функциию ajax, и использоваться
-	 * для загрузки дерева
-	 * @var string
-	 */
-	private $action_get_data = '';
+    /**
+     * Действие для загрузки дерева
+     *
+     * Определяет название действия, которое бужет передаваться в функциию ajax, и использоваться
+     * для загрузки дерева
+     * @var string
+     */
+    private $action_get_data = '';
 
-	/**
-	 * ID главной ноды
-	 *
-	 * @var string
-	 */
+    /**
+     * ID главной ноды
+     *
+     * @var string
+     */
     private $root_id = 'index';
 
     /**
@@ -55,11 +55,11 @@ class data_tree
      */
     private $root_name = 'Tree';
 
-	/**
-	 * Разрешает/запрещает перенос нод
-	 *
-	 * @var boolean
-	 */
+    /**
+     * Разрешает/запрещает перенос нод
+     *
+     * @var boolean
+     */
     private $drag_and_drop = false;
 
     /**
@@ -90,14 +90,14 @@ class data_tree
      *
      * Пример массива
      * <code>
-	 * 	[1] => array
-	 * 	(
-	 *      [type] Один из 4 возможных типов элемента контекстного меню (context_empty, context_element_normal, context_element_remov, context_element_add)
+     * 	[1] => array
+     * 	(
+     *      [type] Один из 4 возможных типов элемента контекстного меню (context_empty, context_element_normal, context_element_remov, context_element_add)
      * 		[name] Название пункта меню
      * 		[link] ссылка, начинающаяся с ID дейсвтия, выполняемого по клику по пункту меню
      *      [exclude] ID нод, через запятую, где данные пункт меню будет недоступен
      * 		[confirm] Строка предупреждения, перед выполением действия (если не задана, то предупреждение не выводится)
-	 * 	)
+     * 	)
      * </code>
      * @var array
      * @access private
@@ -181,38 +181,38 @@ class data_tree
         $this->is_page_structure = $bool;
     }
 
-	/**
-	 * Конструктр класса
-	 *
-	 * @param string $root_name Имя корневой ноды
-	 * @param string $root_id ID корневой ноды
-	 * @param array $nodes ноды
-	 * @return data_tree
-	 */
-	function __construct($root_name = "", $root_id = "", $nodes = null)
-	{
-	    global $kernel;
+    /**
+     * Конструктр класса
+     *
+     * @param string $root_name Имя корневой ноды
+     * @param string $root_id ID корневой ноды
+     * @param array $nodes ноды
+     * @return data_tree
+     */
+    function __construct($root_name = "", $root_id = "", $nodes = null)
+    {
+        global $kernel;
 
-	    $this->template = $kernel->pub_template_parse('admin/templates/default/tree.html');
-	    $this->set_nodes($nodes);
+        $this->template = $kernel->pub_template_parse('admin/templates/default/tree.html');
+        $this->set_nodes($nodes);
 
-	    if (is_null($this->nodes))
-	    {
+        if (is_null($this->nodes))
+        {
             $this->template['main'] = str_replace('/*%tree_data_url%*/', $this->template['tree_data_url'], $this->template['main']);
             $this->template['main'] = str_replace('"%tree_data_children%"', 'null', $this->template['main']);
-	    }
-	    else
-	    {
+        }
+        else
+        {
             $this->template['main'] = str_replace('/*%tree_data_url%*/', '', $this->template['main']);
             $this->template['main'] = str_replace('"%tree_data_children%"', $kernel->pub_json_encode($this->nodes), $this->template['main']);
-	    }
+        }
 
-	    if ($root_name)
-	        $this->root_name = $root_name;
+        if ($root_name)
+            $this->root_name = $root_name;
 
-	    //Именно так, так как может быть пустой строкой
-	    if ($root_id !== "")
-	        $this->root_id = $root_id;
+        //Именно так, так как может быть пустой строкой
+        if ($root_id !== "")
+            $this->root_id = $root_id;
 
     }
 
@@ -331,12 +331,12 @@ class data_tree
     function contextmenu_action_set($name, $link, $exclude = false, $message_confirm = '', $class = '')
     {
         $this->contextmenu[] = array("type" => "context_element_normal",
-                                     "name" => $name,
-                                     "link" => $link,
-                                     "exclude" => $exclude,
-                                     "confirm" => $message_confirm,
-                                     "class" => $class
-                                     );
+            "name" => $name,
+            "link" => $link,
+            "exclude" => $exclude,
+            "confirm" => $message_confirm,
+            "class" => $class
+        );
     }
 
 
@@ -354,11 +354,11 @@ class data_tree
     function contextmenu_action_remove($name, $link, $exclude = false, $message_confirm = '')
     {
         $this->contextmenu[] = array("type" => "context_element_remov",
-                                     "name" => $name,
-                                     "link" => $link,
-                                     "exclude" => $exclude,
-                                     "confirm" => $message_confirm
-                                     );
+            "name" => $name,
+            "link" => $link,
+            "exclude" => $exclude,
+            "confirm" => $message_confirm
+        );
     }
 
 
@@ -367,7 +367,7 @@ class data_tree
      * @return void
      */
     function contextmenu_delimiter()
-    {//@todo remove
+    {//@todo remove?
         //$this->contextmenu[] = array("type" => "context_empty", "name" => "", "link" => "", "exclude" => "", "confirm" => "");
     }
 
@@ -390,7 +390,6 @@ class data_tree
             $direct_click = "true";
 
         //Сформируем код для котекстного меню
-        //$html_context_menu = $this->template['context_menu_not']; //если нет контекст-меню
         $html_context_menu_function = '';
 
         if (!empty($this->contextmenu))
@@ -400,34 +399,28 @@ class data_tree
             $array_function = array();
             foreach ($this->contextmenu as $element)
             {
-
-                //Создадим функцию, которая будет обрабатывать клик по меню её шаблон
-                //зависит от типа элемента меню, так как возможно нужно выполнять разные
-                //действия
+                //Создадим функцию, которая будет обрабатывать клик по меню
+                //её шаблон зависит от типа элемента меню, так как возможно нужно выполнять разные действия
                 $str = $this->template[$element['type'].'_click_function'];
-
-                $str = str_replace("[#node_exclude#]", $element['exclude'], $str);
-
+                $str = str_replace("%node_exclude%", $element['exclude'], $str);
                 //Если нужно - вставим обвязку для вопроса, внутри которой снова появляется [#action#]
                 //Конфирм общий, и не зависит от типа меню
                 if (!empty($element['confirm']))
-                	$str = str_replace("[#action#]", $this->template['message_confirm'], $str);
+                    $str = str_replace("//%action%", $this->template['message_confirm'], $str);
 
                 //Теперь по-любому добавляем действие
-                $str = str_replace("[#action#]", $this->template[$element['type'].'_context_action'], $str);
-                $str = str_replace("[#name#]"        , $element['name']   , $str);
-                $str = str_replace("[#class#]"        , $element['class']   , $str);
+                $str = str_replace("//%action%", $this->template[$element['type'].'_context_action'], $str);
+                $str = str_replace("%name%", $element['name'], $str);
+                $str = str_replace("%class%", $element['class'], $str);
                 //Ну теперь заменим имеющиеся переменные в получившемся коде
-                $str = str_replace("[#link_orig#]", $element['link'], $str);
-                $str = str_replace("[#link#]", $kernel->pub_redirect_for_form($element['link'], $this->relativ_url), $str);
-
-                $str = str_replace("[#confirm#]", $element['confirm'], $str);
+                $str = str_replace("%link_orig%", $element['link'], $str);
+                $str = str_replace("%link%", $kernel->pub_redirect_for_form($element['link'], $this->relativ_url), $str);
+                $str = str_replace("%confirm%", $element['confirm'], $str);
                 $array_function[] = $str;
                 $i++;
             }
             if (count($array_function) > 0)
                 $html_context_menu_function = ",".join(',',$array_function);
-
         }
 
         //Путь для получения данных о структуре и выполнении различных жействий
@@ -444,48 +437,45 @@ class data_tree
             //загрузить интерфейс формы, так как его ещё точно нет
             if ($this->is_page_structure)
             {
-            	$def_link = 'start_interface.link_go("'.$this->action_node.'&id="+sel_node);';
+                $def_link = $this->template['click_node_default'];
+                $def_link = str_replace('%action_node%', $this->action_node, $def_link);
             }
         }
 
         $treeID = $this->get_tree_ID();
         //Сформируем непосредственно дерево
         $html = $this->template['main'];
-        $html = str_replace("%tree_id%"   , $treeID,   $html);
-        $html = str_replace("[#root_name#]"   , $this->root_name,   $html);
-        $html = str_replace("[#root_id#]"     , $this->root_id,     $html);
-        $html = str_replace("[#data_url#]"    , $data_url,          $html);
-
-        $html = str_replace("[#not_click#]"   , $notclick,          $html);
-        $html = str_replace("true/*[#direct_click#]*/", $direct_click,      $html);
-        $html = str_replace("/*[#node_default#]*/", $this->node_default, $html);
+        $html = str_replace("%tree_id%", $treeID, $html);
+        $html = str_replace("%root_name%", $this->root_name, $html);
+        $html = str_replace("%root_id%", $this->root_id, $html);
+        $html = str_replace("%data_url%", $data_url, $html);
+        //$html = str_replace("%not_click%", $notclick, $html);
+        $html = str_replace("true/*%direct_click%*/", $direct_click, $html);
+        $html = str_replace("//%node_default%", $this->node_default, $html);
 
         //Настройки drag&drop, меняются 3 части шаблона
         if ($this->drag_and_drop)
         {
-            $html = str_replace("/*[#dnd_enabled#]*/", $this->template['dnd_enabled'], $html);
-            $html = str_replace("/*[#dnd_action1#]*/", $this->template['dnd_action1'], $html);
-            $html = str_replace("/*[#dnd_action2#]*/", $this->template['dnd_action2'], $html);
+            $html = str_replace("//%dnd_enabled%", $this->template['dnd_enabled'], $html);
+            $html = str_replace("//%dnd_action1%", $this->template['dnd_action1'], $html);
+            $html = str_replace("//%dnd_action2%", $this->template['dnd_action2'], $html);
         }
         else
         {
-            $html = str_replace("/*[#dnd_enabled#]*/", "", $html);
-            $html = str_replace("/*[#dnd_action1#]*/", "", $html);
-            $html = str_replace("/*[#dnd_action2#]*/", "", $html);
+            $html = str_replace("//%dnd_enabled%", "", $html);
+            $html = str_replace("//%dnd_action1%", "", $html);
+            $html = str_replace("//%dnd_action2%", "", $html);
         }
-        $html = str_replace("[#move_url#]", $move_url, $html);
-
-        $html = str_replace("/*[#context_menu_functions#]*/", $html_context_menu_function, $html);
-
-        //Обычный клик по ноде будет вызывать перегрузку сентрaльного блока
-        $link = 'start_interface.link_go("'.$this->action_node.'&id=" + currNodeId);';
-        //А вот если это работа со структурой, то всё сложнее, так как нужно только обновить уже загруженную форму
+        $html = str_replace("%move_url%", $move_url, $html);
+        $html = str_replace("//%context_menu_functions%", $html_context_menu_function, $html);
         if ($this->is_page_structure)
-            $link = 'structure_tree_click_node("'.$this->action_node.'&id=" + currNodeId);';
-
-        $html = str_replace("/*[#linkmenu#]*/"  , $link, $html);
-        $html = str_replace("/*[#click_node_default#]*/" , $def_link                      , $html);
-        $html = str_replace("%cookie_name_tree%"     , $this->name_for_cookie , $html);
+            $link = $this->template['linkmenu_struct'];
+        else
+            $link = $this->template['linkmenu'];
+        $link = str_replace('%action_node%',$this->action_node,$link);
+        $html = str_replace("//%linkmenu%", $link, $html);
+        $html = str_replace("//%click_node_default%", $def_link, $html);
+        $html = str_replace("%cookie_name_tree%", $this->name_for_cookie , $html);
 
         //И последнее, вставим признак необходимости выставлять дефолтную ноду, или ноду из кук
         //Это можно делать только в том случае, если текущего пункта левого меню нет вообще

@@ -141,11 +141,6 @@
         }
     });
 
-    if($('#structure_page_name').length)
-    {
-        $("#contentLoading").hide();
-        $("#structure_page_name").html('"<a href="/'+$('#fieldPageID').val()+'.html" class="link2page" target="_blank" title="Откроется в новом окне">'+$('#fieldPageName').val()+'</a>"');
-    }
 </script>
 
 <!-- page name -->
@@ -153,7 +148,7 @@
 Страница: <span id="structure_page_name"></span>
 </span>
 <!-- page container -->
-<div id="page_container">
+<div id="page_container" style="display: none;">
     <div id="content_container">
         <!-- page tabs -->
         <div id="page_tabs">
@@ -168,20 +163,19 @@
         <form id="struct_form">
             <!-- метки  -->
             <div id="table_metki" class="content">
-             <table id="metki_table" cellpadding="2" cellspacing="3">
-              <thead>
-               <tr class="nohover">
-                <th class="metka_name">Название метки</th>
-                <th>Наследование</th>
-                <th>Действие для метки</th>
-                <th>Редактор</th>
-                <th>Постпроцессоры</th>
-               </tr>
-              </thead>
-              <tbody id="table_metki_content">
-              
-              </tbody>
-             </table>
+                <table id="metki_table" cellpadding="2" cellspacing="3">
+                    <thead>
+                    <tr class="nohover">
+                        <th class="metka_name">Название метки</th>
+                        <th>Наследование</th>
+                        <th>Действие для метки</th>
+                        <th>Редактор</th>
+                        <th>Постпроцессоры</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table_metki_content">
+                    </tbody>
+                </table>
             </div>
 
             <div id="page_prop_label_prop" class="content">
@@ -224,8 +218,6 @@
                 %str_prop_modul%
             </div>
 
-
-
             <fieldset class="page_submit_field">
                 <input type="button" id="admin_struct_savebutton" class="submit_btn" value="[#structure_page_properties_button_save#]"/>
             </fieldset>
@@ -235,12 +227,9 @@
 </div><!-- end of page container -->
 
 <script type="text/javascript">
-    $( "input:button").button();
-    $('#page_tabs').parent().tabs();
-
-    $('#content_container select').selectmenu({
+    $("#content_container").find("input:button").button();
+    $('#content_container').find('select').selectmenu({
         style:'dropdown',
         maxHeight: 200
     });
-    beforeStructureChange();
 </script>

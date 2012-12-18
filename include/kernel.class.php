@@ -1479,8 +1479,8 @@ class kernel
             }
         }
 
-        if ($is_backoffice)
-            $html = $this->priv_page_textlabels_replace($html);
+        //if ($is_backoffice)
+        //    $html = $this->priv_page_textlabels_replace($html);
         print $html;
     }
 

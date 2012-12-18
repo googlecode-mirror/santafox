@@ -1386,7 +1386,7 @@ class kernel
      * Конечный метод, который вызывается для вывода сформированной страницы сайта
      * на экран пользователя
      * @param string $html
-     * @param boolean $for_edit Если true - то значит это вывод в редактор котнента и не нужно делать ряд вещей
+     * @param boolean $for_edit Если true - то значит это вывод в редактор контента и не нужно делать ряд вещей
      * @param boolean $js_encode
      * @access private
      * @return string
@@ -1479,8 +1479,8 @@ class kernel
             }
         }
 
-        //if ($is_backoffice)
-        //    $html = $this->priv_page_textlabels_replace($html);
+        if ($is_backoffice && !$for_edit)
+            $html = $this->priv_page_textlabels_replace($html);
         print $html;
     }
 

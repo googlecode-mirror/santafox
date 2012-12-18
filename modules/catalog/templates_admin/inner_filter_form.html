@@ -108,7 +108,6 @@
 </div>
 
 <script type="text/javascript">
- $("input:submit, input:button, button").button();
  $('#cattype').change(function(){
      console.log('cattype: '+$(this).val());
      if ($(this).val()!='selected')
@@ -118,16 +117,11 @@
 
  });
 
- $('#content_container select').selectmenu({
-   style:'dropdown',
-   maxHeight: 200
- });
-
-	function show_filter_results()
-	{
-        santaUpdateRegion('filter',start_interface.global_link + 'test_filter&id=%id%');
-        return false;
-	}
+ function show_filter_results()
+ {
+    santaUpdateRegion('filter',start_interface.global_link + 'test_filter&id=%id%');
+    return false;
+ }
 
  $('#inner_form_cats ul li ul').css({'display':'none'});
  $('#inner_form_cats ul li b').css({'cursor':'pointer'});

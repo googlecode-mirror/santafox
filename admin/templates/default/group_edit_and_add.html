@@ -1,7 +1,5 @@
 <!-- @main -->
 <script language="javascript">
-$('input:button').button();
-
 $('#admin_group_savebutton').click(function(){
         var postArr = $('#admin_form_group_edit').serializeArray();
         $.post('[#form_action#]', postArr,  function(data){

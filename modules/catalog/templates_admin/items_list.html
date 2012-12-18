@@ -1,19 +1,12 @@
 <!-- @header -->
 <script type="text/javascript">
  var ccontainer=$('#content_container');
- ccontainer.find("input:submit, input:button, button").button();
-
  ccontainer.find('.searchbtn').button({
    icons: { primary: "ui-icon-search" }
  });
 
  ccontainer.find('.checkallbtn').button({
    icons: { primary: "ui-icon-check" }
- });
-
- ccontainer.find('select').selectmenu({
-   style:'dropdown',
-   maxHeight: 200
  });
 
  function groupSelectChange()
@@ -28,13 +21,13 @@
 
  function checkall()
  {
-     $('form#scif input[type=checkbox]').attr('checked','checked');
+     $('#scif').find('input[type=checkbox]').attr('checked','checked');
      return false;
  }
 
  function uncheckall()
  {
-     $('form#scif input[type=checkbox]').removeAttr('checked');
+     $('#scif').find('input[type=checkbox]').removeAttr('checked');
      return false;
  }
 

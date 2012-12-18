@@ -19,25 +19,18 @@
 
 <!-- @header -->
 <script type="text/javascript">
- $("input:button").button();
- 
- $('div.content select').selectmenu({
-   style:'dropdown',
-   maxHeight: 200
- });
- 
  function selectChange()
  {
-  if ($('#stype').val()=='enum')
-  {
-  	   $('#prop_addon').html($('#enum_for_add').html());
-       $('#prop_addon').css('display','block');
-  }
-  else
-  {
-      $('#prop_addon').css('display','none');
-      $('#prop_addon').html('');
-  }
+     if ($('#stype').val()=='enum')
+     {
+  	     $('#prop_addon').html($('#enum_for_add').html());
+         $('#prop_addon').css('display','block');
+     }
+     else
+     {
+        $('#prop_addon').css('display','none');
+        $('#prop_addon').html('');
+     }
  }
 
  function pict_on_off(id_object)

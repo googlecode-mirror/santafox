@@ -1,12 +1,5 @@
 <!-- @table_header -->
-<script type="text/javascript">
-    $( "input:submit").button();
 
-    $('#content_container select').selectmenu({
-        style:'dropdown',
-        maxHeight: 200
-    });
-</script>
 <span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#comments_base_name#]</span></span>
 <div id="page_container">
     <div id="content_container">
@@ -68,7 +61,6 @@
             </form>
 
             <script type="text/javascript">
-                $( "input:button").button();
                 $(function() {
                     $("#startDate").datepicker({dateFormat:"yy.mm.dd"});
                     $("#endDate").datepicker({dateFormat:"yy.mm.dd"});

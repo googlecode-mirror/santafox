@@ -1,15 +1,8 @@
 <!-- @header -->
 <script type="text/javascript">
     var ccontainer = $('#content_container');
-    ccontainer.find("input:submit, input:button, button").button();
-
     ccontainer.find('.checkallbtn').button({
         icons:{ primary:"ui-icon-check" }
-    });
-
-    ccontainer.find('select').selectmenu({
-        style:'dropdown',
-        maxHeight: 200
     });
 
     function add_new_item() {
@@ -17,11 +10,11 @@
     }
 
     function checkall() {
-        $('form#savecategoryitemsform input[type=checkbox]').attr('checked', 'checked');
+        $('#savecategoryitemsform input[type=checkbox]').attr('checked', 'checked');
     }
 
     function uncheckall() {
-        $('form#savecategoryitemsform input[type=checkbox]').removeAttr('checked');
+        $('#savecategoryitemsform input[type=checkbox]').removeAttr('checked');
     }
 </script>
 

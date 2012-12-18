@@ -28,7 +28,11 @@ function santaUpdateRegion(regid, loadFrom,opts)
         opts={};
     opts.url=loadFrom;
     opts.error=function(err) {reg.html("Load error: "+err)};
-    opts.success=function(result) {reg.empty().html(result)};
+    opts.success=function(result) {
+        reg.empty().html(result);
+        if (regid=='content')
+            onMainContentLoaded();
+    };
     $('#popup_div').css('display','none');
     var reg=$("#"+regid);
     reg.html('<span id="contentLoading">Loading...</span>');
@@ -470,6 +474,19 @@ function onPageInfoblockLoad()
     }
 
 }
+
+function onMainContentLoaded()
+{
+    var mc=$("#content_container");
+    mc.find("button").button();
+    mc.find("input:button").button();
+    mc.find("input:submit").button();
+    mc.find('select').selectmenu({
+        style:'dropdown',
+        maxHeight: 200
+    });
+}
+
 function beforeStructureChange()
 {
     $('#content_header').before('<span id="contentLoading">Loading, Please wait..</span>');

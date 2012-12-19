@@ -3834,6 +3834,140 @@ class kernel
 		return $newname;
     }
 
+
+    /**
+     * @param array $file - массив для одного файла из $_FILE
+     * @param string $save_path путь, куда сохраняем
+     * @param array $thumb_settings массив настроек tn-изображения
+     * @param array $big_settings массив настроек изображения
+     * @param array $source_settings массив настроек src-изображения
+     * @return bool|string
+     */
+    public function save_uploaded_image($file, $save_path, $thumb_settings=array(), $big_settings=array(), $source_settings = array())
+    {
+        if (!$file|| !isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name']))
+            return false;
+        $ufile=$file['tmp_name'];
+        $paths2close = array();
+        //Перед тем, как начинать преобразование, возможно надо открыть папку для записи
+        //так как она могла быть переписана по FTP и тогда скрипт не сможет сюда писать
+        if (!is_writable($save_path))
+        {
+            $this->pub_ftp_dir_chmod_change($save_path);
+            $paths2close[]=$save_path;
+        }
+        if (!is_writable($save_path."/tn"))
+        {
+            $this->pub_ftp_dir_chmod_change($save_path."/tn");
+            $paths2close[]=$save_path."/tn";
+        }
+        if (!is_writable($save_path."/source"))
+        {
+            $this->pub_ftp_dir_chmod_change($save_path."/source");
+            $paths2close[]=$save_path."/source";
+        }
+        $this->priv_set_memory_for_image($ufile);
+        list($width,$height,$itype) = getimagesize($ufile);
+        if (!$width)
+            return false;
+
+        if ($itype == IMAGETYPE_GIF)
+        {
+            $ext = ".gif";
+            $im = ImageCreateFromGIF($ufile);
+        }
+        elseif ($itype == IMAGETYPE_PNG)
+        {
+            $ext = ".png";
+            $im = ImageCreateFromPNG($ufile);
+        }
+        else
+        {
+            $ext = ".jpg";
+            $im = ImageCreateFromJPEG($ufile);
+        }
+        //Определим имя файла
+        $origFilename=pathinfo($file['name'],PATHINFO_FILENAME);
+        $origFilename=$this->pub_translit_string($origFilename);//в транслит
+        $origFilename = str_replace('.','_',$origFilename);
+        $origFilename = preg_replace('~([^\da-z_-]+)~i','',$origFilename); //оставим только символы из набора
+        if (!$origFilename)
+            $origFilename = date("Y_m_d");
+        $newname=$origFilename.$ext;
+        $n=1;
+        while (file_exists($save_path."/".$newname) || file_exists($save_path."/tn/".$newname) || file_exists($save_path."/source/".$newname))
+        {
+            $newname=$origFilename.++$n.$ext;
+        }
+        $file_big   = $save_path."/".$newname;
+        $file_small = $save_path."/tn/".$newname;
+        $file_surce = $save_path."/source/".$newname;
+        if (!is_resource($im))
+            return false;
+
+        //Создаём маленькое изображение
+        if ($thumb_settings)
+        {
+            $im_small = $this->pub_image_resize_to($im, $thumb_settings);
+            if ($im_small)
+            {
+                if ($itype == IMAGETYPE_PNG)
+                    ImagePNG($im_small , $file_small);
+                elseif ($itype == IMAGETYPE_GIF)
+                    ImageGIF($im_small , $file_small);
+                else
+                    ImageJPEG($im_small, $file_small, 95);
+
+                ImageDestroy($im_small);
+                chmod ($file_small, $this->priv_chmod_limit_get());
+            }
+        }
+        //Если $big, то сохраняем и большую картинку
+        if ($big_settings)
+        {
+            //Создадим большое изображение
+            $im_big = $this->pub_image_resize_to($im, $big_settings, $big_settings);
+            if ($im_big)
+            {
+                if ($itype == IMAGETYPE_GIF)
+                    ImageGIF($im_big , $file_big);
+                elseif ($itype ==  IMAGETYPE_PNG)
+                    ImagePNG($im_big , $file_big);
+                else
+                    ImageJPEG($im_big, $file_big, 85);
+                ImageDestroy($im_big);
+                chmod ($file_big, $this->priv_chmod_limit_get());
+            }
+        }
+
+        //И самое последние, если надо то исправим исходное изображение
+        if ($source_settings)
+        {
+            //Создадим большое изображение
+            $im_source = $this->pub_image_resize_to($im, $source_settings, $big_settings);
+            if ($im_source)
+            {
+                if ($itype == IMAGETYPE_GIF)
+                    ImageGIF($im_source , $file_surce);
+                elseif ($itype == IMAGETYPE_PNG)
+                    ImagePNG($im_source , $file_surce);
+                else
+                    ImageJPEG($im_source, $file_surce, 85);
+                ImageDestroy($im_source);
+                chmod ($file_surce, $this->priv_chmod_limit_get());
+            }
+        }
+        elseif (!is_null($source_settings)) //просто копируем не изменяя
+            $this->pub_file_copy($ufile, $save_path."/source/".$newname, false, false);
+
+        imagedestroy($im);
+        foreach($paths2close as $path2close)
+        {
+            $this->pub_ftp_dir_chmod_change($path2close);
+        }
+        return $newname;
+    }
+
     /** Проверяет email-адрес на валидность
      * @param  $email
      * @return boolean
@@ -5569,11 +5703,8 @@ class kernel
         // ...и копируем туда уменьшенное изображение
         imagecopyresampled($image_new, $source, 0,0, $offset_x, $offset_y, $size['width'], $size['height'], $source_w, $source_h);
 
-        //$this->debug($watermark_image, true);
-		if ($watermark_image != 0)
-		{
+		if ($watermark_image)
 	        $image_new=$this->pub_add_watermark2image($image_new, $watermark_image, $size);
-		}
         return $image_new;
     }
     /**

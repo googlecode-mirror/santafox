@@ -169,7 +169,7 @@ function santaFormSubmitSuccess(responseText, statusText, xhr, form)
 {
     if (parseInt(responseText.errore_count) > 0)
     {
-        santaShowPopupHint("Error", post_res.errore_text,0);
+        santaShowPopupHint("Error", responseText.errore_text,0);
         return;
     }
     //Значит ошибок небыло и нужно вывести сообщение с результатом...

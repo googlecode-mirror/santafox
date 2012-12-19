@@ -27,7 +27,14 @@ function santaUpdateRegion(regid, loadFrom,opts)
     if (typeof  opts === "undefined")
         opts={};
     opts.url=loadFrom;
-    opts.error=function(err) {reg.html("Load error: "+err)};
+    opts.error=function(jqXHR, textStatus, errorThrown) {
+        var msg='';
+        if (textStatus)
+            msg+=textStatus;
+        if (errorThrown)
+            msg+=" "+errorThrown;
+        reg.html(msg)
+    };
     opts.success=function(result) {
         reg.empty().html(result);
         if (regid=='content')
@@ -158,13 +165,42 @@ function jspub_disabled_change(elem1ID,elem2ID)
     }
 }
 
+function santaFormSubmitSuccess(responseText, statusText, xhr, form)
+{
+    if (parseInt(responseText.errore_count) > 0)
+    {
+        santaShowPopupHint("Error", post_res.errore_text,0);
+        return;
+    }
+    //Значит ошибок небыло и нужно вывести сообщение с результатом...
+    var msg_label = responseText.result_label;
+    var msg = responseText.result_message;
+    var timeout=3;//по-умолчанию таймаут 3 секунды
+    if (responseText.hasOwnProperty('msg_timeout'))
+        timeout=responseText.msg_timeout;
+    if (msg != "")
+        santaShowPopupHint(msg_label, msg,timeout*1000);
+    //...и возможно перейти на другой пункт меню
+    var id_link =  responseText.redirect;
+    if (id_link != "")
+        jspub_click(id_link);
+}
+
+function santaFormSubmit(formID)
+{
+    var foptions={
+        success: santaFormSubmitSuccess,
+        dataType:  'json'
+    };
+    $('#'+formID).ajaxSubmit(foptions);
+}
+
 /**
  * Производит отправку формы
  *
  * @param formID ID HTML объекта FORM, которую отправляем
  * @param url URL, на который осуществляем отсылку
  */
-
 function jspub_form_submit(formID, url)
 {
     //different variants: http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery

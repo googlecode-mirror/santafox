@@ -21,6 +21,9 @@
 <!-- tree js -->
 <script type="text/javascript" src="/admin/js/jquery.jstree.js"></script>
 
+
+<script type="text/javascript" src="/admin/js/jquery.form.js"></script>
+
 <!-- content editors js -->
 <script type="text/javascript" src="/components/html_editor/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/components/html_editor/ckeditor/adapters/jquery.js"></script>
@@ -119,7 +122,7 @@ var start_interface = function () {
             return true;
         },
 
-        //Убирает ывделение текущего ппункта меню со всего меню
+        //Убирает ывделение текущего пункта меню со всего меню
         left_menu_clear_select: function () {
             if (this.left_menu_element_select != null)
                 $(this.left_menu_element_select).removeClass('left_menu_select').addClass('left_menu');
@@ -133,11 +136,6 @@ var start_interface = function () {
 
         //Загрузка контента при клике по левому элементу меню
         left_menu_click: function (el, query) {
-            //Прежде проверим, может есть дерево и при клике
-            //по пункту левого меню нужно убрать выделение с текущей ноды
-            //if (this.select_node != null) // @todo fix here
-            //	this.select_node.unselect();
-
             //Выберем все элементы и проставим им обычный класс
             //а текущему элементу проставим класс того что он выбран
             if (this.left_menu_element_select != null)
@@ -158,9 +156,7 @@ var start_interface = function () {
         //А теперь загрузим контент в нужную часть
 
         link_go: function (str_link) {
-            console.log('link_go: '+this.global_link +str_link);
             santaUpdateRegion('content', this.global_link + str_link);
-
         },
         // Функция для формирования дебага
         show_console_info: function (content_console) {
@@ -271,27 +267,12 @@ var start_interface = function () {
             $('#modules_toolbar').html(modsHtml);
             $('#modules_toolbar select.modselect').modmenu();
 
-            $('select.modselect').bind("click", function (e) {
-                alert('click1 ');
-                var selectedModuleID = this.value;
-                //alert('click, new val: '+selectedModuleID);
-                this.modules_element_select = this.parent;
-                //santaUpdateRegion('west', "index.php?section=" + selectedModuleID + "&action=get_left_menu");
-            });
-
-            //вызывается только при изменении! - если значение прежнее - нет вызова
             $('select.modselect').bind("change", function (e) {
-
+                $('#main_menu').find('a.main_menu_select').removeClass('main_menu_select');
                 var selectedModuleID = this.value;
-                //alert('changed, new val: '+selectedModuleID);
                 this.modules_element_select = this.parent;
                 santaUpdateRegion('west', "index.php?section=" + selectedModuleID + "&action=get_left_menu");
             });
-            //select mod handler = function(item){this.modules_tab_click(item, null);}
-            /*$("#west").resizable({
-             maxWidth: 400,
-             minWidth: 200
-             });*/
 
             //---------- Создание левой менюшки -------------------
             //Обновление контента левой, и центральной части, значение секции не указывается

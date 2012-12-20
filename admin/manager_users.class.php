@@ -301,7 +301,7 @@ class manager_users
         	$sql = "INSERT INTO `".$kernel->pub_prefix_get()."_admin_trace`
         	        (`id_admin`,`time`,`place`,`ip`,`host`)
         	        VALUES
-        	        ('".$id."','','','','')";
+        	        ('".$id."',NOW(),'','','')";
         	$kernel->runSQL($sql);
 
         	//И теперь надо поработать с группами

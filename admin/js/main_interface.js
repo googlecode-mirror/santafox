@@ -420,8 +420,10 @@ function start_include_content(name_area)
         name_area = 'content_html';
     var config =
     {
-        skin : 'kama',
+        skin : 'moono',
         autoUpdateElement:true,
+        width: '100%',
+        height: '100%',
         filebrowserBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
         filebrowserImageBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=images',
         filebrowserFlashBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
@@ -435,7 +437,7 @@ function start_include_content(name_area)
         ImageUpload:false,
         FlashUpload:false,
         language:'ru',
-        toolbar_Full: [
+        toolbar: [
             ['Source','-','Preview'],
             ['Cut','Copy','Paste','PasteText','PasteFromWord'],
             ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
@@ -449,14 +451,16 @@ function start_include_content(name_area)
             ['Styles','Format','Font','FontSize'],
             ['TextColor','BGColor'],
             ['Maximize', 'ShowBlocks']
-        ]
+        ],
         //close_on_save:[#close_on_save#]
     };
-    //убираем предыдущий instance, если есть
-    var inst = CKEDITOR.instances[name_area];
-    if (inst)
-        inst.destroy(true);
-    $('#'+name_area).ckeditor(config);
+    /*убираем предыдущий instance, если есть
+     var inst = CKEDITOR.instances[name_area];
+     if (inst)
+     inst.destroy(true);
+     $('#'+name_area).ckeditor(config);*/
+
+    CKEDITOR.replace( ''+name_area+'', config);
     return true;
 }
 

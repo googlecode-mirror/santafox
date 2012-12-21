@@ -28,19 +28,21 @@
         language:'ru',
         on: { 'instanceReady': function (evt) { evt.editor.execCommand('maximize'); }},
         toolbar: [
-            ['Source','-','AjaxSave','Preview'],
-            ['Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['Source','Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['Image','Flash','Table','HorizontalRule','SpecialChar','PageBreak'],
+            ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
             ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
+
             '/',
             ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-            ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
+
             ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
             ['Link','Unlink','Anchor'],
-            ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
-            '/',
+
+            // '/',
             ['Styles','Format','Font','FontSize'],
             ['TextColor','BGColor'],
-            ['ShowBlocks']
+            ['Maximize', 'ShowBlocks']
         ],
         close_on_save:[#close_on_save#]
     };

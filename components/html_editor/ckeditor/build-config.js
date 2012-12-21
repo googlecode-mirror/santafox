@@ -93,6 +93,6 @@ var CKBUILDER_CONFIG = {
 		'about' : 1
 	},
 	languages : {
-		'ru' : 1,
+		'ru' : 1
 	}
 };

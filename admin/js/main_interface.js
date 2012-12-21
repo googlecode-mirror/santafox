@@ -413,7 +413,7 @@ function form_submit_include_content(name_area)
     return true;
 }
 
-// Функция используется в шаблоне main.html активации редактора контента
+// для редактора контента, встроенного в страницу
 function start_include_content(name_area)
 {
     if (!name_area)
@@ -438,16 +438,18 @@ function start_include_content(name_area)
         FlashUpload:false,
         language:'ru',
         toolbar: [
-            ['Source','-','Preview'],
-            ['Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['Source','Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['Image','Flash','Table','HorizontalRule','SpecialChar','PageBreak'],
+            ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
             ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
+
             '/',
             ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-            ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
+
             ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
             ['Link','Unlink','Anchor'],
-            ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
-            '/',
+
+           // '/',
             ['Styles','Format','Font','FontSize'],
             ['TextColor','BGColor'],
             ['Maximize', 'ShowBlocks']

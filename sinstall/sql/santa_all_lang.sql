@@ -2306,3 +2306,5 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_list_group_items_count_lab
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_groups_list_delete_only_empty',NULL,'Удалить возможно только товарную группу без товаров');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_groups_list_delete_only_empty',NULL,'Удалить возможно только товарную группу без товаров');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ua','catalog_groups_list_delete_only_empty',NULL,'Удалить возможно только товарную группу без товаров');
+
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','common_edit_property_pict_transparency',NULL,'Прозрачность водяного знака, %');

@@ -1,13 +1,10 @@
 <!-- @form_user -->
-<script type="text/javascript">
- $("input:button").button();
-</script>
-<span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#auth_modul_base_name#]</span></span>
+<span class="content_header" xmlns="http://www.w3.org/1999/html">[#admin_module_label#] &rarr; <span class="black">[#auth_modul_base_name#]</span></span>
 <div id="page_container">
  <div id="content_container">
   <div class="content">
    <h3>[#auth_users_list_buttom1#] / [#auth_users_list_action1#]</h3>
-   <form action="" method="post" id="edit_user">
+   <form action="%url%" method="post" id="edit_user">
    <div id="sel_group" style="position:absolute; display:none;"></div>
    
    <span class="header_block">[#auth_users_edit_user_label1#]</span>
@@ -54,19 +51,58 @@
    %str_fields_group%
    
    <fieldset class="page_submit_field">
-    <input type="button" value="[#auth_users_edit_user_action_save#]" onclick="jspub_form_submit('edit_user','%url%')">
+       <input type="button" value="[#auth_users_edit_user_action_save#]" onclick="santaFormSubmit('edit_user');">
+       %init_button%
    </fieldset>
   </form>
-
 </div>
 </div>
 </div>
 
-<!-- @form_line -->
-    <fieldset %class_str%>
-      <label for="fields_%id%">%caption% <small style="color:#999; font-weight:normal;">%only_admin%</small></label>
-      <input type="text" id="fields_%id%" name="fields_%id%" value="%value%">
-    </tr>
+<!-- @init_button -->
+<input type="button" value="[#auth_verify_and_save_user#]" onclick="$('#edit_user').append('<input type=\'hidden\' name=\'inituser\' value=\'1\'>');santaFormSubmit('edit_user');">
+<!-- @form_line_date -->
+<fieldset>
+    <label>%caption%<font size="-4" color="#999999">%only_admin%</font></label>
+    <input type="text" name="fields_%id%" value="%value%" class="text" style="width:60px;"> [#auth_dateformat_sample#]
+</fieldset>
+<!-- @form_line_image -->
+<fieldset>
+    <label>%caption%<font size="-4" color="#999999">%only_admin%</font></label>
+    <img src="%value%" /><a href="#" onclick="jspub_confirm('user_field_clear&type_field=image&userid=%userid%&fieldid=%id%','[#auth_clear_img_confirm#]');"><img src="/admin/templates/default/images/icon_delet.gif" alt="delete" /></a>
+</fieldset>
+<!-- @form_line_image_empty -->
+<fieldset>
+    <label>%caption%<font size="-4" color="#999999">%only_admin%</font></label>
+    <input name="fields_%id%" type="file" class="text">
+</fieldset
+<!-- @form_line_select_option_selected -->
+<option value="%k%" selected>%v%</option>
+<!-- @form_line_select_option -->
+<option value="%k%">%v%</option>
+<!-- @form_line_select -->
+<fieldset>
+    <label>%caption%<font size="-4" color="#999999">%only_admin%</font></label>
+    <select name="fields_%id%" class="text">
+        <option value="">[#auth_user_field_empty_option#]</option>
+        %options%
+    </select>
+</fieldset>
+<!-- @form_line_html -->
+<fieldset>
+    <label>%caption%<font size="-4" color="#999999">%only_admin%</font></label>
+    <textarea name="fields_%id%" class="text">%value%</textarea>
+</fieldset>
+<!-- @form_line_text -->
+<fieldset>
+    <label>%caption%<font size="-4" color="#999999">%only_admin%</font></label>
+    <textarea name="fields_%id%" class="text">%value%</textarea>
+</fieldset>
+<!-- @form_line_string -->
+<fieldset>
+    <label>%caption%<font size="-4" color="#999999">%only_admin%</font></label>
+    <input type="text" name="fields_%id%" value="%value%" class="text">
+</fieldset>
 <!-- @form_line_group -->
   <fieldset %class_str%>
     <label for="dirs%id%">%name%</label>
@@ -74,14 +110,20 @@
   </fieldset>
 
 <!-- @begin -->
-<script type="text/javascript">
- $("input:button").button();
-</script>
+
+
+
 <span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#auth_modul_base_name#]</span></span>
 <div id="page_container">
  <div id="content_container">
   <div class="content">
   <h3>[#auth_users_list#]</h3>
+
+      <form action="%search_action%" method="post" id="slogin_form" name="slogin_form">
+          <label style="width: 150px;">[#auth_search_by_login#]:</label> <input type="text" name="slogin">
+          <input type="button" value="[#auth_search_by_login_do_search#]" onclick="santaFormSubmit('slogin_form');">
+      </form>
+      <br>
   
    <table class="admin_table">
       <tr>

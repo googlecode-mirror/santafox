@@ -9,7 +9,7 @@ $il['auth_user_tpl']	= 'Шаблон';
 //$il['auth_module_label_propertes1'] = 'Количество возможных скидок';
 //$il['auth_module_label_propertes2'] = 'Страница корзины';
 //$il['auth_module_label_propertes3'] = '';
-$il["auth_admin_leftmenu_caption"] = "Управ. пользователями";
+$il["auth_leftmenu_caption"] = "Управ. пользователями";
 
 //работа с группами
 $il["auth_group_list"]  = "Управление группами";
@@ -89,4 +89,52 @@ $il['auth_protect_dir_button'] = 'OK';
 $il['auth_protect_dir_caption'] = 'Введите папку, которую требуется защитить (от корня, сначала /)';
 $il['auth_protect_dir_success'] = 'Папка успешно защищена';
 $il['auth_protect_dir_failed']  = 'Ошибка при попытке создать htaccess файл в папке';
-?>
+
+
+
+$il['auth_menu_user_fields']  = 'Поля пользователей';
+$il['auth_add_user_field']  = 'Добавить поле';
+$il['auth_user_field_caption']  = 'Название';
+$il['auth_user_field_id']  = 'ID';
+$il['auth_user_field_only_admin']  = 'Только для админа?';
+$il['auth_user_field_type']  = 'Тип';
+$il['auth_user_field_required']  = 'Обязательное?';
+$il['auth_user_field_type_string']  = 'Строка';
+$il['auth_user_field_type_text']  = 'Текст';
+$il['auth_user_field_type_html']  = 'HTML';
+$il['auth_user_field_type_date']  = 'Дата';
+$il['auth_user_field_type_image']  = 'Изображение';
+$il['auth_user_field_type_select']  = 'Набор значений';
+$il['auth_user_field_saved']  = 'Сохранено';
+$il['auth_user_field_save_button']  = 'Сохранить';
+$il['auth_user_field_select_del_option_confirm']  = 'Удалить из набора значение ';
+$il['auth_user_field_select_new_options']  = 'Возможные значения<br>(каждое значение начинается с новой строки)';
+$il['auth_user_field_select_new_option']  = 'Новое значение в набор';
+$il['auth_user_field_select_options']  = 'Возможные значения';
+$il['auth_user_field_delete_confirm']  = 'Действительно удалить поле ';
+$il['auth_pub_show_profile']  = 'Публичное отображение профиля';
+$il['auth_user_field_empty_option']  = '-не выбрано-';
+$il['auth_generate_tpl_filename']  = 'имя файла (новый или существующий, в /modules/auth/templates_user/)';
+$il['auth_generate_do']  = 'Сгенерировать';
+$il['auth_generate_cabinet_label']  = 'Сгенерировать шаблон для кабинета пользователя';
+$il['auth_generate_register_label']  = 'Сгенерировать шаблон для регистрации пользователя';
+$il['auth_generate_cabinet_tpl_tpl_label']  = 'За основу будет взят файл /modules/auth/templates_admin/_tpl_cabinet.html';
+$il['auth_generate_reg_tpl_tpl_label']  = 'За основу будет взят файл /modules/auth/templates_admin/_tpl_reg.html';
+$il['auth_generate_filename_empty_msg']  = 'Ошибка: не задан файл шаблона';
+$il['auth_generate_ok_msg']  = 'Шаблон сгенерирован';
+$il['auth_module_method_myorders']  = 'Мои заказы';
+$il['auth_users_inactive_list']  = 'Неактивированные пользователи';
+$il['auth_search_by_login']  = 'поиск по логину';
+$il['auth_search_by_login_do_search']  = 'искать';
+$il['auth_dateformat_sample']  = 'дд.мм.гггг';
+$il['auth_user_found_msg']  = 'Пользователь найден';
+$il['auth_user_not_found_msg']  = 'Пользователь не найден';
+$il['auth_user_saved_msg']  = 'Пользователь сохранён';
+$il['auth_incorrect_email_msg']  = 'Ошибка - некорректный email';
+$il['auth_verify_and_save_user']  = 'Активировать и сохранить';
+$il['auth_user_activated_msg']  = 'Пользователь активирован и подтерждён';
+$il['auth_clear_img_confirm']  = 'Действительно удалить изображение?';
+$il['auth_error_adding_user']  = 'Ошибка при добавлении пользователя';
+$il['auth_error_adding_user_exists']  = 'Пользователь с таким логином или email уже существует';
+$il['auth_edit_user_field']  = 'Редактирование поля пользователя';
+$il['auth_user_fields_list']  = 'Список полей пользователя';

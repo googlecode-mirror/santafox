@@ -17,7 +17,7 @@ class auth_install extends install_modules
 
 
 	/**
-     * Методы вызывается при деинтсаляции базового модуля. ID базоовго модуля
+     * Методы вызывается при деинсталяции базового модуля. ID базоовго модуля
      * точно известно и определется самим модулем, но он (ID) так же передается в
      * качестве параметра. Здесь необходимо производить удаление каталогов, файлов и таблиц используемых
      * базовым модулем и создаваемых в install
@@ -30,21 +30,25 @@ class auth_install extends install_modules
 
 
 	/**
-     * Методы вызывается, при инсталяции каждого дочернего модуля, здесь необходимо
+     * Методы вызывается при инсталяции каждого дочернего модуля, здесь необходимо
      * создавать таблицы каталоги, или файлы используемые дочерним модулем. Уникальность создаваемых
      * объектов обеспечивается с помощью передвавемого ID модуля
      *
-     * @param string $id_module ID вновь создоваемого дочернего модуля
+     * @param string $id_module ID вновь создаваемого дочернего модуля
      */
 	function install_children($id_module)
 	{
+        global $kernel;
+        $kernel->pub_dir_create_in_images('auth');
+        $kernel->pub_dir_create_in_images('auth/tn');
+        $kernel->pub_dir_create_in_images('auth/source');
 	}
 
 	/**
     * Методы вызывается, при деинсталяции каждого дочернего модуля, здесь необходимо
     * удалять таблицы, каталоги, или файлы используемые дочерним модулем.
     *
-    * @param string $id_module ID удоляемого дочернего модуля
+    * @param string $id_module ID удаляемого дочернего модуля
     */
 	function uninstall_children($id_module)
 	{
@@ -54,8 +58,6 @@ class auth_install extends install_modules
 }
 
 $install = new auth_install();
-
-
 $install->set_name('[#auth_modul_base_name#]');
 $install->set_id_modul('auth');
 $install->set_admin_interface(1);
@@ -66,34 +68,12 @@ $param = new properties_pagesite();
 $param->set_id("id_page_registration");
 $param->set_caption("[#auth_module_method_name1_param1_caption#]");
 $install->add_modul_properties($param);
-unset($param);
 
 //Страница с личным кабинетом
 $param = new properties_pagesite();
 $param->set_id("id_page_cabinet");
 $param->set_caption("[#auth_module_method_name1_param2_caption#]");
 $install->add_modul_properties($param);
-unset($param);
-
-//Параметры страницы, прописываемые модулем
-//$param = new properties_select();
-//$param->set_id("visible");
-//$param->set_caption("[#module_waysite_label_visible#]");
-//$param->set_data(array ("true"=>"[#module_waysite_visible_var1#]","false"=>"[#module_waysite_visible_var2#]"));
-//$install->add_page_properties($param);
-
-
-//Добавим необходимые поля к пользователю сайта
-//
-//$param = new properties_string();
-//$param->set_id("data_b");
-//$param->set_caption("Дата рождения");
-//$install->add_user_properties($param, false, true);
-//
-//$param = new properties_string();
-//$param->set_id("data_b2");
-//$param->set_caption("Дата рождения 2");
-//$install->add_user_properties($param, false, false);
 
 
 //========================================================================================
@@ -109,13 +89,13 @@ $property->set_id('authorize_tpl');
 $property->set_mask('htm,html');
 $property->set_patch('modules/auth/templates_user/');
 $install->add_public_metod_parametrs('pub_show_authorize', $property);
-// Станица регистрации
+// Страница регистрации
 $property = new properties_pagesite();
 $property->set_caption('[#auth_module_method_name1_param1_caption#]');
 $property->set_default('');
 $property->set_id('id_page_registration');
 $install->add_public_metod_parametrs('pub_show_authorize', $property);
-// Станица кабинета
+// Страница кабинета
 $property = new properties_pagesite();
 $property->set_caption('[#auth_module_method_name1_param2_caption#]');
 $property->set_default('');
@@ -173,7 +153,20 @@ $property->set_default('');
 $property->set_id('id_page_cabinet');
 $install->add_public_metod_parametrs('pub_show_info', $property);
 
-//Показываем личные данные
+
+//Отображение публичного профиля
+$install->add_public_metod('pub_show_profile', '[#auth_pub_show_profile#]');
+// Шаблон
+$property = new properties_file();
+$property->set_caption('[#auth_user_tpl#]');
+$property->set_default('modules/auth/templates_user/auth_show_profile.html');
+$property->set_id('info_tpl');
+$property->set_mask('htm,html');
+$property->set_patch('modules/auth/templates_user/');
+$install->add_public_metod_parametrs('pub_show_profile', $property);
+
+
+//Показываем форму восстановления пароля
 $install->add_public_metod('pub_show_remember', '[#auth_module_method_name5#]');
 // Шаблон
 $property = new properties_file();
@@ -183,11 +176,6 @@ $property->set_id('remember_tpl');
 $property->set_mask('htm,html');
 $property->set_patch('modules/auth/templates_user/');
 $install->add_public_metod_parametrs('pub_show_remember', $property);
-
-//Уровни доступа
-//$install->add_admin_acces_label('acces_admin','Доступ в административную часть');
-//$install->add_admin_acces_label('acces_admin2','Доступ в административную часть 2');
-
 
 //То, что ставится автоматически при интсляции базового модуля пока оставим так, как есть...
 //Теперь можно прописать дочерние модули, которые будут автоматически созданы при
@@ -216,4 +204,3 @@ $install->module_copy[0]['action'][3]['properties']['remember_tpl'] = 'auth_show
 $install->module_copy[0]['action'][4]['caption'] = 'Напоминание пароля';
 $install->module_copy[0]['action'][4]['id_metod'] = 'pub_show_remember';
 $install->module_copy[0]['action'][3]['properties']['info_tpl'] = 'auth_show_cab.html';
-?>

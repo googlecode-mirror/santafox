@@ -3398,16 +3398,16 @@ class catalog extends BaseModule
         $_tmp['water_path']  = $kernel->priv_file_full_patch($_tmp['water_path']);
         $_is_add 			 = $kernel->pub_httppost_get($prop['name_db'].'_need_add_big_water');
 
-        if ((isset($_tmp['water_add'])) &&
+        if (isset($_tmp['water_add']) &&
             //(file_exists($_tmp['water_path'])) &&
-            (is_file($_tmp['water_path'])) &&
-            (($_tmp['water_add'] == 1) || (($_tmp['water_add'] == 2) && !empty($_is_add)))
+            is_file($_tmp['water_path']) &&
+            ($_tmp['water_add'] == 1 || ($_tmp['water_add'] == 2 && !empty($_is_add)))
         )
         {
             $watermark_image_big = array(
                 'path' =>  $_tmp['water_path'],
                 'place' => $_tmp['water_position'],
-                'transparency' => 25
+                'transparency' => 25 //@todo use field settings
             );
         }
 
@@ -3427,15 +3427,15 @@ class catalog extends BaseModule
         $_tmp['water_path']    = $kernel->priv_file_full_patch($_tmp['water_path']);
         $_is_add 			   = $kernel->pub_httppost_get($prop['name_db'].'_need_add_source_water');
 
-        if ((isset($_tmp['water_add'])) &&
-            (file_exists($_tmp['water_path'])) &&
-            (($_tmp['water_add'] == 1) || (($_tmp['water_add'] == 2) && !empty($_is_add)))
+        if (isset($_tmp['water_add']) &&
+            file_exists($_tmp['water_path']) &&
+            ($_tmp['water_add'] == 1 || ($_tmp['water_add'] == 2 && !empty($_is_add)))
         )
         {
             $watermark_image_source = array(
                 'path'  => $_tmp['water_path'],
                 'place' => $_tmp['water_position'],
-                'transparency' => 25
+                'transparency' => 25//@todo use field settings
             );
         }
 
@@ -6614,6 +6614,10 @@ class catalog extends BaseModule
         elseif ($prop['type'] == 'pict')
         {
             $addons_param = $this->get_template_block('addons_pict');
+            if (isset($prop['add_param']['big']['water_position']))
+                $prop['add_param']['big']['place']=$prop['add_param']['big']['water_position'];
+            if (isset($prop['add_param']['source']['water_position']))
+                $prop['add_param']['source']['place']=$prop['add_param']['source']['water_position'];
             $addons_param = self::process_image_settings_block($addons_param,$prop['add_param']);
 
             //Общее для всех параметров

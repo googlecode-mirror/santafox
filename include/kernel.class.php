@@ -5573,7 +5573,7 @@ class kernel
     }
 
 
-    function pub_add_watermark2image($image, $watermark_image, $size)
+    public function pub_add_watermark2image($image, $watermark_image, $size)
     {
         $copy = ImageCreateFromGIF($watermark_image['path']);
         $cpx = ImageSx($copy);
@@ -5594,7 +5594,6 @@ class kernel
             // По центру
             case 0:
                 ImageCopyMerge($image, $copy, ($size['width']-$cpx)/2, ($size['height']-$cpy)/2, 0, 0, $cpx, $cpy, $transparency);
-                //die($im);
                 break;
 
             // левый верхний край

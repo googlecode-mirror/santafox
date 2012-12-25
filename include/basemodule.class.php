@@ -33,8 +33,8 @@ abstract class BaseModule
         $block = $kernel->pub_array_key_2_value($block, $wm);
         //список возможного расположения водяного знака
         $wm = array("pswps0"=> "","pswps1"=> "","pswps2" => "","pswps3" => "","pswps4" => "");
-        if (isset($src_settings['water_position']))
-            $wm['pswps'.intval($src_settings['water_position'])] = ' selected="selected"';
+        if (isset($src_settings['place']))
+            $wm['pswps'.intval($src_settings['place'])] = ' selected="selected"';
         $block = $kernel->pub_array_key_2_value($block, $wm);
 
 
@@ -50,8 +50,8 @@ abstract class BaseModule
         $block = $kernel->pub_array_key_2_value($block, $wm);
         //список возможного расположения водяного знака
         $wm = array("pbwps0"=> "","pbwps1"=> "","pbwps2" => "","pbwps3" => "","pbwps4" => "");
-        if (isset($big_settings['water_position']))
-            $wm['pbwps'.intval($big_settings['water_position'])] = ' selected="selected"';
+        if (isset($big_settings['place']))
+            $wm['pbwps'.intval($big_settings['place'])] = ' selected="selected"';
         $block = $kernel->pub_array_key_2_value($block, $wm);
 
 

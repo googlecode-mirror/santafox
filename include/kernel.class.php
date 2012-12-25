@@ -1379,6 +1379,10 @@ class kernel
 
     }
 
+    public static function is_backend()
+    {
+        return preg_match("/^\\/admin\\//",$_SERVER['REQUEST_URI']);
+    }
 
     /**
      * Метод для вывода соформированной страницы на экран
@@ -1394,10 +1398,7 @@ class kernel
     function priv_output($html = "", $for_edit = false, $js_encode=false)
     {
         $is_xml_data = false;
-        if (preg_match("/^\\/admin\\//",$_SERVER['REQUEST_URI']))
-            $is_backoffice=true;
-        else
-            $is_backoffice=false;
+        $is_backend=self::is_backend();
         //Заменим значения переменных на страницах
         //нужными значениями в зависимости от языка.
         if (!$this->header_is_sent && isset($_SERVER['HTTP_HOST']))
@@ -1412,7 +1413,7 @@ class kernel
             $this->header_is_sent = true;
         }
 
-        if (!$for_edit && !$is_xml_data && !$is_backoffice)
+        if (!$for_edit && !$is_xml_data && !$is_backend)
         {
             $html = $this->priv_page_charset_set($html);
             if (defined('TIME_CREAT') && TIME_CREAT)
@@ -1465,13 +1466,13 @@ class kernel
 
         }
 
-        if ($js_encode && !$is_xml_data && defined('WEBFORM_CODING') && WEBFORM_CODING && !$is_backoffice)
+        if ($js_encode && !$is_xml_data && defined('WEBFORM_CODING') && WEBFORM_CODING && !$is_backend)
         {
             $html = $this->pub_page_email_encode($html);
             $html = $this->pub_page_form_encode($html);
         }
 
-        if (!$is_backoffice && preg_match_all("|\\%html_escape\\[(.*)\\]\\%|isU",$html, $matches, PREG_SET_ORDER))
+        if (!$is_backend && preg_match_all("|\\%html_escape\\[(.*)\\]\\%|isU",$html, $matches, PREG_SET_ORDER))
         {
             foreach ($matches as $match)
             {
@@ -1479,7 +1480,7 @@ class kernel
             }
         }
 
-        if ($is_backoffice && !$for_edit)
+        if ($is_backend && !$for_edit)
             $html = $this->priv_page_textlabels_replace($html);
         print $html;
     }
@@ -3905,7 +3906,7 @@ class kernel
         if (!is_resource($im))
             return false;
 
-        //Создаём маленькое изображение
+        //Создаём маленькое изображение, если надо
         if ($thumb_settings)
         {
             $im_small = $this->pub_image_resize_to($im, $thumb_settings);
@@ -3922,11 +3923,15 @@ class kernel
                 chmod ($file_small, $this->priv_chmod_limit_get());
             }
         }
-        //Если $big, то сохраняем и большую картинку
+        //Если $big_settings, то сохраняем-обрабатываем и большую картинку
         if ($big_settings)
         {
+            if (isset($big_settings['water_add']) && $big_settings['water_add']==0)
+                $big_wm=array();
+            else
+                $big_wm=$big_settings;
             //Создадим большое изображение
-            $im_big = $this->pub_image_resize_to($im, $big_settings, $big_settings);
+            $im_big = $this->pub_image_resize_to($im, $big_settings, $big_wm);
             if ($im_big)
             {
                 if ($itype == IMAGETYPE_GIF)
@@ -3943,8 +3948,12 @@ class kernel
         //И самое последние, если надо то исправим исходное изображение
         if ($source_settings)
         {
-            //Создадим большое изображение
-            $im_source = $this->pub_image_resize_to($im, $source_settings, $big_settings);
+            if (isset($source_settings['water_add']) && $source_settings['water_add']==0)
+                $src_wm=array();
+            else
+                $src_wm=$big_settings;
+            //Обрабатываем исходное изображение
+            $im_source = $this->pub_image_resize_to($im, $source_settings, $src_wm);
             if ($im_source)
             {
                 if ($itype == IMAGETYPE_GIF)
@@ -5619,11 +5628,7 @@ class kernel
      */
     function pub_image_resize_to($source, $size, $watermark_image = 0)
     {
-
-        if ((!isset($size['width'])) || (!isset($size['height'])))
-            return false;
-
-        if (!is_resource($source))
+        if (!isset($size['width']) || !isset($size['height']) || !is_resource($source))
             return false;
 
         $size['width']  = intval($size['width']);

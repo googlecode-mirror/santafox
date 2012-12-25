@@ -21,6 +21,7 @@ abstract class BaseModule
         $big_settings = isset($settings['big'])?$settings['big']:array();
         $src_settings = isset($settings['source'])?$settings['source']:array();
 
+        $block = str_replace('%pict_source_transparency%', isset($src_settings['transparency'])?$src_settings['transparency']:"", $block);
         $block = str_replace('%source_check%', (isset($src_settings['isset']) && $src_settings['isset'])?"checked":"", $block);
         $block = str_replace('%path_source_water_path%', isset($src_settings['water_path'])?$src_settings['water_path']:"", $block);
         $block = str_replace('%pict_source_width%', (isset($src_settings['width']))?$src_settings['width']:"", $block);
@@ -37,6 +38,7 @@ abstract class BaseModule
         $block = $kernel->pub_array_key_2_value($block, $wm);
 
 
+        $block = str_replace('%pict_big_transparency%', isset($big_settings['transparency'])?$big_settings['transparency']:"", $block);
         $block = str_replace('%big_check%', (isset($big_settings['isset']) && $big_settings['isset'])?"checked":"", $block);
         $block = str_replace('%path_big_water_path%', isset($big_settings['water_path'])?$big_settings['water_path']:"", $block);
         $block = str_replace('%pict_big_width%', (isset($big_settings['width']))?$big_settings['width']:"", $block);

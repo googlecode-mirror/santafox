@@ -13,4 +13,4 @@ CREATE TABLE `%PREFIX%_stat_referer` (
   KEY `referer_domain` (`referer_domain`),
   KEY `tstc` (`tstc`),
   KEY `IDSearch` (`IDSearch`)
-) ENGINE=MyISAM AUTO_INCREMENT=671 DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM AUTO_INCREMENT=671 DEFAULT CHARSET=utf8 COMMENT='Статистика - рефереры';

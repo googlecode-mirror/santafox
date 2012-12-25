@@ -9,4 +9,4 @@ CREATE TABLE `%PREFIX%_admin_group_access` (
   KEY `group_id` (`group_id`),
   KEY `modul_id` (`modul_id`),
   KEY `access_id` (`access_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

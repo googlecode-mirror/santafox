@@ -7,4 +7,4 @@ CREATE TABLE `%PREFIX%_search1_index` (
   PRIMARY KEY  (`id`),
   KEY `doc_id` (`doc_id`,`word_id`),
   KEY `word_id` (`word_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6783 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

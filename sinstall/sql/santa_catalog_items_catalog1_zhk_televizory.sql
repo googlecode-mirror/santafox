@@ -13,7 +13,7 @@ CREATE TABLE `%PREFIX%_catalog_items_catalog1_zhk_televizory` (
   `Review_corner` decimal(12,2) default NULL,
   `Overall_dimensions` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_items_catalog1_zhk_televizory` VALUES ('1','1.00','зеркальный','есть','14 (7x2)','2.00','32.00','16.77','1280x768','500.00','170.00',NULL);
 INSERT INTO `%PREFIX%_catalog_items_catalog1_zhk_televizory` VALUES ('2','1.00','рамка - черное стекло','есть','14 (7x2)','2.00','32.00','16.77','1280x768','500.00','170.00',NULL);
 INSERT INTO `%PREFIX%_catalog_items_catalog1_zhk_televizory` VALUES ('3','1.00','черный','есть','14','2.00','42.00','16.77','1920x1080','500.00','178.00',NULL);

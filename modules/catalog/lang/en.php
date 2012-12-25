@@ -202,22 +202,6 @@ $il['catalog_edit_property_enum_del_alert']           = 'Вы действите
 $il['catalog_edit_property_enum_add_msg']             = 'Новое значение добавлено';
 
 $il['catalog_edit_property_pict_path']                = 'Путь сохранения изображений';
-$il['catalog_edit_property_pict_big_create_label']    = 'Создавать большое изображение';
-$il['catalog_edit_property_pict_source_create_label'] = 'Модифицировать исходное изображение';
-$il['catalog_edit_property_pict_small_create_label'] =  'Создавать малое изображение';
-$il['catalog_edit_property_pict_width_and_height']    = 'Ширина и высота';
-$il['catalog_edit_property_pict_width_and_height_help'] = 'Может быть задана только ширина, или только высота, иди два параметра одноврменно';
-$il['catalog_edit_property_pict_watermark_add']       = 'Добавлять водяной знак';
-$il['catalog_edit_property_pict_watermark_val1']      = 'Никогда';
-$il['catalog_edit_property_pict_watermark_val2']      = 'Всегда';
-$il['catalog_edit_property_pict_watermark_val3']      = 'Спрашивать';
-$il['catalog_edit_property_pict_watermark_path']      = 'Файл знака с путём (только GIF)';
-$il['catalog_edit_property_pict_watermark_place']     = 'Место размещения на изображения';
-$il['catalog_edit_property_pict_watermark_place_val0'] = 'По центру';
-$il['catalog_edit_property_pict_watermark_place_val1'] = 'Левый верхний угол';
-$il['catalog_edit_property_pict_watermark_place_val2'] = 'Правый верхний угол';
-$il['catalog_edit_property_pict_watermark_place_val3'] = 'Правый нижний угол';
-$il['catalog_edit_property_pict_watermark_place_val4'] = 'Левый нижний угол';
 
 //Работа со списком свойст для категорий
 $il['catalog_edit_property_cat_mainlabel']            = 'Свойства всех категорий каталога';

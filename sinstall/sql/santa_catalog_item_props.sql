@@ -18,7 +18,7 @@ DROP TABLE IF EXISTS `%PREFIX%_catalog_item_props`;
   KEY `order` (`order`),
   KEY `group_main` (`group_id`,`ismain`),
   KEY `group_sort` (`group_id`,`sorted`)
-) ENGINE=MyISAM AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_item_props` VALUES ('1','0','catalog1','name','Название','string','1','0','0',NULL,'10');
 INSERT INTO `%PREFIX%_catalog_item_props` VALUES ('23','0','catalog1','description','Описание','html','0','0','0',NULL,'80');
 INSERT INTO `%PREFIX%_catalog_item_props` VALUES ('3','0','catalog1','price','Цена','number','1','0','0',NULL,'40');

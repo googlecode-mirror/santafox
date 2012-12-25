@@ -6614,73 +6614,11 @@ class catalog extends BaseModule
         elseif ($prop['type'] == 'pict')
         {
             $addons_param = $this->get_template_block('addons_pict');
-
-            //$modul_param = $kernel->pub_module_serial_get();
-
-            //Бедем теперь всё заполнять значениями из массива
-            // и подставлять их в шаблон
-
-            //Сначала всё, что касается исходного изображения
-            $source_check = "";
-            if ($prop['add_param']['source']['isset'])
-                $source_check = ' checked="checked"';
-
-            //Отметим тек значение по дабавлению водяного знака
-            $_tmp_array = array("pswas0"=> "", "pswas1"=> "",  "pswas2" => "");
-            $_tmp_array['pswas'.intval($prop['add_param']['source']['water_add'])] = ' selected="selected"';
-            $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
-
-            //Аналогично обрабатываем список возможного расположения водяного знака
-            $_tmp_array = array("pswps0"=> "","pswps1"=> "","pswps2" => "","pswps3" => "","pswps4" => "");
-            $_tmp_array['pswps'.intval($prop['add_param']['source']['water_position'])] = ' selected="selected"';
-            $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
-
-            //Теперь оставшиеся простые значения
-            $addons_param = str_replace('%source_check%'          , $source_check                             , $addons_param);
-            $addons_param = str_replace('%path_source_water_path%', $prop['add_param']['source']['water_path'], $addons_param);
-            $addons_param = str_replace('%pict_source_width%'     , $prop['add_param']['source']['width']     , $addons_param);
-            $addons_param = str_replace('%pict_source_height%'    , $prop['add_param']['source']['height']    , $addons_param);
-
-
-
-            //Теперь всё, что касается большого изображения
-            $big_check = "";
-            if ($prop['add_param']['big']['isset'])
-                $big_check = ' checked="checked"';
-
-            //Отметим тек значение по дабавлению водяного знака
-            $_tmp_array = array("pbwas0"=> "", "pbwas1"=> "",  "pbwas2" => "");
-            $_tmp_array['pbwas'.intval($prop['add_param']['big']['water_add'])] = ' selected="selected"';
-            $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
-
-            //Аналогично обрабатываем список возможного расположения водяного знака
-            $_tmp_array = array("pbwps0"=> "","pbwps1"=> "","pbwps2" => "","pbwps3" => "","pbwps4" => "");
-            $_tmp_array['pbwps'.intval($prop['add_param']['big']['water_position'])] = ' selected="selected"';
-            $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
-
-            //Теперь оставшиеся простые значения
-            $addons_param = str_replace('%big_check%'          , $big_check                             , $addons_param);
-            $addons_param = str_replace('%path_big_water_path%', $prop['add_param']['big']['water_path'], $addons_param);
-            $addons_param = str_replace('%pict_big_width%'     , $prop['add_param']['big']['width']     , $addons_param);
-            $addons_param = str_replace('%pict_big_height%'    , $prop['add_param']['big']['height']    , $addons_param);
-
-
-
-            //Теперь всё, что касается малого изображения
-            $small_check = "";
-            if ($prop['add_param']['small']['isset'])
-                $small_check = ' checked="checked"';
-
-            $addons_param = str_replace('%small_check%'          , $small_check                             , $addons_param);
-            $addons_param = str_replace('%pict_small_width%'     , $prop['add_param']['small']['width']     , $addons_param);
-            $addons_param = str_replace('%pict_small_height%'    , $prop['add_param']['small']['height']    , $addons_param);
-
-
+            $addons_param = self::process_image_settings_block($addons_param,$prop['add_param']);
 
             //Общее для всех параметров
             $addons_param = str_replace('%pict_path%'      , $prop['add_param']['pict_path']                  , $addons_param);
             $addons_param = str_replace('%pict_path_start%', 'content/files/'.$kernel->pub_module_id_get().'/', $addons_param);
-
         }
 
         //Обязательно первым, так там есть ещё переменные
@@ -6691,8 +6629,6 @@ class catalog extends BaseModule
 
         //Теперь, если это поле "изображение" то тут ещё толпа параметров, которые надо
         //получить из свойств модуля
-
-
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form($action.'&id_group_control='.$id_group_control), $content);
         $content = str_replace('%form_label%' , $form_label       , $content);
         $content = str_replace('%name_full%'  , $prop['name_full'], $content);
@@ -9602,32 +9538,5 @@ class catalog extends BaseModule
             }
         }
         return $content;
-    }
-
-
-    private static function make_default_pict_prop_addparam()
-    {
-        $ret = array();
-        $ret['pict_path']			      = '';
-
-        $ret['source']['isset']          = true;
-        $ret['source']['width']          = 800;
-        $ret['source']['height']         = 600;
-        $ret['source']['water_add']      = '0';
-        $ret['source']['water_path']     = '';
-        $ret['source']['water_position'] = '0';
-
-        $ret['big']['isset']          = true;
-        $ret['big']['width']          = 400;
-        $ret['big']['height']         = 300;
-        $ret['big']['water_add']      = '1';
-        $ret['big']['water_path']     = '';
-        $ret['big']['water_position'] = '3';
-
-        // Маленькое изображение без знаков
-        $ret['small']['isset']          = false;
-        $ret['small']['width']          = '100';
-        $ret['small']['height']         = '';
-        return $ret;
     }
 }

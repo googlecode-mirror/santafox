@@ -6,4 +6,4 @@ CREATE TABLE `%PREFIX%_stat_uri` (
   PRIMARY KEY  (`IDUri`),
   KEY `tstc` (`tstc`),
   KEY `uri_ts` (`uri`,`tstc`)
-) ENGINE=MyISAM AUTO_INCREMENT=854 DEFAULT CHARSET=utf8 COMMENT='Таблица статистики по uri';
+) ENGINE=MyISAM AUTO_INCREMENT=854 DEFAULT CHARSET=utf8 COMMENT='Статистика по uri';

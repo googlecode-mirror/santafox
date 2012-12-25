@@ -12,7 +12,7 @@ CREATE TABLE `%PREFIX%_catalog_catalog1_items` (
   `description` text,
   PRIMARY KEY  (`id`),
   KEY `group_id` (`group_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_catalog1_items` VALUES ('1','1','1','1','Sony DAV-DZ690M','14300.00','content/files/catalog1/123_1258562003.jpg',NULL,NULL,NULL);
 INSERT INTO `%PREFIX%_catalog_catalog1_items` VALUES ('2','1','2','1','Sony DAV-DZ590','12000.00','content/files/catalog1/321_1258562052.jpg',NULL,NULL,NULL);
 INSERT INTO `%PREFIX%_catalog_catalog1_items` VALUES ('3','1','3','1','Samsung HT-X810','17000.00','content/files/catalog1/444_1258562111.jpg',NULL,NULL,NULL);

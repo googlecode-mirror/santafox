@@ -1,24 +1,14 @@
 DROP TABLE IF EXISTS `%PREFIX%_action`;
-
 CREATE TABLE `%PREFIX%_action` (
-
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-
   `id_module` varchar(255) NOT NULL,
-
   `caption` varchar(255) NOT NULL,
-
   `link_str` text NOT NULL,
-
   `properties` text NOT NULL,
-
   `param_array` text NOT NULL,
-
   PRIMARY KEY (`id`),
-
   KEY `id_module` (`id_module`)
-
-) ENGINE=MyISAM AUTO_INCREMENT=41 DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Действия модулей';
 INSERT INTO `%PREFIX%_action` VALUES ('1', 'kernel', '[#structure_label_editcontent#]', 'priv_html_editor_start', 'a:0:{}', 'a:0:{}');
 INSERT INTO `%PREFIX%_action` VALUES ('2', 'kernel', '[#structure_label_get_title#]', 'priv_page_title_get', 'a:0:{}', 'a:0:{}');
 INSERT INTO `%PREFIX%_action` VALUES ('17', 'menu1', 'Вывести левое меню', 'pub_show_menu', 'a:4:{i:0;a:4:{s:4:\"name\";s:13:\"id_page_start\";s:7:\"caption\";s:30:\"[#module_menu_id_page_start1#]\";s:4:\"type\";s:4:\"page\";s:7:\"default\";s:0:\"\";}i:1;a:5:{s:4:\"name\";s:17:\"count_level_start\";s:7:\"caption\";s:33:\"[#module_menu_count_level_start#]\";s:4:\"type\";s:6:\"select\";s:4:\"data\";a:6:{i:1;s:1:\"1\";i:2;s:1:\"2\";i:3;s:1:\"3\";i:4;s:1:\"4\";i:5;s:1:\"5\";i:6;s:1:\"6\";}s:7:\"default\";s:0:\"\";}i:2;a:5:{s:4:\"name\";s:16:\"count_level_show\";s:7:\"caption\";s:32:\"[#module_menu_count_level_show#]\";s:4:\"type\";s:6:\"select\";s:4:\"data\";a:6:{i:1;s:1:\"1\";i:2;s:1:\"2\";i:3;s:1:\"3\";i:4;s:1:\"4\";i:5;s:1:\"5\";i:6;s:1:\"6\";}s:7:\"default\";s:0:\"\";}i:3;a:6:{s:4:\"name\";s:8:\"template\";s:7:\"caption\";s:32:\"[#module_menu_label_propertes1#]\";s:4:\"type\";s:4:\"file\";s:5:\"patch\";s:27:\"modules/menu/templates_user\";s:4:\"mask\";s:8:\"html,htm\";s:7:\"default\";s:0:\"\";}}', 'a:4:{s:13:\"id_page_start\";s:5:\"index\";s:17:\"count_level_start\";s:1:\"1\";s:16:\"count_level_show\";s:1:\"3\";s:8:\"template\";s:41:\"modules/menu/templates_user/extended.html\";}');

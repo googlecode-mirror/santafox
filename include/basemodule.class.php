@@ -13,6 +13,79 @@ abstract class BaseModule
 
     }
 
+    protected static function process_image_settings_block($block,$settings)
+    {
+        global $kernel;
+
+        $thumb_settings = isset($settings['small'])?$settings['small']:array();
+        $big_settings = isset($settings['big'])?$settings['big']:array();
+        $src_settings = isset($settings['source'])?$settings['source']:array();
+
+        $block = str_replace('%source_check%', (isset($src_settings['isset']) && $src_settings['isset'])?"checked":"", $block);
+        $block = str_replace('%path_source_water_path%', isset($src_settings['water_path'])?$src_settings['water_path']:"", $block);
+        $block = str_replace('%pict_source_width%', (isset($src_settings['width']))?$src_settings['width']:"", $block);
+        $block = str_replace('%pict_source_height%', (isset($src_settings['height']))?$src_settings['height']:"", $block);
+        //Отметим тек значение по добавлению водяного знака
+        $wm = array("pswas0"=> "", "pswas1"=> "",  "pswas2" => "");
+        if (isset($src_settings['water_add']))
+            $wm['pswas'.intval($src_settings['water_add'])] = ' selected="selected"';
+        $block = $kernel->pub_array_key_2_value($block, $wm);
+        //список возможного расположения водяного знака
+        $wm = array("pswps0"=> "","pswps1"=> "","pswps2" => "","pswps3" => "","pswps4" => "");
+        if (isset($src_settings['water_position']))
+            $wm['pswps'.intval($src_settings['water_position'])] = ' selected="selected"';
+        $block = $kernel->pub_array_key_2_value($block, $wm);
+
+
+        $block = str_replace('%big_check%', (isset($big_settings['isset']) && $big_settings['isset'])?"checked":"", $block);
+        $block = str_replace('%path_big_water_path%', isset($big_settings['water_path'])?$big_settings['water_path']:"", $block);
+        $block = str_replace('%pict_big_width%', (isset($big_settings['width']))?$big_settings['width']:"", $block);
+        $block = str_replace('%pict_big_height%', (isset($big_settings['height']))?$big_settings['height']:"", $block);
+        //Отметим тек значение по добавлению водяного знака
+        $wm = array("pbwas0"=> "", "pbwas1"=> "",  "pbwas2" => "");
+        if (isset($big_settings['water_add']))
+            $wm['pbwas'.intval($big_settings['water_add'])] = ' selected="selected"';
+        $block = $kernel->pub_array_key_2_value($block, $wm);
+        //список возможного расположения водяного знака
+        $wm = array("pbwps0"=> "","pbwps1"=> "","pbwps2" => "","pbwps3" => "","pbwps4" => "");
+        if (isset($big_settings['water_position']))
+            $wm['pbwps'.intval($big_settings['water_position'])] = ' selected="selected"';
+        $block = $kernel->pub_array_key_2_value($block, $wm);
+
+
+        $block = str_replace('%small_check%', (isset($thumb_settings['isset']) && $thumb_settings['isset'])?"checked":"", $block);
+        $block = str_replace('%pict_small_width%', (isset($thumb_settings['width']))?$thumb_settings['width']:"", $block);
+        $block = str_replace('%pict_small_height%', (isset($thumb_settings['height']))?$thumb_settings['height']:"", $block);
+
+        return $block;
+    }
+
+    public static function make_default_pict_prop_addparam()
+    {
+        $ret = array();
+        $ret['pict_path']			     = '';
+
+        $ret['source']['isset']          = true;
+        $ret['source']['width']          = 800;
+        $ret['source']['height']         = 600;
+        $ret['source']['water_add']      = '0';
+        $ret['source']['water_path']     = '';
+        $ret['source']['water_position'] = '0';
+
+        $ret['big']['isset']          = true;
+        $ret['big']['width']          = 400;
+        $ret['big']['height']         = 300;
+        $ret['big']['water_add']      = '1';
+        $ret['big']['water_path']     = '';
+        $ret['big']['water_position'] = '3';
+
+        // Маленькое изображение без знаков
+        $ret['small']['isset']        = false;
+        $ret['small']['width']        = '100';
+        $ret['small']['height']       = '';
+        return $ret;
+    }
+
     /**
 	 * Функция для отображения административного интерфейса
 	 *

@@ -13,5 +13,5 @@ CREATE TABLE `%PREFIX%_backup_rules` (
   `needdesign` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `stringid` (`stringid`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_backup_rules` VALUES ('2','contab','Таблицы и контент','','','','/','1','0','1','0');

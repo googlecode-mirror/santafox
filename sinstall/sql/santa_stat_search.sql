@@ -5,7 +5,7 @@ CREATE TABLE `%PREFIX%_stat_search` (
   `preg_host` varchar(32) NOT NULL default '',
   `preg_word` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`IDSearch`)
-) ENGINE=MyISAM AUTO_INCREMENT=95 DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM AUTO_INCREMENT=95 DEFAULT CHARSET=utf8 COMMENT='Статистика - поисковые системы';
 INSERT INTO `%PREFIX%_stat_search` VALUES ('1','Yandex','ya(ndex)?\\.ru','(text|qs=text)');
 INSERT INTO `%PREFIX%_stat_search` VALUES ('2','Aport','aport\\.ru','r=');
 INSERT INTO `%PREFIX%_stat_search` VALUES ('3','Rambler','rambler\\.ru','words=');

@@ -8,7 +8,7 @@ CREATE TABLE `%PREFIX%_catalog_catalog2_items` (
   `image1` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
   KEY `group_id` (`group_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_catalog2_items` VALUES ('1','2','1','1','Название №1','content/files/catalog2/122343298_22333fb8e3_o_1258563359.jpg');
 INSERT INTO `%PREFIX%_catalog_catalog2_items` VALUES ('2','2','2','1','Название №2','content/files/catalog2/321464099_a7cfcb95cf_b_1258563397.jpg');
 INSERT INTO `%PREFIX%_catalog_catalog2_items` VALUES ('3','2','3','1','Название №3','content/files/catalog2/66523124_b468cf4978_o_1258563428.jpg');

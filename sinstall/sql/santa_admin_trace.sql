@@ -6,6 +6,6 @@ CREATE TABLE `%PREFIX%_admin_trace` (
   `ip` varchar(255) NOT NULL,
   `host` varchar(255) NOT NULL,
   PRIMARY KEY  (`id_admin`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_admin_trace` VALUES ('1','0000-00-00 00:00:00','catalog1','192.168.25.103','server');
 INSERT INTO `%PREFIX%_admin_trace` VALUES ('2','2010-01-11 13:02:55','catalog1','192.168.25.100','server');

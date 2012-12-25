@@ -417,3 +417,21 @@ $il['common_deselect_all_label']='Убрать все';
 $il['common_done_label']='Готово';
 
 $il['admin_msg_not_unique_email']='Неуникальный email';
+
+
+$il['common_edit_property_pict_watermark_add'] = 'Добавлять водяной знак';
+$il['common_edit_property_pict_watermark_path'] = 'Файл знака с путём (только GIF)';
+$il['common_edit_property_pict_watermark_place_val0'] = 'По центру';
+$il['common_edit_property_pict_watermark_place_val1'] = 'Левый верхний угол';
+$il['common_edit_property_pict_watermark_place_val2'] = 'Правый верхний угол';
+$il['common_edit_property_pict_watermark_place_val3'] = 'Правый нижний угол';
+$il['common_edit_property_pict_watermark_place_val4'] = 'Левый нижний угол';
+$il['common_edit_property_pict_source_create_label'] = 'Модифицировать исходное изображение';
+$il['common_edit_property_pict_width_and_height_help'] = 'Может быть задана только ширина, или только высота, иди два параметра одноврменно';
+$il['common_edit_property_pict_width_and_height']    = 'Ширина и высота';
+$il['common_edit_property_pict_watermark_val1']      = 'Никогда';
+$il['common_edit_property_pict_watermark_val2']      = 'Всегда';
+$il['common_edit_property_pict_watermark_val3']      = 'Спрашивать';
+$il['common_edit_property_pict_watermark_place']     = 'Место размещения на изображения';
+$il['common_edit_property_pict_big_create_label']    = 'Создавать большое изображение';
+$il['common_edit_property_pict_small_create_label'] =  'Создавать малое изображение';

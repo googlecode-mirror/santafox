@@ -8,4 +8,4 @@ CREATE TABLE `%PREFIX%_stat_index` (
   KEY `IDRobot` (`IDRobot`),
   KEY `IDUri` (`IDUri`),
   KEY `tstc` (`tstc`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Статистика';

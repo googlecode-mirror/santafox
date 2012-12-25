@@ -11,4 +11,4 @@ CREATE TABLE `%PREFIX%_stat_word` (
   KEY `IDSearch` (`IDSearch`),
   KEY `IDReferer` (`IDReferer`),
   KEY `IDPartner` (`IDPartner`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Статистика по словам';

@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `%PREFIX%_catalog_items_catalog1_photos`;
 CREATE TABLE `%PREFIX%_catalog_items_catalog1_photos` (
   `id` int(10) unsigned NOT NULL auto_increment,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_items_catalog1_photos` VALUES ('1');
 INSERT INTO `%PREFIX%_catalog_items_catalog1_photos` VALUES ('2');
 INSERT INTO `%PREFIX%_catalog_items_catalog1_photos` VALUES ('3');

@@ -6,5 +6,5 @@ CREATE TABLE `%PREFIX%_catalog_catalog1_cats_props` (
   `type` enum('string','enum','number','text','html','file','pict') NOT NULL,
   `add_param` text,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_catalog1_cats_props` VALUES ('1','name','Название','string',NULL);

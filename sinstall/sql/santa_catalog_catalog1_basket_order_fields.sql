@@ -8,6 +8,6 @@ CREATE TABLE `%PREFIX%_catalog_catalog1_basket_order_fields` (
   `isrequired` tinyint(1) unsigned NOT NULL default '0',
   `regexp` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_catalog1_basket_order_fields` VALUES ('1','name','имя','string','10','0','');
 INSERT INTO `%PREFIX%_catalog_catalog1_basket_order_fields` VALUES ('2','email','мыло','string','20','1','/^[a-z0-9]{1}[a-z0-9_.-]*@[a-z0-9.-]{1,}.[a-z]{2,6}$/i');

@@ -4,7 +4,7 @@ CREATE TABLE `%PREFIX%_stat_robot` (
   `robot` varchar(30) NOT NULL default '',
   `agent` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`IDRobot`)
-) ENGINE=MyISAM AUTO_INCREMENT=331 DEFAULT CHARSET=utf8 COMMENT='Это моя тестовая таблица';
+) ENGINE=MyISAM AUTO_INCREMENT=331 DEFAULT CHARSET=utf8 COMMENT='Статистика - поисковые роботы';
 INSERT INTO `%PREFIX%_stat_robot` VALUES ('1','Aport','aport');
 INSERT INTO `%PREFIX%_stat_robot` VALUES ('2','AWBot','awbot');
 INSERT INTO `%PREFIX%_stat_robot` VALUES ('3','BaiDuSpider','baiduspider');

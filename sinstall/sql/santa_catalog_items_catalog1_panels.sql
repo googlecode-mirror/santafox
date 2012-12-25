@@ -10,7 +10,7 @@ CREATE TABLE `%PREFIX%_catalog_items_catalog1_panels` (
   `screen_touch` enum('есть','нет') default NULL,
   `food` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `%PREFIX%_catalog_items_catalog1_panels` VALUES ('1','110.00','20x50x224','1.00','черный/белый',NULL,'нет',NULL,'аккумулятор');
 INSERT INTO `%PREFIX%_catalog_items_catalog1_panels` VALUES ('2','200.00','20x54x227','1.00','черный','нет','есть','нет','аккумулятор');
 INSERT INTO `%PREFIX%_catalog_items_catalog1_panels` VALUES ('3','320.00','34x166.4x100','1.00','черный/серебристый','есть','есть','есть','аккумулятор');

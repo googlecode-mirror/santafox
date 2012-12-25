@@ -8,4 +8,4 @@ CREATE TABLE `%PREFIX%_search1_docs` (
   `snipped` mediumblob,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `doc_hash` (`doc_hash`)
-) ENGINE=MyISAM AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

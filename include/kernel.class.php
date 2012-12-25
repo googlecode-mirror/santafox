@@ -3851,17 +3851,17 @@ class kernel
         $paths2close = array();
         //Перед тем, как начинать преобразование, возможно надо открыть папку для записи
         //так как она могла быть переписана по FTP и тогда скрипт не сможет сюда писать
-        if (!is_writable($save_path))
+        if ($big_settings && !is_writable($save_path))
         {
             $this->pub_ftp_dir_chmod_change($save_path);
             $paths2close[]=$save_path;
         }
-        if (!is_writable($save_path."/tn"))
+        if ($thumb_settings && !is_writable($save_path."/tn"))
         {
             $this->pub_ftp_dir_chmod_change($save_path."/tn");
             $paths2close[]=$save_path."/tn";
         }
-        if (!is_writable($save_path."/source"))
+        if ($source_settings && !is_writable($save_path."/source"))
         {
             $this->pub_ftp_dir_chmod_change($save_path."/source");
             $paths2close[]=$save_path."/source";

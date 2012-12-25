@@ -3892,13 +3892,20 @@ class kernel
         $origFilename=$this->pub_translit_string($origFilename);//в транслит
         $origFilename = str_replace('.','_',$origFilename);
         $origFilename = preg_replace('~([^\da-z_-]+)~i','',$origFilename); //оставим только символы из набора
+        $maxLength=250;
+        if (strlen($origFilename)+strlen($ext)>$maxLength)
+            $origFilename=substr($origFilename,0,$maxLength-strlen($ext));
         if (!$origFilename)
             $origFilename = date("Y_m_d");
         $newname=$origFilename.$ext;
         $n=1;
         while (file_exists($save_path."/".$newname) || file_exists($save_path."/tn/".$newname) || file_exists($save_path."/source/".$newname))
         {
-            $newname=$origFilename.++$n.$ext;
+            $n++;
+            $newname=$origFilename.$n.$ext;
+            $len = strlen($newname);
+            if ($len>$maxLength)
+                $newname=substr($origFilename,0,$maxLength-$len).$n.$ext;
         }
         $file_big   = $save_path."/".$newname;
         $file_small = $save_path."/tn/".$newname;

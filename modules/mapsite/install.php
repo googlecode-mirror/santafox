@@ -16,8 +16,6 @@ class mapsite_install extends install_modules
      */
 	function install($id_module)
 	{
-		global $kernel;
-
 	}
 
 
@@ -29,8 +27,6 @@ class mapsite_install extends install_modules
      */
 	function uninstall($id_module)
 	{
-		global $kernel;
-
 	}
 
 
@@ -39,12 +35,11 @@ class mapsite_install extends install_modules
      *
      * Методы вызывается при инсталяции каждого дочернего модуля. В качестве параметра
      * передается уникальный идентефикатор вновь создаваемого дочернего объекта.
-     * @param string $id_module ID вновь создоваемого дочернего модуля
+     * @param string $id_module ID вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
-		global $kernel;
-
 	}
 
 	/**
@@ -55,8 +50,6 @@ class mapsite_install extends install_modules
      */
 	function uninstall_children($id_module)
 	{
-		global $kernel;
-
 	}
 }
 

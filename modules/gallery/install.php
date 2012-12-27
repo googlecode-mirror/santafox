@@ -47,7 +47,7 @@ class gallery_install extends install_modules
 	}
 
 	
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
 		global $kernel;
 		$kernel->pub_dir_create_in_images($id_module);

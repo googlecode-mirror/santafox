@@ -15,7 +15,6 @@ class newssubmit_install extends install_modules
      */
 	function install($id_module)
 	{
-		global $kernel;
 	}
 
 
@@ -27,8 +26,6 @@ class newssubmit_install extends install_modules
      */
 	function uninstall($id_module)
 	{
-		global $kernel;
-
 	}
 
 
@@ -37,17 +34,14 @@ class newssubmit_install extends install_modules
      *
      * Методы вызывается при инсталяции каждого дочернего модуля. В качестве параметра
      * передается уникальный идентефикатор вновь создаваемого дочернего объекта.
-     * @param string $id_module ID вновь создоваемого дочернего модуля
+     * @param string $id_module ID вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
-		global $kernel;
-
-		include_once('modules/newssubmit/mysql_submit.php');
-
+        require_once( dirname(__FILE__).'/mysql_submit.php');
         $newssub = new mysql_submit(PREFIX.'_'.$id_module);
         $newssub->create_table();
-
 	}
 
 	/**
@@ -58,13 +52,9 @@ class newssubmit_install extends install_modules
      */
 	function uninstall_children($id_module)
 	{
-		global $kernel;
-
-		include_once('modules/newssubmit/mysql_submit.php');
-
+		require_once( dirname(__FILE__).'/mysql_submit.php');
         $newssub = new mysql_submit(PREFIX.'_'.$id_module);
         $newssub->drop_table();
-
 	}
 
 }

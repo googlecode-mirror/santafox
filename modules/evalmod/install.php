@@ -6,36 +6,29 @@ class evalmod_install extends install_modules
 	function install($id_module)
 	{
 		global $kernel;
-
 	    $sql = 'CREATE TABLE `'.$kernel->pub_prefix_get().'_evalmod`
-	        (
-	            `id_modul` varchar(255) NOT NULL ,
-	            `text_php` text,
-	            PRIMARY KEY  (`id_modul`)
-	        ) ENGINE=MyISAM DEFAULT CHARSET=utf8';
-
+                (
+                    `id_modul` varchar(255) NOT NULL ,
+                    `text_php` text,
+                    PRIMARY KEY  (`id_modul`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8';
 	    $kernel->runSQL($sql);
-
 	}
-
 
 	function uninstall($id_module)
 	{
 		global $kernel;
-
         $sql = 'DROP TABLE `'.$kernel->pub_prefix_get().'_evalmod`';
 	    $kernel->runSQL($sql);
 	}
 
 
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
-		global $kernel;
 	}
 
 	function uninstall_children($id_module)
 	{
-		global $kernel;
 	}
 }
 

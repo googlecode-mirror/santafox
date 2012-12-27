@@ -100,7 +100,7 @@ class catalog_install extends install_modules
 	/**
      * Инсталяция дочернего модуля
      *
-     * @param string $id_module Идентификатор вновь создоваемого дочернего модуля
+     * @param string $id_module Идентификатор вновь создаваемого дочернего модуля
      * @param boolean $reinstall
      */
 	function install_children($id_module, $reinstall = false)

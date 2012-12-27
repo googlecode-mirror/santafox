@@ -19,7 +19,7 @@ class pageprint_install extends install_modules
      * Класс может содержать любые внтренние переменные которые могут быть использованы
      * в методах инсталяции
      *
-     * @var stiring
+     * @var string
      */
 	var $path_pictures = "content/images/news";
 
@@ -36,15 +36,10 @@ class pageprint_install extends install_modules
 	 *
 	 * Следует помнить, что этот метод будет вызван ОДИН раз, в момент инсталяции базового
 	 * модуля
-	 * @param string $id_modul Идентификатор создаваемого базового модуля
+	 * @param string $id_module Идентификатор создаваемого базового модуля
 	 */
 	function install($id_module)
 	{
-		global $kernel;
-
-		//Здесь Вы может создать необходимые таблицы mySql или каталоги для
-		//хранения файлов, которые будут использоваться как самим базовым модулем
-		//так и его ВСЕМИ дочернеми модулями
 	}
 
 	/**
@@ -59,11 +54,6 @@ class pageprint_install extends install_modules
 
 	function uninstall($id_module)
 	{
-		global $kernel;
-        //Здесь необходимо производить
-        //удаление каталогов, файлов и таблиц используемых базовым модулем и создаваемых
-        //в install
-
 	}
 
 
@@ -71,14 +61,11 @@ class pageprint_install extends install_modules
      * Инсталяция дочернего модуля
      *
      * Методы вызывается, при инсталяции каждого дочернего модуля.
-     * @param string $id_module Идентификатор вновь создоваемого дочернего модуля
+     * @param string $id_module Идентификатор вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
-		global $kernel;
-        //здесь необходимо создавать таблицы каталоги, или файлы используемые
-        //дочерним модулем. Уникальность создаваемых объектов обеспечивается с
-        //помощью передвавемого ID модуля
 	}
 
 	/**
@@ -90,11 +77,6 @@ class pageprint_install extends install_modules
     */
 	function uninstall_children($id_module)
 	{
-		global $kernel;
-
-		//здесь необходимо
-		//удалять таблицы, каталоги, или файлы используемые дочерним модулем.
-
 	}
 }
 

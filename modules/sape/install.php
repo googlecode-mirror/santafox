@@ -17,7 +17,7 @@ class sape_install extends install_modules
 	}
 
 
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
 	}
 

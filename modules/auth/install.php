@@ -35,8 +35,9 @@ class auth_install extends install_modules
      * объектов обеспечивается с помощью передвавемого ID модуля
      *
      * @param string $id_module ID вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
         global $kernel;
         $kernel->pub_dir_create_in_images('auth');

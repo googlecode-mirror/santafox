@@ -25,17 +25,16 @@ class feedback_install extends install_modules
      */
 	function uninstall($id_module)
 	{
-		global $kernel;
 	}
 
 	/**
      * Инсталяция дочернего модуля
      *
-     * @param string $id_module Идентификатор вновь создоваемого дочернего модуля
+     * @param string $id_module Идентификатор вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
-		global $kernel;
 	}
 
 	/**
@@ -46,7 +45,6 @@ class feedback_install extends install_modules
      */
 	function uninstall_children($id_module)
 	{
-		global $kernel;
 	}
 }
 

@@ -29,9 +29,10 @@ class faq_install extends install_modules
      * создавать таблицы каталоги, или файлы используемые дочерним модулем. Уникальность создаваемых
      * объектов обеспечивается с помощью передвавемого ID модуля
      *
-     * @param string $id_module ID вновь создоваемого дочернего модуля
+     * @param string $id_module ID вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-    function install_children($id_module)
+    function install_children($id_module, $reinstall = false)
     {
         global $kernel;
 

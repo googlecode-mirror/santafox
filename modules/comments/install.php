@@ -54,8 +54,9 @@ class comments_install extends install_modules
      * Инсталяция дочернего модуля
      *
      * @param string $id_module Идентификатор вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
         global $kernel;
         //таблица отзывов

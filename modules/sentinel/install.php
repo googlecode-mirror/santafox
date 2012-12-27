@@ -19,7 +19,7 @@ class sentinel_install extends install_modules
         $kernel->runSQL($q);
     }
 
-    function install_children($id_module)
+    function install_children($id_module, $reinstall = false)
     {
     }
 

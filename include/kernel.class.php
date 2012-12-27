@@ -4058,23 +4058,37 @@ class kernel
 
                 if ($attach)
                 {
-                    //ищем <ims src=... в письме и обрабатываем, добавляя эти картинки как аттачи
+                    //ищем <img src=... в письме и обрабатываем, добавляя эти картинки как аттачи
                     $img_files = false;
                     if (preg_match_all('/<img.*?src=([\"\']+.*?[\"\']+).*?\/*?>/i', $message, $img_files))
                     {
                         $img_files = array_unique($img_files[1]);
                         foreach ($img_files as $filepath)
                         {
-                            $filepath = str_replace('"', '', $filepath);
-                            $filepath = str_replace("'", "", $filepath);
+                            $filepath = trim($filepath,'"\'');
                             if (preg_match("/(^\\.\\.\\/)|(^\\/)/", $filepath))
                             {
                                 $message = str_replace($filepath, $hostname.$filepath, $message);
                                 $filepath = $hostname.$filepath;
                             }
                             $file_orig_name = md5($filepath);
-                            //$mail->AddAttachment($filepath, $file_orig_name);
-                            $mail->AddEmbeddedImage($filepath, $file_orig_name, $file_orig_name);
+                            switch(strtolower(pathinfo($filepath,PATHINFO_EXTENSION)))
+                            {
+                                case 'jpg':
+                                case 'jpeg':
+                                    $etype='image/jpeg';
+                                    break;
+                                case 'png':
+                                    $etype='image/png';
+                                    break;
+                                case 'gif':
+                                    $etype='image/gif';
+                                    break;
+                                default:
+                                    $etype='application/octet-stream';
+                                    break;
+                            }
+                            $mail->AddEmbeddedImage($filepath, $file_orig_name, $file_orig_name,'base64',$etype);
                             $message = str_replace($filepath, 'cid:'.$file_orig_name, $message);
                         }
                     }

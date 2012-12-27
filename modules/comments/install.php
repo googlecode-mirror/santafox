@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Модуль "Комментарии"
+ * Модуль "Комментарии и отзывы"
  *
- * @copyright ArtProm (с) 2001-2008
- * @version 1.0 beta
+ * @copyright ArtProm (с) 2001-2012
+ * @version 2.0
  *
  */
 class comments_install extends install_modules
@@ -13,8 +13,9 @@ class comments_install extends install_modules
 	 * Инсталяция базового модуля
 	 *
 	 * @param string $id_module Идентификатор создаваемого базового модуля
+     * @param boolean $reinstall переинсталяция?
 	 */
-	function install($id_module)
+	function install($id_module, $reinstall = false)
 	{
 	    global $kernel;
 

@@ -12,8 +12,9 @@ class way_install extends install_modules
      *
      * Вызывается при инсталляции базового модуля
      * @param string $id_module ID инсталлируемого базового модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install($id_module)
+	function install($id_module, $reinstall = false)
 	{
 	}
 

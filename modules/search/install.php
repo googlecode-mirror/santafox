@@ -21,9 +21,9 @@ require_once("include/searchdb.class.php");
 class search_install extends install_modules
 {
 	/**
-     * Вызывается при инстялции базвоового модуля
+     * Вызывается при инстялции базового модуля
      */
-	function install($id_module)
+	function install($id_module, $reinstall = false)
 	{
 
 	}
@@ -49,8 +49,9 @@ class search_install extends install_modules
      * объектов обеспечивается с помощью передвавемого ID модуля
      *
      * @param string $id_module ID вновь создаваемого дочернего модуля
+     * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module)
+	function install_children($id_module, $reinstall = false)
 	{
 		global $kernel;
 

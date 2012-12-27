@@ -1,7 +1,7 @@
 <?php
 class sentinel_install extends install_modules
 {
-    function install($id_module)
+    function install($id_module, $reinstall = false)
     {
         global $kernel;
         $q="CREATE TABLE `".$kernel->pub_prefix_get()."_sentinel_filehashes` (

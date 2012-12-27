@@ -3,7 +3,7 @@ class evalmod_install extends install_modules
 {
     const id = 'evalmod';
 
-	function install($id_module)
+	function install($id_module, $reinstall = false)
 	{
 		global $kernel;
 	    $sql = 'CREATE TABLE `'.$kernel->pub_prefix_get().'_evalmod`

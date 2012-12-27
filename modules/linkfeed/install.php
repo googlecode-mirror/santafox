@@ -8,7 +8,7 @@
 class linkfeed_install extends install_modules
 {
 
-	function install($id_module)
+	function install($id_module, $reinstall = false)
 	{
 	}
 

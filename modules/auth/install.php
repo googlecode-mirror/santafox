@@ -11,7 +11,7 @@ class auth_install extends install_modules
 	/**
      * Вызывается при инстялции базвоового модуля
      */
-	function install()
+	function install($id_module, $reinstall = false)
 	{
 	}
 

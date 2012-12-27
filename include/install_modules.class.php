@@ -12,18 +12,16 @@ class install_modules
 	/**
 	 * Имя базвоого модуля, используемое при инсталяции
 	 *
-	 * @access private
 	 * @var string
 	 */
-	var $modul_name				= '';
+	protected $modul_name = '';
 
 	/**
 	 * id базвого модуля
 	 *
-	 * @access private
 	 * @var string
 	 */
-	var $modul_id				= '';
+	protected $modul_id	= '';
 
 	/**
 	 * Тип администртивного интерфейса
@@ -32,26 +30,23 @@ class install_modules
 	 * 0 - модули не имеют административного интерфейса (АИ)
 	 * 1 - модули имеют один АИ, на базовый модуль
 	 * 2 - каждый экземпляр модуля имеет свою админку
-	 * @access private
 	 * @var int
 	 */
-	var $type_admin_interfase 	= 0;
+	protected $type_admin_interfase = 0;
 
 	/**
 	 * Массив параметров модуля
 	 *
-	 * @access private
 	 * @var array
 	 */
-	var $modul_properties 		= array();
+	protected $modul_properties = array();
 
 	/**
 	 * Массив параметров, которые модуль добовляет к каждой странице
 	 *
-	 * @access private
 	 * @var array
 	 */
-	var $page_properties		= array();
+	protected $page_properties = array();
 
 	/**
 	 * Массив дополнительных полей, которые будут прописаны к БАЗОВОМУ модулю
@@ -59,60 +54,49 @@ class install_modules
 	 * @access private
 	 * @var array
 	 */
-	var $users_properties_one	= array();
+	protected $users_properties_one	= array();
 
 	/**
 	 * Массив дополнительных полей, которые будут прописаны к КАЖДОМУ дочернему модулю
 	 *
-	 * @access private
 	 * @var array
 	 */
-	var $users_properties_multi	= array();
+	protected $users_properties_multi = array();
 
 	/**
 	 * Массив признаков доступа для администраторов сайта
 	 *
-	 * @access private
 	 * @var array
 	 */
-	var $admin_acces_label 		= array();
+	protected $admin_acces_label = array();
 
 	/**
 	 * Массив методов, из которых строятся макросы, с параметрами
 	 *
-	 * @access private
 	 * @var array
 	 */
-	var $admin_public_metods 	= array();
+	protected $admin_public_metods = array();
 
 	/**
 	 * Массив значений параметров модуля, выставляемых при исталяции
 	 *
-	 * @access private
 	 * @var array
 	 */
-	var $parametrs_def 			= array();
+	protected $parametrs_def = array();
 
 	/**
 	 * Массив, показывающий сколько нужно сделать экземпляров модуля при инсталляции
 	 *
-	 * @access private
 	 * @var array
 	 */
-	var $module_copy = array();
+	public $module_copy = array();
 
 	/**
 	 * Определяет возможность обрботки таблиц mysql при реинсталляции
 	 *
 	 * @var bool
-	 * @access private
 	 */
-	var $call_reinstall_mysql = true;
-
-	//Конструктор класса
-	function install_modules()
-	{
-	}
+	protected  $call_reinstall_mysql = true;
 
 
 	/**
@@ -120,7 +104,6 @@ class install_modules
 	 *
 	 * @param string $id_module ID базового модуля
 	 * @param boolean $reinstall переинсталяция?
-	 * @access private
 	 * @return void
 	 */
 	function install($id_module, $reinstall = false)

@@ -1,7 +1,7 @@
 <?php
 class gallery_install extends install_modules
 {
-	function install($id_module)
+	function install($id_module, $reinstall = false)
 	{
 		global $kernel;
 	    $query = 'CREATE TABLE IF NOT EXISTS `'.$kernel->pub_prefix_get().'_gallery` (

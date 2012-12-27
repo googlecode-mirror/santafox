@@ -13,8 +13,9 @@ class feedback_install extends install_modules
 	 * Инсталяция базового модуля
 	 *
 	 * @param string $id_module Идентификатор создаваемого базового модуля
+     * @param boolean $reinstall переинсталяция?
 	 */
-	function install($id_module)
+	function install($id_module, $reinstall = false)
 	{
 	}
 

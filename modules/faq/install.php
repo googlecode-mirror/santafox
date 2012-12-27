@@ -13,7 +13,7 @@ class faq_install extends install_modules
     /**
      * Функция инсталляции базового модуля
      */
-    function install()
+    function install($id_module, $reinstall = false)
     {
     }
 

@@ -104,7 +104,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_category_bt_save_labe
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_category_need_select_label',NULL,'Значение не выбрано');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_category_isdefault_label',NULL,'Категория по-умолчанию');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_category_label_main',NULL,'Редактирование категории');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_property_cat_enum_del_alert',NULL,'Вы действительн хотите удалить свойство');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_property_cat_enum_del_alert',NULL,'Вы действительно хотите удалить значение из набора');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_property_cat_enum_addnew_bt',NULL,'Добавить');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_property_cat_enum_addnew_msg',NULL,'Новое значение свойства добавлено');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('en','catalog_edit_property_cat_enum_addnew',NULL,'Добавить значение');
@@ -385,7 +385,7 @@ INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_category_isdefault_la
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_category_label_main',NULL,'Редактирование категории');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_cat_enum_addnew_bt',NULL,'Добавить');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_cat_enum_addnew_msg',NULL,'Новое значение свойства добавлено');
-INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_cat_enum_del_alert',NULL,'Вы действительн хотите удалить свойство');
+INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_cat_enum_del_alert',NULL,'Вы действительно хотите удалить значение из набора');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_cat_enum_addnew',NULL,'Добавить значение');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_cat_enum_label',NULL,'Возможные значения');
 INSERT INTO `%PREFIX%_all_lang` VALUES ('ru','catalog_edit_property_cat_edit_bt_save',NULL,'Сохранить');

@@ -2698,7 +2698,7 @@ class catalog extends BaseModule
      */
     private function get_enum_prop_values($str, $needDefault=true)
     {
-        $elems = explode(',',mb_substr($str,5, -1));
+        $elems = explode("','",mb_substr($str,6, -2));
         $res   = array();
         //Добавим сюда сразу 0-вое значение
         //при выводе оно будет пропускаться
@@ -2707,7 +2707,7 @@ class catalog extends BaseModule
             $res[0] = 'Не выбран';
 
         foreach ($elems as $el)
-            $res[] = str_replace("''","'",mb_substr(stripslashes($el),1,-1));
+            $res[] = str_replace("''","'",stripslashes($el));
         $res = array_unique($res);
         return $res;
     }
@@ -2781,11 +2781,6 @@ class catalog extends BaseModule
 
             $num++;
         }
-
-
-        $kernel->debug($props, true);
-        die();
-
 
     }
     */
@@ -3171,8 +3166,6 @@ class catalog extends BaseModule
     private function save_category($id)
     {
         global $kernel;
-        //$kernel->debug($kernel->pub_httppost_get(), true);
-        //die();
         $isdef = $kernel->pub_httppost_get('isdefault');
         if (!empty($isdef))
         {//значит эта категория будет по-умолчанию, сбрасываем другую
@@ -6377,6 +6370,7 @@ class catalog extends BaseModule
                 {
                     $line = $this->get_template_block('enum_val');
                     $line = str_replace('%val_name%',$val, $line);
+                    $line = str_replace('%val_name_urlencoded%',urlencode($val), $line);
                     $lines .= $line;
                 }
                 $block_addparam = $this->get_template_block('enum_vals');
@@ -6477,12 +6471,6 @@ class catalog extends BaseModule
 
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'property_form.html'));
 
-        //Если $id_prop = 0 значит это новое свойство
-        //Если $id_group = 0 значит это общее свойство
-        //$kernel->debug('=='.$id_prop.'==', true);
-        //$kernel->debug('=='.($id_group == 0).'==', true);
-
-
         //Получим массив с параметрами свойства или сделаем пустой,
         //если это новое свойство
         $_tmp_label = "_add";
@@ -6523,12 +6511,7 @@ class catalog extends BaseModule
         //Определим какой тип поля должен быть выбран, и заменим в шаблоне
         $select_type = $this->get_template_block('prop_type');
         $select_type = str_replace('value="'.$prop['type'].'"','value="'.$prop['type'].'" selected="selected"', $select_type);
-
         $content = $this->get_template_block('header');
-
-
-
-
         if ($prop['group_id'] == 0)
         {
             $content = str_replace("%sort_enabled%", "", $content);
@@ -6540,7 +6523,6 @@ class catalog extends BaseModule
                 $content = str_replace("%ismain_checked%", " checked", $content);
             else
                 $content = str_replace("%ismain_checked%", "", $content);
-
         }
         else
         {
@@ -6568,17 +6550,11 @@ class catalog extends BaseModule
         $sort_param = str_replace("%sort_checked%", $prop['sorted']==2?" selected":"", $sort_param);
         $sort_param = str_replace("%sort_name%", $kernel->pub_page_textlabel_replace("[#catalog_prop_sort_desc#]"), $sort_param);
         $sort_params .= $sort_param;
-
         $content = str_replace("%sort_params%", $sort_params, $content);
-
-
-
-
         $content .= $this->get_template_block('footer');
 
         //Теперь, в зависимости от того, какое это поле, возможно нам нужно показать
         //что-то дополнительное
-
         $addons_param = '';
         if ($prop['type'] == 'enum')
         {
@@ -6591,9 +6567,7 @@ class catalog extends BaseModule
                 $group = CatalogCommons::get_group($prop['group_id']);
                 $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
             }
-
             $addons_param = $this->get_template_block('enum_vals');
-
             $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
             $lines = '';
             foreach ($vals as $num_val => $val)
@@ -6601,10 +6575,8 @@ class catalog extends BaseModule
                 //пропускаем нулевое (не выбранное значение)
                 if ($num_val == 0)
                     continue;
-
                 $line = $this->get_template_block('enum_val');
-
-                $line = str_replace('%action_del%','enum_prop_delete&enumval=%val_name%&propid=%id%&id_group_control='.$id_group_control, $line);
+                $line = str_replace('%action_del%','enum_prop_delete&enumval='.urlencode($val).'&propid=%id%&id_group_control='.$id_group_control, $line);
                 $line = str_replace('%val_name%',$val, $line);
                 $lines .= $line;
             }
@@ -6839,17 +6811,12 @@ class catalog extends BaseModule
                 "isrequired" => 0,
             );
         }
-
         $form_label = $this->get_template_block(trim($form_label));
 
         //Определим какой тип поля должен быть выбран, и заменим в шаблоне
         $select_type = $this->get_template_block('prop_type');
         $select_type = str_replace('value="'.$prop['type'].'"','value="'.$prop['type'].'" selected="selected"', $select_type);
-
         $content = $this->get_template_block('header');
-
-
-
         $content .= $this->get_template_block('footer');
 
         //Теперь, в зависимости от того, какое это поле, возможно нам нужно показать
@@ -6868,7 +6835,7 @@ class catalog extends BaseModule
                 if ($num_val == 0)
                     continue;
                 $line = $this->get_template_block('enum_val');
-                $line = str_replace('%action_del%','order_enum_field_delete&enumval=%val_name%&id=%id%', $line);
+                $line = str_replace('%action_del%','order_enum_field_delete&enumval='.urlencode($val).'&id=%id%', $line);
                 $line = str_replace('%val_name%',$val, $line);
                 $lines .= $line;
             }
@@ -7041,7 +7008,7 @@ class catalog extends BaseModule
     private function delete_order_enum_field($id)
     {
         global $kernel;
-        $enumval = $kernel->pub_httpget_get("enumval");
+        $enumval = $kernel->pub_httpget_get("enumval",false);
         $prop = CatalogCommons::get_order_field($id);
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
         $tinfo   = $kernel->db_get_table_info($table);
@@ -7069,7 +7036,7 @@ class catalog extends BaseModule
     private function add_order_enum_field($id)
     {
         global $kernel;
-        $enumval = $kernel->pub_httppost_get("enumval");
+        $enumval = $kernel->pub_httppost_get("enumval",false);
         $prop = CatalogCommons::get_order_field($id);
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
         $tinfo   = $kernel->db_get_table_info($table);
@@ -7078,7 +7045,6 @@ class catalog extends BaseModule
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
         $kernel->runSQL($query);
     }
-
 
 
     /**
@@ -8738,11 +8704,10 @@ class catalog extends BaseModule
                 break;
 
             case 'cat_enum_prop_add':
-                $enumval = $kernel->pub_httppost_get("enumval");
+                $enumval = $kernel->pub_httppost_get("enumval",false);
                 $propid  = $kernel->pub_httppost_get("id");
                 $prop    = $this->get_cat_prop($propid);
                 $table   = '_catalog_'.$moduleid.'_cats';
-
                 $tinfo   = $kernel->db_get_table_info($table);
                 $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
                 $evals[] = $enumval;
@@ -8751,7 +8716,7 @@ class catalog extends BaseModule
                 return $kernel->pub_httppost_response("[#catalog_edit_property_cat_enum_addnew_msg#]","cat_prop_edit&id=".$propid);
 
             case 'cat_enum_prop_delete':
-                $enumval = $kernel->pub_httpget_get("enumval");
+                $enumval = $kernel->pub_httpget_get("enumval",false);
                 $propid  = $kernel->pub_httpget_get("propid");
                 $prop    = $this->get_cat_prop($propid);
                 $table   = '_catalog_'.$moduleid.'_cats';
@@ -9099,10 +9064,10 @@ class catalog extends BaseModule
      * К уже существующему перечислению добавляет новое значение
      *
      */
-    function enum_prop_add()
+    private function enum_prop_add()
     {
         global $kernel;
-        $enumval = $kernel->pub_httppost_get("enumval");
+        $enumval = $kernel->pub_httppost_get("enumval",false);
         $propid  = $kernel->pub_httppost_get("id");
         $prop    = $this->get_prop($propid);
         if ($prop['group_id'] == 0)
@@ -9126,7 +9091,7 @@ class catalog extends BaseModule
     function enum_prop_delete()
     {
         global $kernel;
-        $enumval = $kernel->pub_httpget_get("enumval");
+        $enumval = $kernel->pub_httpget_get("enumval",false);
         $propid  = $kernel->pub_httpget_get("propid");
         $prop    = $this->get_prop($propid);
         if ($prop['group_id'] == 0)

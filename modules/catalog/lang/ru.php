@@ -333,7 +333,7 @@ $il['catalog_edit_property_cat_enum_label']          = 'Возможные зн�
 $il['catalog_edit_property_cat_enum_addnew']         = 'Добавить значение';
 $il['catalog_edit_property_cat_enum_addnew_bt']      = 'Добавить';
 $il['catalog_edit_property_cat_enum_addnew_msg']     = 'Новое значение свойства добавлено';
-$il['catalog_edit_property_cat_enum_del_alert']      = 'Вы действительн хотите удалить свойство';
+$il['catalog_edit_property_cat_enum_del_alert']      = 'Вы действительно хотите удалить значение из набора';
 
 
 //Редактируем параметры категории

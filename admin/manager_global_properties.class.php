@@ -622,9 +622,7 @@ class manager_global_properties
      */
     function lang_reinstall()
     {
-        global $kernel;
-
-        $m_table = new mysql_table($kernel->pub_prefix_get(), $kernel);
+        $m_table = new mysql_table();
 
         $modul = new manager_modules();
         $arr = $modul->return_modules();
@@ -632,7 +630,7 @@ class manager_global_properties
         //Определим тем записи, которые нам нужно оставить
         //А оставить нам нужно названия модуля для разных языков
         $lang_save = array();
-        foreach ($arr as $key => $val)
+        foreach ($arr as $val)
         {
             $lkey = $val['caption'];
             $lkey = str_replace("[#", "", $lkey);
@@ -655,5 +653,3 @@ class manager_global_properties
     }
 
 }
-
-?>

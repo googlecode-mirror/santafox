@@ -475,26 +475,15 @@ class install_ftp
         //error_reporting(0);
         error_reporting(E_ALL);
         //require_once dirname(dirname(__FILE__)) . "/ini.php"; // Файл с настройками
-
         require_once dirname(dirname(__FILE__)) . "/include/kernel.class.php"; //Ядро
         //require_once dirname(dirname(__FILE__))."/include/pub_interface.class.php";
         require_once dirname(dirname(__FILE__)) . "/include/mysql_table.class.php";
-        //require_once ("admin/manager_modules.class.php"); //Менеджер управления модулями
-        //require_once ("admin/manager_users.class.php"); //Менеджер управления пользователями
-        //require_once ("admin/manager_stat.class.php");
-
-
         $kernel = new kernel(PREFIX);
-        $kernel->runSQL("SET NAMES utf8");
-
-        $m_table = new mysql_table(PREFIX, $kernel);
-        //$m_table->install($kernel);
+        $m_table = new mysql_table();
         $m_table->install($etalon_install);
-
         $kernel->runSQL("INSERT INTO " . PREFIX . "_admin_group (name, full_name, main_admin) VALUES ('admin', 'Главные администраторы', 1), ('all_admin', 'Администраторы', 0)");
         $kernel->runSQL("INSERT INTO " . PREFIX . "_admin (login, pass, full_name, lang, code_page) VALUES ('" . mysql_real_escape_string($admin_login) . "', '" . mysql_real_escape_string($admin_pass) . "', 'Главный администратор', 'ru', 'utf-8')");
         $kernel->runSQL("INSERT INTO " . PREFIX . "_admin_cross_group (user_id, group_id) VALUES (1, 1)");
-
     }
 
     function set_ftp_parametrs($host, $login, $pass)

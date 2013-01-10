@@ -3,89 +3,26 @@
  * Описывает инсталируемые CMS mySQL таблицы
  *
  * Содрежит SQL запросы для создания необходимых CMS
- * таблиц. По мимо этого, содержит список значений по умолчанию
+ * таблиц. Помимо этого, содержит список значений по умолчанию
  * которые прописываются в таблицы при инсталяции
  *
- * @name dhtml_data
- * @package Install
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2013
+ * @version 2.0
  */
 class mysql_table
 {
 	/**
-	 * Массив SQL зпросов, выполняемыйх при инсталяции CMS
-	 *
-	 * @access private
-	 * @var array
-	 */
-	var $sql = array();
-
-	/**
-	 * Префикс создаваемых таблиц
-	 *
-	 * @access private
-	 * @var string
-	 */
-	var $prefix = "";
-
-	/**
-	 * Переменная куда передаётся ядро
-	 *
-	 * @access private
-	 * @var object
-	 */
-	var $kernel;
-
-	/**
-	 * Конструктор. Опиcывает создаваемые таблицы и значения, прописываемые при инстляции
-	 *
-	 * @param string $prefix_base
-	 * @return void
-	 */
-
-	function mysql_table($prefix_base, $in_core)
-    {
-
-    	$this->prefix = $prefix_base;
-        $this->kernel = $in_core;
-
-    }
-   //=====================   Слежение за пользователем бэкофиса ====================================
-
-
-
-    /**
-     * Подготавливает БД к инсталяции таблиц
-     *
-     * Необходимо для совестимости с различно настроеными БД
-     * @param array $comands
-     * @access private
-     * @return string
-     */
-    function prepare_table($comands)
-    {
-        $str = $comands['CREATE'];
-        $str .= " ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci";
-        if (!isset($comands['COMMENT']))
-            $str .= " COMMENT = 'Это моя тестовая таблица'";
-
-        return $str;
-    }
-
-	/**
 	 * Создает необходимые таблицы в базе данных
-
-	 * @access public
+     * @param $is_etalon_install
 	 * @return void
 	 */
 	function install($is_etalon_install)
     {
-        $kernel = $this->kernel;
+        global $kernel;
+        if (!$kernel)
+            $kernel = new kernel(PREFIX);
         $sql_files_dir = $kernel->pub_site_root_get()."/sinstall/sql";
         $log_file = $kernel->pub_site_root_get()."/sinstall/_install.log";
-        //print "log: ".$log_file."<br>\n";
-        //error_reporting(E_ALL);
         $sql_files = array_keys($kernel->pub_files_list_get($sql_files_dir));
         foreach($sql_files as $sql_file)
         {
@@ -98,8 +35,7 @@ class mysql_table
                 $query = trim($query);
                 if (empty($query))
                     continue;
-                $query = str_replace("`%PREFIX%","`".$this->prefix, $query);
-                //$kernel->pub_add_line2file($log_file, "executing query:\n ".$query); //
+                $query = str_replace("`%PREFIX%","`".PREFIX, $query);
                 $kernel->runSQL($query);
                 $err = mysql_error();
                 if (!empty($err))
@@ -127,9 +63,7 @@ class mysql_table
             $query = trim($query);
             if (empty($query))
                 continue;
-            //$query = substr($query, 0, -1);
-            $query = str_replace("`%PREFIX%","`".$this->prefix, $query);
-            $kernel->pub_add_line2file($log_file, "executing query:\n ".$query);
+            $query = str_replace("`%PREFIX%","`".PREFIX, $query);
             $kernel->runSQL($query);
             $err = mysql_error();
             if (!empty($err))
@@ -139,47 +73,49 @@ class mysql_table
                 print $msg."<br>\n";
             }
         }
+        //добавляем общие языковые метки в БД
+        $this->add_langauge('include/install/lang');
 
+        //и языковые метки для всех модулей, если это эталонная инсталяция
+        if ($is_etalon_install)
+        {
+            $moddirs = array_keys($kernel->pub_dirs_list_get('modules'));
+            foreach($moddirs as $moddir)
+            {
+                $this->add_langauge($moddir.'lang');
+            }
+        }
     }
 
 
 	/**
 	 * Проверяет наличие в базе данных укзанной языковой переменной
 	 *
-	 * @param string $lang Двух буквенный код языка.
+	 * @param string $lang Двубуквенный код языка.
 	 * @param String $elem Языковая переменная
-	 * @access private
 	 * @return bool
 	 */
 	function lang_exist($lang, $elem)
 	{
-    	$query = "SELECT * FROM ".$this->prefix."_all_lang
-    			  WHERE (lang = '".$lang."') and (element ='".$elem."')
-    			 ";
-
-    	$result = $this->kernel->runSQL($query);
-
-        if (mysql_num_rows($result) > 0)
-        	return true;
-
+        global $kernel;
+        $rec = $kernel->db_get_record_simple('_all_lang',"lang = '".$lang."' and element ='".$elem."'");
+        if ($rec)
+            return true;
         return false;
-
 	}
 
     /**
     * Считывает языковые файлы и по их содержимому заполняет языковую таблицу
     *
     * @param  string $path_in_lang Путь к языковам файлам
-    * @access public
     * @return void
     */
 	function add_langauge($path_in_lang)
     {
-
+        global $kernel;
 		if (!file_exists($path_in_lang))
             return;
-
-        $lang_isset = $this->kernel->priv_languages_get(false);
+        $lang_isset = $kernel->priv_languages_get(false);
         foreach ($lang_isset as $lang_code => $lang_name)
         {
             $file_name = $path_in_lang.'/'.$lang_code.'.php';
@@ -200,12 +136,11 @@ class mysql_table
     * Вызывается при удалении базавого модуля с тем что бы очистить
     * языковую таблицу от лишней информации
     * @param  string $path_in_lang Путь к языковам файлам
-    * @access public
     * @return void
     */
-	function del_langauge($path_in_lang)
+	public static function del_langauge($path_in_lang)
     {
-
+        global $kernel;
 		if (!file_exists($path_in_lang))
             return ;
 
@@ -220,10 +155,8 @@ class mysql_table
                 //Удалим все записи
                 if (!empty($il))
                 {
-					$query = "DELETE FROM ".$this->prefix."_all_lang
-    						  WHERE element IN ('".join("','",array_keys($il))."')";
-
-					$this->kernel->runSQL($query);
+					$query = "DELETE FROM ".PREFIX."_all_lang WHERE element IN ('".join("','",array_keys($il))."')";
+					$kernel->runSQL($query);
                 }
             }
         }
@@ -235,15 +168,13 @@ class mysql_table
     * @param string $lang Двух буквенный код языка
     * @param string $id id языковой переменной
     * @param string $val Представление языковой переменной
-    * @access private
     * @return void
     */
 	function add_data_langauge($lang, $id, $val)
     {
-
-    	//Если такой такой id, такой языковой переменной существет, то он будет
-    	//заменён
-		$query = "REPLACE INTO ".$this->prefix."_all_lang VALUES
+        global $kernel;
+    	//Если такой такой id, такой языковой переменной существет, то он будет заменён
+		$query = "REPLACE INTO ".PREFIX."_all_lang VALUES
 				   (
     	           		'".$lang."',
         	            '".$id."',
@@ -251,28 +182,21 @@ class mysql_table
                 	    '".mysql_real_escape_string($val)."'
                    )
 	             ";
-
-		$this->kernel->runSQL($query);
+		$kernel->runSQL($query);
     }
 
     /**
      * Очищает всю языковую таблицу
      *
      * @param array $nodel значения, которые не нужно удалять
-     * @access private
      * @return void
      */
     function lang_all_clear($nodel)
     {
-
-		$query = "DELETE FROM ".$this->prefix."_all_lang";
+        global $kernel;
+		$query = "DELETE FROM ".PREFIX."_all_lang";
 		if (count($nodel) > 0)
 		  $query .= " WHERE element NOT IN ('".join("','",array_values($nodel))."')";
-
-
-		$this->kernel->runSQL($query);
+		$kernel->runSQL($query);
     }
-
 }
-
-?>

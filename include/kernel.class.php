@@ -256,7 +256,7 @@ class kernel
     {
         $this->prefix = $prefix;
         $this->curent_os = strtolower(PHP_OS);
-        //тепеь произведем соединеие с базой данных MySql
+        //теперь произведем соединение с базой данных MySql
         $this->resurs_mysql = mysql_connect(DB_HOST, DB_USERNAME, DB_PASSWORD);
         if (!$this->resurs_mysql)
             die('mysql connect failed');
@@ -264,6 +264,7 @@ class kernel
         if (!mysql_select_db (DB_BASENAME, $this->resurs_mysql))
             die('mysql select db failed');
 
+        ini_set('session.use_only_cookies',1);
         $ver_arr = false;
         preg_match("/^([\\d]\\.[\\d]+)/i", mysql_get_server_info($this->resurs_mysql), $ver_arr);
 
@@ -275,9 +276,8 @@ class kernel
 
         // Определяем корень сайта
         $this->priv_path_root_set();
-        //$pub_interface = new pub_interface();
 
-        //Проверяем канстанты на адекватность значений
+        //Проверяем константы на адекватность значений
         $this->path_for_content = PATH_PAGE_CONTENT;
         if (mb_substr($this->path_for_content, 0, 1) !== '/')
             $this->path_for_content ="/".$this->path_for_content;
@@ -2648,6 +2648,36 @@ class kernel
             }
             $d->close();
         }
+        return $ret;
+    }
+
+
+    /**
+	 * Получить массив каталогов в указанном каталоге
+	 *
+     * @param string $path Путь к папке, в которой необходимо считывать содержимое
+	 * @access public
+	 * @return array
+	 */
+    function pub_dirs_list_get($path)
+    {
+        $ret = array();
+        if (!$path)
+            return $ret;
+        if (substr($path,-1)!='/')
+            $path.='/';
+        if (!is_dir($path))
+            return $ret;
+        $d = dir($path);
+        while (false !== ($entry = $d->read()))
+        {
+            if ($entry=='.' || $entry=='..')
+                continue;
+            $link = $path.$entry.'/';
+            if (is_dir($link))
+                $ret[$link] = $entry;
+        }
+        $d->close();
         return $ret;
     }
 

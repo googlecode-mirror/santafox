@@ -685,11 +685,7 @@ class manager_modules
 		//Удалим языковые переменные модуля, только в том случае, если
 		//удаляется бызовый модуль.
 		if (empty($arr_modul['parent_id']))
-		{
-			$lang_install = new mysql_table($kernel->pub_prefix_get(), $kernel);
-			$lang_install->del_langauge('modules/'.$arr_modul['id'].'/lang');
-		}
-
+            mysql_table::del_langauge('modules/'.$arr_modul['id'].'/lang');
 
        	//ВСЁ удалили, теперь можно удалять модули непосредственно из таблицы модулей
 		$query = "DELETE FROM `".$kernel->pub_prefix_get()."_modules` ";
@@ -844,7 +840,7 @@ class manager_modules
         $kernel->runSQL($query);
 
         //Теперь проведем инсталяцию языковых переменных
-        $lang_install = new mysql_table($kernel->pub_prefix_get(), $kernel);
+        $lang_install = new mysql_table();
 		$lang_install->add_langauge($path.'/lang');
 
 		//Проверим необходимость добавления к пользователю Фротнофиса новых полей базовым модулем
@@ -972,7 +968,7 @@ class manager_modules
         	{
 				foreach ($array_text as $key => $val)
             	{
-		        	$lang_install = new mysql_table($kernel->pub_prefix_get(), $kernel);
+		        	$lang_install = new mysql_table();
 					$lang_install->add_data_langauge($key, $full_name, $val.'_name'.$num_id);
 				}
         	}

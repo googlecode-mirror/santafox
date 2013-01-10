@@ -1,5 +1,6 @@
 <?php
-
+//используется ТОЛЬКО для удалённой инсталяции
+//@todo исключать из дистрибутива
 require_once("ini.php"); // Файл с настройками
 
 if (SHOW_INT_ERRORE_MESSAGE)
@@ -12,7 +13,6 @@ require_once ("include/pub_interface.class.php");
 require_once ("include/mysql_table.class.php");
 require_once ("components/pclzip/pclzip.lib.php");
 
-ini_set('url_rewriter.tags', 'none');
 session_cache_expire(60*60*24*7);
 session_start();
 
@@ -20,10 +20,7 @@ session_start();
 $expiry = 60*60*24*100;
 setcookie(session_name(), session_id(), time()+$expiry, "/");
 $kernel = new kernel(PREFIX);
-$kernel->runSQL("SET NAMES utf8");
 
-//Перед инсталяцией провреим, естли в папка
-//CMS архивы и запустим на распаковку
 $arr_files = array();
 $arr_files["admin"]      = "admin.zip";
 $arr_files["components"] = "components.zip";
@@ -43,7 +40,7 @@ foreach ($arr_files as $dir_name => $file_name)
     //$archive->extract(PCLZIP_OPT_SET_CHMOD, 0777);
     if ( $result <= 0)
     {
-        echo '<br><br><font color="red"><b>Ошибка при распоковке <br>'.$archive->error_string.'</b><br>Это необходимо сделать вручную!</font>\n';
+        echo '<br><br><font color="red"><b>Ошибка при распаковке <br>'.$archive->error_string.'</b><br>Это необходимо сделать вручную!</font>\n';
         error_log("unzip error: ".$archive->error_string);
     }
     $kernel->pub_ftp_dir_chmod_close($dir_name."/".$file_name);
@@ -56,7 +53,7 @@ if ($_GET['is_etalon']=="1")
 else
     $is_etalon = false;
 
-$m_table = new mysql_table(PREFIX, $kernel);
+$m_table = new mysql_table();
 $m_table->install($is_etalon);
 
 

@@ -475,3 +475,4 @@ $il['catalog_compare_max_items']='Макс. кол-во сравниваемых
 $il['catalog_groups_list']='Список товарных групп';
 $il['catalog_groups_list_delete_only_empty']='Удалить возможно только товарную группу без товаров';
 $il['catalog_list_group_items_count_label']='Товаров';
+$il['catalog_edit_category_hide_from_waysite_label']='Скрывать в дороге';

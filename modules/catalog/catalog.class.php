@@ -823,6 +823,8 @@ class catalog extends BaseModule
             {
                 if ($cwe['id']==0)
                     continue;
+                if ($cwe['_hide_from_waysite']==1)
+                    continue;
                 $cat_label = $way_cat_tpl;
                 foreach ($cwe as $cpname=>$cpval)
                 {
@@ -3175,10 +3177,14 @@ class catalog extends BaseModule
         }
         else
             $isdef = 0;
+        if ($kernel->pub_httppost_get('_hide_from_waysite'))
+            $_hide_from_waysite=1;
+        else
+            $_hide_from_waysite=0;
 
         $props = CatalogCommons::get_cats_props();
         $cat   = $this->get_category($id);
-        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET ';
+        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `_hide_from_waysite`= '.$_hide_from_waysite.', ';
         for ($i=0; $i<count($props); $i++)
         {
             $prop   = $props[$i];
@@ -3190,7 +3196,6 @@ class catalog extends BaseModule
                         $val = $this->process_pict_upload($_FILES[$prop['name_db']], $prop);
                     else
                         $val = $this->process_file_upload($_FILES[$prop['name_db']]);
-
                 }
                 elseif (!empty($cat[$prop['name_db']]))
                     $val = $cat[$prop['name_db']];
@@ -4347,7 +4352,7 @@ class catalog extends BaseModule
      */
     private function is_cat_prop_exists($pname)
     {
-        $reserved = array('id','parent_id','is_default','order');
+        $reserved = array('id','parent_id','is_default','order','_hide_from_waysite');
         if (in_array($pname,$reserved))
             return true;
         global $kernel;
@@ -6169,6 +6174,10 @@ class catalog extends BaseModule
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('category_save'), $content);
         $content = str_replace('%pid%', $cat['parent_id'], $content);
 
+        if ($cat['_hide_from_waysite'] == 1)
+            $content = str_replace('%_hide_from_waysitechecked%', 'checked', $content);
+        else
+            $content = str_replace('%_hide_from_waysitechecked%', '', $content);
         if ($cat['is_default'] == 1)
             $content = str_replace('%isdefaultchecked%', 'checked', $content);
         else

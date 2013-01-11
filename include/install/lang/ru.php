@@ -415,6 +415,7 @@ $il['admin_msg_incorrect_email'] = 'Некорректный email';
 $il['common_select_all_label']='Выбрать все';
 $il['common_deselect_all_label']='Убрать все';
 $il['common_done_label']='Готово';
+$il['common_saved_label']='Сохранено';
 
 $il['admin_msg_not_unique_email']='Неуникальный email';
 

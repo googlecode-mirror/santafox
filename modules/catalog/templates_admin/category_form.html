@@ -6,7 +6,7 @@
  
  <h3>[#catalog_edit_category_label_main#]</h3>
  
- <form action="%form_action%" method="POST" enctype="multipart/form-data" id="savecategoryform" onsubmit="form_submit_include_content_auto();">
+ <form action="%form_action%" method="POST" enctype="multipart/form-data" id="savecategoryform">
  <input type="hidden" name="id" value="%id%">
  <input type="hidden" name="pid" value="%pid%">
  
@@ -70,8 +70,8 @@
 
 <!-- @footer -->
  <fieldset class="page_submit_field">
-  <input type="submit" name="submit" value="[#catalog_edit_category_bt_save_label#]">
-  <!--<input type="button" name="submit" value="[#catalog_save_label#]" onclick="jspub_form_submit('savecategoryform','/admin/index.php?action=set_left_menu&leftmenu=category_save')">-->
+  <!--<input type="submit" name="submit" value="[#catalog_edit_category_bt_save_label#]">-->
+  <input type="button" name="submit" value="[#catalog_edit_category_bt_save_label#]" onclick="santaFormSubmit('savecategoryform')">
  </fieldset>
  </form>
  

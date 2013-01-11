@@ -3163,13 +3163,12 @@ class catalog extends BaseModule
      * Сохраняет категорию в БД
      *
      * @param $id integer id-шник категории
-     * @return void
+     * @return string
      */
     private function save_category($id)
     {
         global $kernel;
-        $isdef = $kernel->pub_httppost_get('isdefault');
-        if (!empty($isdef))
+        if ($kernel->pub_httppost_get('isdefault'))
         {//значит эта категория будет по-умолчанию, сбрасываем другую
             $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `is_default`=0 WHERE `is_default`=1';
             $kernel->runSQL($query);
@@ -3209,6 +3208,7 @@ class catalog extends BaseModule
         $query .= ' `is_default`='.$isdef.' WHERE `id`='.$id;
         $kernel->runSQL($query);
         $this->regenerate_all_groups_tpls(false);
+        return $kernel->pub_httppost_response('[#common_saved_label#]');
     }
 
     /**
@@ -8768,11 +8768,7 @@ class catalog extends BaseModule
 
             //Сохраняет параметры отредактированнной категории
             case 'category_save':
-                $cid   = $kernel->pub_httppost_get('id');
-                $this->save_category($cid);
-                //$kernel->pub_redirect_refresh('category_edit&id='.$cid.'&selectcat='.$cid);
-                $kernel->pub_redirect_refresh_reload('category_edit&id='.$cid.'&selectcat='.$cid);
-                break;
+                return $this->save_category($kernel->pub_httppost_get('id'));
 
             //Удаление категории
             case 'category_delete':

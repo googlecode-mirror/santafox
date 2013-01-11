@@ -51,7 +51,7 @@
         <div class="content">
             <h3>[#catalog_item_edit_mainlabel#]</h3>
 
-            <form action="%form_action%" method="POST" enctype="multipart/form-data" id="saveitemform" onsubmit="form_submit_include_content_auto()">
+            <form action="%form_action%" method="POST" enctype="multipart/form-data" id="saveitemform">
                 <input type="hidden" name="id" value="%id%">
                 <input type="hidden" name="group_id" value="%group_id%">
 
@@ -92,8 +92,10 @@
                     %props%
                 </table>
 
+                <input type="hidden" name="redir2" value="%redir2%">
                 <fieldset class="page_submit_field">
-                    <input type="submit" name="submit" value="[#catalog_item_edit_bt_save_label#]">
+                    <!-- <input type="submit" name="submit" value="[#catalog_item_edit_bt_save_label#]"> -->
+                    <input type="button" value="[#catalog_item_edit_bt_save_label#]" onclick="santaFormSubmit('saveitemform');">
                 </fieldset>
 
             </form>
@@ -208,7 +210,7 @@
 <!-- @prop_pict_edit -->
 <tr %class%>
 <td align="left">%prop_name_full%:</td>
-<td><img src="%prop_value%" width="50"><a href="#" onclick="form_submit_include_content_auto();jspub_confirm('item_clear_field&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
+<td><img src="%prop_value%" width="50"><a href="#" onclick="jspub_confirm('item_clear_field&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
 </tr>
 <!-- @prop_pict_marka_source -->
 <br><input type="checkbox" name="%prop_name_db%_need_add_source_water" id="%prop_name_db%_need_add_source_water" checked="checked"/><label for="%prop_name_db%_need_add_source_water">[#catalog_item_edit_pict_add_mark_for_source#]</label>

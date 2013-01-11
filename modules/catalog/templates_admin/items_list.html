@@ -16,7 +16,7 @@
 
  function add_new_item()
  {
- 	jspub_click('item_add&group_id='+$('#group_id_for_add').val());
+ 	jspub_click('item_add&group_id='+$('#group_id_for_add').val()+'&redir2=%redir2%');
  }
 
  function checkall()
@@ -101,7 +101,7 @@
             <td valign="middle" nowrap>
                 <a href="#" onclick="jspub_click('item_clone&id=%id%')" title="клонировать"><img src="/admin/templates/default/images/eye_old.gif" alt="клонировать"/></a>
 	             <a href="#" onclick="jspub_confirm('item_delete&id=%id%&group_id=%group_id%','[#catalog_items_all_list_table_action_alertdel#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_items_all_list_table_action_alertdel#]"/></a>
-                <a href="#" onclick="jspub_click('item_edit&id=%id%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#catalog_items_all_list_table_action_edit#]"/></a>
+                <a href="#" onclick="jspub_click('item_edit&id=%id%&redir2=%redir2%')"><img src="/admin/templates/default/images/icon_edit.gif" alt="[#catalog_items_all_list_table_action_edit#]"/></a>
             </td>
         </tr>
 <!-- @table_footer -->

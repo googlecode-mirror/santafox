@@ -6,7 +6,7 @@ require 'catalog.commons.class.php';
  * Модуль "Каталог товаров"
  *
  * @author s@nchez s@nchez.me
- * @copyright ArtProm (с) 2001-2011
+ * @copyright ArtProm (с) 2001-2013
  * @name catalog
  * @version 2.0
  *
@@ -3539,7 +3539,7 @@ class catalog extends BaseModule
 
     /**
      * Сохраняет товар в БД после его редактирования или добавления
-     * @return void
+     * @return string
      */
     private function save_item()
     {
@@ -3551,7 +3551,7 @@ class catalog extends BaseModule
         {
             $itemid  = $this->add_item();
             if (!$itemid)
-                return;
+                return $kernel->pub_httppost_errore('[#interface_global_label_error#]',true);
         }
         $item  = $this->get_item_full_data($itemid);
 
@@ -3643,8 +3643,8 @@ class catalog extends BaseModule
             {//чекбокс не отмечен
                 if (array_key_exists($cat['id'], $item_catids))
                 {//товар был в категории, но чекбокс снят - удалим
-                    $del_q = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` '.
-                        'WHERE  `item_id`='.$itemid.' AND `cat_id`='.$cat['id'];
+                    $del_q = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat`
+                              WHERE  `item_id`='.$itemid.' AND `cat_id`='.$cat['id'];
                     $kernel->runSQL($del_q);
                 }
             }
@@ -3654,6 +3654,7 @@ class catalog extends BaseModule
             $query .= implode(',', $vals);
             $kernel->runSQL($query);
         }
+        return $kernel->pub_httppost_response('[#common_saved_label#]',$kernel->pub_httppost_get('redir2'));
     }
 
 
@@ -4734,8 +4735,6 @@ class catalog extends BaseModule
         }
         $count  = count($items);
         $purl.='&'.$this->admin_param_offset_name.'=';
-        $kernel->pub_session_set("redir_after_save_item",$purl.$offset);
-
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_list.html'));
         $content = '';
         // Сформируем список доступных товарных групп
@@ -4916,6 +4915,7 @@ class catalog extends BaseModule
             $content .= $this->get_template_block('no_groups');
 
         $content = str_replace('%group_id%', $group_id, $content);
+        $content = str_replace('%redir2%', urlencode($purl.$offset), $content);
         return $content;
     }
 
@@ -5039,14 +5039,10 @@ class catalog extends BaseModule
             $group = CatalogCommons::get_group($group_id);
             $item_catids = explode(",",$group['defcatids']);
         }
-
         $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
         $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
         $props = CatalogCommons::get_props($group['id'], true);
-
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
-
-
         //Строить начнём с
         //Произведём первичную сортировку массива со свойствами, чтобы шаблон был
         //оптимизирован изначально. В дальнейшем пользователь его самостоятельно поменяет
@@ -5068,9 +5064,7 @@ class catalog extends BaseModule
         {
             if ($prop['group_id']==0 &&  !array_key_exists($prop['name_db'], $visible_props))
                 continue;
-
             $template_line = $this->get_template_block('prop_'.$prop['type']);
-
             //Запишим значения заменяемых переменных
             //для большенства свойств
             $pname_db   = $prop['name_db'];
@@ -5124,7 +5118,6 @@ class catalog extends BaseModule
                 //загруженный файл
                 $template_line = $this->get_template_block('prop_'.$prop['type'].'_edit');
                 $pvalue     = "/".$item[$prop['name_db']];
-
                 //Нужно проставить id свойсвта, что бы можно было удалить файл
                 //$template_line = str_replace('%id%'    , $item['commonid'] , $template_line);
                 $template_line = str_replace('%id%'    , $id , $template_line);
@@ -5158,14 +5151,10 @@ class catalog extends BaseModule
             $template_line = str_replace('%prop_value%'    , $pvalue    , $template_line);
             $template_line = str_replace('%prop_name_full%', $pname_full, $template_line);
             $template_line = str_replace('%prop_name_db%'  , $pname_db  , $template_line);
-
-
             $lines[$sort_def[$prop['type']].'_'.$prop['id']] = $template_line;
         }
-
         //Отсортируем свойства пока в автоматическом режиме
         //ksort($lines); // временно отключено
-
         //Проставим чередование строк только после сортировки
         $num = 1;
         foreach ($lines as $key => $val)
@@ -5173,10 +5162,8 @@ class catalog extends BaseModule
             $lines[$key] = str_replace("%class%", $kernel->pub_table_tr_class($num),$val);
             $num++;
         }
-
         //Начнём строить итоговоую форму
         $content  = $this->get_template_block('form');
-
         $linked_block = "";
         if ($id>0)
         {//связанные товары только при редактировании
@@ -5185,7 +5172,6 @@ class catalog extends BaseModule
             if ($main_prop)
             {
                 $linked_items = $this->get_linked_items($id);
-
                 foreach ($linked_items as $litem)
                 {
                     $linked_val = $this->get_template_block('linked_item');
@@ -5197,59 +5183,39 @@ class catalog extends BaseModule
             }
             else
                 $linked_data=$this->get_template_block('linked_no_main_prop_block');
-
             $linked_block = $this->get_template_block('linked');
             $linked_block = str_replace("%linked_data%", $linked_data, $linked_block);
             $linked_block = str_replace("%linked_items%", $linked_vals, $linked_block);
         }
         $content = str_replace("%linked%", $linked_block, $content);
-
         //Отметка о том, включён товар или нет
         if ($item['available'] == 1)
             $content = str_replace('%isavalchecked%', 'checked', $content);
         else
             $content = str_replace('%isavalchecked%', '', $content);
-
         $content = str_replace("%group.name%", $group['name_full'], $content);
-
         //Строим список категорий, куда входит товар
-
         $cats = $this->get_child_categories(0);
-
         $categories = array();
-
         foreach ($cats as $cat)
         {
             $repl = "";
             if (in_array($cat['id'], $item_catids) || $cat['id'] == $id_cat)
                 $repl = ' checked';
-
             $catline = $this->get_template_block('category_item');
             $catline = str_replace("%checked%", $repl                             , $catline);
             $catline = str_replace("%id%",      $cat["id"]                        , $catline);
             $catline = str_replace("%catname%", $cat["name"]                      , $catline);
             $catline = str_replace("%shift%"  , str_repeat("&nbsp;&nbsp;&nbsp;",$cat['depth']), $catline);
-
             $categories[] = $catline;
         }
-        //Определим, линк для сохранения, так как там нужно ещё указать куда нужно вернуться
-        //после сохранения. Либо в категорию конкртеную, либо во все товары
         $form_action = $kernel->pub_redirect_for_form('item_save');
-        /*
-        if ($id_cat > 0)
-        {
-            $form_action = $kernel->pub_redirect_for_form('item_save&id_cat='.$id_cat);
-        }
-        */
-
         $content  = str_replace('%props%'      , join("\n", $lines)     , $content);
         $content  = str_replace('%categories%' , join("\n", $categories), $content);
         $content  = str_replace('%form_action%', $form_action           , $content);
-        //$content  = str_replace('%id%'         , $item['commonid']      , $content);
         $content  = str_replace('%id%'         , $id                    , $content);
         $content  = str_replace('%group_id%'   , $group_id              , $content);
-
-
+        $content  = str_replace('%redir2%'     , htmlspecialchars($kernel->pub_httpget_get('redir2')), $content);
         return $content;
     }
 
@@ -6040,6 +6006,7 @@ class catalog extends BaseModule
         //По умолчанию вернём что нет товаров тут
         $items_html = $this->get_template_block('cat_items_empty');
         $pblock = '';
+        $purl = 'category_items&id='.$id_cat.'&'.$this->admin_param_offset_name.'=';
         if ($count > 0)
         {
             //Сначала формируем массив с достпными строками товара
@@ -6118,17 +6085,12 @@ class catalog extends BaseModule
             $items_html = $this->get_template_block('cat_items');
             $items_html = str_replace('%form_action%', $kernel->pub_redirect_for_form('category_items_save'), $items_html);
             $items_html = str_replace('%cat_items_line%', join("\n", $lines), $items_html);
-            $purl = 'category_items&id='.$id_cat.'&'.$this->admin_param_offset_name.'=';
-            $kernel->pub_session_set("redir_after_save_item",$purl.$offset);
             $pblock = $this->build_pages_nav($total, $offset, $limit, $purl, 0,'url');
             $search_block=$this->get_template_block('search_block');
         }
         else
             $search_block='';
-
-
-        //$content .= $lines;
-        //Построим список категорий куда пользователь момжет перенести товар
+        //Построим список категорий куда пользователь может перенести товар
         $cats = $this->get_child_categories(0, 0, array());
         $options = '';
         $cat_shift = $this->get_template_block('cat_shift');
@@ -6144,7 +6106,6 @@ class catalog extends BaseModule
 
         //сначала итемсы, так как там ещё есть переменные
         $content = str_replace('%items%'        , $items_html   , $content);
-
         //Теперь всё остальное
         $content = str_replace('%colum_th%'     , $colum_th        , $content);
         $content = str_replace('%cname%'        , $cdata['name']   , $content);
@@ -6155,6 +6116,7 @@ class catalog extends BaseModule
         $content = str_replace('%pages%'        , $pblock          , $content);
         $content = str_replace('%catid%'        , $id_cat          , $content);
         $content = str_replace('%search_block%' , $search_block    , $content);
+        $content = str_replace('%redir2%'       , urlencode($purl.$offset), $content);
 
         return $content;
     }
@@ -8896,11 +8858,7 @@ class catalog extends BaseModule
 
             //Сохраняет товар после редактирования или добавляет новый
             case 'item_save':
-                $this->save_item();
-                $redir2=$kernel->pub_session_get("redir_after_save_item");
-                if ($redir2)
-                    $kernel->pub_redirect_refresh_reload($redir2);
-                break;
+                return $this->save_item();
 
             //Очистка поля с файлом в товаре
             case 'item_clear_field':

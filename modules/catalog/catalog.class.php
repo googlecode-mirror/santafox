@@ -2483,7 +2483,7 @@ class catalog extends BaseModule
                 $this->set_templates($parsed_template);
                 $cblock = str_replace($match[0], $items_block, $cblock);
             }
-
+            $cblock = str_replace('%cat_items_count%',$cat['_items_count'],$cblock);
             $content .= $cblock;
             $prev_depth = $cat['depth'];
         }
@@ -4353,7 +4353,7 @@ class catalog extends BaseModule
      */
     private function is_cat_prop_exists($pname)
     {
-        $reserved = array('id','parent_id','is_default','order','_hide_from_waysite');
+        $reserved = array('id','parent_id','is_default','order','_hide_from_waysite','_items_count','_subcats_count','depth');
         if (in_array($pname,$reserved))
             return true;
         global $kernel;
@@ -4501,38 +4501,29 @@ class catalog extends BaseModule
     }
 
 
-    public function get_categories_tree($node_id, $module_id=false)
+    protected function get_categories_tree($node_id, $module_id=false)
     {
         global $kernel;
         if (!$module_id)
             $module_id = $kernel->pub_module_id_get();
         $data  = array();
-        $sql   = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$module_id.'_cats` WHERE `parent_id` = '.$node_id.' ORDER BY `order`';
-        $query = $kernel->runSQL($sql);
-        if (mysql_num_rows($query) > 0)
+        $rows = CatalogCommons::get_child_cats_with_count($module_id,$node_id,'cats.id,cats.name',true);
+        foreach($rows as $row)
         {
-            while ($row = mysql_fetch_assoc($query))
+            $array = array(
+                'data'  => htmlentities($row['name'], ENT_NOQUOTES, 'UTF-8').' ('.$row['_items_count'].')',
+                'attr'=>array("id"=>$row['id'],'rel'=>'default'),
+            );
+            if ($row['_subcats_count'] == 0)
+                $array['leaf'] = true;
+            else
             {
-                $array = array(
-                    'data'  => htmlentities($row['name'], ENT_NOQUOTES, 'UTF-8'),
-                    'attr'=>array("id"=>$row['id'],'rel'=>'default'),
-                );
-
-                $children = $this->get_categories_tree($row['id'], $module_id);
-
-                if (sizeof($children) == 0)
-                    $array['leaf'] = true;
-                else
-                {
-                    $array['children'] = $children;
-                    $array['leaf'] = false;
-                    $array['attr']['rel'] = "folder";
-                }
-                $data[] = $array;
-
+                $array['children'] = $this->get_categories_tree($row['id'], $module_id);;
+                $array['leaf'] = false;
+                $array['attr']['rel'] = "folder";
             }
+            $data[] = $array;
         }
-        mysql_free_result($query);
         return $data;
     }
 
@@ -4564,7 +4555,7 @@ class catalog extends BaseModule
      * @param string|boolean $module_id
      * @return array
      */
-    public function get_child_categories($node_id, $depth = 0, $data = array(), $maxdepth = 100, $module_id = false)
+    protected function get_child_categories($node_id, $depth = 0, $data = array(), $maxdepth = 100, $module_id = false)
     {
         global $kernel;
         if ($depth >= $maxdepth)
@@ -4572,20 +4563,17 @@ class catalog extends BaseModule
         $currdepth = $depth++;
         if (!$module_id)
             $module_id = $kernel->pub_module_id_get();
-        $sql   = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$module_id.'_cats` WHERE `parent_id` = '.$node_id." ORDER BY `order`";
-        $query = $kernel->runSQL($sql);
-
-        while ($row = mysql_fetch_assoc($query))
+        $rows = CatalogCommons::get_child_cats_with_count($module_id,$node_id,'cats.*',true);
+        foreach($rows as $row)
         {
-            $array = $row;
-            $array['depth'] = $currdepth;
-            $data[] = $array;
-            $data = $this->get_child_categories($row['id'],$depth, $data, $maxdepth, $module_id);
+            $row['depth'] = $currdepth;
+            $data[] = $row;
+            if ($row['_subcats_count']>0)
+                $data = $this->get_child_categories($row['id'],$depth, $data, $maxdepth, $module_id);
         }
-
-        mysql_free_result($query);
         return $data;
     }
+
     /**
      * Возвращает вложенные категории с учётом кол-ва раскрываемых уровней
      *
@@ -4597,40 +4585,23 @@ class catalog extends BaseModule
      * @param integer $openlevels кол-во раскрываемых уровней
      * @return array
      */
-    private function get_child_categories2($node_id, $depth = 0, $data = array(), $maxdepth = 100, $way, $openlevels)
+    protected function get_child_categories2($node_id, $depth = 0, $data = array(), $maxdepth = 100, $way, $openlevels)
     {
         global $kernel;
-
         if ($depth >= $maxdepth)
             return $data;
         $currdepth = $depth++;
-        $sql   = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` WHERE `parent_id` = '.$node_id." ORDER BY `order`";
-        $query = $kernel->runSQL($sql);
-        if (mysql_num_rows($query) > 0)
+        $rows = CatalogCommons::get_child_cats_with_count($kernel->pub_module_id_get(),$node_id,'cats.*',true);
+        foreach($rows as $row)
         {
-            while ($row = mysql_fetch_assoc($query))
-            {
-                /*
-                $array = array(
-                    'name'     => $row['name'],
-                    'id'       => $row['id'],
-                    'depth'    => $currdepth,
-                );*/
-                $array = $row;
-                $array['depth'] = $currdepth;
-                $data[] = $array;
-                $wpos = $this->is_cat_in_array($row['id'], $way);
-                if ($wpos>=0 || $depth<$openlevels)
-                    $data = $this->get_child_categories2($row['id'],$depth, $data, $maxdepth, $way, $openlevels);
-            }
-
+            $row['depth'] = $currdepth;
+            $data[] = $row;
+            $wpos = $this->is_cat_in_array($row['id'], $way);
+            if (($wpos>=0 || $depth<$openlevels) && $row['_subcats_count']>0)
+                $data = $this->get_child_categories2($row['id'],$depth, $data, $maxdepth, $way, $openlevels);
         }
-        mysql_free_result($query);
         return $data;
     }
-
-
-
 
     /**
      * Конвертирует строку в приемлимую для использования в БД

@@ -17,6 +17,21 @@ class CatalogCommons
      */
     private static $templates_user_prefix = 'modules/catalog/templates_user/';
 
+    public static function get_child_cats_with_count($moduleid,$parentid,$select_fields="cats.*",$subcats_count=false)
+    {
+        global $kernel;
+        $prfx=$kernel->pub_prefix_get();
+        if ($subcats_count)
+            $select_fields.=', COUNT(subcats.id) AS _subcats_count';
+        $sql = 'SELECT '.$select_fields.', COUNT(i2c.item_id) AS _items_count FROM `'.$prfx.'_catalog_'.$moduleid.'_cats` AS cats
+                LEFT JOIN `'.$prfx.'_catalog_'.$moduleid.'_item2cat` AS i2c ON cats.id = i2c.cat_id';
+        if ($subcats_count)
+            $sql.=' LEFT JOIN '.$prfx.'_catalog_'.$moduleid.'_cats AS subcats ON subcats.parent_id=cats.id';
+        $sql.=  ' WHERE cats.`parent_id` = '.$parentid.'
+                GROUP BY cats.id
+                ORDER BY cats.`order`';
+        return $kernel->db_get_list($sql);
+    }
 
     /**
      * Возвращает товарную группу

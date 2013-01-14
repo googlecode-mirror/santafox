@@ -240,61 +240,48 @@ class manager_modules
 
 
     /**
-        @return void
-        @desc Пробегает по всем страницам сайта и обновляет параметры вызова макроса
-    */
-	function update_macros_in_page()
+    @return void
+    @desc Пробегает по всем страницам сайта и обновляет параметры вызова макроса
+     */
+    function update_macros_in_page()
     {
-    	global $kernel;
-    	//Сперва сформируем массив всех макросов, прям в том виде, как они исплользуются
-    	//на страницах сайта
-    	$macros = array();
-    	$query = 'SELECT *
-                  FROM '.$kernel->pub_prefix_get().'_action
-        	     ';
-
-        $result = $kernel->runSQL($query);
-    	while ($row = mysql_fetch_assoc($result))
-    	{
-    		$macros[$row['id']]['id_mod'] = $row['id_module'];
-    		$macros[$row['id']]['id_action'] = $row['id'];
-    		$macros[$row['id']]['run']['name'] = $row['link_str'];
-    		$macros[$row['id']]['run']['param'] = $row['param_array'];
-    	}
-
-    	//Зачитаем сначала все страницы с индификаторами и serializ-ами в массив
-        $query = 'SELECT id, serialize
-                  FROM `'.$kernel->pub_prefix_get().'_structure` ';
-        $page = array();
-        $result = $kernel->runSQL($query);
-    	while ($row = mysql_fetch_assoc($result))
-    	{
-    		if (!empty($row['serialize']))
-    		{
-    			$curent = unserialize(stripslashes($row['serialize']));
-    			$perebor = unserialize(stripslashes($row['serialize']));
-    			foreach ($perebor as $key => $val)
-    			{
-    				$id_m = $val['id_action'];
-	    			if (($id_m > 0) && (isset($macros[$id_m])))
-    					$curent[$key] = $macros[$id_m];
-    				elseif (($id_m > 0) && (!isset($macros[$id_m])))
-    					unset($curent[$key]);
-    			}
-    			$page[$row['id']] = addslashes(serialize($curent));
-    		}
-    	}
-
-    	//Теперь нужно провести обдейт нужных строк
-    	foreach ($page as $key => $val)
-    	{
-        	$query = 'UPDATE `'.$kernel->pub_prefix_get().'_structure`
-        	      	  SET serialize = "'.$val.'"
-                      WHERE id = "'.$key.'"';
-			$kernel->runSQL($query);
-    	}
+        //@todo rewrite - не использовать "run" в serialize для cтруктуры, брать данные из _actions
+        global $kernel;
+        //Сперва сформируем массив всех макросов, прям в том виде, как они используются на страницах сайта
+        $macros = array();
+        $actions = $kernel->db_get_list_simple('_action','true');
+        foreach($actions as $row)
+        {
+            $macros[$row['id']]['id_mod'] = $row['id_module'];
+            $macros[$row['id']]['id_action'] = $row['id'];
+            $macros[$row['id']]['run']['name'] = $row['link_str'];
+            $macros[$row['id']]['run']['param'] = $row['param_array'];
+        }
+        $structs = $kernel->db_get_list_simple('_structure',"true","id, serialize");
+        foreach($structs as $struct)
+        {
+            if ($struct['serialize'])
+            {
+                $perebor = $curent = unserialize($struct['serialize']);
+                foreach ($perebor as $label => $val)
+                {
+                    $id_action = $val['id_action'];
+                    if ($id_action > 0)
+                    {
+                        if (isset($macros[$id_action]))
+                        {
+                            $curent[$label] = $macros[$id_action];
+                            if (isset($val['postprocessors']))
+                                $curent[$label]['postprocessors']=$val['postprocessors'];
+                        }
+                        else
+                            unset($curent[$label]);
+                    }
+                }
+                $kernel->db_update_record('_structure',array('serialize'=>mysql_real_escape_string(serialize($curent))),"id='".$struct['id']."'");
+            }
+        }
     }
-
 
     /**
      * Сохраняет отредактированные значения параметров действия

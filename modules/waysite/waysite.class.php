@@ -1,47 +1,23 @@
-<?PHP
+<?php
+require_once realpath(dirname(__FILE__)."/../../")."/include/basemodule.class.php";
 /**
  * Основной управляющий класс модуля «дорога»
  *
  * Модуль «дорога» предназначен для построения так называемой дороги сайта.
- * Дорога сайта необходимо для того, что бы посетитель сайта мог быстро
+ * Дорога сайта необходимо для того, чтобы посетитель сайта мог быстро
  * вернуться ну нужный ему уровень иерархии сайта.
- * @copyright ArtProm (с) 2001-2008
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2013
+ * @version 2.0
  */
 
-class waysite
+class waysite extends BaseModule
 {
-
-	/**
-	 * Распаршенный шаблон
-	 *
-	 * Массив с обработанным шаблоном, где в качетсве ключа используется название секции шаблона
-	 * а в качестве значения HTML контент, используемый вместо секции
-	 * @var array
-	 * @access private
-	 */
-	var $template_array = array();
-
-    /**
-     * Конструктор класса
-     *
-     * @return void
-     */
-	function waysite ()
-    {
-
-    }
-
-
-//***********************************************************************
-//	Наборы Публичных методов из которых будут строится макросы
-//**********************************************************************
-
     /**
      * Публичный метод используемый для построения дороги
      *
      * Служит для формирования действия отвечающего за вывод дороги
-     * @return HTML
+     * @param $template
+     * @return string
      */
     function pub_show_waysite($template = '')
     {
@@ -68,7 +44,7 @@ class waysite
         if (!file_exists($template))
             return '[#module_waysite_errore1#] "<i>'.trim($template).'</i> "';
 
-        $this->template_array = $kernel->pub_template_parse($template);
+        $this->set_templates($kernel->pub_template_parse($template));
 
 		$way_arr = array();
 		foreach ($pages as $key => $way_item)
@@ -82,12 +58,12 @@ class waysite
 			//Выводим, если позволяет свойство
 			if ($visible)
 			{
-				if (($key == $kernel->pub_page_current_get()) && (!isset($pages_additional_way)))
-					$tmpl = $this->template_array['activelink'];
+				if ($key == $kernel->pub_page_current_get() && !isset($pages_additional_way))
+					$tmpl = $this->get_template_block('activelink');
 				else
-					$tmpl = $this->template_array['link'];
+					$tmpl = $this->get_template_block('link');
 
-				$tmpl = str_replace("%text%", htmlspecialchars($way_item['caption']), $tmpl);
+				$tmpl = str_replace("%text%", $way_item['caption'], $tmpl);
                 if ($key=="index")
 				    $tmpl = str_replace("%link%", "/", $tmpl);
                 else
@@ -104,29 +80,24 @@ class waysite
 		    $last_additional_way = key($last_additional_way);
 
 		    // И достроим дорогу
-		    foreach ($pages_additional_way AS $key => $value)
+		    foreach ($pages_additional_way as $key => $value)
 		    {
 				if ($key == $last_additional_way)
-					$tmpl = $this->template_array['activelink'];
+					$tmpl = $this->get_template_block('activelink');
 				else
-					$tmpl = $this->template_array['link'];
-
-				$tmpl = str_replace("%text%", htmlspecialchars($value['caption']), $tmpl);
+					$tmpl = $this->get_template_block('link');
+				$tmpl = str_replace("%text%", $value['caption'], $tmpl);
 				$tmpl = str_replace("%link%", $value['url'], $tmpl);
-
 				$way_arr[] = $tmpl;
 		    }
 		}
 
-
 		if (count($way_arr) <= 1)
 			return "";
 
-		$html = "";
-		$html .= $this->template_array['begin'];
-		$html .= join($this->template_array['delimiter'], $way_arr);
-		$html .= $this->template_array['end'];
-
+		$html = $this->get_template_block('begin');
+		$html .= join($this->get_template_block('delimiter'), $way_arr);
+		$html .= $this->get_template_block('end');
         return $html;
     }
 
@@ -135,7 +106,7 @@ class waysite
      * по по номеру текущего уровня в дороге
      *
      * Используется для формирования заголовков страницы в контенете
-     * @param string $p_id_page Номер уровня в дороге, который будет выводится
+     * @param string $level_num Номер уровня в дороге, который будет выводится
      * @return string
      */
     function pub_show_caption_static($level_num)
@@ -163,25 +134,11 @@ class waysite
     }
 
 
+    public function start_admin()
+    {
+    }
 
-//***********************************************************************
-//	Наборы методов, для работы с админкой модуля
-//**********************************************************************
-
-
-	/**
-	 * Вызывается при переходе в АИ модуля
-	 *
-	 * Предопределйнный метод, используется для вызова административного интерфейса модуля
-	 * АИ может быть разным в зависиости от прав и кол-ва дочерних модулей
-	 */
-	function start_admin()
-	{
-		global $kernel;
-
-
-		return "";
-	}
+    public function interface_get_menu($menu)
+    {
+    }
 }
-
-?>

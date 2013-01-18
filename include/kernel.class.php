@@ -5667,6 +5667,7 @@ class kernel
                 ImageCopyMerge($image, $copy, 0, ($size['height']-$cpy), 0, 0, $cpx, $cpy, $transparency);
                 break;
         }
+        imagedestroy($copy);
         return $image;
     }
 

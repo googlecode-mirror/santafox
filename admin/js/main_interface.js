@@ -188,6 +188,10 @@ function santaFormSubmitSuccess(responseText, statusText, xhr, form)
 
 function santaFormSubmit(formID)
 {
+    for (var i in CKEDITOR.instances)
+    {
+        CKEDITOR.instances[i].destroy();
+    }
     var foptions={
         success: santaFormSubmitSuccess,
         dataType:  'json'

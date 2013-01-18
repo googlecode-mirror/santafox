@@ -3208,7 +3208,7 @@ class catalog extends BaseModule
         $query .= ' `is_default`='.$isdef.' WHERE `id`='.$id;
         $kernel->runSQL($query);
         $this->regenerate_all_groups_tpls(false);
-        return $kernel->pub_httppost_response('[#common_saved_label#]');
+        return $kernel->pub_httppost_response('[#common_saved_label#]','category_items&id='.$id);
     }
 
     /**

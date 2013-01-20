@@ -58,4 +58,6 @@ $il['module_newssubmit_add2cron2_label'] = 'Добавить в cron2';
 $il['newssubmit_uname_error']='Ошибка в имени пользователя (от 4 до 255 символов)';
 $il['newssubmit_email_error']='Некорректный email-адрес';
 $il['newssubmit_no_news_error']='Необходимо отметить хотя бы одну новостную группу';
-$il['newssubmit_user_saved']='Пользователь сохранён';
+$il['newssubmit_user_saved']='Подписчик сохранён';
+$il['newssubmit_user_activated']='Подписчик активирован';
+$il['newssubmit_user_deleted']='Подписчик удалён';

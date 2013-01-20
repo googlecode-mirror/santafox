@@ -7,7 +7,7 @@ class newssubmit extends BaseModule
 	protected  $mysql_base;
 	protected $pristavka = 'SF2008';
 	protected $full_name_serv;
-    const UNAME_REGEXP="/[а-яa-z-_\\. ]{4,255}/i";
+    const UNAME_REGEXP="/[а-яa-z-_\\.\\s]{4,255}/i";
 
 	function __construct($modul_id = '')
     {
@@ -465,13 +465,17 @@ class newssubmit extends BaseModule
             case 'action_user':
                 if ($kernel->pub_httppost_get('save_user'))
 	       	        return $this->user_save();
-                elseif ($kernel->pub_httppost_get('delete_user'))
+                if ($kernel->pub_httppost_get('delete_user'))
+                {
     				$this->users_delete($kernel->pub_httppost_get('id_user'));
-    		    elseif ($kernel->pub_httppost_get('activate_user'))
+                    return $kernel->pub_httppost_response('[#newssubmit_user_deleted#]','show_users');
+                }
+    		    if ($kernel->pub_httppost_get('activate_user'))
     		    {
         			$data = array();
         			$data['submit'] = '1';
         			$this->mysql_base->update_user($kernel->pub_httppost_get('id_user'), $data);
+                    return $kernel->pub_httppost_response('[#newssubmit_user_activated#]','show_users');
     		    }
                 $kernel->pub_redirect_refresh_reload('show_users');
                 break;
@@ -614,18 +618,24 @@ class newssubmit extends BaseModule
 		$html = $this->get_template_block('content');
 		$html = str_replace('%url_form%', $kernel->pub_redirect_for_form('action_user'), $html);
 
-		//Если форма редактирования существующего пользователя то проверим нужно ли
-		//активировать кнопку активации
-		$button_activ = ' disabled="disabled"';
-		$button_del   = ' disabled="disabled"';
-		if ($id_user > 0 )
-		{
+        if ($id_user > 0 )
+        {
             $user = $this->mysql_base->get_all_user($id_user);
             $user = $user[$id_user];
-            $button_del = '';
-		    if ((!isset($user['activate'])) || !($user['activate'] == '1'))
-                $button_activ = '';
-		}
+        }
+
+		//Если форма редактирования существующего пользователя то проверим нужно ли активировать кнопку активации
+        if ($id_user >0 && (!isset($user['activate']) || $user['activate'] != '1'))
+            $button_activ = $this->get_template_block('button_activ');
+        else
+            $button_activ = $this->get_template_block('button_activ_disabled');
+
+        if ($id_user > 0 )
+            $button_del=$this->get_template_block('button_del');
+        else
+            $button_del=$this->get_template_block('button_del_disabled');
+
+
 
 		//Сформируем список новостных групп
 		$select_section = array();

@@ -1,18 +1,15 @@
 <!-- @body -->
 <script type="text/javascript">
     arr_link_content = [];//массив имён файлов для редактирования контента
-
+    shouldReloadTree = false; //надо ли перезагружать структуру?
     metkiCount = 0;//кол-во меток
 
     //{"html escape":"tralala","strip_tags":"tralala2"};
     postProcessors= %post_processors%;
 
-
     // что-то вроде  [["ppf_mapsite1_visible","ppv_mapsite1_visible"],["ppf_waysite1_visible","ppv_waysite1_visible"],["ppf_menu1_visible","ppv_menu1_visible"]]
     var modulesProps = %prop_modul_array%;
-    /*
-     *
-     * */
+
 
     /* % all_modules % заменяется на что-то вроде
      [["","","Действие не выбрано"],["Карта сайта","",""],["","8","Показать карту"],["Дорога","",""],["","9","Вывести дорогу"],["","10","Вывести страницу 2-ого уровня"],["Меню","",""],["","13","Вывести верхнее меню"],["","17","Вывести левое меню"],["Основные новости","",""],["","16","Вывести архив"],["","15","Вывести ленту"],["Поиск","",""],["","35","Вывести результаты поиска"],["","34","Вывести форму поиска (для главной)"],["Обратная связь","",""],["","24","Отобразить форму"],["Основные Комментарии","",""],["","40","Комментарии по-умолчанию"],["Вопросы и Ответы","",""],["","25","Показать список вопросов-ответов"],["","26","Показать список разделов вопросов-ответов"],["Каталог товаров","",""],["","37","Вывести содержимое корзины"],["","38","Вывести стикер корзины"],["","32","Название элемента"],["","39","Отобразить форму заказа"],["","30","Список категорий"],["","31","Список товаров"],["","36","Сформировать заголовок"],["Фотогалерея","",""],["","41","Показать все фото"],["","33","Сформировать список товаров"],["Ядро","",""],["","2","Вернуть заголовок страницы"],["","1","Редактор контента"]]
@@ -25,9 +22,6 @@
      [["design/template1.html","design/template1.html"],["design/template2.html","design/template2.html"],["design/template3.html","design/template3.html"],["design/template4.html","design/template4.html"],["design/xml.html","design/xml.html"]]
      */
     var allTemplates = %store_templates%;
-
-
-
 
     //Сначала обрежем длину заголовков, т.к. это колонки и мы не можем делать большие названия
     var label1 = '[#page_prop_name_page#]';    label1 = label1.ellipse(28);
@@ -46,96 +40,26 @@
         htmlSelectTemplates+='<option value="'+elem[0]+'">'+elem[1]+'</option>';
     }
     $("#fieldPageTemplate").html(htmlSelectTemplates);
-    $("#fieldPageTemplate").change(function () {saveStructForm('%chnage_template%', false);});
+    $("#fieldPageTemplate").change(function () {
+        saveStructForm('%chnage_template%', false, modulesProps);
+    });
     //выбор страницы перехода
     $("#opentree").click(function (e) {
-        get_properes_page(e, 'fieldPageURL');
+        showPageSelector('fieldPageURL');
     });
 
     //сохранение всего
-    $("#admin_struct_savebutton").click(function () {saveStructForm('%url_action%', true); });
+    $("#admin_struct_savebutton").click(function () {
+        saveStructForm('%url_action%', true, modulesProps); }
+    );
 
-
-    function saveStructForm(url,isFull)
-    {
-        var postArr = {page_properties: {
-            page_template:$('select#fieldPageTemplate').selectmenu("value"),
-            page_title:$("#fieldPageTitle").val(),
-            page_name:$("#fieldPageName").val(),
-            page_id:$("#fieldPageID").val(),
-            page_url:$("#fieldPageURL").val()
-        }};
-
-        if ($('#flag_template').attr('checked'))
-            postArr.page_properties.flag_template='on';
-        if ($('#fieldPageOnlyAuth').attr('checked'))
-            postArr.page_properties.only_auth='on';
-
-        if (isFull)
-        {
-            postArr.properties_cb = {};
-            postArr.properties = {};
-            postArr.page_inheritance = {};
-            postArr.page_modules = {};
-            postArr.page_postprocessors = {};
-            var elem,elemName;
-            //свойства модулей
-            for (var j=0;j<modulesProps.length;j++)
-            {
-                elem = modulesProps[j];
-                if ($('#'+elem[0]).attr('checked'))
-                {
-                    postArr.properties_cb[elem[0]] = 'on';
-                    //properties[waysite1_visible]	true
-                }
-                else
-                {
-                    //properties[mapsite1_visible]
-                    elemName = new String(elem[1]).substr(4);
-                    postArr.properties[elemName] = $('#'+elem[1]).val();
-                }
-            }
-            //метки
-            for (j=0; j<metkiCount;j++)
-            {
-                elemName = $('#flag_metka_'+j).attr('name');
-                if ($('#flag_metka_'+j).attr('checked'))
-                { //наследное
-                    postArr.page_inheritance[elemName]='on';
-                }
-                else
-                {
-                    postArr.page_modules[elemName]=$('#sel_modul_ext_'+j).val();
-                    postArr.page_postprocessors[elemName]=[$('#sel_label_postprocessor_'+j).val()];
-                }
-            }
-        }
-        $.post(url, postArr,  function(data){
-            //Обрабатываем ответ
-            var post_res=jQuery.parseJSON(data);
-            if (post_res!=null)
-            {
-                //сначала проверка на наличие ошибок
-                if (post_res.success)
-                {
-                    santaShowPopupHint("Info",post_res.info,1500);
-                    run_update_metki('%leftmenu%');//обновляем метки для нового шаблона, если всё ок
-                    //обновим дерево на случай если название страницы изменилось
-                    santaUpdateRegion('west','index.php?action=get_left_menu');
-                }
-                else
-                    santaShowPopupHint("Error", post_res.info,0);
-            }
-        });
-
-
-    }
     /*  str_prop_modul_code here:
      %--str_prop_modul_code--%
      */
     //run_update_metki('%link_show_metki%');
 
     $('#fieldPageName').change(function(){
+        shouldReloadTree=true;
         if(!$('#fieldPageTitle').val()){
             $('#fieldPageTitle').val($('#fieldPageName').val());
         }

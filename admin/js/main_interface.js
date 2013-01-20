@@ -1,5 +1,5 @@
 var curent_action_confirm = "";
-
+var shouldReloadTree=false;
 
 //Открывает окно для редактирования или создания нового действия модуля
 function show_action_edit(strlink, name)
@@ -165,7 +165,7 @@ function jspub_disabled_change(elem1ID,elem2ID)
     }
 }
 
-function santaFormSubmitSuccess(responseText, statusText, xhr, form)
+function santaFormSubmitSuccess(responseText)
 {
     if (parseInt(responseText.errore_count) > 0)
     {
@@ -286,21 +286,13 @@ function santaShowPopupHint(header, text,timeout)
 
 //Функция открывает слой для выбора страницы сайта
 //во всех свойствах с типом (страница сайта)
-//function get_properes_page(EventElement, Object)
-function get_properes_page(e, fieldID)
+function showPageSelector(fieldID)
 {
     var popup=$('#popup_sitemap_div');
     popup.html('');
     popup.load("index.php?action=select_page", function(response, status, xhr) {
         if (status == "error")
-        {
             $("#popup_sitemap_div").html("Load error: " + xhr.status + " " + xhr.statusText);
-        }
-        else
-        {
-            //$('#popup_sitemap_div').css('position','absolute').css('top',e.clientY).css('left',e.clientX);
-            //$('#popup_sitemap_div').css('display','block');
-        }
     });
 
     $("#popup_sitemap_div").dialog({
@@ -457,8 +449,7 @@ function start_include_content(name_area)
             ['Styles','Format','Font','FontSize'],
             ['TextColor','BGColor'],
             ['Maximize', 'ShowBlocks']
-        ],
-        //close_on_save:[#close_on_save#]
+        ]
     };
     /*убираем предыдущий instance, если есть
      var inst = CKEDITOR.instances[name_area];
@@ -570,7 +561,6 @@ function run_update_metki(url)
         var comboStore = jQuery.parseJSON(data);
         if (comboStore != null)
             set_metki(comboStore);
-
     });
 
 }
@@ -646,7 +636,7 @@ var metkiCount=0;
 var arr_link_content = [];
 function set_metki(d)
 {
-    var ctable=$('#table_metki_content'),str_code = "", table_metki_content= "",hasPostprocessors = !is_empty(postProcessors),str_content;
+    var ctable=$('#table_metki_content'), table_metki_content= "",hasPostprocessors = !is_empty(postProcessors),str_content;
     metkiCount = d.length;
     arr_link_content = [];
     for (var i = 0; i < d.length; i++)
@@ -845,18 +835,14 @@ jQuery.fn.autoGrow = function(){
         };
 
         var characterWidth = function (obj){
-            var characterWidth = 0;
-            var temp1 = 0;
-            var temp2 = 0;
+            var characterWidth,temp1,temp2;
             var tempCols = obj.cols;
-
             obj.cols = 1;
             temp1 = obj.offsetWidth;
             obj.cols = 2;
             temp2 = obj.offsetWidth;
             characterWidth = temp2 - temp1;
             obj.cols = tempCols;
-
             return characterWidth;
         };
 
@@ -871,3 +857,77 @@ jQuery.fn.autoGrow = function(){
         growByRef(this);
     });
 };
+
+
+function saveStructForm(url,isFull,modulesProps)
+{
+    var postArr = {page_properties: {
+        page_template:$('select#fieldPageTemplate').selectmenu("value"),
+        page_title:$("#fieldPageTitle").val(),
+        page_name:$("#fieldPageName").val(),
+        page_id:$("#fieldPageID").val(),
+        page_url:$("#fieldPageURL").val()
+    }};
+
+    if ($('#flag_template').attr('checked'))
+        postArr.page_properties.flag_template='on';
+    if ($('#fieldPageOnlyAuth').attr('checked'))
+        postArr.page_properties.only_auth='on';
+
+    if (isFull)
+    {
+        postArr.properties_cb = {};
+        postArr.properties = {};
+        postArr.page_inheritance = {};
+        postArr.page_modules = {};
+        postArr.page_postprocessors = {};
+        var elem,elemName;
+        //свойства модулей
+        for (var j=0;j<modulesProps.length;j++)
+        {
+            elem = modulesProps[j];
+            if ($('#'+elem[0]).attr('checked'))
+                postArr.properties_cb[elem[0]] = 'on';
+            else
+            {
+                elemName = String(elem[1]).substr(4);
+                postArr.properties[elemName] = $('#'+elem[1]).val();
+            }
+        }
+        //метки
+        for (j=0; j<metkiCount;j++)
+        {
+            elemName = $('#flag_metka_'+j).attr('name');
+            if ($('#flag_metka_'+j).attr('checked'))
+            { //наследное
+                postArr.page_inheritance[elemName]='on';
+            }
+            else
+            {
+                postArr.page_modules[elemName]=$('#sel_modul_ext_'+j).val();
+                postArr.page_postprocessors[elemName]=[$('#sel_label_postprocessor_'+j).val()];
+            }
+        }
+    }
+    $.post(url, postArr,  function(data){
+        //Обрабатываем ответ
+        var post_res=jQuery.parseJSON(data);
+        if (post_res!=null)
+        {
+            //сначала проверка на наличие ошибок
+            if (post_res.success)
+            {
+                santaShowPopupHint("Info",post_res.info,1500);
+                //обновим всё дерево, если требуется
+                if (shouldReloadTree)
+                    santaUpdateRegion('west','index.php?action=get_left_menu');
+                else if(!isFull)
+                    run_update_metki('view');//обновляем метки для нового шаблона
+            }
+            else
+                santaShowPopupHint("Error", post_res.info,0);
+        }
+    });
+
+
+}

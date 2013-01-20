@@ -5613,7 +5613,7 @@ class catalog extends BaseModule
 
 
         $exFilter = CatalogCommons::get_inner_filter_by_stringid($stringid);
-        if ($exFilter && $exFilter['id']!=$id)
+        if ($stringid=="null" || ($exFilter && $exFilter['id']!=$id))
             return "[#catalog_edit_inner_filter_save_msg_error#] [#catalog_edit_inner_filter_save_msg_stringid_exists#]";
 
         $cattype = $kernel->pub_httppost_get('cattype');
@@ -9160,7 +9160,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $categories = false;
-        if (!empty($filterid))
+        if ($filterid && $filterid!="null")
         {
             //если указан внутренний фильтр - возьмём товары из него
             //в данном случае будет использоваться шаблон, прописанный в фильтре

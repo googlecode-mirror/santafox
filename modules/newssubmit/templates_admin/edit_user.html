@@ -1,3 +1,4 @@
+<!-- @content -->
 <span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#newssubmit_name_modul_base_name#]</span></span>
 <div id="page_container">
  <div id="content_container">
@@ -5,7 +6,7 @@
  
  <h3>[#newssubmit_admin_user_control_label1#]</h3>
  
- <form method="post" name="formuser" enctype="multipart/form-data" action="%url_form%">
+ <form method="post" id="formuser" action="%url_form%">
   <input type="hidden" name="id_user" value="%id_user%">
   
   <fieldset>
@@ -36,15 +37,16 @@
   </fieldset>
   
   <fieldset class="page_submit_field">
-   <input class="text" type="submit" value="[#newssubmit_admin_user_control_action_save#]" name="save_user">
-   <input class="text" type="submit" value="[#newssubmit_admin_user_control_action_activate#]" name="activate_user" %button_activ%>
-   <input class="text" type="submit" value="[#newssubmit_admin_user_control_action_delete#]" name="delete_user" %button_del%>
-   <!-- 
-   <input  class="text" type="button" value="Сохранить" onClick="set_form_action('save_user')"> &nbsp;&nbsp;&nbsp;
-   <input class="text" type="button" value="Удалить подписку" onClick="set_form_action('delete_user')">
-   -->
+   <input class="text" type="button" value="[#newssubmit_admin_user_control_action_save#]" onclick="santaFormSubmit('formuser',{'save_user':1});">
+   <input class="text" type="button" value="[#newssubmit_admin_user_control_action_activate#]" onclick="santaFormSubmit('formuser',{'activate_user':1});" %button_activ% >
+   <input class="text" type="button" value="[#newssubmit_admin_user_control_action_delete#]" onclick="santaFormSubmit('formuser',{'delete_user':1});"  %button_del%>
+
   </fieldset>
  </form>
  </div>
  </div>
 </div>
+<!-- @page_news_selected -->
+<input id="%key%" name="section[%key%]" type="checkbox" checked>&nbsp;&nbsp;<label for="%key%" style="min-width: 200px;">%caption%</label><br>
+<!-- @page_news -->
+<input id="%key%" name="section[%key%]" type="checkbox">&nbsp;&nbsp;<label for="%key%" style="min-width: 200px;">%caption%</label><br>

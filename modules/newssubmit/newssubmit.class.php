@@ -1,63 +1,49 @@
 <?PHP
-if (file_exists('modules/newssubmit/mysql_submit.php'))
-    include_once('modules/newssubmit/mysql_submit.php');
-
-class newssubmit
+require_once(dirname(__FILE__).'/mysql_submit.php');
+require_once realpath(dirname(__FILE__)."/../../")."/include/basemodule.class.php";
+class newssubmit extends BaseModule
 {
+    /** @var mysql_submit */
+	protected  $mysql_base;
+	protected $pristavka = 'SF2008';
+	protected $full_name_serv;
+    const UNAME_REGEXP="/[а-яa-z-_\\. ]{4,255}/i";
 
-	var $template_array = array();
-	var $curent_way = array();
-	var $path_templates = "modules/newssubmit/templates_user"; //Путь, к шаблонам модуля (туда будут скопированны шаблоны при инсталяции
-	var $mysql_base;
-	var $pristavka = 'SF2008';
-	var $full_name_serv;
-	var $n = 25;
-
-	function newssubmit($modul_id = '')
+	function __construct($modul_id = '')
     {
 		global $kernel;
         if (empty($modul_id))
             $modul_id = $kernel->pub_module_id_get();
-
 		$this->mysql_base = new mysql_submit(PREFIX.'_'.$modul_id);
 		$this->mysql_base->set_pristavka($this->pristavka);
 		if (isset($_SERVER['HTTP_HOST']))
 			$this->full_name_serv = $_SERVER['HTTP_HOST'];
-
 		if (!preg_match("/^www\\..*/i", $this->full_name_serv))
 			$this->full_name_serv = "www.".$this->full_name_serv;
-
 		$this->full_name_serv = "http://".$this->full_name_serv;
-
 		//Получим ещё параметр модуля, и определим приставку
 		$arr = $kernel->pub_modul_properties_get('prefix_unic');
 		if (!empty($arr['value']))
-		  $this->pristavka = $arr['value'];
+		    $this->pristavka = $arr['value'];
     }
 
     function add2cron2()
     {
 		global $kernel;
-
         $send_all = true;
         //Получим шаблон используемый для отсылки письма
 		$prom = $kernel->pub_modul_properties_get("template_send");
-		if ($prom["isset"])
-		{
-            if (file_exists($prom["value"]))
-                $this->template_array = $kernel->pub_template_parse($prom["value"]);
-		}
-
-		if (empty($this->template_array))
-            return "Template not selected";
-
-
+        if ($prom["isset"] && file_exists($prom["value"]))
+            $this->set_templates($kernel->pub_template_parse($prom["value"]));
+		else
+            return "no template";
 		//Прежде всего определим, это тестовая рассылка или нет
 		$prop = $kernel->pub_modul_properties_get("is_test");
         if ($prop["value"])
-            $array_for_submit = $this->prepare_html_for_submit($send_all, false);
+            $set_submit=false;
         else
-            $array_for_submit = $this->prepare_html_for_submit($send_all, true);
+            $set_submit=true;
+        $array_for_submit = $this->prepare_html_for_submit($send_all, $set_submit);
 
         //Проверим, а есть ли-нам что отсылать вообще
 		$start_text  = $kernel->pub_httppost_get('start_text',false);
@@ -107,14 +93,13 @@ class newssubmit
 			}
             $link = $this->full_name_serv.'/'.$page.'.html?controlcode='.trim($val['code']);
 
-			$html_submit = $this->template_array['mail'];
-
+			$html_submit = $this->get_template_block('mail');
 			$html_submit = str_replace("%start_text%", $start_text          , $html_submit);
 			$html_submit = str_replace("%base_link%" , $this->full_name_serv, $html_submit);
 			$html_submit = str_replace("%end_text%"  , $end_text            , $html_submit);
 			$html_submit = str_replace("%user_link%" , $link                , $html_submit);
 
-			$html_submit = str_replace("%news%", implode($this->template_array['news_block_delimiter'], $html_news), $html_submit);
+			$html_submit = str_replace("%news%", implode($this->get_template_block('news_block_delimiter'), $html_news), $html_submit);
 
 			//Проверим, если этому пользователю нечего рассылать, то не будем ничего слать
             if ((count($html_news) <= 0) && (empty($start_text)) && (empty($end_text)))
@@ -152,16 +137,16 @@ class newssubmit
 
 
     function user_save_control($code)
-    {//@todo check
+    {
         global $kernel;
         if (empty($code))
-            return $this->template_array['code_not_exist'];
+            return $this->get_template_block('code_not_exist');
         $user = $this->mysql_base->get_info_user($code);
 		if (empty($user))
-			return $this->template_array['code_not_exist'];
+			return $this->get_template_block('code_not_exist');
         $my_post = $kernel->pub_httppost_get();
         if (!isset($my_post['section']))
-            return $this->template_array['errore_news'];
+            return $this->get_template_block('errore_news');
         $userid = $user['id'];
         if (isset($my_post['name']) && !empty($my_post['name']))
             $this->mysql_base->update_user($userid, array("name"=>$my_post['name']));
@@ -188,10 +173,13 @@ class newssubmit
     /*******************************************************
 	Наборы Публичных методов из которых будут строится действия
     ********************************************************/
+
 	/**
 	 * Выводит форму для осуществелния подписки на новости
 	 *
-	 * @param string $errore Сообщение, выводимое как ошибка
+	 * @param string $file_template
+	 * @param string $file_template_control
+     * @return string
 	 */
 	function pub_formsubmit_show($file_template, $file_template_control)
 	{
@@ -201,12 +189,9 @@ class newssubmit
 		$my_get  = $kernel->pub_httpget_get();
 
         if (file_exists($file_template))
-            $this->template_array = $kernel->pub_template_parse($file_template);
-
-		if (empty($this->template_array))
-            return "Template not select";
-
-		$template = $this->template_array;
+            $this->set_templates($kernel->pub_template_parse($file_template));
+        else
+            return "no template";
 
 		//Проверим, может надо вывести подтвреждение рассылки
 		if ((isset($my_get['activatecode'])) && (!empty($my_get['activatecode'])))
@@ -215,17 +200,17 @@ class newssubmit
         //возможно пользователь захотел удалить себя из подписки
         if ((isset($my_post['del_user'])) && (isset($my_post['code'])) && (isset($my_post['id'])))
         {
-            $this->template_array = $kernel->pub_template_parse($file_template_control);
-            return $this->user_delete($kernel->pub_httppost_get('id'), $kernel->pub_httppost_get('code'));
+            $this->set_templates($kernel->pub_template_parse($file_template_control));
+            $this->mysql_base->delet_user($kernel->pub_httppost_get('id'), $kernel->pub_httppost_get('code'));
+            return $this->get_template_block('user_delet');
         }
         //Возможно захотел настроить свою подписку
-        if ((isset($my_post['save_control'])) && (isset($my_post['code'])) && (isset($my_post['id'])))
+        if (isset($my_post['save_control']) && isset($my_post['code']) && isset($my_post['id']))
         {
-            $this->template_array = $kernel->pub_template_parse($file_template_control);
+            $this->set_templates($kernel->pub_template_parse($file_template_control));
             $errore = '';
             $ret = $this->user_save_control($my_post['code']);
-            if ($ret === true) {}
-            else
+            if (!$ret )
                 $errore = $ret;
 
             return $this->user_controle($kernel->pub_httppost_get('code'), $errore);
@@ -233,7 +218,7 @@ class newssubmit
 
 		if ((isset($my_get['controlcode'])) && (!empty($my_get['controlcode'])))
 		{
-		    $this->template_array = $kernel->pub_template_parse($file_template_control);
+            $this->set_templates($kernel->pub_template_parse($file_template_control));
             return $this->user_controle(mysql_real_escape_string($my_get['controlcode']));
 		}
 
@@ -250,7 +235,7 @@ class newssubmit
             $result = $this->create_new_submit($curent_name, $curent_mail, $select_section);
 
         if ($result === true)
-            return $template['sucсess_subscribe'];
+            return $this->get_template_block('sucсess_subscribe');
         else
             $errore = $result;
 
@@ -264,7 +249,7 @@ class newssubmit
             $caption =$kernel->pub_page_textlabel_replace($val['caption']);
             $html_page .= '<input id="'.$key.'" name="section['.$key.']" value="'.$caption.'" type="checkbox" '.$select.'><label for="'.$key.'">'.$caption.'</label><br>';
 		}
-        $html = $template['form_subscrip'];
+        $html = $this->get_template_block('form_subscrip');
 		$html = str_replace("%pages_news%", $html_page, $html);
 		$html = str_replace("%name%", $curent_name, $html);
 		$html = str_replace("%mail%", $curent_mail, $html);
@@ -277,29 +262,23 @@ class newssubmit
 	Наборы внутренних методов модуля
     ********************************************************/
 
-
-	function user_delete($user_id, $code)
-	{
-		$this->mysql_base->delet_user($user_id, $code);
-		return $this->template_array['user_delet'];
-	}
-
 	/**
 	 * Выводит форму для редактирования подписки
 	 *
+	 * @param string $code
 	 * @param string $errore Сообщение, выводимое как ошибка
+     * @return string
 	 */
 	function user_controle($code, $errore = '')
 	{
 		global $kernel;
-		//Вытащим уникальный код из параметров
 		if (empty($code))
-            return ;
+            return '';
 		//Узнаем данные пользователя рассылки по коду
 		$user = $this->mysql_base->get_info_user($code);
 
 		if (empty($user))
-			return $this->template_array['code_not_exist'];
+			return $this->get_template_block('code_not_exist');
 
 		//Пользователь найден, отобразим для него форму
 		$curent_name = $user['name'];
@@ -317,22 +296,21 @@ class newssubmit
 		$date = $user['date'];
 		$id = $user['id'];
 
-		$html_page = '';
+		$html_pages = array();
 		$news_lent = $kernel->pub_modules_get('newsi');
 		foreach ($news_lent as $key => $val)
 		{
-            $select = '';
-            $id_str_sec = 0;
             if (isset($select_section[$key]))
-            {
-            	$select = ' checked';
-            	$id_str_sec = $select_section[$key];
-            }
+                $mline = $this->get_template_block('module_line_checked');
+            else
+                $mline = $this->get_template_block('module_line');
             $caption =$kernel->pub_page_textlabel_replace($val['caption']);
-            $html_page .= '<input id="'.$key.'" name="section['.$key.']" value="'.$id_str_sec.'" type="checkbox" '.$select.'>&nbsp<label for="'.$key.'">'.$caption.'</label><br>';
+            $mline= str_replace('%key%', $key, $mline);
+            $mline= str_replace('%caption%', $caption, $mline);
+            $html_pages[]=$mline;
 		}
-		$html = $this->template_array['form'];
-		$html = str_replace("%pages_news%", $html_page, $html);
+		$html = $this->get_template_block('form');
+		$html = str_replace("%pages_news%", implode("\n",$html_pages), $html);
 		$html = str_replace("%name%",   $curent_name, $html);
 		$html = str_replace("%mail%",   $curent_mail, $html);
 		$html = str_replace("%errore%", $errore, $html);
@@ -341,6 +319,9 @@ class newssubmit
 		$html = str_replace("%code%",   $code, $html);
 		return $html;
 	}
+
+
+
 	/**
 	 * Создаёт новую запись в базе, для подготовки рассылки и формирует письмо на
 	 * на подтверждение
@@ -352,21 +333,21 @@ class newssubmit
 		//Узнаем значения из переданной нам формы
 		$errore = '';
 		//Проверим на заполненность всех полей
-		if (!preg_match("/[а-яa-z-_\\. ]{4,255}/i",$name))
-			$errore .= $this->template_array['errore_name'];
+		if (!preg_match(self::UNAME_REGEXP,$name))
+			$errore .= $this->get_template_block('errore_name');
 
 		if (!$kernel->pub_is_valid_email($mail))
-			$errore .= $this->template_array['errore_email'];
+			$errore .= $this->get_template_block('errore_email');
 
 	    $mail = mysql_real_escape_string($mail);
 	    $name = mysql_real_escape_string($name);
 
 		//Теперь проверим, что бы этого мыло ещё не было в подписчиках.
 		if ($this->mysql_base->isset_email($mail))
-			$errore .= $this->template_array['exist_subscrip'];
+			$errore .= $this->get_template_block('exist_subscrip');
 
 		if ((!is_array($news)) || (count($news) <= 0 ))
-			$errore .= $this->template_array['not_news'];
+			$errore .= $this->get_template_block('not_news');
 
 		if (!empty($errore))
 			return $errore;
@@ -377,11 +358,11 @@ class newssubmit
 		if (!empty($code))
 		{
 			//Всё хорошо, и можно сформировать письмо с подтеверждением подписки
-			$html = $this->template_array['letter_confirm'];
+			$html = $this->get_template_block('letter_confirm');
 			$html_news = '';
 			foreach ($news as $val)
 			{
-			    $tmp = $this->template_array["letter_confirm_news_one"];
+			    $tmp = $this->get_template_block("letter_confirm_news_one");
 			    $tmp = str_replace("%name%", $val, $tmp);
 				$html_news .= $tmp;
 			}
@@ -420,28 +401,26 @@ class newssubmit
 	 * Производит активацию юзера в рассылке
 	 *
 	 * @param string $code MD5 от ящика и приставки
+     * @return string
 	 */
 	function user_activate($code)
 	{
 		global $kernel;
-
-		//Сначала проверим
-		//Что данный код есть в базе
+		//Сначала проверим, что данный код есть в базе
 		$num_user = $this->mysql_base->veref_user($code);
 		if ($num_user > 0)
 		{
 			$data = array();
 			$data['submit'] = '1';
 			$this->mysql_base->update_user($num_user, $data);
-
-			$html = $this->template_array['activate_success'];
+			$html = $this->get_template_block('activate_success');
 		}
 		else
 		{
 			$page = $kernel->pub_modul_properties_get('page_submit');
 			$page = $page['value'];
 			$link = '/'.$page. ".html";
-			$html = $this->template_array['activate_faild'];
+			$html = $this->get_template_block('activate_faild');
 			$html = str_replace("%link%", $link, $html);
 		}
 		return $html;
@@ -485,7 +464,7 @@ class newssubmit
 		    //Действия из формы подписчика (удалить, активировать, сохранить
             case 'action_user':
                 if ($kernel->pub_httppost_get('save_user'))
-	       	        $this->user_save();
+	       	        return $this->user_save();
                 elseif ($kernel->pub_httppost_get('delete_user'))
     				$this->users_delete($kernel->pub_httppost_get('id_user'));
     		    elseif ($kernel->pub_httppost_get('activate_user'))
@@ -626,12 +605,13 @@ class newssubmit
 	 * Форма редактирования и добавления подписчика
 	 *
 	 * @param int $id_user
-	 * @return HTML
+	 * @return string
 	 */
 	function users_edit($id_user = -1)
 	{
 		global $kernel;
-		$html = file_get_contents("modules/newssubmit/templates_admin/edit_user.html");
+        $this->set_templates($kernel->pub_template_parse("modules/newssubmit/templates_admin/edit_user.html"));
+		$html = $this->get_template_block('content');
 		$html = str_replace('%url_form%', $kernel->pub_redirect_for_form('action_user'), $html);
 
 		//Если форма редактирования существующего пользователя то проверим нужно ли
@@ -654,18 +634,16 @@ class newssubmit
 
 		$news_lent = $kernel->pub_modules_get('newsi');
 
-		$html_page = '';
+		$html_pages = array();
 		foreach ($news_lent as $key => $val)
 		{
-				$select = '';
-				$id_str_sec = 0;
-				if (isset($select_section[$key]))
-				{
-					$select = ' checked';
-					$id_str_sec = $select_section[$key];
-				}
-
-				$html_page .= '<input id="'.$key.'" name="section['.$key.']" value="'.$id_str_sec.'" type="checkbox" '.$select.'>&nbsp;&nbsp;<label for="'.$key.'">'.$val['caption'].'</label><br>';
+            if (isset($select_section[$key]))
+                $html_page =  $this->get_template_block('page_news_selected');
+            else
+                $html_page =  $this->get_template_block('page_news');
+            $html_page = str_replace('%key%', $key,$html_page);
+            $html_page = str_replace('%caption%', $val['caption'],$html_page);
+            $html_pages[]=$html_page;
 		}
 
 		//Доформируем остальные поля
@@ -690,7 +668,7 @@ class newssubmit
         if (isset($user['mail']))
             $mail = $user['mail'];
 
-		$html = str_replace("%pages_news%", $html_page, $html);
+		$html = str_replace("%pages_news%", implode("\n",$html_pages), $html);
 		$html = str_replace("%name%", $name, $html);
 		$html = str_replace("%mail%", $mail, $html);
 		$html = str_replace("%errore%", '', $html);
@@ -705,7 +683,7 @@ class newssubmit
 	/**
 	 * Сохраняет изменённые данные о подписке
 	 *
-	 * @return unknown
+	 * @return integer
 	 */
 	function user_save()
 	{
@@ -713,24 +691,24 @@ class newssubmit
 		$my_post = $kernel->pub_httppost_get();
 		$errore = '';
 		$name = $kernel->pub_httppost_get('name');
-		if (!preg_match("/[а-яa-z-_\\. ]{4,255}/i",$name))
-			$errore .= "Ошибка в имени пользователя<br>";
+		if (!preg_match(self::UNAME_REGEXP,$name))
+			$errore .= "[#newssubmit_uname_error#]<br>";
 
 		$mail = $kernel->pub_httppost_get('mail');
-		if (!preg_match("/^.+@.+\\..+$/i",$mail))
-			$errore .= "Ошибка в адресе электронной почты<br>";
+		if (!$kernel->pub_is_valid_email($mail))
+			$errore .= "[#newssubmit_email_error#]<br>";
 
 		$news = array();
 		if (isset($my_post['section']))
 			$news = $my_post['section'];
 		else
-			$errore .= "Необходимо отметить хотя бы одну новостную группу<br>";
+			$errore .= "[#newssubmit_no_news_error#]<br>";
 
-		if (!empty($errore))
-			return '';
+		if ($errore)
+			return $kernel->pub_httppost_errore($errore,true);
 
-		//Обновим данные о пользователи
-		$user_id = $kernel->pub_httppost_get('id_user'); //Ссылка на id в таблице подписчиков
+		//Обновим данные о пользователе
+		$user_id = intval($kernel->pub_httppost_get('id_user')); //Ссылка на id в таблице подписчиков
 		$data = array();
 		$data['name'] = $name;
 		$data['mail'] = $mail;
@@ -764,14 +742,14 @@ class newssubmit
             		$this->mysql_base->add_news_group($user_id, $key);
             }
 	    }
-		return $user_id;
+		return $kernel->pub_httppost_response('[#newssubmit_user_saved#]','show_users');
 	}
 
 
 	function users_delete($users)
 	{
-        if (empty($users))
-            return false;
+        if (!$users)
+            return;
         if (is_array($users))
         {
             foreach ($users as $key => $val)
@@ -791,21 +769,17 @@ class newssubmit
 	function show_form_submit()
 	{
 		global $kernel;
-
-		$this->template_array = $kernel->pub_template_parse("modules/newssubmit/templates_admin/list_submit.html");
-		$html = $this->template_array["form"];
+		$this->set_templates($kernel->pub_template_parse("modules/newssubmit/templates_admin/list_submit.html"));
+		$html = $this->get_template_block("form");
 		$html = str_replace("%url_form%", $kernel->pub_redirect_for_form('run_submit'), $html);
         $html = str_replace("%add2cron2_form_submit%", $kernel->pub_redirect_for_form('add2cron2'), $html);
-
 		//узнаем новости, которые подлежат рассылки и Сформируем
 		$html_news = '';
-
 		$news_lent = $kernel->pub_modules_get('newsi');
 		foreach ($news_lent as $key => $val)
 		{
 			//Теперь узнаем, какие новости для этой рубрики нам нужно отослать
 			$html_news .= $this->get_news_for_submit($key, $val['caption']);
-
 		}
 		$html = str_replace("%news_for_submit%", $html_news, $html);
 		return $html;
@@ -813,8 +787,7 @@ class newssubmit
 
 
 	/**
-	 * Возвращает html-ку для конкрентой рубрике при построение формы
-	 * с новостями, готовыми к отправке
+	 * Возвращает html-ку для конкрентой рубрики при построении формы с новостями, готовыми к отправке
 	 *
 	 */
 	function get_news_for_submit($section, $caption)
@@ -828,7 +801,7 @@ class newssubmit
 
 	    //Сформируем собсвтенно HTML с новостями
 	    //Заголовок блока
-	    $html = $this->template_array['news_lenta'];
+	    $html = $this->get_template_block('news_lenta');
 	    $html = str_replace("%name%", $caption, $html);
 	    $html = str_replace("%id%", $section, $html);
 
@@ -840,7 +813,7 @@ class newssubmit
 			$parts = explode('-', substr($val['time'],0,10));
 			$date = trim($parts[2]).'.'.trim($parts[1]).'.'.trim($parts[0]);
 
-            $html_news = $this->template_array['news_one'];
+            $html_news = $this->get_template_block('news_one');
 	        $html_news = str_replace("%num%"     , $i              , $html_news);
 	        $html_news = str_replace("%section%" , $section        , $html_news);
 	        $html_news = str_replace("%id%"      , $key            , $html_news);
@@ -856,7 +829,7 @@ class newssubmit
 
 
 	/**
-	 * Собственно осуществляет рассылку
+	 * осуществляет рассылку
 	 *
 	 */
 	function run_submit($send_all = false)
@@ -866,14 +839,10 @@ class newssubmit
 
         //Получим шаблон используемый для отсылки письма
 		$prom = $kernel->pub_modul_properties_get("template_send");
-		if ($prom["isset"])
-		{
-            if (file_exists($prom["value"]))
-                $this->template_array = $kernel->pub_template_parse($prom["value"]);
-		}
-
-		if (empty($this->template_array))
-            return die("Template not found");
+		if ($prom["isset"] && file_exists($prom["value"]))
+            $this->set_templates($kernel->pub_template_parse($prom["value"]));
+        else
+            return "no template";
 
 		//Прежде всего определим, это тестовая рассылка или нет
 		$prop = $kernel->pub_modul_properties_get("is_test");
@@ -888,7 +857,7 @@ class newssubmit
 		$end_text    = $kernel->pub_httppost_get('end_text', false);
 
 		//Проверка на то, что хоть что-то должно быть для рассыдки
-		if (($array_for_submit === false) && (empty($start_text)) && (empty($end_text)))
+		if (($array_for_submit === false) && empty($start_text) && empty($end_text))
 		{
     		print "<h3>Not data for submit</h3>";
     		print str_repeat(" ", 500);
@@ -942,14 +911,14 @@ class newssubmit
 
 
 			//Дособировываем текст рассылки
-			$html_submit = $this->template_array['mail'];
+			$html_submit = $this->get_template_block('mail');
 
 			$html_submit = str_replace("%start_text%", $start_text          , $html_submit);
 			$html_submit = str_replace("%base_link%" , $this->full_name_serv, $html_submit);
 			$html_submit = str_replace("%end_text%"  , $end_text            , $html_submit);
 			$html_submit = str_replace("%user_link%" , $link                , $html_submit);
 
-			$html_submit = str_replace("%news%", implode($this->template_array['news_block_delimiter'], $html_news), $html_submit);
+			$html_submit = str_replace("%news%", implode($this->get_template_block('news_block_delimiter'), $html_news), $html_submit);
 
 			//Проверим, если этому пользователю нечего рассылать, то не будем ничего слать
             if ((count($html_news) <= 0) && (empty($start_text)) && (empty($end_text)))
@@ -972,10 +941,11 @@ class newssubmit
 
 
 	/**
-	 * Формирует непосредственно HTML для рассылки
-	 * Если задан первый параметр, то значит рассылаем все новости, без привязки
-	 * к тому, что отметил пользователь
-	 * @return $html;
+	 * Формирует HTML для рассылки
+	 * Если задан первый параметр, то значит рассылаем все новости, без привязки к тому, что отметил пользователь
+     * @param $send_all
+     * @param $set_submit
+	 * @return array;
 	 */
 	function prepare_html_for_submit($send_all = false, $set_submit = true)
 	{
@@ -1032,7 +1002,7 @@ class newssubmit
 				$url = $link_for_news[$section]['link'].'?id='.$news['id'];
 
 				//Начали формировать HTML c одной новостью
-				$tmp = $this->template_array['news'];
+				$tmp = $this->get_template_block('news');
 
 				//Заполняем шаблон
 				$tmp = str_replace("%data%"     , $date          , $tmp);
@@ -1047,11 +1017,10 @@ class newssubmit
 			}
 
 		    //Формируем итоговый блок по новости
-			$html = $this->template_array['news_block'];
+			$html = $this->get_template_block('news_block');
 			$html = str_replace("%name%", $link_for_news[$section]["name"], $html);
 			$html = str_replace("%url%", $link_for_news[$section]["link"], $html);
-			$html = str_replace("%news%", implode($this->template_array['news_delimiter'],$news_in_block), $html);
-
+			$html = str_replace("%news%", implode($this->get_template_block('news_delimiter'),$news_in_block), $html);
 			$array_html_news[$section] = $html;
 		}
 		return $array_html_news;
@@ -1099,4 +1068,3 @@ class newssubmit
         return $ret;
     }
 }
-?>

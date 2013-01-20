@@ -317,38 +317,13 @@ class auth extends basemodule
                     if (count($incorrect_fields)==0)//не было неправильно заполненных (пустых) полей
                     {
                         $reg = $my_post['reg'];
-
-
                         foreach ($reg as $rk=>$rv)
                         {
                             $reg[$rk] = $kernel->pub_str_prepare_set($rv);
                         }
                         $id = $kernel->pub_user_add_new($reg['login'], $reg['pass'], $reg['email'], $reg['name']);
-
-
-
                         if ($id > 0)
                         {
-
-                            //поставим сумму средств==0
-                            $frec=$kernel->db_get_record_simple('_user_fields',"`id_field`='summa_sredstv'","id");
-                            if ($frec)
-                                $additional_fields[$frec['id']]=0.00;
-
-                            //Запишем информацию о доп полях к юзеру
-                            if (count($additional_fields)>0)
-                            {
-                                $user = array();
-                                //$moduleid = $kernel->pub_module_id_get();
-                                foreach ($additional_fields as $afk=>$afv)
-                                {
-                                    //$user[$id]['fields'][$moduleid."-".$afk]=$afv;
-                                    $user[$id]['fields'][$afk]=$afv;
-                                }
-                                $kernel->pub_users_info_set($user, false);
-                            }
-
-                            //new
                             $message=$this->get_template_block('email2admin_body');
                             $aflines='';
                             $fields2rus=array();
@@ -387,7 +362,6 @@ class auth extends basemodule
                         $html .= $this->get_template_block('register');
                     }
                 }
-
                 break;
 
 
@@ -439,7 +413,6 @@ class auth extends basemodule
         $my_post = $kernel->pub_httppost_get();
         if (empty($tpl))
             $tpl = $this->path_templates."/auth_show_cab.html";
-
         $this->set_templates($kernel->pub_template_parse($tpl));
         $userid = $kernel->pub_user_is_registred();
         if ($userid)
@@ -777,8 +750,8 @@ class auth extends basemodule
         $caption = $kernel->pub_httppost_get('caption');
         $id_field = $kernel->pub_httppost_get('id_field');
         $type_field = $kernel->pub_httppost_get('type_field');
-        $only_admin = intval($kernel->pub_httppost_get('only_admin'));
-        $required = intval($kernel->pub_httppost_get('required'));
+        $only_admin = isset($_POST['only_admin'])?1:0;
+        $required =  isset($_POST['required'])?1:0;
         $moduleid = $kernel->pub_module_id_get();
 
         if ($id==0)
@@ -1557,20 +1530,16 @@ class auth extends basemodule
             return $kernel->pub_httppost_errore("[#auth_users_edit_user_errore2#]", true);
 
         //Проверка заполненности пароля
-        $values['password']    = trim ($values['password']);
-        $values['re_password'] = trim ($values['re_password']);
         if (mb_strlen($values['password']) < 4 )
             return $kernel->pub_httppost_errore("[#auth_users_edit_user_errore3#]", true);
         elseif ($values['re_password'] !== $values['password'])
             return $kernel->pub_httppost_errore("[#auth_users_edit_user_errore4#]", true);
 
         //Проверка заполненности адреса почты
-        $values['email']    = trim ($values['email']);
-        if (empty($values['email']) || !$kernel->pub_is_valid_email($values['email']))
+        $values['email'] = trim ($values['email']);
+        if (!$values['email'] || !$kernel->pub_is_valid_email($values['email']))
             return $kernel->pub_httppost_errore('[#auth_incorrect_email_msg#]',true);
 
-        //Подготовим дополнительные поля, с ними чуть сложнее
-        //т.к. через такой пост нельзя передать массивы
         $values['fields'] = array();
         $fields = $kernel->pub_users_fields_get();
 
@@ -1588,6 +1557,8 @@ class auth extends basemodule
                 }
                 elseif (isset($values[$fname]))
                 {
+                    if ($id_value['required']==1 && mb_strlen($values[$fname])==0)
+                        return $kernel->pub_httppost_errore('[#auth_no_req_field_msg#] - '.$id_value['caption'],true);
                     $values['fields'][$id_key] = $this->prepare_user_input($values[$fname],$id_value['type_field']);
                     unset($values[$fname]);
                 }
@@ -1611,7 +1582,6 @@ class auth extends basemodule
         if ($id_user <= 0)
         {
             $id_user = $kernel->pub_user_add_new($values['login'], $values['password'], $values['email'], $values['name']);
-
             if ($id_user < 1)
             {
                 $msg='[#auth_error_adding_user#]';

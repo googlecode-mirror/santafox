@@ -186,15 +186,18 @@ function santaFormSubmitSuccess(responseText)
         jspub_click(id_link);
 }
 
-function santaFormSubmit(formID)
+function santaFormSubmit(formID,data)
 {
     for (var i in CKEDITOR.instances)
     {
         CKEDITOR.instances[i].destroy();
     }
+    if (typeof  data === "undefined")
+        data={};
     var foptions={
         success: santaFormSubmitSuccess,
-        dataType:  'json'
+        dataType:  'json',
+        data: data
     };
     $('#'+formID).ajaxSubmit(foptions);
 }

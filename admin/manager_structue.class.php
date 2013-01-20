@@ -3,8 +3,8 @@
 /**
  * Управляет структурой сайта, а так же настройками каждой конкретной страницы
  * @name manager_structue
- * @copyright  ArtProm (с) 2002-2006
- * @version 1.0
+ * @copyright  ArtProm (с) 2002-2013
+ * @version 2.0
  */
 
 class manager_structue
@@ -18,9 +18,9 @@ class manager_structue
     {
         global $kernel;
         $object->set_menu_block('[#structure_main_header#]');
-
         //Создаём дерево
-        $tree = new data_tree('Структура', 'index', $this->get_all_nodes('index'));
+        $idx = $kernel->db_get_record_simple('_structure',"id='index'",'caption');
+        $tree = new data_tree($idx['caption'], 'index', $this->get_all_nodes('index'));
         $tree->set_work_page_structure();
         $tree->set_action_click_node('view');
         $tree->set_action_move_node('move');
@@ -115,38 +115,6 @@ class manager_structue
     }
 
 
-    /**
-     * Фомирует массив со страницами по заданному родителю
-     * используется для "get_tree"
-     * now using only get_all_nodes //@todo cleanup?
-     * @param string $node_id ID родителя
-     * @return array
-     */
-    /*
-    function get_nodes($node_id)
-    {
-    	global $kernel;
-
-		$sql = 'SELECT pages.id,pages.caption, (subpages.id IS NOT NULL) AS hasChildren
-				FROM `'.$kernel->pub_prefix_get().'_structure` AS pages
-				LEFT JOIN `'.$kernel->pub_prefix_get().'_structure` `subpages` ON subpages.parent_id=pages.id
-				WHERE pages.`parent_id` = "'.$node_id.'"
-				GROUP BY `pages`.`id`
-				ORDER BY `pages`.`order_number` ASC';
-		$res = $kernel->runSQL($sql);
-        $data = array();
-        while ($row = mysql_fetch_assoc($res))
-        {
-            $data[] = array(
-                'data'  => htmlentities($row['caption'], ENT_QUOTES, 'utf-8'),
-                'attr'  => array('id'=> $row['id'],'rel'=>($row['hasChildren']?'folder':'default')),
-           );
-        }
-        mysql_free_result($res);
-		return $data;
-    }
-    */
-
     function get_all_nodes($node_id = 'index')
     {
     	global $kernel;
@@ -179,20 +147,6 @@ class manager_structue
             $data[] = $array;
         }
 		return $data;
-    }
-
-    function is_leaf($id)
-    {
-        global $kernel;
-
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_structure` WHERE `parent_id` = "'.$id.'"';
-        $result = $kernel->runSQL($query);
-
-        if (mysql_num_rows($result)) {
-        	return false;
-        } else {
-            return true;
-        }
     }
 
 
@@ -281,20 +235,23 @@ class manager_structue
     function node_add($node_parent_id)
     {
         global $kernel;
-
         $query = "SELECT MAX(`order_number`) + 1 AS `order`
                  FROM `".$kernel->pub_prefix_get()."_structure`
                  WHERE `parent_id` = '".$node_parent_id."' ";
 	    $result = mysql_fetch_assoc($kernel->runSQL($query));
-	    if(isset($result['order']))
-		    $neworder = $result['order'];
-	    else
-		    $neworder = 1;
-        $node_new_id = $node_parent_id.'_p_'.$neworder;
+        $neworder = intval($result['order'])+1;
+        $num=0;
+        do
+        {
+            $node_new_id = $node_parent_id.'_sub'.(++$num);
+        }
+        while($kernel->db_get_record_simple('_structure',"`id`='".$node_new_id."'",'id'));
+
         $node_new_text = $kernel->pub_page_textlabel_replace('[#admin_new_struct_page_name#]');
-        $query = "INSERT INTO `".$kernel->pub_prefix_get()."_structure` "
-                 . " (`id` ,`parent_id` ,`caption` ,`order_number` ,`properties` ,`serialize`) "
-                 . " VALUES ('".$node_new_id."', '".$node_parent_id."', '".$node_new_text."', '".$neworder."', NULL , NULL)";
+        $query = "INSERT INTO `".$kernel->pub_prefix_get()."_structure`
+                  (`id` ,`parent_id` ,`caption` ,`order_number` ,`properties` ,`serialize`)
+                  VALUES
+                  ('".$node_new_id."', '".$node_parent_id."', '".$node_new_text."', '".$neworder."', NULL , NULL)";
         $kernel->runSQL($query);
     	$this->structure_reorder($node_new_id);
     	return $node_new_id;
@@ -326,6 +283,7 @@ class manager_structue
             $children[] = '"'.$row['id'].'"';
             $children = array_merge($children, $this->node_get_children($row['id']));
     	}
+        mysql_free_result($result);
     	return $children;
     }
 
@@ -357,4 +315,3 @@ class manager_structue
         mysql_free_result($result);
     }
 }
-?>

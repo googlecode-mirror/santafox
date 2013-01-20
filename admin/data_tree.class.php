@@ -2,10 +2,10 @@
 /**
  * Создает древовидную структуру для управления данными
  *
- * Создававемая древовидная структура поддерживает следующие особенности:
+ * Создаваемая древовидная структура поддерживает следующие особенности:
  * <ul>
  * <li>Создание интерактивного дерева</li>
- * <li>Использование возможности Drag&Drop для изменения взаимо связи между элементами</li>
+ * <li>Использование возможности Drag&Drop для изменения взаимосвязи между элементами</li>
  * <li>Возможность блокировки корневого узла</li>
  * <li>Возможность создания контекстного меню, вызываемого по клику правой кнопки мыши</li>
  * </ul>
@@ -110,13 +110,6 @@ class data_tree
      * @var string
      */
     private $node_default = '';
-
-    /**
-     * Запрещает/разрешает выполнять действие при клике по центральной ноде
-     *
-     * @var string
-     */
-    private $not_click_main = 'false';
 
     /**
      * Если параметр установлен в false, то все ссылки (id действий) должны быть указаны вместе
@@ -371,20 +364,9 @@ class data_tree
         //$this->contextmenu[] = array("type" => "context_empty", "name" => "", "link" => "", "exclude" => "", "confirm" => "");
     }
 
-    /*
-    function set_menu_link($link)
-    {
-        $this->menu_global_link = $link;
-    }
-*/
     function get_tree()
     {
         global $kernel;
-
-        $notclick = "false";
-        if ($this->not_click_main === true)
-            $notclick = "true";
-
         $direct_click = "false";
         if ($this->relativ_url === false)
             $direct_click = "true";

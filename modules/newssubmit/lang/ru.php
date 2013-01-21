@@ -61,3 +61,7 @@ $il['newssubmit_no_news_error']='Необходимо отметить хотя 
 $il['newssubmit_user_saved']='Подписчик сохранён';
 $il['newssubmit_user_activated']='Подписчик активирован';
 $il['newssubmit_user_deleted']='Подписчик удалён';
+$il['newssubmit_user_found']='Подписчик найден';
+$il['newssubmit_user_not_found']='Подписчик не найден';
+$il['newssubmit_find_user_by_email']='найти подписчика по email';
+$il['newssubmit_do_search_user']='искать';

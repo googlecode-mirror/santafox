@@ -4,6 +4,12 @@
  <div id="content_container">
  <div class="content">
  <h3>[#module_newssubmit_menu_show_users#]</h3>
+
+ <form method="post" action="%search_subscriber_url%" id="search_subscriber">
+     <label for="semail" style="width: 200px;">[#newssubmit_find_user_by_email#]:</label> <input type="text" name="semail" id="semail">
+     <input value="[#newssubmit_do_search_user#]" type="button" onclick="santaFormSubmit('search_subscriber');">
+ </form>
+
  <form method="post" name="formuser" enctype="multipart/form-data" action="%form_url%">
   <!--<p>Всего подписчиков: %users_count%</p>-->
   %pages%

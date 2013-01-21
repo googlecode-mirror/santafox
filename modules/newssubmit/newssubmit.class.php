@@ -7,7 +7,7 @@ class newssubmit extends BaseModule
 	protected  $mysql_base;
 	protected $pristavka = 'SF2008';
 	protected $full_name_serv;
-    const UNAME_REGEXP="/[а-яa-z-_\\.\\s]{4,255}/i";
+    const UNAME_REGEXP="/[а-яa-z-_\\.\\s\\d]{4,255}/i";
 
 	function __construct($modul_id = '')
     {
@@ -441,6 +441,12 @@ class newssubmit extends BaseModule
 		$html_content = '';
 		switch ($kernel->pub_section_leftmenu_get())
 		{
+            case 'search_subscriber':
+                $semail = $kernel->pub_httppost_get('semail');
+                if ($kernel->pub_is_valid_email($semail) && $rec=$kernel->db_get_record_simple('_'.$kernel->pub_module_id_get().'_people',"mail='".$semail."'"))
+                    return $kernel->pub_httppost_response('[#newssubmit_user_found#]','edit_user&user_id='.$rec['id']);
+                return $kernel->pub_httppost_response('[#newssubmit_user_not_found#]');
+
 		    //Покажем список сущестующих подписчиков
 		    case 'show_users':
 		        $page = 1;
@@ -525,8 +531,8 @@ class newssubmit extends BaseModule
 	function users_show_all($page)
 	{
 		global $kernel;
-		$template = $kernel->pub_template_parse("modules/newssubmit/templates_admin/list_users.html");
-		$html = $template['form'];
+		$this->set_templates($kernel->pub_template_parse("modules/newssubmit/templates_admin/list_users.html"));
+		$html = $this->get_template_block('form');
 
 		//Узнаем сколько новостных лент, что бы вывести по ним колонки
 		$sort_section = array();
@@ -570,7 +576,7 @@ class newssubmit extends BaseModule
 			if ($val['off'] == '1')
 				$pname = '<font color="#990000">'.$pname.'</font>';
 
-            $user = $template['user'];
+            $user = $this->get_template_block('user');
 			$user = str_replace("%class%"     , $kernel->pub_table_tr_class($i), $user);
 			$user = str_replace("%num%"       , $i, $user);
 			$user = str_replace("%name%"      , $pname, $user);
@@ -582,26 +588,26 @@ class newssubmit extends BaseModule
 		}
 
 		//Сформируем постраничную навигацию
-		$pages = $template['pages'];
+		$pages = $this->get_template_block('pages'); //@todo use BaseModule::build_pages_nav
 
 		$num_pages = $this->mysql_base->get_num_pages();
 		$arr_pages = array();
 		for ($i = 1; $i <= $num_pages; $i++)
 		{
-		    $tmp = $template['page_activ'];
-		    if ($i == $page)
-		        $tmp = $template['page_passiv'];
-
+            if ($i == $page)
+                $tmp = $this->get_template_block('page_passiv');
+            else
+		        $tmp = $this->get_template_block('page_activ');
             $arr_pages[] = str_replace("%num_page%", $i, $tmp);
 		}
-		$pages = str_replace("%pages%", implode($template['page_delimiter'], $arr_pages), $pages);
+		$pages = str_replace("%pages%", implode($this->get_template_block('page_delimiter'), $arr_pages), $pages);
 
 		//Заполним окончательно все переменные
-		$html = str_replace("%pages%"      , $pages , $html);
-        $html = str_replace('%form_url%'   , $kernel->pub_redirect_for_form('delete_users'), $html);
+		$html = str_replace("%pages%", $pages , $html);
+        $html = str_replace('%form_url%', $kernel->pub_redirect_for_form('delete_users'), $html);
         $html = str_replace('%users_count%', count($users), $html);
-		$html = str_replace('%users%'      , $html_users, $html);
-
+		$html = str_replace('%users%', $html_users, $html);
+        $html = str_replace('%search_subscriber_url%', $kernel->pub_redirect_for_form('search_subscriber'), $html);
 		return $html;
 	}
 

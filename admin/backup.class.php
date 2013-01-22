@@ -4,21 +4,20 @@ class backup
 {
     private $root;
     private $path_content = array("/content");
-    private $path_system = array("/admin",
-                             "/include",
-                             "/modules"
-                             );
+    private $path_system = array(
+        "/admin",
+        "/include",
+        "/modules"
+    );
     private $path_design = array("/design");
     private $path_save;
     private $debug_trace;
 
 
-    function backup()
+    function __construct()
     {
-        global $kernel;
-        $root = $kernel->pub_site_root_get();
-        $this->root = $root;
-        $this->path_save = $root."/backup/";
+        $this->root = dirname(dirname(__FILE__));
+        $this->path_save = $this->root."/backup/";
     }
 
     function error_last_get()
@@ -38,7 +37,6 @@ class backup
         global $kernel;
         //В качесте $id нам могут передать имя файла, а так же
         //непосредствено ID mysql записи
-        $root = $kernel->pub_site_root_get();
         if (intval($id)>0)
         {
             $sql = "SELECT real_filename
@@ -48,14 +46,14 @@ class backup
             $data = mysql_fetch_assoc($result);
             $real_filename = $data['real_filename'];
         }
-        elseif (file_exists($root."/backup/".$id))
+        elseif (file_exists($this->root."/backup/".$id))
             $real_filename = $id;
         else
             return false;
 
-		require_once($root."/components/pclzip/pclzip.lib.php");
+		require_once(dirname(dirname(__FILE__))."/components/pclzip/pclzip.lib.php");
 
-		$full_zip_path = $root."/backup/".$real_filename;
+		$full_zip_path = $this->root."/backup/".$real_filename;
 		$archive = new PclZip($full_zip_path);
 		$list = $archive->listContent();
 		if ($list == 0) //ошибка чтения архива
@@ -104,7 +102,6 @@ class backup
 	    {//файлы контента и системные
 
 	        $relative_filename = substr($afile['stored_filename'], 5);
-		    //$full_path = $root."/".$relative_filename;
 		    $full_path = $relative_filename;
 		    $pathinfo = pathinfo($relative_filename);
 
@@ -148,8 +145,7 @@ class backup
         global $kernel;
         $full_path = false;
         $filename="";
-        $root = $kernel->pub_site_root_get();
-        if (is_numeric($id) && ($id > 0))
+        if (is_numeric($id) && $id > 0)
         {
 
             $data = $kernel->db_get_record_simple("_backup","id='".intval($id)."'");
@@ -157,12 +153,14 @@ class backup
             {
                 $real_filename = $data['real_filename'];
                 $filename = $data['filename'];
-                $full_path = $root."/backup/".$real_filename;
+                $full_path = $this->root."/backup/".$real_filename;
             }
         }
         else
-            $full_path = $root."/backup/".$id;
+            $full_path = $this->root."/backup/".$id;
 
+        if (!$filename)
+            $filename=$id;
         if ($full_path)
         {
             $file_content = $this->give_file($full_path);
@@ -175,9 +173,7 @@ class backup
             die();
         }
         else
-        {
             $kernel->pub_redirect_refresh("backup&backup=backup_files");
-        }
 
     }
 
@@ -197,7 +193,7 @@ class backup
     function backup_run_save($rule, $needcontent, $needsystem, $needtables, $needdesign, $descr='')
     {
         global $kernel;
-        $root = $kernel->pub_site_root_get();
+        $root = dirname(dirname(__FILE__));
 
         if (!is_dir($root."/backup"))
             $kernel->pub_file_dir_create($root."/backup");
@@ -694,10 +690,9 @@ class backup
 			$res = $kernel->runSQL("SELECT * FROM ".$table_name);
 			while ($data = mysql_fetch_assoc($res))
 			{
-				//Прежде, заменим все пустые значения значением NULL иначе всё будет глючить
 				foreach ($data as $key => $val)
 				{
-                    if (gettype($val) == "NULL" || $val==="")
+                    if (is_null($val))
 						$data[$key] = "NULL";
 					else
 						$data[$key] = "'".mysql_real_escape_string($val)."'";
@@ -1151,89 +1146,9 @@ class backup
      */
     private function translate2stringid($s)
     {
-        $res = $this->translit_string($s);
-        $res = preg_replace("/[^0-9a-z_]/i", '', $res);
-        return $res;
+        global $kernel;
+        $s = $kernel->pub_translit_string($s);
+        $s = preg_replace("/[^0-9a-z_]/i", '', $s);
+        return $s;
     }
-	/**
-     * Делает транслит строки
-     *
-     * @param string $str
-     *
-     * @return string
-     */
-    public function translit_string($str)
-    {
-        $iso = array(
-        "А" => "A" ,
-        "Б" => "B" ,
-        "В" => "V" ,
-        "Г" => "G" ,
-        "Д" => "D" ,
-        "Е" => "E" ,
-        "Ё" => "YO" ,
-        "Ж" => "ZH" ,
-        "З" => "Z" ,
-        "И" => "I" ,
-        "Й" => "J" ,
-        "К" => "K" ,
-        "Л" => "L" ,
-        "М" => "M" ,
-        "Н" => "N" ,
-        "О" => "O" ,
-        "П" => "P" ,
-        "Р" => "R" ,
-        "С" => "S" ,
-        "Т" => "T" ,
-        "У" => "U" ,
-        "Ф" => "F" ,
-        "Х" => "X" ,
-        "Ц" => "C" ,
-        "Ч" => "CH" ,
-        "Ш" => "SH" ,
-        "Щ" => "SHH" ,
-        "Ъ" => "'" ,
-        "Ы" => "Y" ,
-        "Ь" => "" ,
-        "Э" => "E" ,
-        "Ю" => "YU" ,
-        "Я" => "YA" ,
-        "а" => "a" ,
-        "б" => "b" ,
-        "в" => "v" ,
-        "г" => "g" ,
-        "д" => "d" ,
-        "е" => "e" ,
-        "ё" => "yo" ,
-        "ж" => "zh" ,
-        "з" => "z" ,
-        "и" => "i" ,
-        "й" => "j" ,
-        "к" => "k" ,
-        "л" => "l" ,
-        "м" => "m" ,
-        "н" => "n" ,
-        "о" => "o" ,
-        "п" => "p" ,
-        "р" => "r" ,
-        "с" => "s" ,
-        "т" => "t" ,
-        "у" => "u" ,
-        "ф" => "f" ,
-        "х" => "x" ,
-        "ц" => "c" ,
-        "ч" => "ch" ,
-        "ш" => "sh" ,
-        "щ" => "shh" ,
-        "ъ" => "" ,
-        "ы" => "y" ,
-        "ь" => "" ,
-        "э" => "e" ,
-        "ю" => "yu" ,
-        "я" => "ya",
-        " " => "_");
-        return strtr($str, $iso);
-    }
-
 }
-?>

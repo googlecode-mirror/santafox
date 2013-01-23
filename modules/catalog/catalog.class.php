@@ -1451,15 +1451,16 @@ class catalog extends BaseModule
      */
     private function add_basket_item($itemid, $qty=1)
     {
+        $qty = abs(intval($qty));
         //если товар с таким itemid уже есть в корзине
-        //просто увеличим кол-во на 1
+        //просто увеличим кол-во на $qty
         $basket_item = $this->get_basket_item_by_itemid($itemid);
         if ($basket_item)
         {
-            $this->update_basket_item_qty($itemid, $basket_item['qty']+1);
+            $this->update_basket_item_qty($itemid, $basket_item['qty']+$qty);
             return ;
         }
-        $qty = abs(intval($qty));
+
         if ($qty == 0)
             return ; //не добавляем нулевое кол-во
         global $kernel;

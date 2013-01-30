@@ -2828,10 +2828,13 @@ class catalog extends BaseModule
         $only_values = '';
         foreach ($props as $prop)
         {
-            if (($prop['type'] == 'html') && (!$include_html))
+            if ($prop['type'] == 'html' && !$include_html)
                 continue;
 
-            $field = $this->get_template_block('prop_'.$prop['type']);
+            if (isset($this->templates[$prop['name_db']])) //чтобы иметь возможность делать особые метки для некоторых полей
+                $field = $this->templates[$prop['name_db']];
+            else
+                $field = $this->get_template_block('prop_'.$prop['type']);
 
             $list_prop_addon .= "<!-- @".$prop['name_db']."_null -->";
             $list_prop_addon .= $template[$prop['type'].'_null'];
@@ -2842,15 +2845,11 @@ class catalog extends BaseModule
             $field = str_replace('%prop%'             , '%'.$prop['name_db'].'%'       ,$field);
             $only_values .= "<!-- @".$prop['name_db']." -->\n".$field."\n";
 
-            //И ещё заменим же из в доп свойсвтах, если они там есть
+            //И ещё заменим в доп свойствах, если они там есть
             $list_prop_addon = str_replace('%prop_name_full%' , $prop['name_full']             , $list_prop_addon);
             $list_prop_addon = str_replace('%prop_value%'     , '%'.$prop['name_db'].'_value%' , $list_prop_addon);
         }
-
-        //$list_prop = $only_names.$only_values;
-
         return array('only_values' => $only_values, 'addon' => $list_prop_addon, 'only_names'=>$only_names);
-
     }
 
 
@@ -2868,35 +2867,36 @@ class catalog extends BaseModule
         global $kernel;
         if ($groupid == 0)
             return true;
-
         $group = CatalogCommons::get_group($groupid);
-
         //пересоздаём шаблон для фронтэнда
-        $viewfilename = CatalogCommons::get_templates_user_prefix().$kernel->pub_module_id_get().'_'.$group['name_db'].'_list.html';
         if ($for_item_card)
             $viewfilename = CatalogCommons::get_templates_user_prefix().$kernel->pub_module_id_get().'_'.$group['name_db'].'_card.html';
+        else
+            $viewfilename = CatalogCommons::get_templates_user_prefix().$kernel->pub_module_id_get().'_'.$group['name_db'].'_list.html';
 
         $props = CatalogCommons::get_props($groupid, true);
         //Пока уберём это проверку, так как она должна будет делаться в форме, и подтвержаться там
         //if ($force || !CatalogCommons::isTemplateChanged($viewfilename, $group['front_tpl_md5']))
         //{//только если шаблон не был изменён или пользователь подтвердил
-        $arr_template = $kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'frontend_templates/blank_items_list.html');
+
         if ($for_item_card)
             $arr_template = $kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'frontend_templates/blank_item_one.html');
+        else
+            $arr_template = $kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'frontend_templates/blank_items_list.html');
 
         $this->set_templates($arr_template);
 
         $viewfh = '';
         //Начнём конструировать таблицу шаблон для отображения списка товаров
 
-        //шаблон списка
+
         if ($for_item_card)
         {
             $viewfh .= "<!-- @item -->\n";
             $viewfh .= $this->get_template_block('list');
         }
         else
-        {
+        {//шаблон списка
             $viewfh .= "<!-- @list -->\n";
             $viewfh .= $this->get_template_block('list');
             $cats_props = CatalogCommons::get_cats_props();
@@ -2914,8 +2914,6 @@ class catalog extends BaseModule
             $viewfh .= "\n\n\n<!-- @list_null -->\n";
             $viewfh .= $this->get_template_block('list_null');
         }
-
-
 
         //блок информации по товару в списке
         //Вмести с ним сразу создаём шаблон для карточки товара
@@ -5910,8 +5908,6 @@ class catalog extends BaseModule
         $content = str_replace('%form_header_txt%', $name_form     , $content);
         $content = str_replace('%form_action%'    , $kernel->pub_redirect_for_form('group_save'), $content);
         $content = str_replace('%form_action2%'   , $kernel->pub_redirect_for_form('regen_tpls4groups&id_group='.$id), $content);
-
-
         return $content;
     }
 

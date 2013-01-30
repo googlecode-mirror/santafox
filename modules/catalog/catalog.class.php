@@ -2843,6 +2843,7 @@ class catalog extends BaseModule
             $field = str_replace('%prop_name_full%'   , $prop['name_full']             ,$field);
             $field = str_replace('%prop_value%'       , '%'.$prop['name_db'].'_value%' ,$field);
             $field = str_replace('%prop%'             , '%'.$prop['name_db'].'%'       ,$field);
+            $field = str_replace('%prop_name_db%'     , $prop['name_db']       ,$field);
             $only_values .= "<!-- @".$prop['name_db']." -->\n".$field."\n";
 
             //И ещё заменим в доп свойствах, если они там есть

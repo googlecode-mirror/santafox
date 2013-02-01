@@ -2896,7 +2896,7 @@ class catalog extends BaseModule
         else
         {//шаблон списка
             $viewfh .= "<!-- @list -->\n";
-            $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('list'));
+            $viewfh .= $this->get_template_block('list');
             $cats_props = CatalogCommons::get_cats_props();
             foreach ($cats_props as $cprop)
             {
@@ -2923,14 +2923,14 @@ class catalog extends BaseModule
             if (!empty($row_odd) && !empty($row_even))
             {
                 $viewfh .= "\n\n\n<!-- @row_odd -->\n";
-                $viewfh .= $this->get_template_block('row_odd');
+                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('row_odd'));
                 $viewfh .= "\n\n\n<!-- @row_even -->\n";
-                $viewfh .= $this->get_template_block('row_even');
+                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('row_even'));
             }
             else
             {
                 $viewfh .= "\n\n\n<!-- @row -->\n";
-                $viewfh .= $this->get_template_block('row');
+                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('row'));
             }
 
         }

@@ -6,7 +6,7 @@
  <div class="content">
  <h3>%form_header_txt%</h3>
  
- <form action="%form_action%" method="POST" enctype="multipart/form-data" id="savegroupform">
+ <form action="%form_action%" method="POST" id="savegroupform">
  <input type="hidden" name="id" value="%groupid%">
  
  <fieldset>
@@ -45,7 +45,9 @@
  </fieldset>
  
  <fieldset class="page_submit_field">
-  <input type="button" name="submit"  value="[#catalog_edit_group_action_save#]" onclick="jspub_form_submit('savegroupform','%form_action%')">&nbsp;&nbsp;<input type="button" name="submit"  value="[#catalog_edit_group_action_new_template#]" onclick="jspub_confirm('%form_action2%', '[#catalog_edit_group_action_new_template_alert#]')">
+  <input type="button" name="submit"  value="[#catalog_edit_group_action_save#]" onclick="jspub_form_submit('savegroupform','%form_action%')">&nbsp;&nbsp;
+
+     <input type="button" name="submit"  value="[#catalog_edit_group_action_new_template#]" onclick="jspub_confirm('%form_action2%', '[#catalog_edit_group_action_new_template_alert#]')">
  </fieldset>
  
 </form>

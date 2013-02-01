@@ -103,13 +103,12 @@ var start_interface = function () {
             //	this.modules_element_select.toggle(false);
             $('#' + el).removeClass('main_menu').addClass('main_menu_select');
             this.main_menu_element_select = el;
-
             //Теперь необходимо обновить контент левой части меню
             if (name_left_menu) {
                 //Это прямое позиционирование на элемент меню в секции
                 $("#west").load("index.php?section=" + name_section + "&action=get_left_menu", function (response, status, xhr) {
                     if (status != "error") {
-                        this.left_menu_click(document.getElementById(name_left_menu, ''))
+                        start_interface.left_menu_click(document.getElementById(name_left_menu),'');
                     }
                 });
 

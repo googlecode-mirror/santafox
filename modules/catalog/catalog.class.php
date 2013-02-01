@@ -2801,8 +2801,6 @@ class catalog extends BaseModule
     {
         $list_prop_addon = "\n\n";
 
-        //cat_way_block
-        $only_names = '';
         if (isset($template['cat_way_block']) && isset($template['cat_way_separator']) &&
             isset($template['cat_way_active']) && isset($template['cat_way_passive']))
         {
@@ -2811,9 +2809,6 @@ class catalog extends BaseModule
             $list_prop_addon .= "<!-- @cat_way_active -->\n".$template['cat_way_active']."\n\n";
             $list_prop_addon .= "<!-- @cat_way_passive -->\n".$template['cat_way_passive']."\n\n";
         }
-
-        $only_names .= $template['start_prop'];
-
         $prop_names_block = '';
         foreach ($props as $prop)
         {
@@ -2822,8 +2817,7 @@ class catalog extends BaseModule
             $prop_names_block .= "%".$prop['name_db']."%\n";
         }
 
-        $only_names .= $prop_names_block;
-        $only_names .= $template['end_prop'];
+        $only_names = $prop_names_block;
 
         $only_values = '';
         foreach ($props as $prop)
@@ -2890,16 +2884,19 @@ class catalog extends BaseModule
         $viewfh = '';
         //Начнём конструировать таблицу шаблон для отображения списка товаров
 
+        //блок информации по товару в списке
+        //Вместе с ним сразу создаём шаблон для карточки товара
+        $arr_prop = $this->regenerate_group_tpls_only_prop($arr_template, $props, $for_item_card);
 
         if ($for_item_card)
         {
             $viewfh .= "<!-- @item -->\n";
-            $viewfh .= $this->get_template_block('list');
+            $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('item'));
         }
         else
         {//шаблон списка
             $viewfh .= "<!-- @list -->\n";
-            $viewfh .= $this->get_template_block('list');
+            $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('list'));
             $cats_props = CatalogCommons::get_cats_props();
             foreach ($cats_props as $cprop)
             {
@@ -2916,9 +2913,7 @@ class catalog extends BaseModule
             $viewfh .= $this->get_template_block('list_null');
         }
 
-        //блок информации по товару в списке
-        //Вмести с ним сразу создаём шаблон для карточки товара
-        $arr_prop = $this->regenerate_group_tpls_only_prop($arr_template, $props, $for_item_card);
+
 
         //Теперь собственно добавим это в результирующий шаблон
         if (!$for_item_card)
@@ -2939,8 +2934,7 @@ class catalog extends BaseModule
             }
 
         }
-        //$only_names
-        $viewfh = str_replace('%list_prop%', $arr_prop['only_names'], $viewfh);
+
         $viewfh .= "\n".$arr_prop['only_values'];
 
         //Добавим доп блоки, которые были сформированы при обработке свойств

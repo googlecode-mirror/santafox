@@ -82,9 +82,9 @@ abstract class BaseModule
         $ret['big']['water_position'] = '3';
 
         // Маленькое изображение без знаков
-        $ret['small']['isset']        = false;
-        $ret['small']['width']        = '100';
-        $ret['small']['height']       = '';
+        $ret['small']['isset']        = true;
+        $ret['small']['width']        = 100;
+        $ret['small']['height']       = 100;
         return $ret;
     }
 

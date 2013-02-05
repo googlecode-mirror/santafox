@@ -4096,11 +4096,14 @@ class catalog extends BaseModule
             if (count($values) == 0)
                 $values = "NULL";
         }
-
+        if ($ptype=='pict')
+            $add_param='"'.mysql_real_escape_string(serialize(self::make_default_pict_prop_addparam())).'"';
+        else
+            $add_param="NULL";
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props`
-                 (`name_db`,`name_full`,`type`)
+                 (`name_db`,`name_full`,`type`,`add_param`)
                  VALUES
-                 ("'.$namedb.'","'.mysql_real_escape_string($pname).'","'.$ptype.'")';
+                 ("'.$namedb.'","'.mysql_real_escape_string($pname).'","'.$ptype.'",'.$add_param.')';
         $kernel->runSQL($query);
 
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats`

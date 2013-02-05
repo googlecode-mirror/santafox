@@ -2814,6 +2814,8 @@ class catalog extends BaseModule
         {
             if ($prop['type']=='html' && !$include_html)
                 continue;
+            if (isset($template[$prop['name_db']]))
+                continue;
             $prop_names_block .= "%".$prop['name_db']."%\n";
         }
 
@@ -2830,6 +2832,7 @@ class catalog extends BaseModule
             else
                 $field = $this->get_template_block('prop_'.$prop['type']);
 
+            $field = trim($field);
             $list_prop_addon .= "<!-- @".$prop['name_db']."_null -->";
             $list_prop_addon .= $template[$prop['type'].'_null'];
 
@@ -2870,6 +2873,12 @@ class catalog extends BaseModule
             $viewfilename = CatalogCommons::get_templates_user_prefix().$kernel->pub_module_id_get().'_'.$group['name_db'].'_list.html';
 
         $props = CatalogCommons::get_props($groupid, true);
+        $visible_props=array_keys($this->get_group_visible_props($groupid));
+        foreach($props as $k=>$prop)
+        {
+            if ($prop['group_id']==0 && !in_array($prop['name_db'],$visible_props))
+                unset($props[$k]);
+        }
         //Пока уберём это проверку, так как она должна будет делаться в форме, и подтвержаться там
         //if ($force || !CatalogCommons::isTemplateChanged($viewfilename, $group['front_tpl_md5']))
         //{//только если шаблон не был изменён или пользователь подтвердил

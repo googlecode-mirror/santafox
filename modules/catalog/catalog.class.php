@@ -8717,10 +8717,9 @@ class catalog extends BaseModule
                 $id    = $kernel->pub_httpget_get('id');
                 $dprop = $kernel->pub_httpget_get('field');
                 $cat   = $this->get_category($id);
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats`
-                            SET `'.$dprop.'`=NULL WHERE `id`='.intval($id);
+                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `'.$dprop.'`=NULL WHERE `id`='.intval($id);
                 $kernel->runSQL($query);
-                $kernel->pub_file_delete('content/files/'.$moduleid.'/'.$cat[$dprop]);
+                $kernel->pub_file_delete($cat[$dprop]);
                 $kernel->pub_redirect_refresh('category_edit&id='.$id.'&selectcat='.$id);
                 break;
 

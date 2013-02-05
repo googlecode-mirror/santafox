@@ -33,12 +33,29 @@
  <div class="block clear" style="padding:10px 0; width:600px; height:300px;">%prop_value%</div>
 </fieldset>
 
+<!-- @prop_file_value_null -->
+     <input type="file" name="%prop_name_db%" size="31">
+<!-- @prop_file_value -->
+     <a href="%path%" target="_blank"><small>%path%</small></a><br>
+     <br>
+     <a href="#" onclick='jspub_confirm("cat_clear_field&id=%id%&field=%prop_name_db%","[#catalog_edit_category_prop_file_del_alert#]?")'>
+         <img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_edit_category_prop_file_del_alert#]">
+     </a>
 <!-- @prop_file -->
 <fieldset>
  <label>%prop_name_full%:</label>
  <span class="block fLeft">%prop_value%</span>
 </fieldset>
 
+<!-- @prop_pict_value_null -->
+     <input type="file" class="inputFile" name="%prop_name_db%" size="31">
+<!-- @prop_pict_value -->
+     <small>%path%</small><br>
+     <img src="%path%" width="50">
+     <br>
+     <a href="#" onclick='jspub_confirm("cat_clear_field&id=%id%&field=%prop_name_db%","[#catalog_edit_category_prop_file_del_alert#]?")'>
+         <img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_edit_category_prop_file_del_alert#]">
+     </a>
 <!-- @prop_pict -->
 <fieldset>
  <label>%prop_name_full%:</label>

@@ -6125,8 +6125,7 @@ class catalog extends BaseModule
         foreach ($props as $prop)
         {
             $line = $this->get_template_block('prop_'.$prop['type']);
-            $line = str_replace('%prop_name_full%', $prop['name_full'], $line);
-            $line = str_replace('%prop_name_db%', $prop['name_db'], $line);
+
             switch ($prop['type'])
             {
                 //Для простых свойств всё просто. Просто заменяем значение в форме
@@ -6138,31 +6137,26 @@ class catalog extends BaseModule
 
                 //Для файла нужно вывести форму загрузки файла, и возможность удалить этот файл
                 case 'file':
-                    $prop_val = '<input type="file" name="'.$prop['name_db'].'" size="31">';
-                    if (!empty($cat[$prop['name_db']]))
+                    if ($cat[$prop['name_db']])
                     {
-                        $prop_val = 'content/files/'.$kernel->pub_module_id_get().'/'.$cat[$prop['name_db']]."&nbsp;&nbsp;".
-                            '<a href="#" onclick=\'jspub_confirm("cat_clear_field&id=%id%&field='.$prop['name_db'].'",'.
-                            '"[#catalog_edit_category_prop_file_del_alert#]?")\'><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_edit_category_prop_file_del_alert#]"></a>';
+                        $prop_val = $this->get_template_block('prop_file_value');
+                        $prop_val = str_replace('%path%','/'.$cat[$prop['name_db']],$prop_val);
                     }
-
+                    else
+                        $prop_val = $this->get_template_block('prop_file_value_null');
                     $line = str_replace('%prop_value%', $prop_val, $line);
 
                     break;
 
                 //Ихображение
                 case 'pict':
-                    $prop_val = '<input type="file" class="inputFile" name="'.$prop['name_db'].'" size="31">';
-                    if (!empty($cat[$prop['name_db']]))
+                    if ($cat[$prop['name_db']])
                     {
-                        // $pict_full_name = 'content/files/'.$kernel->pub_module_id_get().'/'.$cat[$prop['name_db']];
-                        $pict_full_name = $cat[$prop['name_db']];
-                        $prop_val = $pict_full_name."&nbsp;&nbsp;";
-                        $prop_val .= '&nbsp;&nbsp;&nbsp;&nbsp;<img src="/'.$pict_full_name.'" width="50">&nbsp;&nbsp;';
-                        $prop_val .='<a href="#" onclick=\'jspub_confirm("cat_clear_field&id=%id%&field='.$prop['name_db'].'","[#catalog_edit_category_prop_file_del_alert#]?")\'><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_edit_category_prop_file_del_alert#]"></a>';
-
-
+                        $prop_val = $this->get_template_block('prop_pict_value');
+                        $prop_val = str_replace('%path%','/'.$cat[$prop['name_db']],$prop_val);
                     }
+                    else
+                        $prop_val = $this->get_template_block('prop_pict_value_null');
                     $line = str_replace('%prop_value%', $prop_val, $line);
                     break;
 
@@ -6194,6 +6188,8 @@ class catalog extends BaseModule
                     $line = str_replace('%prop_value%', $editor->create(), $line);
                     break;
             }
+            $line = str_replace('%prop_name_full%', $prop['name_full'], $line);
+            $line = str_replace('%prop_name_db%', $prop['name_db'], $line);
             $lines .= $line;
         }
         $content = str_replace('%props%', $lines, $content);

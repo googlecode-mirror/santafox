@@ -4517,7 +4517,7 @@ class catalog extends BaseModule
         foreach($rows as $row)
         {
             $array = array(
-                'data'  => htmlentities($row['name'], ENT_NOQUOTES, 'UTF-8').' ('.$row['_items_count'].')',
+                'data'=>htmlspecialchars($row['name']).'&nbsp;('.$row['_items_count'].')',
                 'attr'=>array("id"=>$row['id'],'rel'=>'default'),
             );
             if ($row['_subcats_count'] == 0)

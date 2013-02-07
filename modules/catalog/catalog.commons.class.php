@@ -22,8 +22,8 @@ class CatalogCommons
         global $kernel;
         $prfx=$kernel->pub_prefix_get();
         if ($subcats_count)
-            $select_fields.=', COUNT(subcats.id) AS _subcats_count';
-        $sql = 'SELECT '.$select_fields.', COUNT(i2c.item_id) AS _items_count FROM `'.$prfx.'_catalog_'.$moduleid.'_cats` AS cats
+            $select_fields.=', COUNT(DISTINCT subcats.id) AS _subcats_count';
+        $sql = 'SELECT '.$select_fields.', COUNT('.($subcats_count?"DISTINCT ":"").'i2c.item_id) AS _items_count FROM `'.$prfx.'_catalog_'.$moduleid.'_cats` AS cats
                 LEFT JOIN `'.$prfx.'_catalog_'.$moduleid.'_item2cat` AS i2c ON cats.id = i2c.cat_id';
         if ($subcats_count)
             $sql.=' LEFT JOIN '.$prfx.'_catalog_'.$moduleid.'_cats AS subcats ON subcats.parent_id=cats.id';

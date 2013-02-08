@@ -32,7 +32,10 @@ start_interface.link_go("%action_node%&id=" + currNodeId);
                     //Это клик когда надо будет проставить значение выбранной ноды
                     //и вызвать событие на закрытие окна. Используется для выбора
                     //страницы сайта в качестве свойства чего-либо.
-                    $('#'+start_interface.select_element).val(currNodeId);
+                    if (typeof structSelectedPage == 'function')
+                        structSelectedPage(currNodeId);
+                    else // 'string'
+                        $('#'+structSelectedPage).val(currNodeId);
                     $("#popup_sitemap_div").dialog("destroy");
                 }
 

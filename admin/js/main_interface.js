@@ -287,9 +287,11 @@ function santaShowPopupHint(header, text,timeout)
         setTimeout(function(){ $("#popup_msg_div").dialog("close"); }, timeout);
 }
 
+//здесь хранится текущая выбранная страница во всплывающем диве
+var structSelectedPage='';
 //Функция открывает слой для выбора страницы сайта
 //во всех свойствах с типом (страница сайта)
-function showPageSelector(fieldID)
+function showPageSelector(fieldIDorHandler)
 {
     var popup=$('#popup_sitemap_div');
     popup.html('');
@@ -302,14 +304,14 @@ function showPageSelector(fieldID)
         resizable: true,
         height:400,
         width:250,
-        zIndex:2000,
+        zIndex:20000,
         title: 'Выбор страницы',
         buttons: {},
         modal: true
         //,close: function() {update_action_list(); }
 
     });
-    start_interface.select_element = fieldID;
+    structSelectedPage = fieldIDorHandler;
     //start_interface.dialog.addKeyListener(27, start_interface.dialog.hide, start_interface.dialog);
     return true;
 }
@@ -412,7 +414,9 @@ function form_submit_include_content(name_area)
     return true;
 }
 
+
 // для редактора контента, встроенного в страницу
+//+для редактора в отдельном окне в структуре
 function start_include_content(name_area)
 {
     if (!name_area)
@@ -459,8 +463,35 @@ function start_include_content(name_area)
      if (inst)
      inst.destroy(true);
      $('#'+name_area).ckeditor(config);*/
+    CKEDITOR.replace(name_area, config);
 
-    CKEDITOR.replace( ''+name_area+'', config);
+    CKEDITOR.on('dialogDefinition', function( ev )
+    {
+        var dialogName = ev.data.name;
+        var dialogDefinition = ev.data.definition;
+        if ( dialogName != 'link' )
+            return;
+        var infoTab = dialogDefinition.getContents('info');
+        infoTab.add(
+            {
+                type : 'vbox',
+                id : 'buttonPageSelector',
+                children : [
+                    {
+                        type : 'button',
+                        id : 'browse',
+                        label: 'Выбрать из структуры',
+                        onClick : function (e){
+                            showPageSelector(function(el){
+                                var dialog = CKEDITOR.dialog.getCurrent();
+                                dialog.getContentElement('info', 'linkType').setValue('');
+                                dialog.getContentElement('info', 'url').setValue('/'+el+'.html');
+                            });
+                        }
+                    }]
+            }
+        );
+    });
     return true;
 }
 
@@ -934,3 +965,5 @@ function saveStructForm(url,isFull,modulesProps)
 
 
 }
+
+

@@ -13,16 +13,16 @@ body {
 
 /* IE border-radius fix */
 .ui-layout-container, .ui-layout-pane, #mainLayout, .middle_content, #page_container, .grey_wrapper, .ui-widget-header,
-#mod_block, #modules_toolbar, 
+#mod_block, #modules_toolbar,
 .ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl,
 .ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr,
 .ui-corner-all, .ui-corner-bottom, .ui-corner-left, .ui-corner-bl,
 .ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br,
-.ui-widget-shadow, .ui-accordion .ui-accordion-header, 
+.ui-widget-shadow, .ui-accordion .ui-accordion-header,
 .ui-state-default, .ui-state-hover, .ui-selectmenu, .ui-selectmenu-menu,
 .ui-button, .ui-datepicker .ui-datepicker-prev-hover,
 .ui-datepicker .ui-datepicker-next-hover, .ui-selectmenu, .jstree-classic .jstree-hovered,
-.jstree-classic .jstree-clicked, #vakata-contextmenu.jstree-classic-context li ul, .submit_btn, 
+.jstree-classic .jstree-clicked, #vakata-contextmenu.jstree-classic-context li ul, .submit_btn,
 input, textarea,
 #contentLoading {
 	behavior: url(/admin/js/PIE.htc);
@@ -617,9 +617,9 @@ a.html_editor_button { margin:2px 0 0 5px; background:url('../images/editor_butt
 #form_container {
    padding:15px; margin:-95px 0 0 -150px;
    width:270px;
-   display:block; 
-   position:absolute; 
-   top:50%; left:50%; 
+   display:block;
+   position:absolute;
+   top:50%; left:50%;
    -webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
 	border-radius: 8px;
@@ -641,9 +641,9 @@ a.html_editor_button { margin:2px 0 0 5px; background:url('../images/editor_butt
 	position:relative;
 	padding:0; margin:-175px 0 0 -300px;
 	width:600px; height:350px;
-	display:block; 
-	position:absolute; 
-	top:50%; left:50%; 
+	display:block;
+	position:absolute;
+	top:50%; left:50%;
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
 	border-radius: 8px;

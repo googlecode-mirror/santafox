@@ -325,7 +325,7 @@ function go_edit_content(name_file, no_redactor)
     var name_edit = 'edit_';
     var left=parseInt(100);
     var top=parseInt(1);
-    var width = parseInt(screen.width / 3 );
+    var width = parseInt(screen.width / 2 );
     var height = parseInt(screen.height / 2);
     if (width < 700)
         width = 700;

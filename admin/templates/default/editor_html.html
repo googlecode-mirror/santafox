@@ -4,6 +4,8 @@
 <head>
     <title>[#name_title#]</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="/admin/templates/default/css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css">
+
     <script type="text/javascript" src="/admin/js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="/admin/js/main_interface.js"></script>
     <script type="text/javascript" src="/components/html_editor/ckeditor/ckeditor.js"></script>
@@ -13,6 +15,10 @@
         window.onload = function() {
             start_include_content('[#name_edit#]');
         };
+
+        CKEDITOR.on('instanceReady', function( evt ) {
+            evt.editor.execCommand('maximize');
+        });
     </script>
 </head>
 

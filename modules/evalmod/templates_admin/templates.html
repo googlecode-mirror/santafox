@@ -1,4 +1,37 @@
 <!-- @form -->
+<!-- codemirror -->
+<link rel="stylesheet" href="/components/codemirror/lib/codemirror.css" type="text/css">
+<script type="text/javascript" src="/components/codemirror/lib/codemirror.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/xml/xml.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/javascript/javascript.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/css/css.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/clike/clike.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/php/php.js"></script>
+<script type="text/javascript" src="/components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<style type="text/css">
+    .CodeMirror {
+        border-top: 1px solid #ededed;
+        border-bottom: 1px solid #ededed;
+        border-right: 1px solid #ededed;
+    }
+
+    .cm-tab:after {
+        content: "\21e5";
+        display: -moz-inline-block;
+        display: -webkit-inline-block;
+        display: inline-block;
+        width: 0;
+        position: relative;
+        overflow: visible;
+        left: -1.4em;
+        color: #aaa;
+    }
+
+    .activeline {
+        background: #e8f2ff !important;
+    }
+</style>
 <span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#evalmod_modul_base_name#]</span></span>
 <div id="page_container">
  <div id="content_container">

@@ -105,6 +105,8 @@ class backup
 		    $full_path = $relative_filename;
 		    $pathinfo = pathinfo($relative_filename);
 
+            if(!$pathinfo['dirname'])//может быть и такое в архивах созданных вручную
+                $kernel->pub_redirect_refresh("backup&backup=restore_step1&id=".$id."&total=".$total."&findex=".++$file_index);
 		    if (!$kernel->pub_file_dir_create($pathinfo['dirname']))
 		    {
     	        $kernel->pub_console_show("dir create failed: ".$pathinfo['dirname']);

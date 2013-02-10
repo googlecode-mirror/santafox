@@ -300,7 +300,7 @@ class manager_global_properties
                 $descript = '[#admin_glob_prop_modified_version_no_update#]';
                 break;
             default:
-                $descript = '<p><a href="#" onclick="jspub_click(\'update_step_1\'); return false;">Обновить</a></p>'.$descript;
+                $descript = '<p><button onclick="jspub_click(\'update_step_1\');">Обновить</button></p>'.$descript;//@todo move to template
                 break;
         }
         $html = str_replace('[#new_version_info#]', $descript, $html);
@@ -382,7 +382,7 @@ class manager_global_properties
         foreach ($temp_files AS $file)
         {
 			
-            preg_match("/\{\@(.*?)\@\}(.*)/is", $file, $result);
+            preg_match("/\\{\\@(.*?)\\@\\}(.*)/is", $file, $result);
             $filename = $result[1];
             $files[$filename] = $result[2];
         }
@@ -413,20 +413,17 @@ class manager_global_properties
         }
 
         //Собственно начнем процесс апдейта
-        $upd_temp_dir = "/upload";
-        $kernel->pub_file_dir_create($root."/upload");
+        $upd_temp_dir = "/upload/update".$new_version;
+        $kernel->pub_file_dir_create($root.$upd_temp_dir);
 
         // Сохраняем во временную папку
         //прежде всего создадим в необходимые дирректории во врменной папке
-        //$kernel->debug("--", true);
-        //$kernel->debug($upd_temp_dir, true);
-        //$kernel->debug("--", true);
         $this->update_dir_create($files, $upd_temp_dir);
 
         $html = '';
         foreach ($files AS $path => $content)
         {
-            if (!$this->file_save($upd_temp_dir.$path, $content))
+            if (!$kernel->pub_file_save($upd_temp_dir.$path, $content))
                 $html .= $this->error_message_get($upd_temp_dir.$path);
             else
                 $html .= 'Upload file: '.$path.'<br>';
@@ -440,24 +437,16 @@ class manager_global_properties
         $update = new site_update();
         $update->start();
 			
-			$del_file_array[] = "/_update.php";
-			$del_file_array[] = "/_description.html";
-			
         unset($files["/_update.php"], $files["/_description.html"]);
         reset($files);
 
-        //Теперь, нужно пройтись и создать в случае необходимости директории
-        //уже в самом сайте
+        //Теперь, нужно пройтись и создать в случае необходимости директории уже в самом сайте
         $this->update_dir_create($files, "/");
 
         //Непосредственно копирование файлов
         $errore_copy = false;
         foreach ($files AS $path => $content)
         {
-            //if (!copy($upd_temp_dir.$path, $root.$path))
-            //$kernel->debug("Из :".$upd_temp_dir.$path, true);
-            //$kernel->debug("В :".$root.$path, true);
-            //$kernel->debug("==", true);
             if (!$kernel->pub_file_copy($upd_temp_dir.$path, $root.$path))
             {
                 $errore_copy = true;
@@ -477,8 +466,7 @@ class manager_global_properties
                 $manager_modules->reinstall_module($modul_id);
         }
 
-
-        //Укажем новую версию в ini файле если небыло ошибок в обновлении
+        //Укажем новую версию в ini файле если не было ошибок в обновлении
         if ($errore_copy)
         {
             $kernel->debug($html, true);
@@ -488,56 +476,10 @@ class manager_global_properties
         {
             $ini_php = str_replace('define("SANTAFOX_VERSION", "'.$version.'");', 'define("SANTAFOX_VERSION", "'.$new_version.'");', $ini_php);
             $kernel->pub_file_save("/ini.php", $ini_php);
+            $kernel->pub_file_delete($root.$upd_temp_dir,true);
         }
         else
             $html .= $this->error_message_get('Отсутствует файл ini.php');
-
-		// Копируем в отдельную папку файлы бекапа и удаляем из основной
-		$new_upd_dir = "/upload/update_".$version;
-		// создали новую папку
-        $kernel->pub_file_dir_create($root.$new_upd_dir);
-		// сoздали в ней структуру папок
-		$this->update_dir_create($files, $new_upd_dir);
-		// копируем в новую папку
-		$errore_copy = false;
-        foreach ($files AS $path => $content)
-        {
-            if (!$kernel->pub_file_copy($root.$upd_temp_dir.$path, $new_upd_dir.$path))
-            {
-                $errore_copy = true;
-                $html .= "Ошибка копирования <i>".$root.$upd_temp_dir.$path."</i> в <i>".$new_upd_dir.$path."</i><br>";
-            }
-        }
-		//создадаим список уникальных директорий и файлов в корне
-		//$del_dirr_array = array();
-    	foreach ($files as $key => $val)
-    	{
-			// отдельно собираем файлы, лежашие в корне
-			if(strpos($key, '/', 1) === false)
-			{
-				$del_file_array[] = $key;
-				continue;
-			}
-			$path = pathinfo($key);
-			$path = $path['dirname'];
-			// берем папки только верхнего уровня
-			preg_match('~^/([^/]+)~', $path, $matches);
-	        	$del_dirr_array[$matches[0]]= $matches[0];
-    	}
-
-		// удаляем папки со всем содержимым
-		 foreach ($del_dirr_array as $del_val)
-        {
-            if (!$kernel->pub_file_delete($upd_temp_dir.$del_val, true))
-                $html .= "Error delete dir <i>".$upd_temp_dir.$del_val."</i><br>";
-        }
-		// удаляем файлы из корня
-		 foreach ($del_file_array as $del_val)
-        {
-            if (!$kernel->pub_file_delete($upd_temp_dir.$del_val, true))
-                $html .= "Error delete file <i>".$upd_temp_dir.$del_val."</i><br>";
-        }
-
         return $html;
     }
 
@@ -569,8 +511,8 @@ class manager_global_properties
      * Сохдаёт папки, которые возможно появились в обновлении
      *
      * @param array $files
-     * @param unknown_type $link
-     * @return unknown
+     * @param string $link
+     * @return boolean
      */
     function update_dir_create($files, $link)
     {
@@ -593,26 +535,10 @@ class manager_global_properties
     	return $result;
     }
 
-    /**
-     * Просто записываем файлы во врменную папку
-     *
-     * @param string $where Имя файла с путём
-     * @param string $what Контент файла
-     * @return unknown
-     */
-    function file_save($where, $what)
-    {
-        global $kernel;
-        $kernel->pub_file_save($where, $what);
-        return true;
-    }
-
-
     function global_actio_start()
     {
         $html = file_get_contents('admin/templates/default/global_actions.html');
         return $html;
-
     }
 
     /**

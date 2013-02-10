@@ -424,6 +424,7 @@ function start_include_content(name_area)
     var config =
     {
         skin : 'moono',
+        extraPlugins : 'ajaxsave',
         autoUpdateElement:true,
         width: '100%',
         height: '100%',
@@ -441,7 +442,7 @@ function start_include_content(name_area)
         FlashUpload:false,
         language:'ru',
         toolbar: [
-            ['Source','Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['AjaxSave','Source','Cut','Copy','Paste','PasteText','PasteFromWord'],
             ['Image','Flash','Table','HorizontalRule','SpecialChar','PageBreak'],
             ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
             ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],

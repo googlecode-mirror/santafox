@@ -5187,12 +5187,15 @@ class catalog extends BaseModule
             $categories[] = $catline;
         }
         $form_action = $kernel->pub_redirect_for_form('item_save');
+        $redir2=$kernel->pub_httpget_get('redir2');
+        if (!$redir2)
+            $redir2='show_items';
         $content  = str_replace('%props%'      , join("\n", $lines)     , $content);
         $content  = str_replace('%categories%' , join("\n", $categories), $content);
         $content  = str_replace('%form_action%', $form_action           , $content);
         $content  = str_replace('%id%'         , $id                    , $content);
         $content  = str_replace('%group_id%'   , $group_id              , $content);
-        $content  = str_replace('%redir2%'     , htmlspecialchars($kernel->pub_httpget_get('redir2')), $content);
+        $content  = str_replace('%redir2%'     , urlencode($redir2), $content);
         return $content;
     }
 
@@ -8211,7 +8214,6 @@ class catalog extends BaseModule
         $moduleid = $kernel->pub_module_id_get();
         switch ($action)
         {
-
             //ajax-поиск товаров
             case 'get_items_quicksearch_result':
                 $term=$kernel->pub_httpget_get('term',false);
@@ -8852,7 +8854,7 @@ class catalog extends BaseModule
                 $kernel->pub_file_delete($item[$dprop]);
                 $kernel->pub_file_delete($path_parts['dirname'].'/tn/'.$path_parts['basename']);
                 $kernel->pub_file_delete($path_parts['dirname'].'/source/'.$path_parts['basename']);
-                $kernel->pub_redirect_refresh("item_edit&id=".$id_tovar);
+                $kernel->pub_redirect_refresh("item_edit&id=".$id_tovar.'&redir2='.urlencode($kernel->pub_httpget_get('redir2')));
                 break;
 
             //Удаление товара

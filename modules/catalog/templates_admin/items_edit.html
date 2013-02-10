@@ -2,38 +2,38 @@
 <script type="text/javascript">
     $(function() {
 
-         $("#incatdialog").dialog({
-             autoOpen: false,
-             closeOnEscape: false,
-             height: 350,
-             width: 300,
-             modal: true,
-             title: '[#catalog_item_edit_incategories_label#]',
-             open: function(event, ui) {
+        $("#incatdialog").dialog({
+            autoOpen: false,
+            closeOnEscape: false,
+            height: 350,
+            width: 300,
+            modal: true,
+            title: '[#catalog_item_edit_incategories_label#]',
+            open: function(event, ui) {
                 $(".ui-dialog-titlebar-close", ui.dialog).hide();
                 $(this).append($('#incat').show());
-             },
-             buttons: {
-                 '[#common_select_all_label#]': function() {
+            },
+            buttons: {
+                '[#common_select_all_label#]': function() {
                     $(this).find(':checkbox').attr('checked', true);
-                 },
+                },
 
-                 '[#common_deselect_all_label#]': function() {
+                '[#common_deselect_all_label#]': function() {
                     $(this).find(':checkbox').removeAttr('checked');
-                 },
+                },
 
-                 '[#common_done_label#]': function() {
+                '[#common_done_label#]': function() {
                     $(this).dialog( "close" );
                     $(this).parent().find('#incat').appendTo($("#incatcontainer"));
-                 }
-             }
-         });
-         
+                }
+            }
+        });
+
 
         $("#incat_btn").button().click(function() {
             $("#incatdialog").dialog("open");
         });
-        
+
 
         function confirm_need_add_big_water(btn)
         {
@@ -81,9 +81,9 @@
                         <td align="center">
                             <span id="incat_btn">Выбрать</span>
                             <div id="incatcontainer" class="clear" style="display:none;">
-                             <div id="incat" class="incat block clear" style="margin:0 auto;">
-                                %categories%
-                             </div>
+                                <div id="incat" class="incat block clear" style="margin:0 auto;">
+                                    %categories%
+                                </div>
                             </div>
                             <div id="incatdialog" style="display:none;"></div>
                         </td>
@@ -129,8 +129,9 @@
 
 <fieldset style="border-top:1px solid #ededed; padding:10px 0;">
     <form action="" method="POST" id="addlinkedform">
-      <input type="hidden" name="itemid" value="%id%">
-      <input type="hidden" name="addlinkedid" value="" id="add_linked_itemid">
+        <input type="hidden" name="redir2" value="%redir2%">
+        <input type="hidden" name="itemid" value="%id%">
+        <input type="hidden" name="addlinkedid" value="" id="add_linked_itemid">
       <span class="block clear">
        <label style="width:170px;">[#catalog_add_linked_item_label#]</label>
        %linked_data%
@@ -147,7 +148,7 @@
 </table>
 
 <!-- @linked_item -->
-<tr><td colspan="2"><a href="#" onclick="jspub_click('item_edit&id=%lid%')">%namestring%</a><a href="#" onclick="jspub_click('item_edit&id=%id%&removlinkedid=%lid%')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_remove_linked_item_label#]"/></a></td></tr>
+<tr><td colspan="2"><a href="#" onclick="jspub_click('item_edit&id=%lid%&redir2=%redir2%')">%namestring%</a><a href="#" onclick="jspub_click('item_edit&id=%id%&removlinkedid=%lid%')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_remove_linked_item_label#]"/></a></td></tr>
 
 <!-- @prop_string -->
 <tr %class%>
@@ -198,7 +199,7 @@
 <!-- @prop_file_edit -->
 <tr %class%>
 <td align="left">%prop_name_full%:</td>
-<td><b>%prop_value%</b> <a href="#" onclick="jspub_confirm('item_clear_field&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
+<td><b>%prop_value%</b> <a href="#" onclick="jspub_confirm('item_clear_field&id=%id%&redir2=%redir2%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
 </tr>
 
 <!-- @prop_pict -->
@@ -210,7 +211,7 @@
 <!-- @prop_pict_edit -->
 <tr %class%>
 <td align="left">%prop_name_full%:</td>
-<td><img src="%prop_value%" width="50"><a href="#" onclick="jspub_confirm('item_clear_field&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
+<td><img src="%prop_value%" width="50"><a href="#" onclick="jspub_confirm('item_clear_field&redir2=%redir2%&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
 </tr>
 <!-- @prop_pict_marka_source -->
 <br><input type="checkbox" name="%prop_name_db%_need_add_source_water" id="%prop_name_db%_need_add_source_water" checked="checked"/><label for="%prop_name_db%_need_add_source_water">[#catalog_item_edit_pict_add_mark_for_source#]</label>

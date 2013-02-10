@@ -11,11 +11,11 @@
 class kernel
 {
 
-	/**
-	 * Объект класса ftpshnik
-	 *
-	 * @var ftpshnik
-	 */
+    /**
+     * Объект класса ftpshnik
+     *
+     * @var ftpshnik
+     */
     private $ftp_client = null;
 
     //private $ftp_root = false;
@@ -28,11 +28,11 @@ class kernel
 
 
     /**
-	 * Счетчик запросов в MySQL
-	 *
-	 * @var integer
-	 */
-	private $queriesCount = 0;
+     * Счетчик запросов в MySQL
+     *
+     * @var integer
+     */
+    private $queriesCount = 0;
 
     /**
      * Хранит признак того что произошла установка текущей страницы
@@ -237,9 +237,9 @@ class kernel
      * @var array
      */
     private $lang = array("ru" => "[#admin_lang_caption_for_ru#]",
-                      "en" => "[#admin_lang_caption_for_en#]",
-                      "ua" => "[#admin_lang_caption_for_ua#]"
-                      );
+        "en" => "[#admin_lang_caption_for_en#]",
+        "ua" => "[#admin_lang_caption_for_ua#]"
+    );
 
 
     /** @var список имеющихся постпроцессоров */
@@ -341,7 +341,7 @@ class kernel
 
     }
 
-     /**
+    /**
      * Возвращает код ограниченного набора прав для директорий
      *
      * Метод возвращает код прав доступа, используемый в UNIX. Данный код проставляется
@@ -597,7 +597,7 @@ class kernel
      * например, для таблицы "ap_admin" префикс будет "ap".
      * @access private
      * @return String
-	 */
+     */
     function pub_prefix_get()
     {
         return $this->prefix;
@@ -737,14 +737,14 @@ class kernel
      * меню значением по умолчанию, если такого это первый вход в админи
      * @access private
      * @return void
-	 */
+     */
     function priv_session_vars_set()
     {
 
         $_SESSION['vars_kernel']['my_get'] = $_GET;
 
         //if (!empty($_POST))
-            $_SESSION['vars_kernel']['my_post'] = $_POST;
+        $_SESSION['vars_kernel']['my_post'] = $_POST;
 
         //Определим, указывается ли текушая секция;
         if (isset($_GET['section']))
@@ -766,17 +766,32 @@ class kernel
      * Для получения текущего пункта меню используется функциz {@link pub_section_leftmenu_get}
      * @param string $curent
      * @param boolean $update
-     * @access private
      * @return void
      */
-    function priv_section_leftmenu_set($curent = '', $update = false)
+    public function priv_section_leftmenu_set($curent = '', $update = false)
     {
         if (isset($_GET['leftmenu']))
-            $_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'] = trim($_GET['leftmenu']);
-        if (($update) && (!empty($curent)))
+        {
+            $lm=$_GET['leftmenu'];
+            if(preg_match('~^(.+?)&(.+)$~',$lm,$m))
+            {
+                $lm=$m[1];
+                $chunks = explode('&',$m[2]);
+                foreach($chunks as $ch)
+                {
+                    if (strpos($ch,'=')===false)
+                        continue;
+                    list($name,$val)=explode('=',$ch);
+                    $_GET[$name]=$val;
+                    $_SESSION['vars_kernel']['my_get'][$name]=$val;
+                }
+            }
+            $_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'] = trim($lm);
+        }
+        if ($update && !empty($curent))
             $_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'] = trim($curent);
 
-        if ((empty($_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'])) && (!isset($_GET['leftmenu'])))
+        if (empty($_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu']) && !isset($_GET['leftmenu']))
             $_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'] = trim($curent);
     }
 
@@ -801,18 +816,18 @@ class kernel
 
     function pub_httpget_get($name_var = "", $prepare = true)
     {
-    	$arr = array();
+        $arr = array();
 
         if ((isset($_SESSION['vars_kernel']['my_get'])) && (!empty($_SESSION['vars_kernel']['my_get'])))
-        	$arr = $_SESSION['vars_kernel']['my_get'];
+            $arr = $_SESSION['vars_kernel']['my_get'];
 
         if ((!empty($name_var)) && (isset($arr[$name_var])))
-        	$arr = $arr[$name_var];
+            $arr = $arr[$name_var];
         elseif ((!empty($name_var)) && (!isset($arr[$name_var])))
-        	$arr = '';
+            $arr = '';
 
         if (!empty($name_var) && $prepare && !is_array($arr))
-			$arr = $this->pub_str_prepare_set($arr);
+            $arr = $this->pub_str_prepare_set($arr);
 
         return $arr;
     }
@@ -836,18 +851,18 @@ class kernel
      */
     function pub_httppost_get($name_var = "", $prepare = true)
     {
-    	$arr = array();
+        $arr = array();
 
         if ((isset($_SESSION['vars_kernel']['my_post'])) && (!empty($_SESSION['vars_kernel']['my_post'])))
             $arr = $_SESSION['vars_kernel']['my_post'];
 
         if ((!empty($name_var)) && (isset($arr[$name_var])))
-        	$arr = $arr[$name_var];
+            $arr = $arr[$name_var];
         elseif ((!empty($name_var)) && (!isset($arr[$name_var])))
-        	$arr = '';
+            $arr = '';
 
         if ((!empty($name_var)) && $prepare && is_string($arr))
-			$arr = $this->pub_str_prepare_set($arr);
+            $arr = $this->pub_str_prepare_set($arr);
 
         return $arr;
     }
@@ -935,17 +950,15 @@ class kernel
             return '';
     }
 
-     /**
-     * Возвращает идентификатор левого меню, в которой сейчас находится администратор сайта
+    /**
+     * Возвращает идентификатор левого меню, в котором сейчас находится администратор сайта
      *
      * Левое меню может быть использовано любым модулем или частью административного интерфейса.
-     * @access public
      * @return string
      */
-    function pub_section_leftmenu_get()
-
+    public function pub_section_leftmenu_get()
     {
-        if ((isset($_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'])) && (!empty($_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'])))
+        if (isset($_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu']) && !empty($_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu']))
             return $_SESSION['vars_kernel'][$this->pub_section_current_get()]['leftmenu'];
         else
             return '';
@@ -1026,22 +1039,22 @@ class kernel
      */
     function priv_page_current_set($id, $front_office = false)
     {
-    	if ($front_office)
-    	{
-        	$this->curent_page = $id;
-    	}
+        if ($front_office)
+        {
+            $this->curent_page = $id;
+        }
         else
         {
-        	$_SESSION['vars_kernel']['page_curent'] = $id;
-        	// Находим текущую главную страницу
-        	$mapsite = $this->pub_mapsite_get();
-        	$main_page = $id;
-        	while (!empty($mapsite[$main_page]['parent_id']))
-        	{
-        	    $main_page = $mapsite[$main_page]['parent_id'];
-        	}
-        	$this->curent_page_main = $main_page;
-        	$_SESSION['vars_kernel']['page_main_curent'] = $main_page;
+            $_SESSION['vars_kernel']['page_curent'] = $id;
+            // Находим текущую главную страницу
+            $mapsite = $this->pub_mapsite_get();
+            $main_page = $id;
+            while (!empty($mapsite[$main_page]['parent_id']))
+            {
+                $main_page = $mapsite[$main_page]['parent_id'];
+            }
+            $this->curent_page_main = $main_page;
+            $_SESSION['vars_kernel']['page_main_curent'] = $main_page;
         }
 
     }
@@ -1066,13 +1079,13 @@ class kernel
     {
 
 
-    	if (!empty($this->curent_page))
-    		return $this->curent_page;
+        if (!empty($this->curent_page))
+            return $this->curent_page;
 
-    	//Значит вызов не из Фронт офиса, и текущую страницу берем из
-    	//сессии
+        //Значит вызов не из Фронт офиса, и текущую страницу берем из
+        //сессии
 
-    	$action = $this->pub_httpget_get();
+        $action = $this->pub_httpget_get();
 
         if ((isset($action['id_p'])) && (!empty($action['id_p'])) && (!$this->curent_page_selected))
         {
@@ -1081,7 +1094,7 @@ class kernel
         }
 
         if ((!isset($_SESSION['vars_kernel']['page_curent']) || empty($_SESSION['vars_kernel']['page_curent'])) &&
-             (!isset($action['id_p']) || empty($action['id_p'])))
+            (!isset($action['id_p']) || empty($action['id_p'])))
             $this->priv_page_current_set('index');
 
         $ret_id = '';
@@ -1099,9 +1112,9 @@ class kernel
      * Устанавливает ID модуля перед началом работы публичных функций. Необходима для
      * автоматического обращения публичных методов ядра к свойствам конкретных модулей без
      * указания их ID
-	 * @access private
+     * @access private
      * @param $id string Индетефикатор модуля
-	*/
+     */
     function priv_module_for_action_set($id)
     {
         $this->curent_modul = $id;
@@ -1118,22 +1131,22 @@ class kernel
      * @param boolean $check_front_only Если <i>true</i> - то обрабатывается только текущий модуль фронт-офиса
      * @access public
      * @return string
-	 */
+     */
     function pub_module_id_get($check_front_only = false)
     {
-    	//Проверим если вызов этой функции идет для нужд Фронт-офиса, то тогда
-    	//возьмем переменную ядра
+        //Проверим если вызов этой функции идет для нужд Фронт-офиса, то тогда
+        //возьмем переменную ядра
 
-    	if (!empty($this->curent_modul))
-    		return $this->curent_modul;
+        if (!empty($this->curent_modul))
+            return $this->curent_modul;
 
-    	if ($check_front_only)
-			return '';
+        if ($check_front_only)
+            return '';
 
-		$value = '';
-		//Если она пуста, значит функция вызывается из АИ и возьмем данные из сессии
-		//При этом, если текущим модулем является дочерний модуль - то вернем его
-		//Если базовый модуль - то вернем его
+        $value = '';
+        //Если она пуста, значит функция вызывается из АИ и возьмем данные из сессии
+        //При этом, если текущим модулем является дочерний модуль - то вернем его
+        //Если базовый модуль - то вернем его
         if (isset($_SESSION['vars_kernel']['modul_properties_curent_children']))
             $value = trim($_SESSION['vars_kernel']['modul_properties_curent_children']);
         elseif (isset($_SESSION['vars_kernel']['modul_properties_curent_base']))
@@ -1238,7 +1251,7 @@ class kernel
      *
      * Определяет разрешение на доступ к одному из основных разделов
      * системы. Для Главного администратора всегда возвращается <i>true</i>
-	 * @param string $id_access Точка доступа
+     * @param string $id_access Точка доступа
      * @param string $id_menu ID модуля
      * @access private
      * @return boolean
@@ -1250,7 +1263,7 @@ class kernel
         //Массив групп, к которым принадлежит текущий пользователь
         $agroups = $this->priv_admin_groups_curent_get();
         if (empty($id_menu))
-        	$id_menu = $this->pub_module_id_get();
+            $id_menu = $this->pub_module_id_get();
         if ($id_menu == "stat")
             $id_menu = "kernel";
         return manager_users::admin_access_for_group_get(join(",", $agroups), intval(count($agroups)), $id_menu, $id_access);
@@ -1753,15 +1766,15 @@ class kernel
      * @param string $def_value
      * @access private
      * @return array
-	 */
+     */
     function priv_value_check($obj, $name_value, $def_value)
     {
         $val_ret = $def_value;
 
         if (isset($obj[$name_value]))
         {
-        	if (!empty($obj[$name_value]))
-        		$val_ret = $obj[$name_value];
+            if (!empty($obj[$name_value]))
+                $val_ret = $obj[$name_value];
         }
         return $val_ret;
     }
@@ -1789,7 +1802,7 @@ class kernel
         {
             $row = $this->db_get_record_simple("_structure","id='".$id."'", "id, properties, caption");
             if (!empty($row['properties']))
-            	$out = unserialize($row['properties']);
+                $out = unserialize($row['properties']);
 
             $out['caption'] = $row['caption'];
         }
@@ -1808,7 +1821,7 @@ class kernel
      * @param $serialize_all_data все данные?
      * @access private
      * @return array
-	 */
+     */
     function priv_page_real_link_get($array_link, $id_page, $serialize_all_data=false)
     {
         //Будем просматривать страницы вверх от текущей до тех пор, пока весь массив
@@ -1861,7 +1874,7 @@ class kernel
      * @param string $id_page - ID старницы
      * @access private
      * @return array
-	 */
+     */
     function priv_page_serialize_get($id_page)
     {
         if (!empty($id_page))
@@ -1914,7 +1927,7 @@ class kernel
      * @param $nasledovat boolean Применять наследование
      * @access public
      * @return array
-	 */
+     */
     function pub_page_property_get($id_page, $id_prop, $nasledovat = true)
     {
         $out['isset'] = false;
@@ -1993,15 +2006,15 @@ class kernel
      * @param string $value Значение свойства
      * @access private
      * @return void
-	 */
+     */
     function priv_page_property_set($id_page, $id_prop, $value)
     {
 
-    	$id_modul = $this->pub_module_id_get(true);
+        $id_modul = $this->pub_module_id_get(true);
         if (!empty($id_modul))
-        	$search_prop = $id_modul.'_'.$id_prop;
+            $search_prop = $id_modul.'_'.$id_prop;
         else
-        	$search_prop = $id_prop;
+            $search_prop = $id_prop;
 
         if (!empty($id_page))
         {
@@ -2032,7 +2045,7 @@ class kernel
      * @param string $id Языковая переменная
      * @access private
      * @return array
-	 */
+     */
     function priv_textlabel_values_get($id)
     {
         $out = array();
@@ -2045,7 +2058,7 @@ class kernel
 
     }
 
-     /**
+    /**
      * Возвращает значения свойства модуля
      *
      * Функция может вызываться как для параметров текущего модуля (из которого происходит её вызов)
@@ -2068,11 +2081,11 @@ class kernel
      * @param Boolean $nasled Если необходимо, признак возможности использования наследования
      * @access public
      * @return array
-	 */
+     */
     function pub_modul_properties_get($name_prop, $id_modul = '', $nasled = true)
     {
-    	$id_modul_curent = $this->pub_module_id_get();
-        if ((empty($id_modul)) && (!empty($id_modul_curent)))
+        $id_modul_curent = $this->pub_module_id_get();
+        if (empty($id_modul) && !empty($id_modul_curent))
             $mod = $id_modul_curent;
         else
             $mod = $id_modul;
@@ -2113,13 +2126,13 @@ class kernel
      */
     function pub_str_prepare_set($str)
     {
-    	$str = trim($str);
-    	if (!get_magic_quotes_gpc())
-    		$str = mysql_real_escape_string($str);
-    	return $str;
+        $str = trim($str);
+        if (!get_magic_quotes_gpc())
+            $str = mysql_real_escape_string($str);
+        return $str;
     }
 
-     /**
+    /**
      * Функция подготовки строки после взятия из mySql
      *
      * Функция производит обработку строки после того как она взята из mySql
@@ -2131,11 +2144,11 @@ class kernel
 
     function pub_str_prepare_get($str, $html = false)
     {
-    	$str = trim($str);
-    	$str = stripslashes($str);
-    	if ($html)
-    		$str = htmlspecialchars($str);
-    	return $str;
+        $str = trim($str);
+        $str = stripslashes($str);
+        if ($html)
+            $str = htmlspecialchars($str);
+        return $str;
     }
 
 
@@ -2146,7 +2159,7 @@ class kernel
      * @param string $id ID языковой переменной
      * @param array $new_lang соержит новые значения для языковой переменной. Ключ - идентификатор языка.
      * @return void
-	 */
+     */
     public function pub_textlabels_update($id, $new_lang)
     {
         foreach ($new_lang as $key => $val)
@@ -2343,7 +2356,7 @@ class kernel
      * @param boolean $direct_output Если задано в <b><i>true</i></b> то информацию будет выведена непосредственно в поток
      * @access public
      *
-	 */
+     */
     function debug($text, $direct_output = false)
     {
         $str  = '';
@@ -2479,18 +2492,18 @@ class kernel
     //********************************************************************************
 
     /**
-	 * Формирует массив с картой сайта
-	 *
-	 * Функция используются модулями для необходимости получить структуру сайта.
-	 * Массив имеет следующий вид:
-	 * Ключ - id страницы. Значение - массив из следующих ключей (caption, properties, curent, include)
-	 * curent - флаг того, что данная страница является текущей
-	 * include - массив(идентичный) страниц, подчинённых данной.
-	 * @param  int $type Тип выходного массива (0 - Линейный массив, 1 = древовидный массив)
-	 * @param string $id Идентификатор страницы, от которой формируется структура
-	 * @access public
-	 * @return array
-	 */
+     * Формирует массив с картой сайта
+     *
+     * Функция используются модулями для необходимости получить структуру сайта.
+     * Массив имеет следующий вид:
+     * Ключ - id страницы. Значение - массив из следующих ключей (caption, properties, curent, include)
+     * curent - флаг того, что данная страница является текущей
+     * include - массив(идентичный) страниц, подчинённых данной.
+     * @param  int $type Тип выходного массива (0 - Линейный массив, 1 = древовидный массив)
+     * @param string $id Идентификатор страницы, от которой формируется структура
+     * @access public
+     * @return array
+     */
 
     function pub_mapsite_cashe_create($type = 0, $id = '')
     {
@@ -2516,7 +2529,7 @@ class kernel
         {
             //Создадим со страницы, если задан конкретный ID
             if ((!empty($id)) && (isset($this->mapsite_cache[$id])))
-               $pages[$id] = $this->mapsite_cache[$id];
+                $pages[$id] = $this->mapsite_cache[$id];
 
 
             //Если конкретный ID не задан, или по нему не получилось.
@@ -2543,11 +2556,11 @@ class kernel
 
 
     /**
-	 * Возвращает массив страниц, входящих в дорогу
-	 *
-	 * Дорога - ветка структуры, в которой находиться пользователь.
-	 * Массив имеет следующий вид:
-	 * [pagefaq] => Array
+     * Возвращает массив страниц, входящих в дорогу
+     *
+     * Дорога - ветка структуры, в которой находиться пользователь.
+     * Массив имеет следующий вид:
+     * [pagefaq] => Array
      *   (
      *       [id] => pagefaq - ID страницы
      *       [parent_id] => - rus родительская страница
@@ -2560,10 +2573,10 @@ class kernel
      *
      *       [curent] => 1 - флаг, указывающий на то, что данная страница является текущей
      *   )
-	 * @param string $id_page ID страницы, для которой необходимо построить дорогу, если не задано - то для текущей
-	 * @access public
-	 * @return array
-	 */
+     * @param string $id_page ID страницы, для которой необходимо построить дорогу, если не задано - то для текущей
+     * @access public
+     * @return array
+     */
     function pub_waysite_get($id_page = '')
     {
         if (empty($id_page))
@@ -2624,15 +2637,15 @@ class kernel
 
 
     /**
-	 * Получить массив файлов в указанном каталоге
-	 *
+     * Получить массив файлов в указанном каталоге
+     *
      * Возвращает массив файлов содержащихся в каталоге, переданном в качестве параметра.
      * В качестве ключа элемента массива используется имя файла вместе с путём к нему,
      * а в качестве значения – только имя файла.
      * @param string $path Путь к папке, в которой необходимо считывать содержимое
-	 * @access public
-	 * @return array
-	 */
+     * @access public
+     * @return array
+     */
     function pub_files_list_get($path)
     {
 
@@ -2653,12 +2666,12 @@ class kernel
 
 
     /**
-	 * Получить массив каталогов в указанном каталоге
-	 *
+     * Получить массив каталогов в указанном каталоге
+     *
      * @param string $path Путь к папке, в которой необходимо считывать содержимое
-	 * @access public
-	 * @return array
-	 */
+     * @access public
+     * @return array
+     */
     function pub_dirs_list_get($path)
     {
         $ret = array();
@@ -2682,15 +2695,15 @@ class kernel
     }
 
     /**
-	 * Получить массив файлов в указанном каталоге
-	 *
+     * Получить массив файлов в указанном каталоге
+     *
      * Возвращает массив файлов содержащихся в каталоге, переданном в качестве параметра.
      * В качестве ключа элемента массива используется имя файла вместе с путём к нему,
      * а в качестве значения – только имя файла.
      * @param string $path Путь к папке, в которой необходимо считывать содержимое
-	 * @access public
-	 * @return array
-	 */
+     * @access public
+     * @return array
+     */
     function pub_files_list_recursive_get($path)
     {
 
@@ -2718,16 +2731,16 @@ class kernel
 
 
     /**
-	 * Вызывается при изменении ID страницы
-	 *
-	 * Производит замену ID страницы на новый, с изменением всех мест,
-	 * где есть этот ID. Возвращает <i>true</i> если операция прошла успешно
-	 * и <i>false</i> в противном случае
-	 * @param string $old_id
-	 * @param string $new_id
-	 * @access private
-	 * @return boolean
-	 */
+     * Вызывается при изменении ID страницы
+     *
+     * Производит замену ID страницы на новый, с изменением всех мест,
+     * где есть этот ID. Возвращает <i>true</i> если операция прошла успешно
+     * и <i>false</i> в противном случае
+     * @param string $old_id
+     * @param string $new_id
+     * @access private
+     * @return boolean
+     */
     function priv_page_id_replace($old_id, $new_id)
     {
         //Проверка на пустые значения
@@ -2760,11 +2773,11 @@ class kernel
                 {
                     //$this->debug($str_link_file_new);
                     if (file_exists($str_link_file_new))
-                    unlink($str_link_file_new);
+                        unlink($str_link_file_new);
 
 
                     if (!rename($str_link_file_old, $str_link_file_new))
-                    return false;
+                        return false;
                 }
             }
         }
@@ -2797,19 +2810,19 @@ class kernel
 
 
     /**
-	 * Определяет, существует ли страница с данным ID
-	 *
-	 * @param string $id_page Провреяемое ID
-	 * @access public
-	 * @return boolean
-	 */
+     * Определяет, существует ли страница с данным ID
+     *
+     * @param string $id_page Провреяемое ID
+     * @access public
+     * @return boolean
+     */
     public function priv_page_exist($id_page)
     {
         $row = $this->db_get_record_simple("_structure","id='".$id_page."'");
         if ($row)
-        	return true;
+            return true;
         else
-        	return false;
+            return false;
 
     }
 
@@ -2820,18 +2833,18 @@ class kernel
 
 
     /**
-	 * Добавляет нового пользователя сайта (фронт-офиса).
-	 *
-	 * Возвращает идентификатор вновь добавленного пользователя либо
-	 * код ошибки (с отрицательным знаком).
-	 *		-1 : пользователь с таким логином (еmail-ом) уже существует и НЕ подтвержден
-	 *		-2 : пользователь с таким логином (еmail-ом) уже существует и подтвержден
-	 * @param string $login
-	 * @param string $password
-	 * @param string $email
-	 * @param string $name
-	 * @return int
-	 */
+     * Добавляет нового пользователя сайта (фронт-офиса).
+     *
+     * Возвращает идентификатор вновь добавленного пользователя либо
+     * код ошибки (с отрицательным знаком).
+     *		-1 : пользователь с таким логином (еmail-ом) уже существует и НЕ подтвержден
+     *		-2 : пользователь с таким логином (еmail-ом) уже существует и подтвержден
+     * @param string $login
+     * @param string $password
+     * @param string $email
+     * @param string $name
+     * @return int
+     */
     function pub_user_add_new($login, $password, $email, $name)
     {
         return manager_users::user_add_new($login, $password, $email, $name);
@@ -2841,20 +2854,20 @@ class kernel
 
 
     /**
-	 * Производит авторизацию пользователя сайта
-	 *
-	 * Регистрация происходит по переданному логину и паролю и делает этого пользователя текущим.
-	 * В качестве логина может быть передан как непосредственно логин так и e-mail.
-	 *		 1 : пользователь с таким логином(еmail-ом) успешно зарегистрирован.
-	 *		-1 : пользователь с таким логином(еmail-ом) не существует.
-	 *		-2 : пользователь с таким логином(еmail-ом) отключен администратором сайта
-	 *		-3 : пользователь с таким логином(еmail-ом) не подтвердил ещё регистрацию.
-	 * @param string $login
-	 * @param string $password
-	 * @param boolean $unic_login Если true - то уникальность пользователя проверяется по логину, если false - то по email-у
-	 * @access public
-	 * @return int
-	 */
+     * Производит авторизацию пользователя сайта
+     *
+     * Регистрация происходит по переданному логину и паролю и делает этого пользователя текущим.
+     * В качестве логина может быть передан как непосредственно логин так и e-mail.
+     *		 1 : пользователь с таким логином(еmail-ом) успешно зарегистрирован.
+     *		-1 : пользователь с таким логином(еmail-ом) не существует.
+     *		-2 : пользователь с таким логином(еmail-ом) отключен администратором сайта
+     *		-3 : пользователь с таким логином(еmail-ом) не подтвердил ещё регистрацию.
+     * @param string $login
+     * @param string $password
+     * @param boolean $unic_login Если true - то уникальность пользователя проверяется по логину, если false - то по email-у
+     * @access public
+     * @return int
+     */
     public function pub_user_register($login, $password, $unic_login = true)
     {
         $res = manager_users::fof_user_authorization($login, $password, $unic_login);
@@ -2871,12 +2884,12 @@ class kernel
 
 
     /**
-	 * Проверяет, авторизирован пользователь в системе или нет
-	 *
-	 * Возвращает true или false соответственно
-	 * @return boolean
-	 * @access public
-	 */
+     * Проверяет, авторизирован пользователь в системе или нет
+     *
+     * Возвращает true или false соответственно
+     * @return boolean
+     * @access public
+     */
     function pub_user_is_registred()
     {
         if ((isset($_SESSION['vars_kernel']['user_fof'])) && (!empty($_SESSION['vars_kernel']['user_fof'])))
@@ -2891,18 +2904,18 @@ class kernel
 
 
     /**
-	 * Возвращает значение конкретного поля у текущего пользователя.
-	 *
-	 * Функция используются (как правило) теми модулями, которые добавляли какие-то
-	 * дополнительные поля к пользователям сайта, и хотят получить эти значения.
-	 *
-	 * Второй параметр может использоваться в том случае, если необходимо узнать
-	 * значение свойства к пользователю сайта, добавленное другим (не текущим модулем).
-	 * @param string $name_field Имя поля, значение которого необходимо узнать
-	 * @param string $name_modul
-	 * @access public
-	 * @return string
-	 */
+     * Возвращает значение конкретного поля у текущего пользователя.
+     *
+     * Функция используются (как правило) теми модулями, которые добавляли какие-то
+     * дополнительные поля к пользователям сайта, и хотят получить эти значения.
+     *
+     * Второй параметр может использоваться в том случае, если необходимо узнать
+     * значение свойства к пользователю сайта, добавленное другим (не текущим модулем).
+     * @param string $name_field Имя поля, значение которого необходимо узнать
+     * @param string $name_modul
+     * @access public
+     * @return string
+     */
     function pub_user_field_get($name_field, $name_modul = "")
     {
         if (empty($name_field))
@@ -2935,15 +2948,15 @@ class kernel
 
 
     /**
-	 * Возвращает всю доступную информацию о текущем (авторизированным) пользователе фронт-офиса.
-	 *
-	 * Возвращаемый массив может иметь два вида – линейный и древовидный ( в зависимости от
-	 * передаваемого в метод параметра). Если передано true, то параметры будут сгруппированы по
-	 * модулям, их добавившим, в противном случае, всё будет представлено в линейном виде.
-	 * @param boolean $tree Тип выходного массива
-	 * @access public
-	 * @return array
-	 */
+     * Возвращает всю доступную информацию о текущем (авторизированным) пользователе фронт-офиса.
+     *
+     * Возвращаемый массив может иметь два вида – линейный и древовидный ( в зависимости от
+     * передаваемого в метод параметра). Если передано true, то параметры будут сгруппированы по
+     * модулям, их добавившим, в противном случае, всё будет представлено в линейном виде.
+     * @param boolean $tree Тип выходного массива
+     * @access public
+     * @return array
+     */
     function pub_user_info_get($tree = false)
     {
         if ($tree)
@@ -2953,18 +2966,18 @@ class kernel
     }
 
     /**
-	 * Возвращает всю доступную информацию о пользователе с переданным идентификатором, либо массив пользователей
-	 *
-	 * Если пользователь не указан - то
-	 * возвращается информация по всем имеющимся записям
-	 * @param mixed $id_user ID конкретного пользователя - если необходимо.
-	 * @param boolean $tree - если <i>true</i> то возвращается в виде "дерева"
-	 * @param string $orderby - поле для сортировки
-	 * @param integer $offset смещение
-	 * @param integer $limit лимит
-	 * @access public
-	 * @return array
-	 */
+     * Возвращает всю доступную информацию о пользователе с переданным идентификатором, либо массив пользователей
+     *
+     * Если пользователь не указан - то
+     * возвращается информация по всем имеющимся записям
+     * @param mixed $id_user ID конкретного пользователя - если необходимо.
+     * @param boolean $tree - если <i>true</i> то возвращается в виде "дерева"
+     * @param string $orderby - поле для сортировки
+     * @param integer $offset смещение
+     * @param integer $limit лимит
+     * @access public
+     * @return array
+     */
     function pub_users_info_get($id_user = "", $tree = true, $orderby="`login`", $offset=null, $limit=null)
     {
         return manager_users::users_info_get($id_user, $tree, $orderby,$offset,$limit);
@@ -2979,15 +2992,15 @@ class kernel
     {
         return manager_users::get_total_users();
     }
-    
+
     /**
      * Возвращает массив с дополнительными полями, которые добавили модули
      *
      * Дополнительные поля, это те поля, которые были прописаны модулями. Возвращается
      * просто массив доступных полей, без значений у конкретного пользователя
      * @param string $cond
-	 * @access public
-	 * @return array
+     * @access public
+     * @return array
      */
     function pub_users_fields_get($cond='true')
     {
@@ -2995,14 +3008,14 @@ class kernel
     }
 
     /**
-	 * Возвращает всю доступную информацию о пользователе по логину
-	 *
-	 * В качестве параметра передается логин пользователя или e-mail, по которому будет определён пользователь.
-	 * @param string $login логин или e-mail пользователя, чьи данные запрашиваются.
-	 * @param boolean $is_login Если <i>true</i> - то передается логин, в противном случае передается e-mail
-	 * @access public
-	 * @return array
-	 */
+     * Возвращает всю доступную информацию о пользователе по логину
+     *
+     * В качестве параметра передается логин пользователя или e-mail, по которому будет определён пользователь.
+     * @param string $login логин или e-mail пользователя, чьи данные запрашиваются.
+     * @param boolean $is_login Если <i>true</i> - то передается логин, в противном случае передается e-mail
+     * @access public
+     * @return array
+     */
     function pub_user_login_info_get($login, $is_login = true)
     {
         $login = mysql_real_escape_string($login);
@@ -3010,15 +3023,15 @@ class kernel
     }
 
     /**
-	 * Записывает измененную информацию о пользователе
-	 *
-	 * Массив должен быть аналогичен тому, который возвращает функция {@link pub_users_info_get}
-	 * Те пользователи и поля, которые не перечислены в массиве не меняются
-	 * @param array $data Массив пользователей с полями и их значениями
-	 * @param boolean $update_curent Если true - то производить обновление информации о пользователи в сессии
-	 * @access public
-	 * @return boolean
-	 */
+     * Записывает измененную информацию о пользователе
+     *
+     * Массив должен быть аналогичен тому, который возвращает функция {@link pub_users_info_get}
+     * Те пользователи и поля, которые не перечислены в массиве не меняются
+     * @param array $data Массив пользователей с полями и их значениями
+     * @param boolean $update_curent Если true - то производить обновление информации о пользователи в сессии
+     * @access public
+     * @return boolean
+     */
     function pub_users_info_set($data, $update_curent = true)
     {
         $ret = manager_users::users_info_save($data);
@@ -3041,13 +3054,13 @@ class kernel
 
 
     /**
-	 * Производит полное удаление пользователя сайта из базы
-	 *
-	 * Помимо этого удаляет все дополнительные поля для него.
-	 * @param integer $id_user Идентификатор пользователя сайта, которого нужно удалить
-	 * @access public
-	 * @return boolean
-	 */
+     * Производит полное удаление пользователя сайта из базы
+     *
+     * Помимо этого удаляет все дополнительные поля для него.
+     * @param integer $id_user Идентификатор пользователя сайта, которого нужно удалить
+     * @access public
+     * @return boolean
+     */
     function pub_user_delete($id_user)
     {
         return manager_users::user_delete($id_user);
@@ -3055,11 +3068,11 @@ class kernel
 
 
     /**
-	 * Очищает информацию о текущем пользователе сайта
-	 *
-	 * @access public
-	 * @return void
-	 */
+     * Очищает информацию о текущем пользователе сайта
+     *
+     * @access public
+     * @return void
+     */
     function pub_user_unregister()
     {
         $_SESSION['vars_kernel']['user_fof'] = array();
@@ -3067,32 +3080,32 @@ class kernel
 
 
     /**
-	 * Подтверждает учетную запись пользователя сайта по переданному идентификатору пользователя.
-	 *
-	 * Изначально зарегистрированный пользователь находится в неподтвержденном состоянии, т.е.
-	 * учетная запись уже существует, но для того, чтобы ей можно было пользоваться, необходимо
-	 * ее подтвердить (обычно по e-mail`у)
-	 * Возвращает <i>true</i> если подтверждение прошло успешно и <i>false</i> в противном случае
-	 * @param integer $id_user Идентификатор пользователя сайта
-	 * @access public
-	 * @return boolean
-	 */
+     * Подтверждает учетную запись пользователя сайта по переданному идентификатору пользователя.
+     *
+     * Изначально зарегистрированный пользователь находится в неподтвержденном состоянии, т.е.
+     * учетная запись уже существует, но для того, чтобы ей можно было пользоваться, необходимо
+     * ее подтвердить (обычно по e-mail`у)
+     * Возвращает <i>true</i> если подтверждение прошло успешно и <i>false</i> в противном случае
+     * @param integer $id_user Идентификатор пользователя сайта
+     * @access public
+     * @return boolean
+     */
     function pub_user_verify($id_user)
     {
         return manager_users::user_verify($id_user);
     }
 
     /**
-	 * Включает или отключает пользователя фронт-офиса
-	 *
-	 * Функция используется для того, чтобы можно было,
-	 * например, временно отключить кого-то из посетителей
-	 * Возрващает <i>true</i> - если действие выполнено успешно
-	 * @param integer $id_user Идентификатор пользователя сайта
-	 * @param Boolean $enabled true - включить пользователя, false - выключить
-	 * @access public
-	 * @return boolean
-	 */
+     * Включает или отключает пользователя фронт-офиса
+     *
+     * Функция используется для того, чтобы можно было,
+     * например, временно отключить кого-то из посетителей
+     * Возрващает <i>true</i> - если действие выполнено успешно
+     * @param integer $id_user Идентификатор пользователя сайта
+     * @param Boolean $enabled true - включить пользователя, false - выключить
+     * @access public
+     * @return boolean
+     */
     function pub_user_change_enabled($id_user, $enabled = true)
     {
         return manager_users::user_change_enabled($id_user, $enabled);
@@ -3142,108 +3155,108 @@ class kernel
     }
 
     /**
-    * Разбирает шаблон
-    *
-    * Разбирает шаблон стандартного вида и формирует массив, где в качестве ключа используется
-    * метка, а значения - HTML код.
-    * Например, из шаблона
-    * <code>
-    * <!--@begin -->
-    * <table cellpadding="3" cellspacing="1" border="0" bordercolor="black" width="100%">
-    * 	<tr class="table_content_shapka" bgcolor="#F05800">
-    * 		<th>[#shop_admin_users_stat_caption1#]</th>
-    * 		<th>[#shop_admin_users_stat_caption2#]</th>
-    * 		<th>[#shop_admin_users_stat_caption3#]</th>
-    * 	</tr>
-    * <!-- @line -->
-    * 	<tr class="table_content_str" bgcolor="#FFF3EB">
-    * 		<td>%username%</td>
-    * 		<td>%usernum%</td>
-    * 		<td>%usersum%</td>
-    * 	</tr>
-    * <!-- @end -->
-    * 	<tr class="table_content_shapka" bgcolor="#F05800">
-    * 		<th>[#shop_admin_users_stat_caption4#]</th>
-    * 		<th>%itognum%</th>
-    * 		<th>%itogsum%</th>
-    * 	</tr>
-    * </table>
-    * </code>
-    * Получится массив
-    * <code>
-    * Array
-    * (
-    *     [begin] =>
-    * <table cellpadding="3" cellspacing="1" border="0" bordercolor="black" width="100%">
-    * 	<tr class="table_content_shapka" bgcolor="#F05800">
-    * 		<th>[#shop_admin_users_stat_caption1#]</th>
-    * 		<th>[#shop_admin_users_stat_caption2#]</th>
-    * 		<th>[#shop_admin_users_stat_caption3#]</th>
-    * 	</tr>
-    *
-    *     [line] =>
-    * 	<tr class="table_content_str" bgcolor="#FFF3EB">
-    * 		<td>%username%</td>
-    * 		<td>%usernum%</td>
-    * 		<td>%usersum%</td>
-    * 	</tr>
-    *
-    *     [end] =>
-    * 	<tr class="table_content_shapka" bgcolor="#F05800">
-    * 		<th>[#shop_admin_users_stat_caption4#]</th>
-    * 		<th>%itognum%</th>
-    * 		<th>%itogsum%</th>
-    * 	</tr>
-    * </table>
-    * )
-    * </code>
-    * Начало блока задаётся как "<i><!-- @Имя_блока -- ></i>". Блок будет продолжаться до
-    * конца файла, либо до объявления другого блока. Шаблон может быть много уровневым. Для
-    * этого внутри любого блока вы можете определить зарезервированный блок вида
-    * "<i><!-- @@nextlevel -- ></i>" (обратите внимания, должно стоять две "собачки").
-    * Указание этого подблока говорит о том, что ваш блок будет иметь несколько подуровней.
-    * В этом случае, выходной массив для такого блока будет состоять и массива, где в качестве
-    * ключа число (уровень вложенности) а в качестве значений - HTML
-    * <br>
-    * Пример многоуровневого шаблона:
-    * Например, из шаблона
-    * <code>
-    * <!--@begin -->
-    * Начало
-    *
-    * <!-- @line -->
-    * Линия уровня 0 <br>
-    *
-    * <!-- @@nextlevel -->
-    * &nbsp;&nbsp; Линия уровня 1 <br>
-    *
-    * <!-- @@nextlevel -->
-    * &nbsp;&nbsp;&nbsp;&nbsp; Линия уровня 2 <br>
-    *
-    * <!-- @end -->
-    * Конец
-    *
-    * </code>
-    * Получившийся массив будет иметь вид:
-    * <code>
-    * Array
-    * (
-    *     [begin] => Начало
-    *
-    *     [line] => Array
-    *               (
-    *                   [0] => Линия уровня 0
-    *                   [1] => Линия уровня 1
-    *                   [2] => Линия уровня 2
-    *               )
-    *     [end] => Конец
-    * )
-    * </code>
-    * @return array
-    * @param string  $filename Путь к файлу шаблонов
-    * @param boolean $createlevel При отсутствии уровней всё равно создавать как нулевой уровень
-    * @access public
-    */
+     * Разбирает шаблон
+     *
+     * Разбирает шаблон стандартного вида и формирует массив, где в качестве ключа используется
+     * метка, а значения - HTML код.
+     * Например, из шаблона
+     * <code>
+     * <!--@begin -->
+     * <table cellpadding="3" cellspacing="1" border="0" bordercolor="black" width="100%">
+     * 	<tr class="table_content_shapka" bgcolor="#F05800">
+     * 		<th>[#shop_admin_users_stat_caption1#]</th>
+     * 		<th>[#shop_admin_users_stat_caption2#]</th>
+     * 		<th>[#shop_admin_users_stat_caption3#]</th>
+     * 	</tr>
+     * <!-- @line -->
+     * 	<tr class="table_content_str" bgcolor="#FFF3EB">
+     * 		<td>%username%</td>
+     * 		<td>%usernum%</td>
+     * 		<td>%usersum%</td>
+     * 	</tr>
+     * <!-- @end -->
+     * 	<tr class="table_content_shapka" bgcolor="#F05800">
+     * 		<th>[#shop_admin_users_stat_caption4#]</th>
+     * 		<th>%itognum%</th>
+     * 		<th>%itogsum%</th>
+     * 	</tr>
+     * </table>
+     * </code>
+     * Получится массив
+     * <code>
+     * Array
+     * (
+     *     [begin] =>
+     * <table cellpadding="3" cellspacing="1" border="0" bordercolor="black" width="100%">
+     * 	<tr class="table_content_shapka" bgcolor="#F05800">
+     * 		<th>[#shop_admin_users_stat_caption1#]</th>
+     * 		<th>[#shop_admin_users_stat_caption2#]</th>
+     * 		<th>[#shop_admin_users_stat_caption3#]</th>
+     * 	</tr>
+     *
+     *     [line] =>
+     * 	<tr class="table_content_str" bgcolor="#FFF3EB">
+     * 		<td>%username%</td>
+     * 		<td>%usernum%</td>
+     * 		<td>%usersum%</td>
+     * 	</tr>
+     *
+     *     [end] =>
+     * 	<tr class="table_content_shapka" bgcolor="#F05800">
+     * 		<th>[#shop_admin_users_stat_caption4#]</th>
+     * 		<th>%itognum%</th>
+     * 		<th>%itogsum%</th>
+     * 	</tr>
+     * </table>
+     * )
+     * </code>
+     * Начало блока задаётся как "<i><!-- @Имя_блока -- ></i>". Блок будет продолжаться до
+     * конца файла, либо до объявления другого блока. Шаблон может быть много уровневым. Для
+     * этого внутри любого блока вы можете определить зарезервированный блок вида
+     * "<i><!-- @@nextlevel -- ></i>" (обратите внимания, должно стоять две "собачки").
+     * Указание этого подблока говорит о том, что ваш блок будет иметь несколько подуровней.
+     * В этом случае, выходной массив для такого блока будет состоять и массива, где в качестве
+     * ключа число (уровень вложенности) а в качестве значений - HTML
+     * <br>
+     * Пример многоуровневого шаблона:
+     * Например, из шаблона
+     * <code>
+     * <!--@begin -->
+     * Начало
+     *
+     * <!-- @line -->
+     * Линия уровня 0 <br>
+     *
+     * <!-- @@nextlevel -->
+     * &nbsp;&nbsp; Линия уровня 1 <br>
+     *
+     * <!-- @@nextlevel -->
+     * &nbsp;&nbsp;&nbsp;&nbsp; Линия уровня 2 <br>
+     *
+     * <!-- @end -->
+     * Конец
+     *
+     * </code>
+     * Получившийся массив будет иметь вид:
+     * <code>
+     * Array
+     * (
+     *     [begin] => Начало
+     *
+     *     [line] => Array
+     *               (
+     *                   [0] => Линия уровня 0
+     *                   [1] => Линия уровня 1
+     *                   [2] => Линия уровня 2
+     *               )
+     *     [end] => Конец
+     * )
+     * </code>
+     * @return array
+     * @param string  $filename Путь к файлу шаблонов
+     * @param boolean $createlevel При отсутствии уровней всё равно создавать как нулевой уровень
+     * @access public
+     */
     function pub_template_parse($filename, $createlevel = false)
     {
         if (!file_exists($filename))
@@ -3275,38 +3288,38 @@ class kernel
             $arr['end'] = "";
 
         $result = array();
-		foreach ($arr as $key => $val)
-		{
+        foreach ($arr as $key => $val)
+        {
             $level_templates = $val;
-			$level_templates_arr = preg_split("/<!--\\s*?\\@@nextlevel\\s*?-->/i", $level_templates);
+            $level_templates_arr = preg_split("/<!--\\s*?\\@@nextlevel\\s*?-->/i", $level_templates);
 
-			//Если не нашли вложенных уровней
-			if (count($level_templates_arr) == 1)
-			{
-			    $level_templates_arr = '';
+            //Если не нашли вложенных уровней
+            if (count($level_templates_arr) == 1)
+            {
+                $level_templates_arr = '';
                 if ($createlevel)
                     $level_templates_arr[] = $val;
                 else
                     $level_templates_arr = $val;
-			}
-			$result[$key] = $level_templates_arr;
-		}
+            }
+            $result[$key] = $level_templates_arr;
+        }
         return $result;
     }
 
 
     /**
-	 * Выполняет MySQL запрос к базе данных
-	 *
-	 * В случае ошибки выводит его на экран с указанием метода, в котором произошла ошибка
-	 * @param string $sql Выполняемый SQL запрос
-	 * @param string $link ресурс соединения с базой данных
-	 * @return resource
-	 * @access public
-	 */
+     * Выполняет MySQL запрос к базе данных
+     *
+     * В случае ошибки выводит его на экран с указанием метода, в котором произошла ошибка
+     * @param string $sql Выполняемый SQL запрос
+     * @param string $link ресурс соединения с базой данных
+     * @return resource
+     * @access public
+     */
     function runSQL($sql = "", $link = "")
     {
-    	++$this->queriesCount;
+        ++$this->queriesCount;
         $sql=trim($sql);
 
         $curent_link = $this->resurs_mysql;
@@ -3325,9 +3338,9 @@ class kernel
                 $httpHost = "unknown";
             $error = "Ошибка (errore):<br>
                     <b>Файл (file):</b> ".$err['file'].
-                    (isset($_SERVER['REQUEST_URI'])?"<br><b>GET запрос (GET request):</b>".$_SERVER['REQUEST_URI']:"").
-                    "<br><b>Строка (String):</b> ".$err['line']." (".$err['class'].$err['type'].$err['function'].")".
-                    "<br><b>SQL запрос (SQL query):</b><br><pre>'".$sql."'</pre><br>".$errorMsg;
+                (isset($_SERVER['REQUEST_URI'])?"<br><b>GET запрос (GET request):</b>".$_SERVER['REQUEST_URI']:"").
+                "<br><b>Строка (String):</b> ".$err['line']." (".$err['class'].$err['type'].$err['function'].")".
+                "<br><b>SQL запрос (SQL query):</b><br><pre>'".$sql."'</pre><br>".$errorMsg;
             if ( preg_match("/\\.ap$/", $httpHost) || (defined("PRINT_MYSQL_ERRORS") && PRINT_MYSQL_ERRORS))
                 echo $error."\n";
             else
@@ -3345,52 +3358,52 @@ class kernel
     }
 
     /**
-	 * Простой метод для получения массива записей из таблицы БД
-	 *
-	 * @param string $table Имя таблицы БД без префикса
-	 * @param string $cond условие выборки, возможно с ORDER BY или GROUP BY, для получения всех записей - "true"
-	 * @param string $fields поля выборки через запятую, либо все - *
-	 * @param integer $offset смещение для LIMIT
-	 * @param integer $limit лимит для LIMIT
-	 * @return array
-	 * @access public
-	 */
+     * Простой метод для получения массива записей из таблицы БД
+     *
+     * @param string $table Имя таблицы БД без префикса
+     * @param string $cond условие выборки, возможно с ORDER BY или GROUP BY, для получения всех записей - "true"
+     * @param string $fields поля выборки через запятую, либо все - *
+     * @param integer $offset смещение для LIMIT
+     * @param integer $limit лимит для LIMIT
+     * @return array
+     * @access public
+     */
     public function db_get_list_simple($table, $cond, $fields="*", $offset=null, $limit=null)
     {
-         $query = "SELECT ".$fields." FROM `".$this->pub_prefix_get().$table."` WHERE ".$cond;
-         return $this->db_get_list($query,$offset,$limit);
+        $query = "SELECT ".$fields." FROM `".$this->pub_prefix_get().$table."` WHERE ".$cond;
+        return $this->db_get_list($query,$offset,$limit);
     }
 
     /**
-	 * Метод для получения массива записей из БД
-	 *
-	 * @param string $query sql-запрос
-	 * @param integer $offset смещение для LIMIT
-	 * @param integer $limit лимит для LIMIT
-	 * @return array
-	 * @access public
-	 */
+     * Метод для получения массива записей из БД
+     *
+     * @param string $query sql-запрос
+     * @param integer $offset смещение для LIMIT
+     * @param integer $limit лимит для LIMIT
+     * @return array
+     * @access public
+     */
     public function db_get_list($query, $offset=null, $limit=null)
     {
-         if (!is_null($offset) && !is_null($limit))
-             $query .= " LIMIT ".$offset.", ".$limit;
-         $res = $this->runSQL($query);
-         $ret = array();
-         while ($row = mysql_fetch_assoc($res))
-             $ret[] = $row;
-         mysql_free_result($res);
-         return $ret;
+        if (!is_null($offset) && !is_null($limit))
+            $query .= " LIMIT ".$offset.", ".$limit;
+        $res = $this->runSQL($query);
+        $ret = array();
+        while ($row = mysql_fetch_assoc($res))
+            $ret[] = $row;
+        mysql_free_result($res);
+        return $ret;
     }
 
     /**
-	 * Простой метод для добавления записи в БД
-	 *
-	 * @param string $table Имя таблицы БД без префикса
-	 * @param array $rec key-value массив полей со значениями
-	 * @param string $type тип INSERT или REPLACE
-	 * @return integer
-	 * @access public
-	 */
+     * Простой метод для добавления записи в БД
+     *
+     * @param string $table Имя таблицы БД без префикса
+     * @param array $rec key-value массив полей со значениями
+     * @param string $type тип INSERT или REPLACE
+     * @return integer
+     * @access public
+     */
     public function db_add_record($table, $rec, $type="INSERT")
     {
         if (strtoupper($type)=="REPLACE")
@@ -3424,14 +3437,14 @@ class kernel
     }
 
     /**
-	 * Простой метод для сохранения записи(записей) в БД
-	 *
-	 * @param string $table Имя таблицы БД без префикса
-	 * @param array $rec key-value массив полей со значениями
-	 * @param string $condition условие
-	 * @return integer
-	 * @access public
-	 */
+     * Простой метод для сохранения записи(записей) в БД
+     *
+     * @param string $table Имя таблицы БД без префикса
+     * @param array $rec key-value массив полей со значениями
+     * @param string $condition условие
+     * @return integer
+     * @access public
+     */
     public function db_update_record($table, $rec, $condition)
     {
         $query="UPDATE `".$this->pub_prefix_get().$table."` SET ";
@@ -3452,25 +3465,25 @@ class kernel
             return mysql_affected_rows($this->resurs_mysql);
     }
     /**
-	 * Простой метод для получения одной записи из БД
-	 *
-	 * @param string $table Имя таблицы БД без префикса
-	 * @param string $cond условие выборки, возможно с ORDER BY или GROUP BY, для получения всех записей - "true"
-	 * @param string $fields поля выборки через запятую, либо все - *
-	 * @return mixed
-	 * @access public
-	 */
+     * Простой метод для получения одной записи из БД
+     *
+     * @param string $table Имя таблицы БД без префикса
+     * @param string $cond условие выборки, возможно с ORDER BY или GROUP BY, для получения всех записей - "true"
+     * @param string $fields поля выборки через запятую, либо все - *
+     * @return mixed
+     * @access public
+     */
     public function db_get_record_simple($table, $cond, $fields="*")
     {
 
-         $query = "SELECT ".$fields." FROM `".$this->pub_prefix_get().$table."` WHERE ".$cond." LIMIT 1";
+        $query = "SELECT ".$fields." FROM `".$this->pub_prefix_get().$table."` WHERE ".$cond." LIMIT 1";
 
-         $res = $this->runSQL($query);
-         $ret = false;
-         if ($row = mysql_fetch_assoc($res))
-             $ret = $row;
-         mysql_free_result($res);
-         return $ret;
+        $res = $this->runSQL($query);
+        $ret = false;
+        if ($row = mysql_fetch_assoc($res))
+            $ret = $row;
+        mysql_free_result($res);
+        return $ret;
     }
 
     /**
@@ -3488,7 +3501,7 @@ class kernel
             return '[]';
         $out = array();
         foreach ($arr as $key => $val)
-			$out[] .= '["'.$key.'","'.$val.'"]';
+            $out[] .= '["'.$key.'","'.$val.'"]';
         return "[".join(",",$out)."]";
     }
 
@@ -3505,17 +3518,17 @@ class kernel
     {
         $string = array();
         $tmp = array();
-    	foreach ($array as $value)
-    	{
-    		if (is_array($value))
-    		    $string[] = $this->pub_array_convert_form_rec($value);
-    		else
+        foreach ($array as $value)
+        {
+            if (is_array($value))
+                $string[] = $this->pub_array_convert_form_rec($value);
+            else
                 $tmp[] =  '"'.$value.'"';
-    	}
-    	if (!empty($tmp))
-        	$string[] = '['.implode(',', $tmp).']';
-    	$string = implode(',', $string);
-    	return $string;
+        }
+        if (!empty($tmp))
+            $string[] = '['.implode(',', $tmp).']';
+        $string = implode(',', $string);
+        return $string;
 
     }
 
@@ -3615,254 +3628,254 @@ class kernel
 
 
 
-   /**
-    * Меняет размеры загруженной картинки до нужных размеров и сохраняет ее в каталог
-    *
-    * Метод обрабатывает изображения в трёх форматах: jpg, gif, png. Из исходного
-    * изображения могут быть сформированы большое и малое изображение, кроме того,
-    * к большому изображению может быть добавлена защита в виде «водяного знака».
-    *
-    * В качестве параметра для формирования большого изображения передаётся массив
-    * следующего вида:
-    * <code>
-    *   $big['width'] = 400;
-    *   $big['height'] = 300;
-    * </code>
-    *
-    * В массиве указываются значения длины и ширины, к которым должно быть приведено
-    * большое изображение. Аналогичным образом указывается массив параметров для
-    * создания маленького изображения:
-    * <code>
-    *   $big['width'] = 100;
-    *   $big['height'] = 75;
-    * </code>
-    *
-    * Следует учитывать, что ширина и высота обработанных изображений может отличаться,
-    * если будут нарушаться пропорции исходного изображения. При выполнении масштабирования
-    * предпочтение отдаётся сохранению пропорций, а затем ширине изображения.
-    *
-    * Для добавления водяного знака необходимо определить массив его настроек и передать его
-    * в метод. Массив выглядит следующим образом:
-    * <code>
-    *   $watermark_image['path'] = 'content/files/fatermark.gif';
-    *   $watermark_image['place'] = 0;
-    *   $watermark_image['transparency'] = 30;
-    * </code>
-    *
-    * Ключ path указывает путь и имя файла водяного изображения. Ключ place определяет
-    * местоположение водяной марки относительно большого изображения, и может принимать
-    * следующие значения:
-    * 0 – по центру;
-    * 1 – левый верхний уровень;
-    * 2 – правый верхний угол;
-    * 3 – правый нижний угол;
-    * 4 – левый нижний угол;
-    * Последний ключ (transparency) определяет уровень прозрачности, в процентах,
-    * который должен иметь водяной знак. Принимает значения от 1 до 100 и если не задан,
-    * то равен 50.
-    *
-    * После выполнения метода будет создано два (или одно) изображения, которые будут
-    * помещены в папку $path_full_image, при этом большое изображение непосредственно
-    * помещается в эту папку, а маленькое помещается во вложенную папку с именем 'tn'
-    * ($path_full_image.'/tn'). Имена файлов большого и маленького изображения будут
-    * одинаковы.
-    *
-    * Пример:
-    * <code>
-    *       //Путь к обрабатываемому файлу
-    *       $tmp_name = 'temp/temp.jpg'
-    *
-    *       //Параметры большого изображения
-    *       $big = array(
-    *           'width' => 400,
-    *           'height' => 300
-    *       );
-    *
-    *       //Параметры малого изображения
-    *       $thumb = array(
-    *           'width' => 100,
-    *           'height' => 75
-    *       );
-    *
-    *       //Параметры водяной марки
-    *       $watermark_image = array(
-    *           'path' => 'content/files/fatermark.gif',
-    *           'place' => 3,
-    *           'transparency' => 25
-    *       );
-    *
-    *       //Задаём путь для сохранения обработанных изображений.
-    *       //такой путь должен существовать
-    *       $path_to_save = 'content/images/'.$kernel->pub_module_id_get();
-    *       $filename = $kernel->pub_image_save($tmp_name, 'img', $path_to_save, $big, $thumb, $watermark_image);
-    *
-    * </code>
-    *
-    * Если взять в качестве идентификатора модуля значение 'news', то будут
-    * созданы следующие файлы:
-    * <code>
-    *   content/images/news/img_345222534.jpg   //большое изображение
-    *   content/images/news/tn/img_345222534.jpg //малое изображение
-    * </code>
-    * А переменная $filename будет содержать:
-    * <code>
-    *   img_345222534.jpg
-    * </code>
-    * @param string $ufile Путь и имя файла обрабатываемого изображения
-    * @param int $id Начальная часть имени файла уже обработанного изображения, к которой будет добавлена уникальная составляющая
-    * @param string $path_full_image Путь, куда будет сохранено изменённое изображение
-    * @param mixed $big Массив с параметрами для формирования БОЛЬШОГО изображения. Если 0, то данное изображение не формируется
-    * @param mixed $thumb Массив с параметрами для формирования МАЛОГО изображения. Если 0, то данное изображение не формируется
-    * @param mixed $watermark_image_b Массив с параметрами для формирования водяного знака на большом изображении.
-    * @param mixed $source
-    * @param mixed $watermark_image_s Массив с параметрами для формирования водяного знака на исходном изображении.
-    * @access public
-    * @return string
-    */
+    /**
+     * Меняет размеры загруженной картинки до нужных размеров и сохраняет ее в каталог
+     *
+     * Метод обрабатывает изображения в трёх форматах: jpg, gif, png. Из исходного
+     * изображения могут быть сформированы большое и малое изображение, кроме того,
+     * к большому изображению может быть добавлена защита в виде «водяного знака».
+     *
+     * В качестве параметра для формирования большого изображения передаётся массив
+     * следующего вида:
+     * <code>
+     *   $big['width'] = 400;
+     *   $big['height'] = 300;
+     * </code>
+     *
+     * В массиве указываются значения длины и ширины, к которым должно быть приведено
+     * большое изображение. Аналогичным образом указывается массив параметров для
+     * создания маленького изображения:
+     * <code>
+     *   $big['width'] = 100;
+     *   $big['height'] = 75;
+     * </code>
+     *
+     * Следует учитывать, что ширина и высота обработанных изображений может отличаться,
+     * если будут нарушаться пропорции исходного изображения. При выполнении масштабирования
+     * предпочтение отдаётся сохранению пропорций, а затем ширине изображения.
+     *
+     * Для добавления водяного знака необходимо определить массив его настроек и передать его
+     * в метод. Массив выглядит следующим образом:
+     * <code>
+     *   $watermark_image['path'] = 'content/files/fatermark.gif';
+     *   $watermark_image['place'] = 0;
+     *   $watermark_image['transparency'] = 30;
+     * </code>
+     *
+     * Ключ path указывает путь и имя файла водяного изображения. Ключ place определяет
+     * местоположение водяной марки относительно большого изображения, и может принимать
+     * следующие значения:
+     * 0 – по центру;
+     * 1 – левый верхний уровень;
+     * 2 – правый верхний угол;
+     * 3 – правый нижний угол;
+     * 4 – левый нижний угол;
+     * Последний ключ (transparency) определяет уровень прозрачности, в процентах,
+     * который должен иметь водяной знак. Принимает значения от 1 до 100 и если не задан,
+     * то равен 50.
+     *
+     * После выполнения метода будет создано два (или одно) изображения, которые будут
+     * помещены в папку $path_full_image, при этом большое изображение непосредственно
+     * помещается в эту папку, а маленькое помещается во вложенную папку с именем 'tn'
+     * ($path_full_image.'/tn'). Имена файлов большого и маленького изображения будут
+     * одинаковы.
+     *
+     * Пример:
+     * <code>
+     *       //Путь к обрабатываемому файлу
+     *       $tmp_name = 'temp/temp.jpg'
+     *
+     *       //Параметры большого изображения
+     *       $big = array(
+     *           'width' => 400,
+     *           'height' => 300
+     *       );
+     *
+     *       //Параметры малого изображения
+     *       $thumb = array(
+     *           'width' => 100,
+     *           'height' => 75
+     *       );
+     *
+     *       //Параметры водяной марки
+     *       $watermark_image = array(
+     *           'path' => 'content/files/fatermark.gif',
+     *           'place' => 3,
+     *           'transparency' => 25
+     *       );
+     *
+     *       //Задаём путь для сохранения обработанных изображений.
+     *       //такой путь должен существовать
+     *       $path_to_save = 'content/images/'.$kernel->pub_module_id_get();
+     *       $filename = $kernel->pub_image_save($tmp_name, 'img', $path_to_save, $big, $thumb, $watermark_image);
+     *
+     * </code>
+     *
+     * Если взять в качестве идентификатора модуля значение 'news', то будут
+     * созданы следующие файлы:
+     * <code>
+     *   content/images/news/img_345222534.jpg   //большое изображение
+     *   content/images/news/tn/img_345222534.jpg //малое изображение
+     * </code>
+     * А переменная $filename будет содержать:
+     * <code>
+     *   img_345222534.jpg
+     * </code>
+     * @param string $ufile Путь и имя файла обрабатываемого изображения
+     * @param int $id Начальная часть имени файла уже обработанного изображения, к которой будет добавлена уникальная составляющая
+     * @param string $path_full_image Путь, куда будет сохранено изменённое изображение
+     * @param mixed $big Массив с параметрами для формирования БОЛЬШОГО изображения. Если 0, то данное изображение не формируется
+     * @param mixed $thumb Массив с параметрами для формирования МАЛОГО изображения. Если 0, то данное изображение не формируется
+     * @param mixed $watermark_image_b Массив с параметрами для формирования водяного знака на большом изображении.
+     * @param mixed $source
+     * @param mixed $watermark_image_s Массив с параметрами для формирования водяного знака на исходном изображении.
+     * @access public
+     * @return string
+     */
     function pub_image_save($ufile, $id, $path_full_image, $big=0, $thumb=0, $watermark_image_b=0, $source = 0, $watermark_image_s=0)
     {
         $newname="";
-		if (isset($ufile) && ($ufile!=""))
-		{
-		    //Перед тем, как начинать преобразование, возможно надо открыть папку для записи
-		    //так как она могла быть переписана по FTP и тогда скрипт не сможет сюда писать
+        if (isset($ufile) && ($ufile!=""))
+        {
+            //Перед тем, как начинать преобразование, возможно надо открыть папку для записи
+            //так как она могла быть переписана по FTP и тогда скрипт не сможет сюда писать
 
-		    $close_full_path = false;
-		    $close_tn = false;
-		    $close_source = false;
+            $close_full_path = false;
+            $close_tn = false;
+            $close_source = false;
 
-		    if (!is_writable($path_full_image))
-		    {
-		        $this->pub_ftp_dir_chmod_change($path_full_image);
-		        $close_full_path = true;
-		    }
-		    if (!is_writable($path_full_image."/tn"))
-		    {
-		        $this->pub_ftp_dir_chmod_change($path_full_image."/tn");
-		        $close_tn = true;
-		    }
-		    if (!is_writable($path_full_image."/source"))
-		    {
-		        $this->pub_ftp_dir_chmod_change($path_full_image."/source");
-		        $close_source = true;
-		    }
+            if (!is_writable($path_full_image))
+            {
+                $this->pub_ftp_dir_chmod_change($path_full_image);
+                $close_full_path = true;
+            }
+            if (!is_writable($path_full_image."/tn"))
+            {
+                $this->pub_ftp_dir_chmod_change($path_full_image."/tn");
+                $close_tn = true;
+            }
+            if (!is_writable($path_full_image."/source"))
+            {
+                $this->pub_ftp_dir_chmod_change($path_full_image."/source");
+                $close_source = true;
+            }
 
 
-		    $this->priv_set_memory_for_image($ufile);
+            $this->priv_set_memory_for_image($ufile);
 
-			$type = ".jpg";
-			$a = getimagesize($ufile);
-			if ($a[2] == "1")
-				$type = ".gif";
-			elseif ($a[2] == "3")
-				$type = ".png";
+            $type = ".jpg";
+            $a = getimagesize($ufile);
+            if ($a[2] == "1")
+                $type = ".gif";
+            elseif ($a[2] == "3")
+                $type = ".png";
 
-			//$image_width = $a[0];
-			//$image_height = $a[1];
+            //$image_width = $a[0];
+            //$image_height = $a[1];
 
-		    //Определим имя файла
-			$newname = $id."_".date("U").$type;
+            //Определим имя файла
+            $newname = $id."_".date("U").$type;
 
-			$file_big   = $path_full_image."/".$newname;
-			$file_small = $path_full_image."/tn/".$newname;
-			$file_surce = $path_full_image."/source/".$newname;
+            $file_big   = $path_full_image."/".$newname;
+            $file_small = $path_full_image."/tn/".$newname;
+            $file_surce = $path_full_image."/source/".$newname;
 
             $im=null;
-			if ($type == ".jpg")
-				$im = @ImageCreateFromJPEG($ufile);
-			elseif($type == ".gif")
-				$im = @ImageCreateFromGIF($ufile);
-			elseif ($type == ".png")
-				$im = @ImageCreateFromPNG($ufile);
+            if ($type == ".jpg")
+                $im = @ImageCreateFromJPEG($ufile);
+            elseif($type == ".gif")
+                $im = @ImageCreateFromGIF($ufile);
+            elseif ($type == ".png")
+                $im = @ImageCreateFromPNG($ufile);
 
-			if (is_resource($im))
-			{
-				//Создаём маленькое изображение
-				if ($thumb != 0)
-				{
+            if (is_resource($im))
+            {
+                //Создаём маленькое изображение
+                if ($thumb != 0)
+                {
                     $im_small = $this->pub_image_resize_to($im, $thumb);
                     if ($im_small)
                     {
-    					if ($type == ".jpg")
-    						ImageJPEG($im_small, $file_small, 100);
-    					elseif ($type == ".gif")
-    						ImageGIF($im_small , $file_small);
-    					elseif ($type == ".png")
-    						ImagePNG($im_small , $file_small);
+                        if ($type == ".jpg")
+                            ImageJPEG($im_small, $file_small, 100);
+                        elseif ($type == ".gif")
+                            ImageGIF($im_small , $file_small);
+                        elseif ($type == ".png")
+                            ImagePNG($im_small , $file_small);
 
-    					ImageDestroy($im_small);
-    					chmod ($file_small, $this->priv_chmod_limit_get());
+                        ImageDestroy($im_small);
+                        chmod ($file_small, $this->priv_chmod_limit_get());
                     }
-				}
-				//Если $big не равен нулю, то сохраняем и большую картинку
-				if ($big != 0)
-				{
-				    // Если он равен 1, не меняем размеры изображения
-					if ($big == 1)
-					{
-						unset($big);
-						$big['width'] = $a[0];//$sx;
-						$big['height'] = $a[1];//$sy;
-					}
+                }
+                //Если $big не равен нулю, то сохраняем и большую картинку
+                if ($big != 0)
+                {
+                    // Если он равен 1, не меняем размеры изображения
+                    if ($big == 1)
+                    {
+                        unset($big);
+                        $big['width'] = $a[0];//$sx;
+                        $big['height'] = $a[1];//$sy;
+                    }
 
-					//Создадим большое изображение
-					$im_big = $this->pub_image_resize_to($im, $big, $watermark_image_b);
-					if ($im_big)
-					{
-    					if ($type == ".jpg")
-    						ImageJPEG($im_big, $file_big, 75);
-    					elseif ($type == ".gif")
-    						ImageGIF($im_big , $file_big);
-    					elseif ($type == ".png")
-    						ImagePNG($im_big , $file_big);
+                    //Создадим большое изображение
+                    $im_big = $this->pub_image_resize_to($im, $big, $watermark_image_b);
+                    if ($im_big)
+                    {
+                        if ($type == ".jpg")
+                            ImageJPEG($im_big, $file_big, 75);
+                        elseif ($type == ".gif")
+                            ImageGIF($im_big , $file_big);
+                        elseif ($type == ".png")
+                            ImagePNG($im_big , $file_big);
 
-    					ImageDestroy($im_big);
-    					chmod ($file_big, $this->priv_chmod_limit_get());
-					}
-				}
+                        ImageDestroy($im_big);
+                        chmod ($file_big, $this->priv_chmod_limit_get());
+                    }
+                }
 
-				//И самое последние, если надо то исправим исходное изображение
-				//Если $big не равен нулю, то сохраняем и большую картинку
-				if ($source != 0)
-				{
-				    // Если он равен 1, не меняем размеры изображения
-				    /*
-					if ($source == 1)
-					{
-						unset($source);
-						$source['width']  = $sx;
-						$source['height'] = $sy;
-					}*/
+                //И самое последние, если надо то исправим исходное изображение
+                //Если $big не равен нулю, то сохраняем и большую картинку
+                if ($source != 0)
+                {
+                    // Если он равен 1, не меняем размеры изображения
+                    /*
+                    if ($source == 1)
+                    {
+                        unset($source);
+                        $source['width']  = $sx;
+                        $source['height'] = $sy;
+                    }*/
 
-					//Создадим большое изображение
-					$im_source = $this->pub_image_resize_to($im, $source, $watermark_image_s);
-					if ($im_source)
-					{
-    					if ($type == ".jpg")
-    						ImageJPEG($im_source, $file_surce, 75);
-    					elseif ($type == ".gif")
-    						ImageGIF($im_source , $file_surce);
-    					elseif ($type == ".png")
-    						ImagePNG($im_source , $file_surce);
-    					ImageDestroy($im_source);
-    					chmod ($file_surce, $this->priv_chmod_limit_get());
-					}
-				}
-				else
-				{//$source == 0, просто копируем не изменяя
-				    $this->pub_file_copy($ufile, $path_full_image."/source/".$newname,$close_source, false);
-				}
+                    //Создадим большое изображение
+                    $im_source = $this->pub_image_resize_to($im, $source, $watermark_image_s);
+                    if ($im_source)
+                    {
+                        if ($type == ".jpg")
+                            ImageJPEG($im_source, $file_surce, 75);
+                        elseif ($type == ".gif")
+                            ImageGIF($im_source , $file_surce);
+                        elseif ($type == ".png")
+                            ImagePNG($im_source , $file_surce);
+                        ImageDestroy($im_source);
+                        chmod ($file_surce, $this->priv_chmod_limit_get());
+                    }
+                }
+                else
+                {//$source == 0, просто копируем не изменяя
+                    $this->pub_file_copy($ufile, $path_full_image."/source/".$newname,$close_source, false);
+                }
 
-				ImageDestroy($im);
-			}
-			if ($close_full_path)
-			    $this->pub_ftp_dir_chmod_change($path_full_image);
-			if ($close_tn)
-			    $this->pub_ftp_dir_chmod_change($path_full_image."/tn");
-			if ($close_source)
-			    $this->pub_ftp_dir_chmod_change($path_full_image."/source");
-		}
-		return $newname;
+                ImageDestroy($im);
+            }
+            if ($close_full_path)
+                $this->pub_ftp_dir_chmod_change($path_full_image);
+            if ($close_tn)
+                $this->pub_ftp_dir_chmod_change($path_full_image."/tn");
+            if ($close_source)
+                $this->pub_ftp_dir_chmod_change($path_full_image."/source");
+        }
+        return $newname;
     }
 
 
@@ -4024,47 +4037,47 @@ class kernel
     }
 
     /**
-    * Отправка электронных писем
-    *
-    * Метод позволяет осуществить отправку электронных писем с сервера, на котором размещён сайт.
-    * Письма могут быть отправлены сразу нескольким адресатам. Кроме, того к письму могут быть
-    * приложены изображения, ссылки на которые есть в самом письме.
-    *
-    * Пример:
-    * <code>
-    *   global $kernel;
-    *
-    *   //Имя и адрес получателя
-    *   $toname[0] = "Сергей Петров";
-    *   $toaddr[0] = "sergey.p@mymail.ru";
-    *
-    *   //Имя и адрес отправителя
-    *   $fromname = "Робот с сервера ".$_SERVER['HTTP_HOST'];
-    *   $fromaddr = "noreply@".$_SERVER['HTTP_HOST'];
-    *
-    *   //Заголовок сообщения
-    *   $subject = "Автоматическое письмо с сайта ".$_SERVER['HTTP_HOST'];
-    *
-    *   //Текст сообщения
-    *   $message = "Hello <b>word</b>!";
-    *
-    *   //Отправка сообщения
-    *   $kernel->pub_mail($toaddr, $toname, $fromaddr, $fromname, $subject, $message);
-    * </code>
-    * @param array $toaddr Массив адресов получателей письма
-    * @param array $toname Имена получателей письма. Ключи должны соответствовать ключам в массиве $toaddr
-    * @param string $fromaddr Адрес отправителя письма
-    * @param string $fromname Имя отправителя письма
-    * @param string $subject Тема письма
-    * @param string $message Тело письма. Может содержать HTML
-    * @param boolean $attach Если true, то к телу письма будут прикреплены изображения, ссылки на которые встретились в теле письма.
-    * @param string $hostname Адрес хоста, где находятся изображения, которые могут
-    * быть прикреплены. Если не задан или равен "", то используется имя хоста, на котором работает сайт.
-    * @param mixed $att_files Файлы, которые должны быть прикреплены к письму. Массив с полными путями
-    * @param mixed $replyto Email для Reply-To
-    * @access public
-    * @return int Количество отправленных писем
-    */
+     * Отправка электронных писем
+     *
+     * Метод позволяет осуществить отправку электронных писем с сервера, на котором размещён сайт.
+     * Письма могут быть отправлены сразу нескольким адресатам. Кроме, того к письму могут быть
+     * приложены изображения, ссылки на которые есть в самом письме.
+     *
+     * Пример:
+     * <code>
+     *   global $kernel;
+     *
+     *   //Имя и адрес получателя
+     *   $toname[0] = "Сергей Петров";
+     *   $toaddr[0] = "sergey.p@mymail.ru";
+     *
+     *   //Имя и адрес отправителя
+     *   $fromname = "Робот с сервера ".$_SERVER['HTTP_HOST'];
+     *   $fromaddr = "noreply@".$_SERVER['HTTP_HOST'];
+     *
+     *   //Заголовок сообщения
+     *   $subject = "Автоматическое письмо с сайта ".$_SERVER['HTTP_HOST'];
+     *
+     *   //Текст сообщения
+     *   $message = "Hello <b>word</b>!";
+     *
+     *   //Отправка сообщения
+     *   $kernel->pub_mail($toaddr, $toname, $fromaddr, $fromname, $subject, $message);
+     * </code>
+     * @param array $toaddr Массив адресов получателей письма
+     * @param array $toname Имена получателей письма. Ключи должны соответствовать ключам в массиве $toaddr
+     * @param string $fromaddr Адрес отправителя письма
+     * @param string $fromname Имя отправителя письма
+     * @param string $subject Тема письма
+     * @param string $message Тело письма. Может содержать HTML
+     * @param boolean $attach Если true, то к телу письма будут прикреплены изображения, ссылки на которые встретились в теле письма.
+     * @param string $hostname Адрес хоста, где находятся изображения, которые могут
+     * быть прикреплены. Если не задан или равен "", то используется имя хоста, на котором работает сайт.
+     * @param mixed $att_files Файлы, которые должны быть прикреплены к письму. Массив с полными путями
+     * @param mixed $replyto Email для Reply-To
+     * @access public
+     * @return int Количество отправленных писем
+     */
     function pub_mail($toaddr, $toname, $fromaddr, $fromname, $subject, $message, $attach=false, $hostname="", $att_files=false, $replyto=false)
     {
         require_once dirname(__FILE__)."/class.phpmailer.php";
@@ -4276,7 +4289,7 @@ class kernel
 
         //Теперь добавим информацию по тайтлу от других модулей
 
-	    if ($this->modul_title!="")
+        if ($this->modul_title!="")
             return $this->modul_title;
 
         return $str.$this->modul_title;
@@ -4483,22 +4496,22 @@ class kernel
         switch (gettype($name))
         {
             // Если не указанна конкретная переменная, то вернем все.
-        	case 'NULL':
+            case 'NULL':
                 return array_map('unserialize',$_SESSION['vars_kernel']['modules_session'][$module]);
-        		break;
+                break;
 
             // Если указанна переменная и она существует в сесии - вернем только ее значение, иначе - false.
             case 'string':
-        	    if (isset($_SESSION['vars_kernel']['modules_session'][$module][$name]))
-        	    	return unserialize($_SESSION['vars_kernel']['modules_session'][$module][$name]);
+                if (isset($_SESSION['vars_kernel']['modules_session'][$module][$name]))
+                    return unserialize($_SESSION['vars_kernel']['modules_session'][$module][$name]);
                 else
-        	    	return null;
-        	    break;
+                    return null;
+                break;
 
             // Если указаная переменная не типа string, то вернем false
-        	default:
-        	    return false;
-        		break;
+            default:
+                return false;
+                break;
         }
     }
 
@@ -4523,13 +4536,13 @@ class kernel
             unset($_SESSION['vars_kernel']['modules_session'][$module_id]);
             return true;
         }
-    	elseif (isset($_SESSION['vars_kernel']['modules_session'][$module_id][$name]))
+        elseif (isset($_SESSION['vars_kernel']['modules_session'][$module_id][$name]))
         {
             unset($_SESSION['vars_kernel']['modules_session'][$module_id][$name]);
             return true;
-    	}
-    	else
-    		return false;
+        }
+        else
+            return false;
     }
 
     /**
@@ -4603,7 +4616,7 @@ class kernel
      */
     public function pub_mysql_queries_get()
     {
-    	return $this->queriesCount;
+        return $this->queriesCount;
     }
 
 
@@ -4768,7 +4781,7 @@ class kernel
     }
 
     //-------------- НЕТ в описании API ---------------------
-     /**
+    /**
      * Возвращает количество ошибок
      *
      * возвращается количество ошибок, которое было накоплено, путём вызова функции pub_httppost_errore
@@ -4829,31 +4842,31 @@ class kernel
           права на файл - безсмыслено - потому один вариант - писать
           файл по FTP.
         */
-    	$file = $this->priv_file_full_patch($file);
+        $file = $this->priv_file_full_patch($file);
 
-    	//Узнаем собсвтенно что с этим файлом
-    	clearstatcache();
+        //Узнаем собсвтенно что с этим файлом
+        clearstatcache();
 
-    	//$content = stripslashes($content);
+        //$content = stripslashes($content);
 
-    	//Сначала определяем, существует файл или нет
+        //Сначала определяем, существует файл или нет
 
-    	$file_exist = file_exists($file);
+        $file_exist = file_exists($file);
 
-	    $parse_file = pathinfo($file);
-	    $curent_dir = $parse_file['dirname'];
+        $parse_file = pathinfo($file);
+        $curent_dir = $parse_file['dirname'];
 
-	    //Можем ли мы записать в сам файл или в папку, где он находиться
-    	if ($file_exist)
-    	   $file_write = is_writable($file);
-    	else
-    	   $file_write = is_writable($curent_dir);
-    	//Пока не важно, есть файл или нет, главное
-    	//что мы можем его переписать, что мы и делаем
+        //Можем ли мы записать в сам файл или в папку, где он находиться
+        if ($file_exist)
+            $file_write = is_writable($file);
+        else
+            $file_write = is_writable($curent_dir);
+        //Пока не важно, есть файл или нет, главное
+        //что мы можем его переписать, что мы и делаем
         //иначе, нужно выполнять
         //дейсвтия в том случае, если скриптом файл не записать.
-    	if ($file_write && !$only_ftp)
-    	    return $this->priv_file_save_script($file, $content);
+        if ($file_write && !$only_ftp)
+            return $this->priv_file_save_script($file, $content);
         else
             return $this->priv_ftp_file_save($file, $content, $ignore_ftp_root_check);
         //В дальнейшем, можно сделать проверку, на то что файл дейсвтитльно был изменеён
@@ -4918,12 +4931,12 @@ class kernel
         $str       = trim($file);
         $root      = $this->pub_site_root_get();
 
-		if ((mb_substr($str,0,1) !== "/") && (mb_substr($str,1,1) !== ":"))
-    		$str = "/".$str;
+        if ((mb_substr($str,0,1) !== "/") && (mb_substr($str,1,1) !== ":"))
+            $str = "/".$str;
         $matches = false;
         //Определим, под чем мы вообще работаем, что бы правильно отстроить пути
-       	if ($this->curent_os == "winnt")
-       	    $str = str_replace("/", "\\", $str);
+        if ($this->curent_os == "winnt")
+            $str = str_replace("/", "\\", $str);
         if (!preg_match("'^".preg_quote($root)."'i", $str, $matches))
             $str = $root.$str;
         return $str;
@@ -5109,7 +5122,7 @@ class kernel
      * то сама директория так же будет удалена, иначе, будет удалено только её содержимое.
      * @return bool
      */
-	function pub_file_delete($path, $delet_parent_dir = true)
+    function pub_file_delete($path, $delet_parent_dir = true)
     {
         $status = false;
 
@@ -5118,27 +5131,27 @@ class kernel
 
         $path = $this->priv_file_full_patch($path);
 
-		if (!file_exists($path))
-			return $status;
+        if (!file_exists($path))
+            return $status;
 
-	    //Для директории удалим всё её содержимое
-		if (is_dir($path))
-		{
-		    //Проверим, а есть ли что удалить внутри этой дериктории
+        //Для директории удалим всё её содержимое
+        if (is_dir($path))
+        {
+            //Проверим, а есть ли что удалить внутри этой дериктории
             if($handle = opendir($path))
-			{
-				while (false !== ($subdir = readdir($handle)))
-				{
-					if (($subdir != ".") && ($subdir != ".."))
-					{
-						if (!$this->pub_file_delete($path."/".$subdir, true))
-						{
-							return false;
-						}
-					}
-				}
-				closedir($handle);
-			}
+            {
+                while (false !== ($subdir = readdir($handle)))
+                {
+                    if (($subdir != ".") && ($subdir != ".."))
+                    {
+                        if (!$this->pub_file_delete($path."/".$subdir, true))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                closedir($handle);
+            }
 
             //Непосредственно удаление директории, если мы этого хотим
             if ($delet_parent_dir)
@@ -5159,11 +5172,11 @@ class kernel
                     $this->pub_ftp_dir_chmod_change($dir_parent);
                 }
             }
-		}
-		else
-		{
-		    //А это, удаление непосредственно файла
-		    //Попытаемся удалить скриптом
+        }
+        else
+        {
+            //А это, удаление непосредственно файла
+            //Попытаемся удалить скриптом
             $status = @unlink($path);
             //Если не вышло, то сразу же попробуем удалить
             //через FTP
@@ -5186,8 +5199,8 @@ class kernel
                 //И возварщаем права на папку
                 $this->pub_ftp_dir_chmod_change($path);
             }
-		}
-		return $status;
+        }
+        return $status;
     }
 
     function priv_file_save_script($file, $content, $del_if_exist = false)
@@ -5196,7 +5209,7 @@ class kernel
         if ($del_if_exist && file_exists($file))
         {
             if (!@unlink($file))
-            //if (!$this->pub_file_delete($file, false))
+                //if (!$this->pub_file_delete($file, false))
             {
                 $this->debug($this->priv_page_textlabels_replace("[#kernel_ftp_change_chmod3#]<br><i>".$file."</i"), true);
                 return false;
@@ -5230,17 +5243,17 @@ class kernel
         //Сначала попробуем поменть временно права на папку в 777
         //создать файл скриптом, и после этого вернуть прова обратно.
 
-	    //Меняем права, если всё хорошо то говорим то делаем дальше
-		if ($this->pub_ftp_dir_chmod_change($file, false, false))
-		{
+        //Меняем права, если всё хорошо то говорим то делаем дальше
+        if ($this->pub_ftp_dir_chmod_change($file, false, false))
+        {
             //Пишим файл скриптом
             $this->priv_file_save_script($file, $content, true);
 
             //Возвращаем старые права на папку
             $this->pub_ftp_dir_chmod_change($file);
-		}
-		else
-		{
+        }
+        else
+        {
             //Это значит что всё плохо, и мы не можем поменять права на папку, что бы
             //записать файл, и нужно делать что-то и как-то по другому.
             //Попытаемся удалить этот файл и тогда ещё раз записать
@@ -5262,7 +5275,7 @@ class kernel
                     return false;
                 }
             }
-		}
+        }
         return true;
     }
 
@@ -5339,11 +5352,11 @@ class kernel
         //$parse_file       = pathinfo($file);
         //if (!isset($parse_file['extension']))
         //    return;
-	    if (isset($this->ftp_dir_chmod_temp[$curent_chmod_dir]))
-	       $res = $this->pub_ftp_dir_chmod_close($file, false, false, $show_errore);
-	    else
-	       $res = $this->pub_ftp_dir_chmod_open($file, false, $show_errore);
-	    return $res;
+        if (isset($this->ftp_dir_chmod_temp[$curent_chmod_dir]))
+            $res = $this->pub_ftp_dir_chmod_close($file, false, false, $show_errore);
+        else
+            $res = $this->pub_ftp_dir_chmod_open($file, false, $show_errore);
+        return $res;
     }
 
     /**
@@ -5375,11 +5388,11 @@ class kernel
         if ($change_for_parent)
             $curent_chmod_dir = $this->pub_file_dir_parent($curent_chmod_dir);
 
-	    if (isset($this->ftp_dir_chmod_temp[$curent_chmod_dir]))
-	        $res = $this->pub_ftp_dir_chmod_close($file, $change_for_parent, false, $show_errore);
-	    else
-	        $res = $this->pub_ftp_dir_chmod_open($file, $change_for_parent, $show_errore);
-	    return $res;
+        if (isset($this->ftp_dir_chmod_temp[$curent_chmod_dir]))
+            $res = $this->pub_ftp_dir_chmod_close($file, $change_for_parent, false, $show_errore);
+        else
+            $res = $this->pub_ftp_dir_chmod_open($file, $change_for_parent, $show_errore);
+        return $res;
     }
 
     /**
@@ -5409,12 +5422,12 @@ class kernel
         if ($change_for_parent)
             $curent_chmod_dir = $this->pub_file_dir_parent($curent_chmod_dir);
 
-	    //Теперь можем открывать доступ к папке
-	    clearstatcache();
+        //Теперь можем открывать доступ к папке
+        clearstatcache();
 
-	    //Теперь собственно либо поставим полные права, либо вернём
-	    //те которые были
-	    //@todo возможно и такое: PHP Warning:  fileperms(): stat failed for
+        //Теперь собственно либо поставим полные права, либо вернём
+        //те которые были
+        //@todo возможно и такое: PHP Warning:  fileperms(): stat failed for
         $before_change = trim(substr(sprintf('%o', fileperms($curent_chmod_dir)), -4));
 
         //Сначала пробуем поставить полные права скриптом
@@ -5483,22 +5496,22 @@ class kernel
         //Если надо, то возьмём родителя этой папки и будем менять именно его
         if ($change_for_parent)
             $curent_chmod_dir = $this->pub_file_dir_parent($curent_chmod_dir);
-	    //Если права не заданы, то попытаемся их взять из переменной ядра
-	    if (!$chmod)
-	       $chmod = $this->ftp_dir_chmod_temp[$curent_chmod_dir];
-	    else
-	    {
-	        $chmod = trim($chmod);
-	        if (preg_match("/^[0-9]+$/i", $chmod))
-	           return false;
-	    }
+        //Если права не заданы, то попытаемся их взять из переменной ядра
+        if (!$chmod)
+            $chmod = $this->ftp_dir_chmod_temp[$curent_chmod_dir];
+        else
+        {
+            $chmod = trim($chmod);
+            if (preg_match("/^[0-9]+$/i", $chmod))
+                return false;
+        }
 
-	    //Теперь можем открывать доступ к папке
-	    clearstatcache();
+        //Теперь можем открывать доступ к папке
+        clearstatcache();
 
-	    //Теперь собственно либо поставим полные права, либо вернём
-	    //те которые были
-	    //@todo возможно и такое: PHP Warning:  fileperms(): stat failed for
+        //Теперь собственно либо поставим полные права, либо вернём
+        //те которые были
+        //@todo возможно и такое: PHP Warning:  fileperms(): stat failed for
         $before_change = trim(substr(sprintf('%o', fileperms($curent_chmod_dir)), -4));
 
         //Сначала пробуем поставить полные права скриптом
@@ -5632,13 +5645,13 @@ class kernel
 
         $transparency = 50;
         if (isset($watermark_image['transparency']))
-          $transparency = intval($watermark_image['transparency']);
+            $transparency = intval($watermark_image['transparency']);
 
         if ($transparency > 100)
-          $transparency = 100;
+            $transparency = 100;
 
         if ($transparency < 1)
-          $transparency = 1;
+            $transparency = 1;
 
         switch ($watermark_image['place'])
         {
@@ -5671,7 +5684,7 @@ class kernel
         return $image;
     }
 
-     /** Ресайз изображения + добавление водяного знака
+    /** Ресайз изображения + добавление водяного знака
      * @param resource $source рерурс - исходное изображение
      * @param array $size массив с размерами
      * @param array|int $watermark_image если 0, то НЕ добавляем водяной знак
@@ -5759,8 +5772,8 @@ class kernel
         // ...и копируем туда уменьшенное изображение
         imagecopyresampled($image_new, $source, 0,0, $offset_x, $offset_y, $size['width'], $size['height'], $source_w, $source_h);
 
-		if ($watermark_image)
-	        $image_new=$this->pub_add_watermark2image($image_new, $watermark_image, $size);
+        if ($watermark_image)
+            $image_new=$this->pub_add_watermark2image($image_new, $watermark_image, $size);
         return $image_new;
     }
     /**
@@ -5776,9 +5789,9 @@ class kernel
         $K64 = 65536;    // number of bytes in 64K
         $TWEAKFACTOR = 2;  // 1.5 Or whatever works for you
         if (isset($imageInfo['channels']))
-        	$channels = $imageInfo['channels'];
+            $channels = $imageInfo['channels'];
         else
-        	$channels = 3;
+            $channels = 3;
         $memoryNeeded = round( ( $imageInfo[0] * $imageInfo[1] * $imageInfo['bits'] * $channels/8  + $K64) * $TWEAKFACTOR);
         //ini_get('memory_limit') only works if compiled with "--enable-memory-limit" also
         //Default memory limit is 8MB so well stick with that.
@@ -5897,73 +5910,73 @@ class kernel
     public function pub_translit_string($str)
     {
         $chars = array(
-        "А" => "A" ,
-        "Б" => "B" ,
-        "В" => "V" ,
-        "Г" => "G" ,
-        "Д" => "D" ,
-        "Е" => "E" ,
-        "Ё" => "YO" ,
-        "Ж" => "ZH" ,
-        "З" => "Z" ,
-        "И" => "I" ,
-        "Й" => "J" ,
-        "К" => "K" ,
-        "Л" => "L" ,
-        "М" => "M" ,
-        "Н" => "N" ,
-        "О" => "O" ,
-        "П" => "P" ,
-        "Р" => "R" ,
-        "С" => "S" ,
-        "Т" => "T" ,
-        "У" => "U" ,
-        "Ф" => "F" ,
-        "Х" => "X" ,
-        "Ц" => "C" ,
-        "Ч" => "CH" ,
-        "Ш" => "SH" ,
-        "Щ" => "SHH" ,
-        "Ъ" => "'" ,
-        "Ы" => "Y" ,
-        "Ь" => "" ,
-        "Э" => "E" ,
-        "Ю" => "YU" ,
-        "Я" => "YA" ,
-        "а" => "a" ,
-        "б" => "b" ,
-        "в" => "v" ,
-        "г" => "g" ,
-        "д" => "d" ,
-        "е" => "e" ,
-        "ё" => "yo" ,
-        "ж" => "zh" ,
-        "з" => "z" ,
-        "и" => "i" ,
-        "й" => "j" ,
-        "к" => "k" ,
-        "л" => "l" ,
-        "м" => "m" ,
-        "н" => "n" ,
-        "о" => "o" ,
-        "п" => "p" ,
-        "р" => "r" ,
-        "с" => "s" ,
-        "т" => "t" ,
-        "у" => "u" ,
-        "ф" => "f" ,
-        "х" => "x" ,
-        "ц" => "c" ,
-        "ч" => "ch" ,
-        "ш" => "sh" ,
-        "щ" => "shh" ,
-        "ъ" => "" ,
-        "ы" => "y" ,
-        "ь" => "" ,
-        "э" => "e" ,
-        "ю" => "yu" ,
-        "я" => "ya",
-        " " => "_");
+            "А" => "A" ,
+            "Б" => "B" ,
+            "В" => "V" ,
+            "Г" => "G" ,
+            "Д" => "D" ,
+            "Е" => "E" ,
+            "Ё" => "YO" ,
+            "Ж" => "ZH" ,
+            "З" => "Z" ,
+            "И" => "I" ,
+            "Й" => "J" ,
+            "К" => "K" ,
+            "Л" => "L" ,
+            "М" => "M" ,
+            "Н" => "N" ,
+            "О" => "O" ,
+            "П" => "P" ,
+            "Р" => "R" ,
+            "С" => "S" ,
+            "Т" => "T" ,
+            "У" => "U" ,
+            "Ф" => "F" ,
+            "Х" => "X" ,
+            "Ц" => "C" ,
+            "Ч" => "CH" ,
+            "Ш" => "SH" ,
+            "Щ" => "SHH" ,
+            "Ъ" => "'" ,
+            "Ы" => "Y" ,
+            "Ь" => "" ,
+            "Э" => "E" ,
+            "Ю" => "YU" ,
+            "Я" => "YA" ,
+            "а" => "a" ,
+            "б" => "b" ,
+            "в" => "v" ,
+            "г" => "g" ,
+            "д" => "d" ,
+            "е" => "e" ,
+            "ё" => "yo" ,
+            "ж" => "zh" ,
+            "з" => "z" ,
+            "и" => "i" ,
+            "й" => "j" ,
+            "к" => "k" ,
+            "л" => "l" ,
+            "м" => "m" ,
+            "н" => "n" ,
+            "о" => "o" ,
+            "п" => "p" ,
+            "р" => "r" ,
+            "с" => "s" ,
+            "т" => "t" ,
+            "у" => "u" ,
+            "ф" => "f" ,
+            "х" => "x" ,
+            "ц" => "c" ,
+            "ч" => "ch" ,
+            "ш" => "sh" ,
+            "щ" => "shh" ,
+            "ъ" => "" ,
+            "ы" => "y" ,
+            "ь" => "" ,
+            "э" => "e" ,
+            "ю" => "yu" ,
+            "я" => "ya",
+            " " => "_");
         return strtr($str, $chars);
     }
 

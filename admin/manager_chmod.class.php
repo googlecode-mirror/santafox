@@ -19,7 +19,7 @@ class manager_chmod
         //список директорий нужно строго зафиксировать, так как там могут быть
         //и другие папки, на которые сайт не обращает внимания
         $root = $kernel->pub_site_root_get();
-        if ($kernel->curent_os == "winnt")
+        if ($kernel->is_windows)
             $root = str_replace("\\", "/", $root);
 
 
@@ -88,7 +88,7 @@ class manager_chmod
                 return false;
             foreach ($array_files as $link => $type_chmod)
             {
-                if ($kernel->curent_os == "winnt")
+                if ($kernel->is_windows)
                     $link = str_replace("/","\\", $link);
                 $ftp_path = $kernel->convert_path4ftp($link, true);
                 $octal_rights = $kernel->pub_chmod_type_get($type_chmod, false);

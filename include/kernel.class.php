@@ -24,8 +24,6 @@ class kernel
     private $flag_can_recurs_save = true;
     private $ftp_dir_chmod_temp = array();
     private $header_is_sent = false;
-    public $curent_os;
-
 
     /**
      * Счетчик запросов в MySQL
@@ -244,6 +242,9 @@ class kernel
 
     /** @var список имеющихся постпроцессоров */
     private $postprocessors=null;
+
+    public $is_windows;
+
     /**
      * Конструктор
      *
@@ -255,7 +256,10 @@ class kernel
     function kernel($prefix)
     {
         $this->prefix = $prefix;
-        $this->curent_os = strtolower(PHP_OS);
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+            $this->is_windows = true;
+        else
+            $this->is_windows = false;
         //теперь произведем соединение с базой данных MySql
         $this->resurs_mysql = mysql_connect(DB_HOST, DB_USERNAME, DB_PASSWORD);
         if (!$this->resurs_mysql)
@@ -4935,7 +4939,7 @@ class kernel
             $str = "/".$str;
         $matches = false;
         //Определим, под чем мы вообще работаем, что бы правильно отстроить пути
-        if ($this->curent_os == "winnt")
+        if ($this->is_windows)
             $str = str_replace("/", "\\", $str);
         if (!preg_match("'^".preg_quote($root)."'i", $str, $matches))
             $str = $root.$str;
@@ -5033,7 +5037,7 @@ class kernel
     function pub_file_dir_create_script($dirFull)
     {
         $root = $this->pub_site_root_get()."/";
-        if ($this->curent_os == "winnt")
+        if ($this->is_windows)
         {
             $dirFull = str_replace("\\","/", $dirFull);
             $root = str_replace("\\","/", $root);
@@ -5291,7 +5295,7 @@ class kernel
     public function convert_path4ftp($path, $need_full = true)
     {
         $root = $this->pub_site_root_get();
-        if ($this->curent_os == "winnt")
+        if ($this->is_windows)
             $root = str_replace("\\", "/", $root);
         $root .= "/";
         $rootpos = mb_strpos($path, $root);

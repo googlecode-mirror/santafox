@@ -417,14 +417,13 @@ function form_submit_include_content(name_area)
 
 // для редактора контента, встроенного в страницу
 //+для редактора в отдельном окне в структуре
-function start_include_content(name_area)
+function start_include_content(name_area,is_separate_window)
 {
     if (!name_area)
         name_area = 'content_html';
     var config =
     {
         skin : 'moono',
-        extraPlugins : 'ajaxsave',
         autoUpdateElement:true,
         width: '100%',
         height: '100%',
@@ -459,6 +458,8 @@ function start_include_content(name_area)
             ['Maximize', 'ShowBlocks']
         ]
     };
+    if (is_separate_window)
+        config["extraPlugins"] = 'ajaxsave';
     /*убираем предыдущий instance, если есть
      var inst = CKEDITOR.instances[name_area];
      if (inst)

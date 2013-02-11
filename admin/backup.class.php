@@ -165,18 +165,17 @@ class backup
             $filename=$id;
         if ($full_path)
         {
-            $file_content = $this->give_file($full_path);
-            $file_size = filesize($full_path);
             header("Cache-control: private");
             header("Content-Type: application/zip");
-            header("Content-Size: ".$file_size);
+            header("Content-Size: ".filesize($full_path));
             header("Content-Disposition: attachment; filename=".$filename);
-            echo $file_content;
+            ob_clean();
+            flush();
+            readfile($full_path);
             die();
         }
         else
             $kernel->pub_redirect_refresh("backup&backup=backup_files");
-
     }
 
     /**
@@ -513,28 +512,6 @@ class backup
         }
         closedir($dir);
         return $array;
-    }
-
-
-    function give_file($file)
-    {
-        clearstatcache();
-        //$kernel->debug($file, true);
-        $file_resource = fopen($file, "r");
-        //$file_resource = $kernel->pub_file_open($file, "r");
-        $file_content = "";
-
-        if ($file_resource)
-        {
-            while (!feof($file_resource))
-                $file_content .= fread($file_resource, 8192);
-
-            //$kernel->pub_file_close($file_resource);
-            fclose($file_resource);
-
-            return $file_content;
-        }
-        return false;
     }
 
     /**

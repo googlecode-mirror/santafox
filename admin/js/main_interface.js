@@ -426,7 +426,6 @@ function start_include_content(name_area,is_separate_window)
         skin : 'moono',
         autoUpdateElement:true,
         width: '100%',
-        height: '100%',
         filebrowserBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',
         filebrowserImageBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=images',
         filebrowserFlashBrowseUrl : '/components/html_editor/ckeditor/plugins/kcfinder/browse.php?type=files',

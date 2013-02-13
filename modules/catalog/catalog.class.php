@@ -3266,12 +3266,13 @@ class catalog extends BaseModule
             $itemids = array();
             foreach ($vals as $itemid => $checked)
             {
-                $itemids[] = $itemid;
+                if ($checked)
+                    $itemids[] = $itemid;
             }
             switch ($kernel->pub_httppost_get("withselected"))
             {
                 case "remove_from_current":
-                    if (count($itemids))
+                    if ($itemids)
                     {
                         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
                         $kernel->runSQL($query);
@@ -3281,7 +3282,7 @@ class catalog extends BaseModule
                     $moveid = intval($kernel->pub_httppost_get("cats"));
                     if ($moveid > 0)
                     {
-                        if (count($itemids))
+                        if ($itemids)
                         {
                             $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
                             $kernel->runSQL($query);

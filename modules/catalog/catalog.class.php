@@ -3634,8 +3634,7 @@ class catalog extends BaseModule
         $vals = array();
         foreach ($cats as $cat)
         {
-            $ccb = $kernel->pub_httppost_get("ccb_".$cat['id']);
-            if (!empty($ccb) )
+            if (isset($_POST['ccb'][$cat['id']]) && $_POST['ccb'][$cat['id']])
             {//добавляем запись, только если отмечен чекбокс...
                 if (!array_key_exists($cat['id'], $item_catids))
                 {//...и товар ещё не принадлежит к категории
@@ -5017,8 +5016,9 @@ class catalog extends BaseModule
             $group = CatalogCommons::get_group($group_id);
             $item_catids = explode(",",$group['defcatids']);
         }
-        $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
-        $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+        $moduleid=$kernel->pub_module_id_get();
+        $tinfo = $kernel->db_get_table_info('_catalog_items_'.$moduleid.'_'.$group['name_db']);
+        $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$moduleid.'_items');
         $props = CatalogCommons::get_props($group['id'], true);
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
         //Строить начнём с
@@ -5172,32 +5172,74 @@ class catalog extends BaseModule
         else
             $content = str_replace('%isavalchecked%', '', $content);
         $content = str_replace("%group.name%", $group['name_full'], $content);
-        //Строим список категорий, куда входит товар
-        $cats = $this->get_child_categories(0);
-        $categories = array();
-        foreach ($cats as $cat)
+
+
+        $checkedIDs = $item_catids;
+        $checkedIDs[]=$id_cat;
+
+        $all_cats = CatalogCommons::get_all_categories($moduleid);
+        $opened_cats = array();
+        foreach($checkedIDs as $chid)
         {
-            $repl = "";
-            if (in_array($cat['id'], $item_catids) || $cat['id'] == $id_cat)
-                $repl = ' checked';
-            $catline = $this->get_template_block('category_item');
-            $catline = str_replace("%checked%", $repl                             , $catline);
-            $catline = str_replace("%id%",      $cat["id"]                        , $catline);
-            $catline = str_replace("%catname%", $cat["name"]                      , $catline);
-            $catline = str_replace("%shift%"  , str_repeat("&nbsp;&nbsp;&nbsp;",$cat['depth']), $catline);
-            $categories[] = $catline;
+            $way=$this->get_way2cat($chid,true,$all_cats);
+            foreach($way as $wel)
+            {
+                $opened_cats[$wel['id']]=true;
+            }
         }
+        $opened_cats = array_keys($opened_cats);
+        $catsblock = $this->build_item_categories_block(0,$checkedIDs,$opened_cats);
         $form_action = $kernel->pub_redirect_for_form('item_save');
         $redir2=$kernel->pub_httpget_get('redir2');
         if (!$redir2)
             $redir2='show_items';
-        $content  = str_replace('%props%'      , join("\n", $lines)     , $content);
-        $content  = str_replace('%categories%' , join("\n", $categories), $content);
-        $content  = str_replace('%form_action%', $form_action           , $content);
-        $content  = str_replace('%id%'         , $id                    , $content);
-        $content  = str_replace('%group_id%'   , $group_id              , $content);
-        $content  = str_replace('%redir2%'     , urlencode($redir2), $content);
+        $content  = str_replace('%props%', implode("\n", $lines), $content);
+        $content  = str_replace('%categories%', $catsblock, $content);
+        $content  = str_replace('%form_action%', $form_action, $content);
+        $content  = str_replace('%id%', $id, $content);
+        $content  = str_replace('%group_id%', $group_id, $content);
+        $content  = str_replace('%redir2%', urlencode($redir2), $content);
         return $content;
+    }
+
+
+    private function build_item_categories_block($pid,array $checkedIDs = array(),$opened_cats=array())
+    {
+        global $kernel;
+        $moduleid = $kernel->pub_module_id_get();
+        $prfx=$kernel->pub_prefix_get();
+        $sql = 'SELECT cats.id,cats.name, COUNT(subcats.id) AS _subcats_count FROM `'.$prfx.'_catalog_'.$moduleid.'_cats` AS cats
+                LEFT JOIN '.$prfx.'_catalog_'.$moduleid.'_cats AS subcats ON subcats.parent_id=cats.id
+                WHERE cats.`parent_id` = '.$pid.'
+                GROUP BY cats.id
+                ORDER BY cats.`order`';
+        $cats = $kernel->db_get_list($sql);
+        $categories = array();
+        foreach ($cats as $cat)
+        {
+            $opened=in_array($cat['id'],$opened_cats);
+            if ($cat['_subcats_count']==0 || $opened)
+                $bname='category_line_no_childs';
+            else
+                $bname='category_line';
+            if (in_array($cat['id'], $checkedIDs))
+                $bname.='_checked';
+
+            $catline = $this->get_template_block($bname);
+            if ($opened && $cat['_subcats_count']>0)
+            {
+                $blockstart=$this->get_template_block('subcats_block_start');
+                $blockstart = str_replace("%id%",$cat['id'],$blockstart);
+                $placeholder=$blockstart.$this->build_item_categories_block($cat['id'],$checkedIDs,$opened_cats).$this->get_template_block('subcats_block_end');
+            }
+            else
+                $placeholder='';
+            $catline = str_replace("%placeholder%", $placeholder, $catline);
+            $catline = str_replace("%id%", $cat["id"], $catline);
+            $catline = str_replace("%name%", $cat["name"], $catline);
+            $categories[] = $catline;
+        }
+        return implode("\n", $categories);
     }
 
     /**
@@ -8215,6 +8257,14 @@ class catalog extends BaseModule
         $moduleid = $kernel->pub_module_id_get();
         switch ($action)
         {
+            case 'get_item_subcats_block':
+                $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
+                $cid=intval($kernel->pub_httpget_get('cid'));
+                $catsblock = $this->build_item_categories_block($cid);
+                $blockstart = $this->get_template_block('subcats_block_start');
+                $blockstart = str_replace("%id%", $cid, $blockstart);
+                return $blockstart.$catsblock.$this->get_template_block('subcats_block_end');
+
             //ajax-поиск товаров
             case 'get_items_quicksearch_result':
                 $term=$kernel->pub_httpget_get('term',false);

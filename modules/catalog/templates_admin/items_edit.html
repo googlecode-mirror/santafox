@@ -35,16 +35,55 @@
         });
 
 
-        function confirm_need_add_big_water(btn)
-        {
-            if (btn == 'no')
-                $('#need_add_big_water').val('0');
-            else
-                $('#need_add_big_water').val('1');
-        }
+        $('#incat').on('click','li.catactive>span',function(){
+            var ccid=$(this).attr('data-id');
+            if (!ccid)
+                return;
+            $(this).parent().removeClass('catactive');
+            $(this).after('<div id="cat'+ccid+'"><img src="/admin/templates/default/images/content-loading.gif"></div>');
+            $.get('/admin/index.php?action=set_left_menu&leftmenu=get_item_subcats_block&cid='+ccid+'&itemid=%id%',function(data){
+                $('#cat'+ccid).html(data);
+            });
+        });
 
+        $('#incat').on('click','li.catactive>input, li.catinactive>input',function(){
+            if (!$(this).is(':checked'))
+                return;
+            var elem = $(this).parent().parent().parent().parent();
+            while (elem.prop("tagName")=='LI')
+            {
+                elem.find('>input:checkbox').attr('checked',true);
+                elem=elem.parent().parent().parent();
+            }
+        });
     });
+
+
+    function confirm_need_add_big_water(btn)
+    {
+        if (btn == 'no')
+            $('#need_add_big_water').val('0');
+        else
+            $('#need_add_big_water').val('1');
+    }
 </script>
+<style>
+
+    ul#itemcats li{
+        list-style: none;
+    }
+    ul#itemcats li.catactive>span{
+        cursor: pointer;
+        font-weight: bold;
+        color: #00ADDB;
+        text-decoration: underline;
+    }
+    /*
+    ul#itemcats li.catinactive span{
+        cursor: default;
+    }
+    */
+</style>
 <span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#catalog_base_name#]</span></span>
 <div id="page_container">
     <div id="content_container">
@@ -82,19 +121,20 @@
                             <span id="incat_btn">Выбрать</span>
                             <div id="incatcontainer" class="clear" style="display:none;">
                                 <div id="incat" class="incat block clear" style="margin:0 auto;">
-                                    %categories%
+
+                                    <ul id="itemcats">
+                                        %categories%
+                                    </ul>
                                 </div>
                             </div>
                             <div id="incatdialog" style="display:none;"></div>
                         </td>
                     </tr>
-
                     %props%
                 </table>
 
                 <input type="hidden" name="redir2" value="%redir2%">
                 <fieldset class="page_submit_field">
-                    <!-- <input type="submit" name="submit" value="[#catalog_item_edit_bt_save_label#]"> -->
                     <input type="button" value="[#catalog_item_edit_bt_save_label#]" onclick="santaFormSubmit('saveitemform');">
                 </fieldset>
 
@@ -106,6 +146,20 @@
     </div>
 </div>
 
+
+<!-- @subcats_block_start -->
+<div id="cat%id%"><ul>
+<!-- @subcats_block_end -->
+</ul>
+</div>
+<!-- @category_line -->
+<li class="catactive clear"><input type="checkbox" name="ccb[%id%]" id="ccb_%id%" class="fNone"><span data-id="%id%">%name%</span>%placeholder%</li>
+<!-- @category_line_checked -->
+<li class="catactive clear"><input type="checkbox" name="ccb[%id%]" id="ccb_%id%" checked class="fNone "><span data-id="%id%">%name%</span>%placeholder%</li>
+<!-- @category_line_no_childs -->
+<li class="catinactive clear"><input type="checkbox" name="ccb[%id%]" id="ccb_%id%" class="fNone"><span>%name%</span>%placeholder%</li>
+<!-- @category_line_no_childs_checked -->
+<li class="catinactive clear"><input type="checkbox" name="ccb[%id%]" id="ccb_%id%" checked class="fNone"><span>%name%</span>%placeholder%</li>
 
 <!-- @linked_no_main_prop_block -->
 [#catalog_no_main_prop_defined_label#]
@@ -224,9 +278,3 @@
 </tr>
 <!-- @prop_enum_value -->
 <option value="%enum_key%" %selected%>%enum_val%</option>
-
-<!-- @category_item -->
-<span class="block clear" style="margin:5px 0;">
-<span class="block fLeft">%shift%</span><input type="checkbox" id="ccb_%id%" class="checkbox" style="float:left; margin:0 5px 0 0;" name="ccb_%id%" %checked%><label for="ccb_%id%" style="width:auto; cursor:pointer; margin-right:0; float:left;">%catname%</label>
-<span class="block clear"></span>
-</span>

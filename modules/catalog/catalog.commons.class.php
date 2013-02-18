@@ -367,7 +367,7 @@ class CatalogCommons
     public static function get_all_categories($moduleid)
     {
     	global $kernel;
-        $dbcats = $kernel->db_get_list_simple('_catalog_'.$moduleid.'_cats', "true");
+        $dbcats = $kernel->db_get_list_simple('_catalog_'.$moduleid.'_cats', "true","id, name,parent_id");
         $cats = array();
         foreach ($dbcats as $cat)
         {

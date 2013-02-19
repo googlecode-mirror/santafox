@@ -39,13 +39,21 @@
             var ccid=$(this).attr('data-id');
             if (!ccid)
                 return;
-            $(this).parent().removeClass('catactive');
-            $(this).after('<div id="cat'+ccid+'"><img src="/admin/templates/default/images/content-loading.gif"></div>');
-            $.get('/admin/index.php?action=set_left_menu&leftmenu=get_item_subcats_block&cid='+ccid+'&itemid=%id%',function(data){
-                $('#cat'+ccid).html(data);
-            });
+            var prnt = $(this).parent();
+            //prnt.removeClass('catactive');
+            if (prnt.attr('data-loaded'))
+                $('#cat'+ccid).toggle();
+            else
+            {
+                prnt.attr('data-loaded',1);
+                $(this).after('<div id="cat'+ccid+'"><img src="/admin/templates/default/images/content-loading.gif"></div>');
+                $.get('/admin/index.php?action=set_left_menu&leftmenu=get_item_subcats_block&cid='+ccid+'&itemid=%id%',function(data){
+                    $('#cat'+ccid).html(data);
+                });
+            }
         });
 
+        //при клике на чекбокс отмечаем всех родителей до корня
         $('#incat').on('click','li.catactive>input, li.catinactive>input',function(){
             if (!$(this).is(':checked'))
                 return;

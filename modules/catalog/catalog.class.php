@@ -8261,9 +8261,7 @@ class catalog extends BaseModule
                 $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
                 $cid=intval($kernel->pub_httpget_get('cid'));
                 $catsblock = $this->build_item_categories_block($cid);
-                $blockstart = $this->get_template_block('subcats_block_start');
-                $blockstart = str_replace("%id%", $cid, $blockstart);
-                return $blockstart.$catsblock.$this->get_template_block('subcats_block_end');
+                return "<ul>".$catsblock."</ul>";
 
             //ajax-поиск товаров
             case 'get_items_quicksearch_result':

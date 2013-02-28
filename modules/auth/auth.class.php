@@ -346,7 +346,31 @@ class auth extends basemodule
                             }
                             $message = str_replace('%fields%',$aflines,$message);
                             $adminEmail=explode(",",trim($this->get_template_block('email2admin_admin_email')));
-                            $kernel->pub_mail($adminEmail, array('admin'), "mail@".$_SERVER['HTTP_HOST'], $_SERVER['HTTP_HOST'], "Новый пользователь на сайте ".$_SERVER['HTTP_HOST'], $message, 1);
+
+                            $http_host = $_SERVER['HTTP_HOST'];
+                            $mailFrom="mail@".$http_host;
+
+                            $admin_subj = $this->get_template_block('email2admin_subj');
+                            if (!$admin_subj)
+                                $admin_subj = "Новый пользователь на сайте %host%";
+                            $admin_subj = str_replace('%host%',$http_host,$admin_subj);
+                            $kernel->pub_mail($adminEmail, array('admin'), $mailFrom, $http_host, $admin_subj, $message, 1);
+
+
+                            $url = $id.md5($reg['email']);
+                            $url = "http://".$http_host."/".$kernel->pub_page_current_get().".html?regaction=confirm&code=".$url;
+
+                            $umessage = $this->get_template_block('mail');
+                            $umessage = str_replace("%url%", $url, $umessage);
+                            $umessage = str_replace("%name%", $reg['name'], $umessage);
+                            $umessage = str_replace("%host%",$_SERVER['HTTP_HOST'], $umessage);
+                            $umessage = str_replace("%email%", $reg['email'], $umessage);
+
+                            $usubj = trim($this->get_template_block('user_subj'));
+                            if (!$usubj)
+                                $usubj = "Регистрация на сайте %host%";
+                            $usubj = str_replace('%host%',$http_host,$usubj);
+                            $kernel->pub_mail(array($reg['email']), array($reg['email']), $mailFrom, $http_host, $usubj, $umessage, 1);
 
                             $html .= $this->get_template_block('follow_link');
                         }

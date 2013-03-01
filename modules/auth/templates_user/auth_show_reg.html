@@ -32,7 +32,7 @@
 <!-- @invalid_email -->
 <h2>Неправильный e-mail адрес</h2>
 <!-- @not_unique -->
-<h2>Пользователь с таким логином уже зарегистрирован. Попробуйте ввести другой.</h2>
+<h2>Пользователь с таким логином или email уже зарегистрирован. Попробуйте ввести другой.</h2>
 <!-- @follow_link -->
 <h2>На Ваш адресс отправлено письмо. Для подтверждения регистрации перейдите по ссылке, указанной в письме.</h2>
 <!-- @invalid_link -->
@@ -47,15 +47,12 @@
 <form method="POST" id="BigForm" action="?regaction=input">
 	<table cellpadding="10">
 		<tr>
-			<td width="200" align="left" valign="top" >ФИО</td>
+			<td width="200" align="left" valign="top" >Имя*</td>
 			<td align="left" valign="top"><input name="reg[name]" type="text" id="name" value="" size="50"></td>
 		</tr>
+
 		<tr>
-			<td width="200" align="left" valign="top" >Дата рождения*</td>
-			<td align="left" valign="top"><input name="reg[birthdate]" type="text" id="birthdate" value="" size="50"></td>
-		</tr>
-		<tr>
-			<td width="200" align="left" valign="top" >Телефон (с кодом города)*</td>
+			<td width="200" align="left" valign="top" >Телефон (с кодом города)</td>
 			<td align="left" valign="top"><input name="reg[phone]" type="text" id="phone" value="" size="50"></td>
 		</tr>
 		<tr>

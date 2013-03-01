@@ -324,6 +324,19 @@ class auth extends basemodule
                         $id = $kernel->pub_user_add_new($reg['login'], $reg['pass'], $reg['email'], $reg['name']);
                         if ($id > 0)
                         {
+                            //Запишем информацию о доп полях к юзеру
+                            if ($additional_fields)
+                            {
+                                $user = array();
+                                $user[$id]['name']=$reg['name'];
+                                $user[$id]['email']=$reg['email'];
+                                foreach ($additional_fields as $afk=>$afv)
+                                {
+                                    $user[$id]['fields'][$afk]=$afv;
+                                }
+                                $kernel->pub_users_info_set($user, true);
+                            }
+
                             $message=$this->get_template_block('email2admin_body');
                             $aflines='';
                             $fields2rus=array();

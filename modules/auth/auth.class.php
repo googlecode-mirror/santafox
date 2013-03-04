@@ -71,11 +71,9 @@ class auth extends basemodule
         {
             if (empty($page_cabinet))
             {
-                $page_cabinet = $kernel->pub_modul_properties_get('id_page_cabinet');
-                if (!$page_cabinet['isset'])
-                    return ("Не установлен параметр '[#auth_module_method_name1_param2_caption#]'");
-                else
-                    $page_cabinet = $page_cabinet['value'];
+                $page_cabinet = $this->get_module_prop_value('id_page_cabinet');
+                if (!$page_cabinet)
+                    return ("[#auth_error_no_param_set#] '[#auth_module_method_name1_param2_caption#]'");
             }
 
             $user_array = $kernel->pub_users_info_get($userid, false);
@@ -154,21 +152,17 @@ class auth extends basemodule
         global $kernel;
         $my_post = $kernel->pub_httppost_get();
 
-        if (empty($page_reg))
+        if (!$page_reg)
         {
-            $page_reg = $kernel->pub_modul_properties_get('id_page_registration', 'auth1');
-            if (!$page_reg['isset'])
-                return ("Не установлен параметр '[#auth_module_method_name1_param1_caption#]'");
-            else
-                $page_reg = $page_reg['value'];
+            $page_reg = $this->get_module_prop_value('id_page_registration');
+            if (!$page_reg)
+                return ("[#auth_error_no_param_set#] '[#auth_module_method_name1_param1_caption#]'");
         }
-        if (empty($page_cabinet))
+        if (!$page_cabinet)
         {
-            $page_cabinet = $kernel->pub_modul_properties_get('id_page_cabinet', 'auth1');
-            if (!$page_cabinet['isset'])
-                return ("Не установлен параметр '[#auth_module_method_name1_param2_caption#]'");
-            else
-                $page_cabinet = $page_cabinet['value'];
+            $page_cabinet = $this->get_module_prop_value('id_page_cabinet');
+            if (!$page_cabinet)
+                return ("[#auth_error_no_param_set#] '[#auth_module_method_name1_param2_caption#]'");
         }
 
         if (empty($tpl))
@@ -358,34 +352,38 @@ class auth extends basemodule
                                 $aflines.=$afline;
                             }
                             $message = str_replace('%fields%',$aflines,$message);
-                            $adminEmail=explode(",",trim($this->get_template_block('email2admin_admin_email')));
+                            $adminEmail=explode(",",$this->get_module_prop_value('admin_email_4_registration'));
 
                             $http_host = $_SERVER['HTTP_HOST'];
                             $mailFrom="mail@".$http_host;
 
-                            $admin_subj = $this->get_template_block('email2admin_subj');
+                            $admin_subj = $this->get_module_prop_value('admin_subj_4_registration');
                             if (!$admin_subj)
                                 $admin_subj = "Новый пользователь на сайте %host%";
                             $admin_subj = str_replace('%host%',$http_host,$admin_subj);
-                            $kernel->pub_mail($adminEmail, array('admin'), $mailFrom, $http_host, $admin_subj, $message, 1);
+                            $kernel->pub_mail($adminEmail, $adminEmail, $mailFrom, $http_host, $admin_subj, $message, 1);
 
 
-                            $url = $id.md5($reg['email']);
-                            $url = "http://".$http_host."/".$kernel->pub_page_current_get().".html?regaction=confirm&code=".$url;
-
-                            $umessage = $this->get_template_block('mail');
-                            $umessage = str_replace("%url%", $url, $umessage);
-                            $umessage = str_replace("%name%", $reg['name'], $umessage);
-                            $umessage = str_replace("%host%",$_SERVER['HTTP_HOST'], $umessage);
-                            $umessage = str_replace("%email%", $reg['email'], $umessage);
-
-                            $usubj = trim($this->get_template_block('user_subj'));
-                            if (!$usubj)
-                                $usubj = "Регистрация на сайте %host%";
-                            $usubj = str_replace('%host%',$http_host,$usubj);
-                            $kernel->pub_mail(array($reg['email']), array($reg['email']), $mailFrom, $http_host, $usubj, $umessage, 1);
-
-                            $html .= $this->get_template_block('follow_link');
+                            if ($this->get_module_prop_value('reg_activation_type')=='admin_manual')
+                            {
+                                $html .= $this->get_template_block('wait_for_confirm');
+                            }
+                            else
+                            {
+                                $url = $id.md5($reg['email']);
+                                $url = "http://".$http_host."/".$kernel->pub_page_current_get().".html?regaction=confirm&code=".$url;
+                                $umessage = $this->get_template_block('mail');
+                                $umessage = str_replace("%url%", $url, $umessage);
+                                $umessage = str_replace("%name%", $reg['name'], $umessage);
+                                $umessage = str_replace("%host%",$_SERVER['HTTP_HOST'], $umessage);
+                                $umessage = str_replace("%email%", $reg['email'], $umessage);
+                                $usubj = $this->get_module_prop_value('auth_user_subj4reg');
+                                if (!$usubj)
+                                    $usubj = "Регистрация на сайте %host%";
+                                $usubj = str_replace('%host%',$http_host,$usubj);
+                                $kernel->pub_mail(array($reg['email']), array($reg['email']), $mailFrom, $http_host, $usubj, $umessage, 1);
+                                $html .= $this->get_template_block('follow_link');
+                            }
                         }
                         else
                         {
@@ -440,7 +438,7 @@ class auth extends basemodule
         {
             $html=str_replace('%'.$rk.'%',htmlspecialchars($rv),$html);
         }
-        $html=preg_replace("/\\%([a-z0-9_-]{3,}+)\\%/i","", $html);
+        $html=$this->clear_left_labels($html);
         return $html;
     }
 
@@ -529,23 +527,18 @@ class auth extends basemodule
                     //Запишем информацию о доп полях к юзеру
                     if (count($additional_fields)>0)
                     {
-
                         foreach ($additional_fields as $afk=>$afv)
                         {
                             $user[$userid]['fields'][$afk]=$afv;
                         }
-
                     }
 
                     $prevUinfo=$kernel->pub_user_info_get(false);
-
-
                     $kernel->pub_users_info_set($user, true);
                     $currUinfo=$kernel->pub_user_info_get(true);
 
                     $mailbody=$this->get_template_block('email_info_changed_body');
                     $mailsubj=$this->get_template_block('email_info_changed_subject');
-
 
                     $flines='';
                     $commonFields = array(
@@ -584,7 +577,6 @@ class auth extends basemodule
                 {
                     $content = $this->get_template_block('required_fields_not_filled');
                 }
-                //--------------------
             }
             else
             {
@@ -621,7 +613,7 @@ class auth extends basemodule
                                 case 'html':
                                 case 'date':
                                 default:
-                                    $val = $id_value['value'];
+                                    $val = htmlspecialchars($id_value['value']);
                                     break;
                                 case 'image':
                                     if (empty($id_value['value']))
@@ -649,6 +641,7 @@ class auth extends basemodule
                                     break;
                             }
                             $line = str_replace("%".$id_value['name']."%", $val, $line);
+                            $line = str_replace("%caption%", $id_value['caption'], $line);
                             $content = str_replace('%'.$id_value['name'].'%',$line,$content);
                         }
                     }

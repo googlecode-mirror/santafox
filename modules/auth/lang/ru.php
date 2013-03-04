@@ -4,11 +4,6 @@ $type_langauge							= 'ru';
 $il['auth_modul_base_name'] 	= 'Авторизация';
 $il['auth_modul_base_name1']	= 'Авторизация';
 $il['auth_user_tpl']	= 'Шаблон';
-//Перевод методов
-// <id базового модуля>."_".<название метода>
-//$il['auth_module_label_propertes1'] = 'Количество возможных скидок';
-//$il['auth_module_label_propertes2'] = 'Страница корзины';
-//$il['auth_module_label_propertes3'] = '';
 $il["auth_leftmenu_caption"] = "Управ. пользователями";
 
 //работа с группами
@@ -77,10 +72,6 @@ $il['auth_module_method_name5'] = 'Напоминание пароля';
 
 $il['auth_module_method_name1_param1_caption'] = 'Страница регистрации';
 $il['auth_module_method_name1_param2_caption'] = 'Страница личного кабинета';
-//$il['auth_module_method_name4_param_caption'] = 'Страница для отображения товара';
-
-
-//$il['auth_users_form_new'] = 'Добавить пользователя';
 
 $il['auth_other'] = ': напоминание пароля';
 
@@ -139,3 +130,10 @@ $il['auth_error_adding_user_exists']  = 'Пользователь с таким 
 $il['auth_edit_user_field']  = 'Редактирование поля пользователя';
 $il['auth_user_fields_list']  = 'Список полей пользователя';
 $il['auth_no_req_field_msg']  = 'Обязательное поле не заполнено';
+$il['auth_admin_email4reg']  = 'Емейл(ы) администраторов для писем о регистрации (через запятую)';
+$il['auth_admin_subj4reg']  = 'Тема письма о регистрации администратору';
+$il['auth_user_subj4reg']  = 'Тема письма о регистрации пользователю';
+$il['auth_reg_activation_type']  = 'Активация пользователя';
+$il['auth_activation_confirmation_link']  = 'Переход по ссылке из письма';
+$il['auth_activation_admin_manual']  = 'Вручную администратором';
+$il['auth_error_no_param_set']  = 'Ошибка: Не установлен параметр ';

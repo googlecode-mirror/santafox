@@ -76,6 +76,37 @@ $param->set_id("id_page_cabinet");
 $param->set_caption("[#auth_module_method_name1_param2_caption#]");
 $install->add_modul_properties($param);
 
+//емейл(ы) админов, куда будет отсылаться письмо о регистрации
+$param = new properties_string();
+$param->set_id("admin_email_4_registration");
+$param->set_caption("[#auth_admin_email4reg#]");
+$install->add_modul_properties($param);
+
+//сабж письма о регистрации юзера для админа
+$param = new properties_string();
+$param->set_id("admin_subj_4_registration");
+$param->set_caption("[#auth_admin_subj4reg#]");
+$param->set_default('Регистрация нового пользователя на сайте %host%');
+$install->add_modul_properties($param);
+
+//сабж письма о регистрации для юзера
+$param = new properties_string();
+$param->set_id("user_subj_4_registration");
+$param->set_caption("[#auth_user_subj4reg#]");
+$param->set_default('Ваша регистрация на сайте %host%');
+$install->add_modul_properties($param);
+
+$param = new properties_select();
+$param->set_id('reg_activation_type');
+$param->set_caption('[#auth_reg_activation_type#]');
+$property->set_data(array(
+    'confirm_link' => '[#auth_activation_confirmation_link#]',
+    'admin_manual' => '[#auth_activation_admin_manual#]',
+));
+$property->set_default('confirm_link');
+
+
+
 
 //========================================================================================
 //Опишем публичные методы со всеми возможными параметрами

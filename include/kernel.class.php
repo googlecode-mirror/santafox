@@ -4091,6 +4091,7 @@ class kernel
             return 0;
         foreach ($toaddr AS $key => $email)
         {
+            $email=trim($email);
             if (!$this->pub_is_valid_email($email))
                 continue;
             try

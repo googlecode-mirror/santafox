@@ -8,10 +8,15 @@ abstract class BaseModule
      */
     public $templates = array();
 
-    public function __construct()
+    protected function get_module_prop_value($propid,$default=null)
     {
-
+        global $kernel;
+        $prop = $kernel->pub_modul_properties_get($propid);
+        if (!$prop || !$prop['isset'])
+            return $default;
+        return $prop['value'];
     }
+
 
     protected static function process_image_settings_block($block,$settings)
     {

@@ -104,11 +104,11 @@ class catalog extends BaseModule
     private $structure_cookie_name;
 
     /** @var array айдишники текущих категорий, moduleid=>catid */
-    private $current_cat_IDs=array();
+    private $current_cat_IDs = array();
 
     /**
      *  Конструктор класса модуля
-     *  @return catalog
+     * @return catalog
      */
     public function __construct()
     {
@@ -126,10 +126,10 @@ class catalog extends BaseModule
         if ($this->is_basket_inited)
             return;
 
-        $this->is_basket_inited=true;
+        $this->is_basket_inited = true;
 
         //устанавливаем уникальное имя cookie для этого экземпляра модуля
-        $this->basketid_cookie_name.= $kernel->pub_module_id_get();
+        $this->basketid_cookie_name .= $kernel->pub_module_id_get();
 
         if (isset($_COOKIE[$this->basketid_cookie_name]))
         {
@@ -141,12 +141,12 @@ class catalog extends BaseModule
             }
         }
 
-        if (isset($_REQUEST["catalog_basket_additemid"]) && !empty($_REQUEST["catalog_basket_additemid"]))//добавляем товар в корзину если надо
+        if (isset($_REQUEST["catalog_basket_additemid"]) && !empty($_REQUEST["catalog_basket_additemid"])) //добавляем товар в корзину если надо
         {
             $add_item_id = $_REQUEST["catalog_basket_additemid"];
-            if (is_array($add_item_id))//для добавления сразу группы товаров через чекбоксы
+            if (is_array($add_item_id)) //для добавления сразу группы товаров через чекбоксы
             {
-                foreach ($add_item_id as $aiid=>$aiq)
+                foreach ($add_item_id as $aiid => $aiq)
                 {
                     $this->add_basket_item(intval($aiid), $aiq);
                 }
@@ -160,19 +160,19 @@ class catalog extends BaseModule
             }
             else //один товар
             {
-                $qty=1;
+                $qty = 1;
                 if (isset($_REQUEST['qty']))
                 {
-                    $qty=intval($_REQUEST['qty']);
-                    if ($qty<1)
-                        $qty=1;
+                    $qty = intval($_REQUEST['qty']);
+                    if ($qty < 1)
+                        $qty = 1;
                 }
                 $this->add_basket_item(intval($add_item_id), $qty);
             }
             if (isset($_REQUEST['redir2']) && !empty($_REQUEST['redir2']))
             {
                 $redirURL = $_REQUEST['redir2'];
-                if (substr($redirURL,0,1)!="/")
+                if (substr($redirURL, 0, 1) != "/")
                     $redirURL = "/".$redirURL;
             }
             else
@@ -185,7 +185,7 @@ class catalog extends BaseModule
         if (!empty($param))
         {
             $qties = $kernel->pub_httppost_get("basket_item_qty");
-            foreach ($qties as $itemid=>$qty)
+            foreach ($qties as $itemid => $qty)
                 $this->update_basket_item_qty($itemid, $qty);
         }
         //+удаление из корзины
@@ -206,8 +206,8 @@ class catalog extends BaseModule
             return $this->current_basket_order;
         $new_basketsid = CatalogCommons::generate_random_string(32, true);
         $new_orderid = $this->add_basket_order($new_basketsid);
-        $this->current_basket_order = array("id"=>$new_orderid,"sessionid"=>$new_basketsid);
-        setcookie($this->basketid_cookie_name, $new_basketsid, time() + $this->basketid_cookie_days*24*60*60);
+        $this->current_basket_order = array("id" => $new_orderid, "sessionid" => $new_basketsid);
+        setcookie($this->basketid_cookie_name, $new_basketsid, time() + $this->basketid_cookie_days * 24 * 60 * 60);
         return $this->current_basket_order;
     }
 
@@ -223,11 +223,11 @@ class catalog extends BaseModule
         global $kernel;
         $itemid = $kernel->pub_httpget_get($this->frontend_param_item_id_name);
         if (!empty($itemid))
-        {//товар - используем шаблон
+        { //товар - используем шаблон
             $curr_item = $this->get_item_full_data($itemid);
             if (!$curr_item) //не нашли товар
                 return '';
-            foreach ($curr_item as $iprop=>$ival)
+            foreach ($curr_item as $iprop => $ival)
             {
                 $fields_template = str_replace("%".$iprop."%", $ival, $fields_template);
             }
@@ -238,12 +238,12 @@ class catalog extends BaseModule
             return $fields_template;
         }
         else
-        {//значит не товар, а категория
+        { //значит не товар, а категория
             $curr_cid = $this->get_current_catid(true);
-            if ($curr_cid == 0)//не нашли, попробуем категорию по-умолчанию
+            if ($curr_cid == 0) //не нашли, попробуем категорию по-умолчанию
             {
                 $curr_cid = $this->get_default_catid();
-                if ($curr_cid == 0)//не нашли
+                if ($curr_cid == 0) //не нашли
                     return '';
             }
             $curr_cat = $this->get_category($curr_cid);
@@ -267,7 +267,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $porders = $kernel->pub_httppost_get("porder");
-        foreach ($porders as $pid=>$order)
+        foreach ($porders as $pid => $order)
         {
             if (is_numeric($order))
             {
@@ -314,7 +314,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $porders = $kernel->pub_httppost_get("porder");
-        foreach ($porders as $pid=>$order)
+        foreach ($porders as $pid => $order)
         {
             if (is_numeric($order))
             {
@@ -333,12 +333,12 @@ class catalog extends BaseModule
     private function get_next_order_in_cat($cat_id)
     {
         global $kernel;
-        $query =   'SELECT `order` FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` '.
+        $query = 'SELECT `order` FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` '.
             'WHERE cat_id='.$cat_id.' ORDER BY `order` DESC LIMIT 1';
         $ret = $this->order_inc;
         $result = $kernel->runSQL($query);
         if ($row = mysql_fetch_assoc($result))
-            $ret = $row['order']+$this->order_inc;
+            $ret = $row['order'] + $this->order_inc;
         mysql_free_result($result);
         return $ret;
     }
@@ -353,8 +353,8 @@ class catalog extends BaseModule
     private function get_item_by_prop($propname, $propval)
     {
         global $kernel;
-        $res    = false;
-        $query  = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` '.
+        $res = false;
+        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` '.
             'WHERE `'.$propname.'` ="'.mysql_real_escape_string($propval).'" LIMIT 1';
         $result = $kernel->runSQL($query);
         if ($row = mysql_fetch_assoc($result))
@@ -393,26 +393,26 @@ class catalog extends BaseModule
         global $kernel;
         $csv_items = $this->parse_csv_file($file, $separator);
 
-        if (count($csv_items)==0)
-            return ;
+        if (count($csv_items) == 0)
+            return;
 
         //пропускаем первую строчку если указано
         $bypass_1st_line = $kernel->pub_httppost_get('bypass_1st_line');
         if (!empty($bypass_1st_line))
         {
             array_shift($csv_items);
-            if (count($csv_items)==0)
-                return ;
+            if (count($csv_items) == 0)
+                return;
         }
         $main_prop = $this->get_common_main_prop();
 
 
-        $order=0;
-        if ($cat_id>0)
+        $order = 0;
+        if ($cat_id > 0)
             $order = $this->get_next_order_in_cat($cat_id);
 
-        $order4newcat=0;
-        if ($cat_id4new>0)
+        $order4newcat = 0;
+        if ($cat_id4new > 0)
             $order4newcat = $this->get_next_order_in_cat($cat_id4new);
 
 
@@ -420,14 +420,14 @@ class catalog extends BaseModule
         $uniqs = $kernel->pub_httppost_get('uniq');
         if (!is_array($uniqs))
             $uniqs = array();
-        $cfields      = $kernel->pub_httppost_get('elem'); //поля для столбцов
-        $group        = CatalogCommons::get_group($group_id);
-        $group_props  = CatalogCommons::get_props2($group_id);
+        $cfields = $kernel->pub_httppost_get('elem'); //поля для столбцов
+        $group = CatalogCommons::get_group($group_id);
+        $group_props = CatalogCommons::get_props2($group_id);
         $common_props = CatalogCommons::get_props2(0);
 
         //все товары из группы, в которую готовим импорт (сначала только common-поля)
         $group_items1 = $this->get_items(0, 0, $group_id, false);
-        $group_items  = array();
+        $group_items = array();
         foreach ($group_items1 as $gi)
         {
             //теперь занесём в этот массив полную инфу о товарах
@@ -441,71 +441,71 @@ class catalog extends BaseModule
 
         foreach ($csv_items as $csv_item)
         {
-            $common_fields = array();// значения общих свойств
-            $group_fields  = array();// значения свойств группы
-            $uniq_fields   = array(); //уникальные столбцы
+            $common_fields = array(); // значения общих свойств
+            $group_fields = array(); // значения свойств группы
+            $uniq_fields = array(); //уникальные столбцы
             $linked_ids = array();
-            for ($i=0;$i<$count_columns;$i++)
-            {//цикл по столбцам
-                if ($cfields[$i]=='') //значит столбец игнорируем (выбрано "Игнорировать")
+            for ($i = 0; $i < $count_columns; $i++)
+            { //цикл по столбцам
+                if ($cfields[$i] == '') //значит столбец игнорируем (выбрано "Игнорировать")
                     continue;
-                if ($cfields[$i]=='__linked__')
-                {//поле для связей товаров
+                if ($cfields[$i] == '__linked__')
+                { //поле для связей товаров
                     $lseparator = $kernel->pub_httppost_get("separator_".$i);
                     if (!empty($lseparator))
-                    {//обрабатываем только если разделитель не пустой
+                    { //обрабатываем только если разделитель не пустой
                         $lvals = explode($lseparator, $csv_item[$i]);
                         foreach ($lvals as $lval)
                         {
                             $lval = trim($lval);
                             if (empty($lval))
                                 continue;
-                            $litem = $this->get_item_by_prop($main_prop,$lval);
+                            $litem = $this->get_item_by_prop($main_prop, $lval);
                             if ($litem)
                                 $linked_ids[] = $litem['id'];
                         }
                     }
                     continue;
                 }
-                if (mb_strpos($cfields[$i],'group0_') === false)
-                {//свойство тов. группы
-                    $fname                = $cfields[$i];
+                if (mb_strpos($cfields[$i], 'group0_') === false)
+                { //свойство тов. группы
+                    $fname = $cfields[$i];
                     if (array_key_exists($fname, $group_fields))
-                    {//значит значения надо "склеить"
+                    { //значит значения надо "склеить"
                         $group_fields[$fname] .= ' '.$csv_item[$i];
                     }
                     else
                         $group_fields[$fname] = $csv_item[$i];
                 }
                 else
-                {//значит выбрано common-свойство
+                { //значит выбрано common-свойство
                     $fname = mb_substr($cfields[$i], 7);
                     if (array_key_exists($fname, $common_fields))
-                    {//значит значения надо "склеить"
+                    { //значит значения надо "склеить"
                         $common_fields[$fname] .= ' '.$csv_item[$i];
                     }
                     else
                         $common_fields[$fname] = $csv_item[$i];
                 }
-                if (array_key_exists($i,$uniqs))//значит это поле-уникальное
+                if (array_key_exists($i, $uniqs)) //значит это поле-уникальное
                     $uniq_fields[$fname] = $csv_item[$i];
 
             }
 
             $found_item_id = $this->get_itemid_in_group($uniq_fields, $group_items);
-            if ($found_item_id >0)
-            {//update
+            if ($found_item_id > 0)
+            { //update
                 //сначала обновим таблицу товаров группы, если надо
-                if (count($group_fields)!=0)
+                if (count($group_fields) != 0)
                 {
                     $uitem = $this->get_item($found_item_id);
                     $query = 'UPDATE '.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).' SET ';
                     $grfields_keys = array_keys($group_fields);
-                    for ($j=0; $j<count($grfields_keys); $j++)
+                    for ($j = 0; $j < count($grfields_keys); $j++)
                     {
                         $grfields_key = $grfields_keys[$j];
-                        $query .= '`'.$grfields_key.'`='.$this->prepare_property_value2($group_fields[$grfields_key],$group_props[$grfields_key]['type']);
-                        if ($j != (count($grfields_keys)-1))
+                        $query .= '`'.$grfields_key.'`='.$this->prepare_property_value2($group_fields[$grfields_key], $group_props[$grfields_key]['type']);
+                        if ($j != (count($grfields_keys) - 1))
                             $query .= ', ';
                     }
                     $query .= ' WHERE `id`='.$uitem['ext_id'];
@@ -514,15 +514,15 @@ class catalog extends BaseModule
 
 
                 // теперь общую таблицу товаров если надо
-                if (count($common_fields)!=0)
+                if (count($common_fields) != 0)
                 {
                     $query = 'UPDATE '.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items SET ';
                     $comfields_keys = array_keys($common_fields);
-                    for ($j=0;$j<count($comfields_keys);$j++)
+                    for ($j = 0; $j < count($comfields_keys); $j++)
                     {
                         $comfields_key = $comfields_keys[$j];
-                        $query .= '`'.$comfields_key.'`='.$this->prepare_property_value2($common_fields[$comfields_key],$common_props[$comfields_key]['type']);
-                        if ($j != (count($comfields_keys)-1))
+                        $query .= '`'.$comfields_key.'`='.$this->prepare_property_value2($common_fields[$comfields_key], $common_props[$comfields_key]['type']);
+                        if ($j != (count($comfields_keys) - 1))
                             $query .= ', ';
                     }
                     $query .= ' WHERE `id`='.$found_item_id;
@@ -534,19 +534,19 @@ class catalog extends BaseModule
 
             }
             else
-            {//insert
+            { //insert
                 //сначала добавим в таблицу товаров группы
                 $query = 'INSERT INTO '.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).' ';
-                if (count($group_fields)==0)
+                if (count($group_fields) == 0)
                     $query .= '(`id`) VALUES (NULL)';
                 else
                 {
                     $grfields_keys = array_keys($group_fields);
-                    $query .= '(`'.implode('`,`',$grfields_keys).'`, `id`) VALUES (';
+                    $query .= '(`'.implode('`,`', $grfields_keys).'`, `id`) VALUES (';
                     foreach ($grfields_keys as $grfields_key)
                     {
                         //$query .= '`'.$grfields_key.'`='.$this->prepare_property_value2($group_fields[$grfields_key],$group_props[$grfields_key]['type']).',';
-                        $query .= $this->prepare_property_value2($group_fields[$grfields_key],$group_props[$grfields_key]['type']).',';
+                        $query .= $this->prepare_property_value2($group_fields[$grfields_key], $group_props[$grfields_key]['type']).',';
                     }
                     $query .= 'NULL)';
                 }
@@ -557,15 +557,15 @@ class catalog extends BaseModule
                 $is_available = 1;
                 // теперь в общую таблицу товаров
                 $query = 'INSERT INTO '.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items';
-                if (count($common_fields)==0)
+                if (count($common_fields) == 0)
                     $query .= '(`group_id`,`ext_id`,`available`) VALUES ('.$group_id.','.$ext_id.','.$is_available.')';
                 else
                 {
                     $comfields_keys = array_keys($common_fields);
-                    $query .= '(`'.implode('`,`',$comfields_keys).'`, `group_id`,`ext_id`,`available`) VALUES (';
+                    $query .= '(`'.implode('`,`', $comfields_keys).'`, `group_id`,`ext_id`,`available`) VALUES (';
                     foreach ($comfields_keys as $comfields_key)
                     {
-                        $query .= $this->prepare_property_value2($common_fields[$comfields_key],$common_props[$comfields_key]['type']).',';
+                        $query .= $this->prepare_property_value2($common_fields[$comfields_key], $common_props[$comfields_key]['type']).',';
                     }
                     $query .= $group_id.', '.$ext_id.', '.$is_available.')';
                 }
@@ -577,22 +577,22 @@ class catalog extends BaseModule
                     $this->add_items_link($linked_id, $comm_id);
                 }
 
-                if ($cat_id>0)
-                {//добавляем в категорию
+                if ($cat_id > 0)
+                { //добавляем в категорию
                     $query = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_item2cat` ".
                         "(`cat_id`,`item_id`,`order`) VALUES ".
                         "(".$cat_id.", ".$comm_id.", ".$order.")";
                     $kernel->runSQL($query);
-                    $order+=$this->order_inc;
+                    $order += $this->order_inc;
                 }
 
-                if ($cat_id4new>0)
-                {//если указана категория для новых, то добавим и в неё
+                if ($cat_id4new > 0)
+                { //если указана категория для новых, то добавим и в неё
                     $query = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_item2cat` ".
                         "(`cat_id`,`item_id`,`order`) VALUES ".
                         "(".$cat_id4new.", ".$comm_id.", ".$order4newcat.")";
                     $kernel->runSQL($query);
-                    $order4newcat+=$this->order_inc;
+                    $order4newcat += $this->order_inc;
                 }
             }
         }
@@ -609,7 +609,7 @@ class catalog extends BaseModule
      */
     private function get_itemid_in_group($uniq_fields, $gitems)
     {
-        if (count($uniq_fields)==0 || count($gitems)==0)
+        if (count($uniq_fields) == 0 || count($gitems) == 0)
             return 0;
         $ret = 0;
         $uniq_keys = array_keys($uniq_fields);
@@ -657,7 +657,7 @@ class catalog extends BaseModule
         $props_select = $kernel->pub_page_textlabel_replace($props_select);
         foreach ($props as $prop)
         {
-            if ($prop['type']=='file' || $prop['type']=='pict')
+            if ($prop['type'] == 'file' || $prop['type'] == 'pict')
                 continue; //эти типы не импортируются в любом случае
             $prop_select = $this->get_template_block("prop_option");
             $opt_name = $prop['name_db'];
@@ -670,7 +670,7 @@ class catalog extends BaseModule
 
         $main_prop = $this->get_common_main_prop();
         if ($main_prop)
-        {//связать с другими товарами можно только если есть "главное" свойство
+        { //связать с другими товарами можно только если есть "главное" свойство
             $prop_select = $this->get_template_block("prop_option");
             $prop_select = str_replace('%prop_name%', '__linked__', $prop_select);
             $prop_select = str_replace('%prop_name_full%', $kernel->pub_page_textlabel_replace('[#catalog_import_linked_col#]'), $prop_select);
@@ -678,13 +678,13 @@ class catalog extends BaseModule
         }
 
         $theads = '';
-        for ($i=0; $i<$elems; $i++)
+        for ($i = 0; $i < $elems; $i++)
         {
             $thead = $this->get_template_block('thead');
-            $thead = str_replace('%prop%','elem['.$i.']', $thead);
-            $thead = str_replace('%cb%','uniq['.$i.']', $thead);
-            $thead = str_replace('%id%',$i, $thead);
-            $thead = str_replace('%props%',$props_select, $thead);
+            $thead = str_replace('%prop%', 'elem['.$i.']', $thead);
+            $thead = str_replace('%cb%', 'uniq['.$i.']', $thead);
+            $thead = str_replace('%id%', $i, $thead);
+            $thead = str_replace('%props%', $props_select, $thead);
             $theads .= $thead;
         }
 
@@ -699,7 +699,7 @@ class catalog extends BaseModule
         }
         $content .= $tlines;
         $content .= $this->get_template_block('table_footer');
-        $content = str_replace('%form_action%',$kernel->pub_redirect_for_form('import_csv3'),$content);
+        $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('import_csv3'), $content);
         return $content;
     }
 
@@ -711,22 +711,22 @@ class catalog extends BaseModule
      * @param integer $limit макс. кол-во обрабатываемых строк
      * @return array
      */
-    private function parse_csv_file($file, $separator, $limit=null)
+    private function parse_csv_file($file, $separator, $limit = null)
     {
         $fc = file_get_contents($file);
         $lines = explode("\n", $fc);
 
-        $res  = array();
+        $res = array();
         $max_els = 0;
         foreach ($lines as $line)
-        {//сначала найдём макс. кол-во эл-тов в строке
+        { //сначала найдём макс. кол-во эл-тов в строке
             $lc = $this->get_real_elements_from_line($line, $separator);
-            if (count($lc)>$max_els)
+            if (count($lc) > $max_els)
                 $max_els = count($lc);
         }
         $curr = 0;
         foreach ($lines as $line)
-        {   //теперь будем "запоминать" только строки с макс. кол-вом элементов,
+        { //теперь будем "запоминать" только строки с макс. кол-вом элементов,
             //остальные - игнорировать
             $lc = $this->get_real_elements_from_line($line, $separator);
             if (count($lc) == $max_els)
@@ -734,7 +734,7 @@ class catalog extends BaseModule
                 $res[] = $lc;
                 $curr++;
             }
-            if (!is_null($limit) && $limit==$curr)
+            if (!is_null($limit) && $limit == $curr)
                 break;
         }
         return $res;
@@ -754,12 +754,12 @@ class catalog extends BaseModule
         foreach ($elems as $elem)
         {
             $elem = trim($elem);
-            if (mb_strlen($elem)==0)
+            if (mb_strlen($elem) == 0)
                 continue;
             $firstChar = mb_substr($elem, 0, 1);
             $lastChar = mb_substr($elem, -1);
-            if (($firstChar=="'" && $lastChar=="'") || ($firstChar=='"' && $lastChar=='"'))
-                $elem = mb_substr($elem, 1, mb_strlen($elem)-2);
+            if (($firstChar == "'" && $lastChar == "'") || ($firstChar == '"' && $lastChar == '"'))
+                $elem = mb_substr($elem, 1, mb_strlen($elem) - 2);
             $res[] = $elem;
         }
         return $res;
@@ -793,11 +793,11 @@ class catalog extends BaseModule
         foreach ($cats as $cat)
         {
             $option = $this->get_template_block('cat_option');
-            $option = str_replace('%cat_id%'  ,$cat['id']  ,$option);
-            $option = str_replace('%cat_name%',str_repeat($cat_shift,$cat['depth']).$cat['name'],$option);
+            $option = str_replace('%cat_id%', $cat['id'], $option);
+            $option = str_replace('%cat_name%', str_repeat($cat_shift, $cat['depth']).$cat['name'], $option);
             $options .= $option;
         }
-        $content = str_replace('%cats_options%', $options , $content);
+        $content = str_replace('%cats_options%', $options, $content);
 
         return $content;
     }
@@ -812,7 +812,7 @@ class catalog extends BaseModule
         global $kernel;
         if ($this->is_way_set)
             return;
-        $way_cat_tpl = $kernel->pub_modul_properties_get("catalog_property_way_cay_tpl",$kernel->pub_module_id_get());
+        $way_cat_tpl = $kernel->pub_modul_properties_get("catalog_property_way_cay_tpl", $kernel->pub_module_id_get());
         if (empty($way_cat_tpl) || !isset($way_cat_tpl['value']) || empty($way_cat_tpl['value']))
             $way_cat_tpl = false;
         else
@@ -821,21 +821,21 @@ class catalog extends BaseModule
         {
             foreach ($cats_way_elems as $cwe)
             {
-                if ($cwe['id']==0)
+                if ($cwe['id'] == 0)
                     continue;
-                if ($cwe['_hide_from_waysite']==1)
+                if ($cwe['_hide_from_waysite'] == 1)
                     continue;
                 $cat_label = $way_cat_tpl;
-                foreach ($cwe as $cpname=>$cpval)
+                foreach ($cwe as $cpname => $cpval)
                 {
                     $cat_label = str_replace("%".$cpname."%", $cpval, $cat_label);
                 }
-                $kernel->pub_waysite_set(array('caption'=>$cat_label,
-                        'url'=>'/'.$kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$cwe['id'])
+                $kernel->pub_waysite_set(array('caption' => $cat_label,
+                        'url' => '/'.$kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$cwe['id'])
                 );
             }
         }
-        $this->is_way_set=true;
+        $this->is_way_set = true;
     }
 
     /**
@@ -848,8 +848,8 @@ class catalog extends BaseModule
     {
         global $kernel;
         //Прежде всего инфу по товару
-        $itemid  = intval($itemid);
-        $idata   = $this->get_item_full_data($itemid);
+        $itemid = intval($itemid);
+        $idata = $this->get_item_full_data($itemid);
         if (!$idata)
             frontoffice_manager::throw_404_error();
 
@@ -865,22 +865,22 @@ class catalog extends BaseModule
 
         //Теперь ищем переменные, свойств и заменяем их
         $block = $this->process_item_props_out($idata, $props, $block, $group);
-        $moduleid=$kernel->pub_module_id_get();
+        $moduleid = $kernel->pub_module_id_get();
         $catid = $this->get_current_catid(true);
         if ($catid == 0)
-        {   // если не знаем точно текущую категорию,
+        { // если не знаем точно текущую категорию,
             //находим кратчайшую дорогу в категориях к этому товару
             $max_way = $this->get_max_catway2item($itemid);
-            if (count($max_way)>0)
+            if (count($max_way) > 0)
             {
-                $catid=$max_way[count($max_way)-1]['id'];
-                $this->current_cat_IDs[$moduleid]=$catid;
+                $catid = $max_way[count($max_way) - 1]['id'];
+                $this->current_cat_IDs[$moduleid] = $catid;
             }
         }
         else
         {
             $max_way = $this->get_way2cat($catid, true);
-            $this->current_cat_IDs[$moduleid]=$catid;
+            $this->current_cat_IDs[$moduleid] = $catid;
         }
 
         $cway = array();
@@ -890,17 +890,17 @@ class catalog extends BaseModule
         {
             if ($cat['id'] == 0)
                 continue;
-            if ($cat['id']== $catid)
+            if ($cat['id'] == $catid)
                 $cwblock = $this->get_template_block('cat_way_active');
             else
                 $cwblock = $this->get_template_block('cat_way_passive');
-            $cwblock  = str_replace('%cat_name%', $cat['name'],$cwblock);
-            $cwblock  = str_replace('%cat_link%', $kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$cat['id'],$cwblock);
+            $cwblock = str_replace('%cat_name%', $cat['name'], $cwblock);
+            $cwblock = str_replace('%cat_link%', $kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$cat['id'], $cwblock);
             $cway[] = $cwblock;
         }
 
         //+сам товар в дорогу, если у нас есть шаблон
-        $way_item_tpl = $kernel->pub_modul_properties_get("catalog_property_way_item_tpl",$moduleid);
+        $way_item_tpl = $kernel->pub_modul_properties_get("catalog_property_way_item_tpl", $moduleid);
         if (empty($way_item_tpl) || !isset($way_item_tpl['value']) || empty($way_item_tpl['value']))
             $way_item_tpl = false;
         else
@@ -909,17 +909,17 @@ class catalog extends BaseModule
         {
 
             $item_label = $way_item_tpl;
-            foreach ($idata as $ipname=>$ipval)
+            foreach ($idata as $ipname => $ipval)
             {
                 $item_label = str_replace("%".$ipname."%", $ipval, $item_label);
             }
-            $kernel->pub_waysite_set(array('caption'=>$item_label,
-                    'url'=>'/'.$kernel->pub_page_current_get().'.html?'.$this->frontend_param_item_id_name.'='.$itemid)
+            $kernel->pub_waysite_set(array('caption' => $item_label,
+                    'url' => '/'.$kernel->pub_page_current_get().'.html?'.$this->frontend_param_item_id_name.'='.$itemid)
             );
         }
 
         $cway_block = $this->get_template_block('cat_way_block');
-        $cway_block = str_replace('%cat_way%', implode($this->get_template_block('cat_way_separator'), $cway),$cway_block);
+        $cway_block = str_replace('%cat_way%', implode($this->get_template_block('cat_way_separator'), $cway), $cway_block);
 
         $block = str_replace('%cat_way_block%', $cway_block, $block);
 
@@ -930,7 +930,7 @@ class catalog extends BaseModule
             if ($lastcat)
             {
                 $last_cat_block = $this->get_template_block('last_cat_block');
-                foreach ($lastcat as $lk=>$lv)
+                foreach ($lastcat as $lk => $lv)
                 {
                     $last_cat_block = str_replace("%".$lk."%", $lv, $last_cat_block);
                 }
@@ -944,6 +944,7 @@ class catalog extends BaseModule
         $block = $this->clear_left_labels($block);
         return $block;
     }
+
     /**
      * Обрабатывает вызовы внутренних фильтров в шаблоне
      *
@@ -951,28 +952,28 @@ class catalog extends BaseModule
      * @param string $ignored stringID фильтра, который игнорируем (базовая защита от рекурсии)
      * @return string
      */
-    private function process_filters_in_template($content,$ignored=null)
+    private function process_filters_in_template($content, $ignored = null)
     {
         //обработаем фильтры, если они есть в шаблоне
         if (preg_match_all("/%show_selection_([a-z0-9_-]+)%/iU", $content, $matches))
-        {//тип 1: %show_selection_NAME%
+        { //тип 1: %show_selection_NAME%
             foreach ($matches[1] as $filterStringID)
             {
-                if ($filterStringID==$ignored)
-                    $replacement='';
+                if ($filterStringID == $ignored)
+                    $replacement = '';
                 else
-                    $replacement=$this->pub_catalog_show_inner_selection_results($filterStringID);
+                    $replacement = $this->pub_catalog_show_inner_selection_results($filterStringID);
                 $content = str_ireplace("%show_selection_".$filterStringID."%", $replacement, $content);
             }
         }
 
         if (preg_match_all("/%show_selection_([a-z0-9_-]+)\\((.+)\\)%/iU", $content, $matches, PREG_SET_ORDER))
-        {//тип 2 (с параметрами) : %show_selection_NAME(param1=value1;param2=value2)%
+        { //тип 2 (с параметрами) : %show_selection_NAME(param1=value1;param2=value2)%
             foreach ($matches as $match)
             {
-                $filterStringID=$match[1];
-                if ($filterStringID==$ignored)
-                    $replacement='';
+                $filterStringID = $match[1];
+                if ($filterStringID == $ignored)
+                    $replacement = '';
                 else
                 {
                     $paramsStr = trim($match[2]);
@@ -986,7 +987,7 @@ class catalog extends BaseModule
                         list($pname, $pvalue) = explode("=", $pstr, 2);
                         $paramsKV[trim($pname)] = trim($pvalue);
                     }
-                    $replacement=$this->pub_catalog_show_inner_selection_results($filterStringID, false, $paramsKV);
+                    $replacement = $this->pub_catalog_show_inner_selection_results($filterStringID, false, $paramsKV);
                 }
                 $content = str_ireplace("%show_selection_".$filterStringID."(".$match[2].")%", $replacement, $content);
             }
@@ -1004,8 +1005,8 @@ class catalog extends BaseModule
     private function get_group_items($group_name, $itemids)
     {
         global $kernel;
-        $query =  "SELECT * FROM `".$kernel->pub_prefix_get()."_catalog_items_".$kernel->pub_module_id_get()."_".strtolower($group_name)."` ".
-            "WHERE `id` IN (".implode(',',$itemids).")";
+        $query = "SELECT * FROM `".$kernel->pub_prefix_get()."_catalog_items_".$kernel->pub_module_id_get()."_".strtolower($group_name)."` ".
+            "WHERE `id` IN (".implode(',', $itemids).")";
         $result = $kernel->runSQL($query);
         $items = array();
         while ($row = mysql_fetch_assoc($result))
@@ -1039,7 +1040,7 @@ class catalog extends BaseModule
         if ($order_received == "true")
         {
             $block = $this->get_template_block("order_received");
-            setcookie($this->basketid_cookie_name, "", time() - $this->basketid_cookie_days*24*60*60);
+            setcookie($this->basketid_cookie_name, "", time() - $this->basketid_cookie_days * 24 * 60 * 60);
             return $block;
         }
         $bitems = $this->get_basket_items();
@@ -1051,13 +1052,13 @@ class catalog extends BaseModule
         $userid = intval($kernel->pub_user_is_registred());
         $process_order = $kernel->pub_httppost_get("process_order");
         if (!empty($process_order))
-        {//обрабатываем форму
+        { //обрабатываем форму
             $form_ok = true;
             $user_email = false;
 
             $fvalues = array();
             $fvalues_orig = array();
-            foreach ($ofields as $db_field=>$ofield)
+            foreach ($ofields as $db_field => $ofield)
             {
                 $postvar = nl2br(htmlspecialchars($kernel->pub_httppost_get($db_field, false)));
                 $fvalues_orig[$db_field] = $postvar;
@@ -1065,8 +1066,8 @@ class catalog extends BaseModule
                 if ($kernel->pub_is_valid_email($postvar))
                     $user_email = $postvar;
 
-                if (empty($postvar) && $ofield['isrequired']==1)
-                {// если поле не заполнено, но помечено как обязательное
+                if (empty($postvar) && $ofield['isrequired'] == 1)
+                { // если поле не заполнено, но помечено как обязательное
                     $msg = $this->get_template_block("required_field_not_filled");
                     $msg = str_replace("%field_name%", $ofield['name_full'], $msg);
                     $content .= $msg;
@@ -1087,18 +1088,18 @@ class catalog extends BaseModule
             //    $content .= $this->get_template_block("no_email_error");
             //else
             if ($form_ok)
-            {//если всё ок - делаем ретурн здесь, не выводим хтмл-форму
+            { //если всё ок - делаем ретурн здесь, не выводим хтмл-форму
 
                 //$block = $this->get_template_block("order_received");
                 $currOrder = $this->get_current_basket_order();
 
                 //номер заказа в сабже
                 $manager_mail_subj = str_replace("%orderid%", $currOrder['id'], $manager_mail_subj);
-                $user_mail_subj    = str_replace("%orderid%", $currOrder['id'], $user_mail_subj);
+                $user_mail_subj = str_replace("%orderid%", $currOrder['id'], $user_mail_subj);
 
                 $fvalues_orig['id'] = $fvalues['id'] = $currOrder['id'];
 
-                $from_email=$manager_email;
+                $from_email = $manager_email;
 
                 //письмо менеджеру
                 $msg_body = $this->process_basket_items_tpl($manager_mail_tpl, $bitems, $fvalues_orig);
@@ -1114,14 +1115,14 @@ class catalog extends BaseModule
 
                 //обновляем запись в БД
                 $updateSQL = "UPDATE `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_basket_orders` SET ";
-                foreach ($fvalues as $fk=>$fv)
+                foreach ($fvalues as $fk => $fv)
                 {
                     $updateSQL .= "`".$fk."`='".$fv."', ";
                 }
                 $updateSQL .= " `userid`= ".$userid.",";
-                $totalprice =floatval($this->convert_basket_sum_strings("%field_total[price]%",true));
+                $totalprice = floatval($this->convert_basket_sum_strings("%field_total[price]%", true));
                 $updateSQL .= "`totalprice`=".$totalprice.", ";
-                $updateSQL.=" `text`='".mysql_real_escape_string($this->process_basket_items_tpl(CatalogCommons::get_templates_admin_prefix()."_order_info_db.html", $bitems, $fvalues))."',";
+                $updateSQL .= " `text`='".mysql_real_escape_string($this->process_basket_items_tpl(CatalogCommons::get_templates_admin_prefix()."_order_info_db.html", $bitems, $fvalues))."',";
 
                 $updateSQL .= " `lastaccess`= '".date("Y-m-d H:i:s")."' WHERE `id`='".$currOrder['id']."'";
                 $kernel->runSQL($updateSQL);
@@ -1140,17 +1141,17 @@ class catalog extends BaseModule
         $form = $this->get_template_block("form");
         $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
         //заполним ранее введённые поля
-        foreach ($ofields as $db_field=>$ofield)
+        foreach ($ofields as $db_field => $ofield)
         {
-            $postvar = $kernel->pub_httppost_get($db_field,false);
+            $postvar = $kernel->pub_httppost_get($db_field, false);
             if ($ofield['type'] == 'enum')
             {
                 $tstr = $tinfo[$db_field]['Type'];
-                $enum_elems = explode(',',mb_substr($tstr,5, -1));
+                $enum_elems = explode(',', mb_substr($tstr, 5, -1));
                 $form = str_replace("%".$db_field."_".$postvar."_selected%", "selected", $form);
                 foreach ($enum_elems as $enum_elem)
                 {
-                    $enum_elem = mb_substr($enum_elem, 1, mb_strlen($enum_elem)-2);
+                    $enum_elem = mb_substr($enum_elem, 1, mb_strlen($enum_elem) - 2);
                     $form = str_replace("%".$db_field."_".$enum_elem."_selected%", " ", $form);
                 }
             }
@@ -1178,7 +1179,7 @@ class catalog extends BaseModule
      *
      * @return string
      */
-    private function process_basket_items_tpl($template, $basket_items, $order_fields=array())
+    private function process_basket_items_tpl($template, $basket_items, $order_fields = array())
     {
         global $kernel;
         if (empty($template) || !file_exists($template))
@@ -1210,9 +1211,9 @@ class catalog extends BaseModule
                 $odd_even = "odd";
 
             //Взяли блок строчки
-            $block  = $this->get_template_block('row_'.$odd_even);
+            $block = $this->get_template_block('row_'.$odd_even);
             if (empty($block))
-                $block  = $this->get_template_block('row');
+                $block = $this->get_template_block('row');
 
             $block = str_replace("%odd_even%", $odd_even, $block);
             $block = str_replace("%items_qty%", $basketitem["qty"], $block);
@@ -1225,10 +1226,10 @@ class catalog extends BaseModule
                     $sum = "";
                     if (isset($item[$sum_field]) && is_numeric($item[$sum_field]))
                     {
-                        if (intval($item[$sum_field])==0)
+                        if (intval($item[$sum_field]) == 0)
                             $is_zero_price = true;
                         else
-                            $sum = $basketitem['qty']*$item[$sum_field];
+                            $sum = $basketitem['qty'] * $item[$sum_field];
                     }
                     else
                         $is_zero_price = true;
@@ -1252,7 +1253,7 @@ class catalog extends BaseModule
 
         if ($order_fields)
         {
-            foreach ($order_fields as $ofield=>$ovalue)
+            foreach ($order_fields as $ofield => $ovalue)
             {
                 $content = str_replace("%".$ofield."_value%", $ovalue, $content);
             }
@@ -1266,7 +1267,7 @@ class catalog extends BaseModule
             if ($lastcat)
             {
                 $last_cat_block = $this->get_template_block('last_cat_block');
-                foreach ($lastcat as $lk=>$lv)
+                foreach ($lastcat as $lk => $lv)
                 {
                     $last_cat_block = str_replace("%".$lk."%", $lv, $last_cat_block);
                 }
@@ -1328,7 +1329,7 @@ class catalog extends BaseModule
      * @param boolean $ignore_zero_price игнорировать приставку для товаров с нулевой ценой?
      * @return integer
      */
-    private function get_basket_column_sum($column, $ignore_zero_price=false)
+    private function get_basket_column_sum($column, $ignore_zero_price = false)
     {
         global $kernel;
         $total = 0;
@@ -1337,8 +1338,8 @@ class catalog extends BaseModule
         foreach ($bitems as $bitem)
         {
             $item = $bitem['item'];
-            if (isset($item[$column]) && is_numeric($item[$column]) && intval($item[$column])>0)
-                $total += $bitem['qty']*$item[$column];
+            if (isset($item[$column]) && is_numeric($item[$column]) && intval($item[$column]) > 0)
+                $total += $bitem['qty'] * $item[$column];
             else
                 $is_zero_price_found = true;
         }
@@ -1357,7 +1358,7 @@ class catalog extends BaseModule
      * @param boolean $ignore_zero_price игнорировать приставку для товаров с нулевой ценой?
      * @return string
      */
-    private function convert_basket_sum_strings($text, $ignore_zero_price=false)
+    private function convert_basket_sum_strings($text, $ignore_zero_price = false)
     {
         $text = str_replace("%total_basket_items%", count($this->get_basket_items()), $text);
         $matches = false;
@@ -1433,7 +1434,7 @@ class catalog extends BaseModule
     private function get_basket_order_by_sid($sessionid)
     {
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_orders','`sessionid` = "'.mysql_real_escape_string($sessionid).'"',"*");
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_orders', '`sessionid` = "'.mysql_real_escape_string($sessionid).'"', "*");
     }
 
     /**
@@ -1443,7 +1444,7 @@ class catalog extends BaseModule
      * @param integer $qty кол-во, которое надо добавить
      * @return void
      */
-    private function add_basket_item($itemid, $qty=1)
+    private function add_basket_item($itemid, $qty = 1)
     {
         $qty = abs(intval($qty));
         //если товар с таким itemid уже есть в корзине
@@ -1451,12 +1452,12 @@ class catalog extends BaseModule
         $basket_item = $this->get_basket_item_by_itemid($itemid);
         if ($basket_item)
         {
-            $this->update_basket_item_qty($itemid, $basket_item['qty']+$qty);
-            return ;
+            $this->update_basket_item_qty($itemid, $basket_item['qty'] + $qty);
+            return;
         }
 
         if ($qty == 0)
-            return ; //не добавляем нулевое кол-во
+            return; //не добавляем нулевое кол-во
         global $kernel;
         $currOrder = $this->get_current_basket_order();
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` '.
@@ -1464,7 +1465,6 @@ class catalog extends BaseModule
         $kernel->runSQL($query);
         $this->update_basket_lastaccess();
     }
-
 
 
     /**
@@ -1476,7 +1476,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $currOrder = $this->get_current_basket_order();
-        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_items','`orderid` = '.$currOrder['id'].' AND `itemid`='.intval($itemid));
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_items', '`orderid` = '.$currOrder['id'].' AND `itemid`='.intval($itemid));
     }
 
     /**
@@ -1509,7 +1509,7 @@ class catalog extends BaseModule
         $arr = array();
         foreach ($bitems as $bitem)
         {
-            $bitem['item']= $this->get_item_full_data($bitem['itemid']);
+            $bitem['item'] = $this->get_item_full_data($bitem['itemid']);
             $arr[] = $bitem;
         }
         $this->current_basket_items = $arr;
@@ -1524,7 +1524,7 @@ class catalog extends BaseModule
     private function get_basket_items_fromdb($orderid)
     {
         global $kernel;
-        return $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_items',' `orderid` = '.$orderid.' ORDER BY id DESC');
+        return $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_basket_items', ' `orderid` = '.$orderid.' ORDER BY id DESC');
     }
 
     /**
@@ -1561,7 +1561,7 @@ class catalog extends BaseModule
         return str_replace("%current_page_url%", $url, $content);
     }
 
-    private function prepare_inner_filter_sql($sql, $params=array(), &$linkParams)
+    private function prepare_inner_filter_sql($sql, $params = array(), &$linkParams)
     {
         global $kernel;
         $matches = false;
@@ -1582,8 +1582,8 @@ class catalog extends BaseModule
                 if ($is_in_request)
                 {
                     if (is_array($_REQUEST[$param]))
-                    {//например группа чекбоксов с именем name[]
-                        if (count($_REQUEST[$param])==1 && !preg_match("/IN\\s+\\(([^(]*)(param".preg_quote("[".$param."]").")([^)]*)\\)/isU",$sql))
+                    { //например группа чекбоксов с именем name[]
+                        if (count($_REQUEST[$param]) == 1 && !preg_match("/IN\\s+\\(([^(]*)(param".preg_quote("[".$param."]").")([^)]*)\\)/isU", $sql))
                         {
                             $value = $_REQUEST[$param][0];
                         }
@@ -1592,7 +1592,7 @@ class catalog extends BaseModule
                             $avalues = array();
                             foreach ($_REQUEST[$param] as $aparam)
                             {
-                                $linkParams.=$param."[]=".urlencode($aparam)."&";
+                                $linkParams .= $param."[]=".urlencode($aparam)."&";
                                 $avalues[] = "'".$kernel->pub_str_prepare_set($aparam)."'";
                             }
                             $value = implode(",", $avalues);
@@ -1600,18 +1600,18 @@ class catalog extends BaseModule
                     }
                     else
                     {
-                        $linkParams.=$param."=".urlencode($_REQUEST[$param])."&";
+                        $linkParams .= $param."=".urlencode($_REQUEST[$param])."&";
                         $value = $kernel->pub_str_prepare_set($_REQUEST[$param]);
                     }
                 }
                 elseif ($is_in_params)
                 {
-                    $linkParams.=$param."=".urlencode($params[$param])."&";
+                    $linkParams .= $param."=".urlencode($params[$param])."&";
                     $pval = $params[$param];
-                    $firstChar = mb_substr($pval,0,1);
-                    $lastChar = mb_substr($pval,-1);
-                    if ( ($firstChar=='"' &&  $lastChar=='"') || ($firstChar=="'" && $lastChar=="'"))
-                        $pval = mb_substr($pval, 1, mb_strlen($pval)-2);
+                    $firstChar = mb_substr($pval, 0, 1);
+                    $lastChar = mb_substr($pval, -1);
+                    if (($firstChar == '"' && $lastChar == '"') || ($firstChar == "'" && $lastChar == "'"))
+                        $pval = mb_substr($pval, 1, mb_strlen($pval) - 2);
                     $value = $kernel->pub_str_prepare_set($pval);
                 }
                 else
@@ -1619,7 +1619,8 @@ class catalog extends BaseModule
                     if ($allow_empty_params)
                         $value = "%PARAM_NOT_SET%";
                     else
-                        return false;//$this->get_template_block('list_null');
+                        return false;
+                    //$this->get_template_block('list_null');
 
                 }
                 $sql = str_ireplace("param[".$param."]", $value, $sql);
@@ -1632,9 +1633,9 @@ class catalog extends BaseModule
                 foreach ($matches[1] as $match)
                 {
                     if (mb_strpos($match, '%PARAM_NOT_SET%') === false)
-                        $sql = str_replace('REMOVE_NOT_SET['.$match.']', " ".$match." ",$sql);
+                        $sql = str_replace('REMOVE_NOT_SET['.$match.']', " ".$match." ", $sql);
                     else
-                        $sql = str_replace('REMOVE_NOT_SET['.$match.']', " ",$sql);
+                        $sql = str_replace('REMOVE_NOT_SET['.$match.']', " ", $sql);
                 }
             }
         }
@@ -1651,7 +1652,7 @@ class catalog extends BaseModule
      * @param boolean  $need_postprocessing очищать оставшиеся метки  и выводить переменные?
      * @return string
      */
-    public function pub_catalog_show_inner_selection_results($filter_stringid, $use_group_template=false, $params=array(), $need_postprocessing=true)
+    public function pub_catalog_show_inner_selection_results($filter_stringid, $use_group_template = false, $params = array(), $need_postprocessing = true)
     {
         global $kernel;
         $filter = CatalogCommons::get_inner_filter_by_stringid($filter_stringid);
@@ -1661,7 +1662,7 @@ class catalog extends BaseModule
             $group = false;
         else
         {
-            $group =  CatalogCommons::get_group(intval($filter['groupid']));
+            $group = CatalogCommons::get_group(intval($filter['groupid']));
             if (!$group) //если мы не нашли товарную группу - запрос не получится
                 return "ERROR";
         }
@@ -1679,15 +1680,15 @@ class catalog extends BaseModule
             if (isset($_REQUEST['filterid']))
                 $linkParams .= "filterid=".$filter_stringid."&";
         }
-        $curr_cat_id=0;
-        if (strlen($filter['catids'])==0) //показываем товары из текущей - добавляем параметр с категорией
+        $curr_cat_id = 0;
+        if (strlen($filter['catids']) == 0) //показываем товары из текущей - добавляем параметр с категорией
         {
-            $curr_cat_id=$this->get_current_catIDs();
+            $curr_cat_id = $this->get_current_catIDs();
             if ($curr_cat_id)
             {
                 if (is_array($curr_cat_id))
                 {
-                    foreach($curr_cat_id as $ccid)
+                    foreach ($curr_cat_id as $ccid)
                     {
                         $linkParams .= "cid[".$ccid."]=on&";
                     }
@@ -1703,9 +1704,9 @@ class catalog extends BaseModule
 
         if (!$sql)
         {
-            $content= $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
+            $content = $this->process_filters_in_template($this->get_template_block('list_null'), $filter['stringid']);
             if ($curr_cat_id && is_numeric($curr_cat_id))
-                $content=$this->cats_props_out($curr_cat_id,$content);
+                $content = $this->cats_props_out($curr_cat_id, $content);
             return $content;
         }
         $filter['query'] = $sql;
@@ -1713,7 +1714,7 @@ class catalog extends BaseModule
 
         $query = $this->convert_inner_filter_query2sql($filter, $group);
         if (!$query)
-            return $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
+            return $this->process_filters_in_template($this->get_template_block('list_null'), $filter['stringid']);
         //обрежем и модифицируем запрос для получения общего кол-ва товаров
         $pos = mb_strpos(mb_strtolower($query), "order by");
         if ($pos === false)
@@ -1736,17 +1737,17 @@ class catalog extends BaseModule
         К примеру, если нам нужно получить ТОП-5 товаров с низкой ценой, то мы установим значение 5.
         Если значение не установлено – тогда в результат отдается все найденные товары
         */
-        if ( (!empty($filter['limit']) && intval($filter['limit'])>0)&& $total>intval($filter['limit']))
+        if ((!empty($filter['limit']) && intval($filter['limit']) > 0) && $total > intval($filter['limit']))
             $total = intval($filter['limit']);
 
         $offset = $this->get_offset_user();
-        if ($offset>=$total)
+        if ($offset >= $total)
             $offset = 0;
 
         $limit = $filter['perpage'];
 
         //добавим LIMIT к запросу и выполним его
-        if ($limit>0)
+        if ($limit > 0)
             $query .= " LIMIT ".$offset.", ".$limit;
         $items = array();
         $result = $kernel->runSQL($query);
@@ -1760,9 +1761,9 @@ class catalog extends BaseModule
 
         if ($count == 0)
         {
-            $content= $this->process_filters_in_template($this->get_template_block('list_null'),$filter['stringid']);
+            $content = $this->process_filters_in_template($this->get_template_block('list_null'), $filter['stringid']);
             if ($curr_cat_id && is_numeric($curr_cat_id))
-                $content=$this->cats_props_out($curr_cat_id,$content);
+                $content = $this->cats_props_out($curr_cat_id, $content);
             return $content;
         }
 
@@ -1785,9 +1786,9 @@ class catalog extends BaseModule
             else
                 $odd_even = "odd";
             //Взяли блок строчки
-            $block  = $this->get_template_block('row_'.$odd_even);
+            $block = $this->get_template_block('row_'.$odd_even);
             if (empty($block))
-                $block  = $this->get_template_block('row');
+                $block = $this->get_template_block('row');
             $block = str_replace("%odd_even%", $odd_even, $block);
             //Теперь ищем переменные, свойств и заменяем их
             $block = $this->process_item_props_out($item, $props, $block, $group);
@@ -1800,10 +1801,10 @@ class catalog extends BaseModule
         $content = str_replace("%row%", $rows, $content);
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$linkParams.$this->frontend_param_offset_name.'=';
-        $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$limit,$purl,intval($filter['maxpages'])), $content);
+        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $purl, intval($filter['maxpages'])), $content);
         if ($curr_cat_id && is_numeric($curr_cat_id))
-            $content=$this->cats_props_out($curr_cat_id,$content);
-        $content = $this->process_filters_in_template($content,$filter['stringid']);
+            $content = $this->cats_props_out($curr_cat_id, $content);
+        $content = $this->process_filters_in_template($content, $filter['stringid']);
         $content = $this->replace_current_page_url($content);
 
         if ($need_postprocessing)
@@ -1826,7 +1827,7 @@ class catalog extends BaseModule
      */
     private function process_variables_out($block)
     {
-        if (preg_match_all("|\\%variable\\[([a-z0-9_]+)\\]\\%|iU",$block, $matches))
+        if (preg_match_all("|\\%variable\\[([a-z0-9_]+)\\]\\%|iU", $block, $matches))
         {
             $vars = CatalogCommons::get_variables();
             foreach ($matches[1] as $var)
@@ -1834,37 +1835,37 @@ class catalog extends BaseModule
                 if (array_key_exists($var, $vars))
                 {
                     $repl = $vars[$var]['value'];
-                    if (preg_match("|^([\\d,\\.]+)$|", $repl))//для дробных числовых значений
-                        $repl = str_replace(",",".",$repl);
+                    if (preg_match("|^([\\d,\\.]+)$|", $repl)) //для дробных числовых значений
+                        $repl = str_replace(",", ".", $repl);
                 }
                 else
                     $repl = "";
                 $block = str_ireplace("%variable[".$var."]%", $repl, $block);
             }
         }
-        if (preg_match_all("|\\%date\\[(.+)\\]\\%|isU",$block, $matches, PREG_SET_ORDER))
+        if (preg_match_all("|\\%date\\[(.+)\\]\\%|isU", $block, $matches, PREG_SET_ORDER))
         {
             foreach ($matches as $match)
             {
                 $block = str_replace($match[0], date($match[1]), $block);
             }
         }
-        if (preg_match_all("|\\%nl2br\\[(.+)\\]\\%|isU",$block, $matches, PREG_SET_ORDER))
+        if (preg_match_all("|\\%nl2br\\[(.+)\\]\\%|isU", $block, $matches, PREG_SET_ORDER))
         {
             foreach ($matches as $match)
             {
                 $block = str_replace($match[0], nl2br($match[1]), $block);
             }
         }
-        if (preg_match_all("|\\%xml_cleanup\\[(.+)\\]\\%|isU",$block, $matches, PREG_SET_ORDER))
+        if (preg_match_all("|\\%xml_cleanup\\[(.+)\\]\\%|isU", $block, $matches, PREG_SET_ORDER))
         {
             foreach ($matches as $match)
             {
-                $block = str_replace($match[0], str_replace(array('"','&','>','<','\''), array('&quot;','&amp;','&gt;','&lt;','&apos;'), $match[1]), $block);
+                $block = str_replace($match[0], str_replace(array('"', '&', '>', '<', '\''), array('&quot;', '&amp;', '&gt;', '&lt;', '&apos;'), $match[1]), $block);
             }
         }
 
-        if (preg_match_all("|\\%formula\\[(.+)\\]\\%|iU",$block, $matches))
+        if (preg_match_all("|\\%formula\\[(.+)\\]\\%|iU", $block, $matches))
         {
             foreach ($matches[1] as $match)
             {
@@ -1890,7 +1891,7 @@ class catalog extends BaseModule
      * @param array $group массив тов. группы, чтобы выводить название группы
      * @return string
      */
-    private function process_item_props_out($item, $props, $block, $group=array())
+    private function process_item_props_out($item, $props, $block, $group = array())
     {
         global $kernel;
         if ($group && isset($group['name_full']))
@@ -1911,53 +1912,53 @@ class catalog extends BaseModule
             //было использовать везде. В крайнем случае это будут пустые строки, что не страшно.
 
             //Взяли блок для переменной, если его нет - то строка будет пустой
-            if (mb_strlen($value)==0)
+            if (mb_strlen($value) == 0)
                 $block = str_replace("%".$cp['name_db']."%", $this->get_template_block($cp['name_db']."_null"), $block);
             else
             {
                 $block = str_replace("%".$cp['name_db']."%", $this->get_template_block($cp['name_db']), $block);
-                switch($cp['type'])
+                switch ($cp['type'])
                 {
                     case 'number':
-                    $value = $this->cleanup_number($value);
+                        $value = $this->cleanup_number($value);
                         break;
                     case 'date':
-                    $dformat = $kernel->pub_modul_properties_get('catalog_property_date_format', $kernel->pub_module_id_get());
-                    $dformat = trim($dformat['value']);
-                    if (empty($dformat))
-                        $dformat = 'd.m.Y';
-                    $time_val = strtotime($value);
-                    $value = date($dformat, $time_val);
+                        $dformat = $kernel->pub_modul_properties_get('catalog_property_date_format', $kernel->pub_module_id_get());
+                        $dformat = trim($dformat['value']);
+                        if (empty($dformat))
+                            $dformat = 'd.m.Y';
+                        $time_val = strtotime($value);
+                        $value = date($dformat, $time_val);
                         break;
                     case 'set':
                         $vblocks = array();
-                        if(isset($this->templates['separator_'.$cp['name_db']]))
-                            $sep=$this->templates['separator_'.$cp['name_db']];
-                        elseif(isset($this->templates['item_sets_separator']))
-                            $sep=$this->templates['item_sets_separator'];
+                        if (isset($this->templates['separator_'.$cp['name_db']]))
+                            $sep = $this->templates['separator_'.$cp['name_db']];
+                        elseif (isset($this->templates['item_sets_separator']))
+                            $sep = $this->templates['item_sets_separator'];
                         else
-                            $sep="\n";
+                            $sep = "\n";
                         $set_value_tpl = $this->get_template_block($cp['name_db'].'_val');
                         if (!$set_value_tpl)
-                            $set_value_tpl='%setvalue%';
-                        foreach(explode(",",$value) as $v)
+                            $set_value_tpl = '%setvalue%';
+                        foreach (explode(",", $value) as $v)
                         {
                             $vblock = $set_value_tpl;
-                            $vblock = str_replace("%setvalue%",$v,$vblock);
-                            $vblocks[]=$vblock;
-                }
-                        $value = implode($sep,$vblocks);
+                            $vblock = str_replace("%setvalue%", $v, $vblock);
+                            $vblocks[] = $vblock;
+                        }
+                        $value = implode($sep, $vblocks);
                         break;
                 }
 
                 $block = str_replace('%'.$cp['name_db'].'_value%', $value, $block);
             }
-            $block = str_replace('%'.$cp['name_db'].'_name%' , $cp['name_full'], $block);
+            $block = str_replace('%'.$cp['name_db'].'_name%', $cp['name_full'], $block);
 
             //Здесь нужно будет обработать доп. переменные для блоков
             //И теперь, если это картинка, то нужно ещё обработать доп переменные на большое/маленькое изображение
             //и на размеры изображения
-            if ($cp['type']=='pict' && !empty($value))
+            if ($cp['type'] == 'pict' && !empty($value))
             {
                 //Сначала размеры большого изображения
                 if (file_exists($kernel->pub_site_root_get().'/'.$value))
@@ -1965,32 +1966,32 @@ class catalog extends BaseModule
                     $size = @getimagesize($value);
                     if ($size)
                     {
-                        $block = str_replace('%'.$cp['name_db'].'_width%' , $size[0], $block);
+                        $block = str_replace('%'.$cp['name_db'].'_width%', $size[0], $block);
                         $block = str_replace('%'.$cp['name_db'].'_height%', $size[1], $block);
                     }
                 }
                 //кроме этого надо добавить переменные для малого и исходного изображения
-                $path_parts  = pathinfo($value);
-                $path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
+                $path_parts = pathinfo($value);
+                $path_small = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
                 $path_source = $path_parts['dirname'].'/source/'.$path_parts['basename'];
 
                 if (file_exists($path_small))
-                {//размеры маленького изображения, если есть
+                { //размеры маленького изображения, если есть
                     $size = @getimagesize($path_small);
                     if ($size)
                     {
-                        $block = str_replace('%'.$cp['name_db'].'_small_width%' , $size[0], $block);
+                        $block = str_replace('%'.$cp['name_db'].'_small_width%', $size[0], $block);
                         $block = str_replace('%'.$cp['name_db'].'_small_height%', $size[1], $block);
                     }
                     $block = str_replace('%'.$cp['name_db'].'_small%', $path_small, $block);
                 }
 
                 if (file_exists($path_source))
-                {//размеры исходного изображения, если есть
+                { //размеры исходного изображения, если есть
                     $size = @getimagesize($path_source);
                     if ($size)
                     {
-                        $block = str_replace('%'.$cp['name_db'].'_source_width%' , $size[0], $block);
+                        $block = str_replace('%'.$cp['name_db'].'_source_width%', $size[0], $block);
                         $block = str_replace('%'.$cp['name_db'].'_source_height%', $size[1], $block);
                     }
                     $block = str_replace('%'.$cp['name_db'].'_source%', $path_source, $block);
@@ -2011,7 +2012,7 @@ class catalog extends BaseModule
             foreach ($matches[1] as $prop)
             {
                 if (isset($item[$prop]))
-                    $block = str_ireplace("%".$prop."_value%", $item[$prop],$block);
+                    $block = str_ireplace("%".$prop."_value%", $item[$prop], $block);
             }
         }
         return $block;
@@ -2021,15 +2022,15 @@ class catalog extends BaseModule
     /**
      * Публичный метод для отображения списка товаров
      *
-     * @param integer 		$limit                    товаров на страницу
-     * @param integer 		$show_cats_if_empty_items выводить ли список категорий, если нет товаров?
-     * @param string  		$cats_tpl                 файл шаблона для списка категорий
-     * @param string  		$multi_group_tpl          файл шаблона для разных групп
+     * @param integer        $limit                    товаров на страницу
+     * @param integer        $show_cats_if_empty_items выводить ли список категорий, если нет товаров?
+     * @param string        $cats_tpl                 файл шаблона для списка категорий
+     * @param string        $multi_group_tpl          файл шаблона для разных групп
      * @param integer|boolean $catid                    idшник категории (для прямого вызова)
      * @param string|boolean  $custom_template          файл шаблона (для прямого вызова)
      * @return string
      */
-    public function pub_catalog_show_items($limit, $show_cats_if_empty_items, $cats_tpl, $multi_group_tpl='', $catid=false, $custom_template=false)
+    public function pub_catalog_show_items($limit, $show_cats_if_empty_items, $cats_tpl, $multi_group_tpl = '', $catid = false, $custom_template = false)
     {
         global $kernel;
         if (!$catid)
@@ -2041,15 +2042,15 @@ class catalog extends BaseModule
         else
             $this->add_categories2waysite($this->get_way2cat($catid, true));
 
-        if (isset($_REQUEST['filterid']))//значит работаем по внешнему фильтру
+        if (isset($_REQUEST['filterid'])) //значит работаем по внешнему фильтру
             return $this->pub_catalog_show_inner_selection_results($_REQUEST['filterid'], true);
 
         if (!$catid)
         {
-            $catid  = $this->get_current_catid(true);
+            $catid = $this->get_current_catid(true);
             if ($catid == 0)
             {
-                $catid= $this->get_default_catid();
+                $catid = $this->get_default_catid();
                 if ($catid == 0)
                     $catid = $this->get_random_catid();
             }
@@ -2060,69 +2061,69 @@ class catalog extends BaseModule
         if (!$category)
             frontoffice_manager::throw_404_error();
 
-        if (!$custom_template)//remember last catid
-            setcookie($kernel->pub_module_id_get().'_last_catid', $category['id'], time() + 31*24*60*60);
+        if (!$custom_template) //remember last catid
+            setcookie($kernel->pub_module_id_get().'_last_catid', $category['id'], time() + 31 * 24 * 60 * 60);
 
         $total = $this->get_cat_items_count($catid, true);
         $offset = $this->get_offset_user();
-        if ($total==0)
-            $items=array();
+        if ($total == 0)
+            $items = array();
         else
         {
             $poupularity_sort_days = 0;
             $popprop = $kernel->pub_modul_properties_get("catalog_property_popular_days");
             if ($popprop['isset'])
                 $poupularity_sort_days = intval($popprop['value']);
-            if ($poupularity_sort_days>0)
+            if ($poupularity_sort_days > 0)
             {
-                $statConds=array();
-                $statUrlPrefix ="`uri`='/".$kernel->pub_page_current_get().".html?".$this->frontend_param_item_id_name."=";
+                $statConds = array();
+                $statUrlPrefix = "`uri`='/".$kernel->pub_page_current_get().".html?".$this->frontend_param_item_id_name."=";
                 $itemids = $this->get_cat_itemids($catid);
 
                 foreach ($itemids as $itemid)
                 {
-                    $statConds[]=$statUrlPrefix.$itemid."'";
+                    $statConds[] = $statUrlPrefix.$itemid."'";
                 }
                 $time = strtotime("-".$poupularity_sort_days." days");
-                $fromTs = mktime(0,0,0,date("m",$time),date("d", $time),date("Y", $time));
+                $fromTs = mktime(0, 0, 0, date("m", $time), date("d", $time), date("Y", $time));
                 $allitems0 = $this->get_cat_items($catid, 0, 0, true);
 
-                $skipLen = 1+strlen("/".$kernel->pub_page_current_get().".html?".$this->frontend_param_item_id_name."=");
-                $cond="`tstc`>=".$fromTs." AND (".implode(" OR ",$statConds).") GROUP BY `itemid` ORDER BY count DESC";
+                $skipLen = 1 + strlen("/".$kernel->pub_page_current_get().".html?".$this->frontend_param_item_id_name."=");
+                $cond = "`tstc`>=".$fromTs." AND (".implode(" OR ", $statConds).") GROUP BY `itemid` ORDER BY count DESC";
                 $fields = "COUNT(uri) AS count,SUBSTR(`uri`,".$skipLen.") AS itemid";
 
-                $fitems = $kernel->db_get_list_simple("_stat_uri", $cond,$fields);
+                $fitems = $kernel->db_get_list_simple("_stat_uri", $cond, $fields);
                 $farray = array();
 
-                $pos=0;
+                $pos = 0;
                 foreach ($fitems as $fitem)
                 {
-                    $farray[$fitem['itemid']]=$pos;
+                    $farray[$fitem['itemid']] = $pos;
                     $pos++;
                 }
-                $allitems=array();
+                $allitems = array();
                 $noStatItems = array();
                 foreach ($allitems0 as $aitem)
                 {
                     if (isset($farray[$aitem['id']]))
-                        $allitems[$farray[$aitem['id']]]=$aitem;
+                        $allitems[$farray[$aitem['id']]] = $aitem;
                     else
-                        $noStatItems[]=$aitem;
+                        $noStatItems[] = $aitem;
                 }
-                ksort($allitems,SORT_NUMERIC);
+                ksort($allitems, SORT_NUMERIC);
 
                 $allitems = array_merge($allitems, $noStatItems);
-                if ($limit>0)
-                    $items=array_slice($allitems, $offset, $limit);
+                if ($limit > 0)
+                    $items = array_slice($allitems, $offset, $limit);
                 else
-                    $items=$allitems;
+                    $items = $allitems;
 
             }
             else
-                $items  = $this->get_cat_items($catid, $offset, $limit, true);
+                $items = $this->get_cat_items($catid, $offset, $limit, true);
         }
 
-        $count  = count($items);
+        $count = count($items);
         if ($count == 0)
         {
             if ($show_cats_if_empty_items)
@@ -2145,13 +2146,13 @@ class catalog extends BaseModule
                     else
                         $content = $kernel->priv_page_textlabels_replace("[#catalog_show_items_list_no_items#]");
                 }
-                $content=$this->cats_props_out($category['id'],$content);
+                $content = $this->cats_props_out($category['id'], $content);
                 return $content;
             }
         }
 
         $itemids = array();
-        $groupid=0;
+        $groupid = 0;
         //проверим, принадлежат ли все товары к одной товарной группе
         //и сохраним id-шники
         $is_single_group = true;
@@ -2168,7 +2169,7 @@ class catalog extends BaseModule
                 }
             }
         }
-        $group=false;
+        $group = false;
         if ($is_single_group)
         {
             $group = CatalogCommons::get_group($groupid);
@@ -2200,9 +2201,9 @@ class catalog extends BaseModule
         else
         {
             if ($custom_template)
-            {//experimental
+            { //experimental
                 $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_user_prefix().$custom_template));
-                $props  = CatalogCommons::get_common_props($kernel->pub_module_id_get(), false);
+                $props = CatalogCommons::get_common_props($kernel->pub_module_id_get(), false);
             }
             else
             {
@@ -2223,7 +2224,7 @@ class catalog extends BaseModule
         //при этом, надо пройтись по свойствам и если там есть
         //картинки, то нужно продублировать их свойствами большого
         //и маленького изображения
-        for ($i=0; $i<count($props);$i++)
+        for ($i = 0; $i < count($props); $i++)
         {
             if (isset($props[$i]['add_param']))
                 $props[$i]['add_param'] = unserialize($props[$i]['add_param']);
@@ -2231,7 +2232,7 @@ class catalog extends BaseModule
 
 
         if ($is_single_group)
-            $groups = array($group['id']=>$group);
+            $groups = array($group['id'] => $group);
         else
             $groups = CatalogCommons::get_groups();
         //Сформируем сначала строки с товарами
@@ -2245,9 +2246,9 @@ class catalog extends BaseModule
                 $odd_even = "odd";
 
             //Взяли блок строчки
-            $block  = $this->get_template_block('row_'.$odd_even);
+            $block = $this->get_template_block('row_'.$odd_even);
             if (empty($block))
-                $block  = $this->get_template_block('row');
+                $block = $this->get_template_block('row');
 
             $block = str_replace("%odd_even%", $odd_even, $block);
             //Теперь ищем переменные, свойств и заменяем их
@@ -2261,8 +2262,8 @@ class catalog extends BaseModule
         $content = str_replace("%row%", $rows, $content);
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$catid.'&'.$this->frontend_param_offset_name.'=';
-        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit,$purl,15), $content);
-        $content=$this->cats_props_out($category['id'],$content);
+        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $purl, 15), $content);
+        $content = $this->cats_props_out($category['id'], $content);
         $content = $this->process_variables_out($content);
         $content = $this->process_filters_in_template($content);
         $content = $this->replace_current_page_url($content);
@@ -2272,7 +2273,6 @@ class catalog extends BaseModule
     }
 
 
-
     /**
      * Возвращает дорогу к категории от корня
      * @param integer $id id-шник категории
@@ -2280,7 +2280,7 @@ class catalog extends BaseModule
      * @param array $cached_cats массив всех категорий
      * @return array
      */
-    private function get_way2cat($id, $skip_root=false, $cached_cats=null)
+    private function get_way2cat($id, $skip_root = false, $cached_cats = null)
     {
         global $kernel;
         if ($id == 0)
@@ -2298,11 +2298,11 @@ class catalog extends BaseModule
             $cats[] = $cat;
             $cid = $cat['parent_id'];
         }
-        while  ($cid!=0);
+        while ($cid != 0);
 
         $depth = count($cats);
         $res = array();
-        for ($i=0;$i<count($cats);$i++)
+        for ($i = 0; $i < count($cats); $i++)
         {
             $elem = $cats[$i];
             $elem['depth'] = $depth--;
@@ -2310,7 +2310,7 @@ class catalog extends BaseModule
         }
         if (!$skip_root)
         {
-            $elem = array('depth'=>0, 'id'=>0, 'name'=>'root');
+            $elem = array('depth' => 0, 'id' => 0, 'name' => 'root');
             $res[] = $elem;
         }
         return array_reverse($res);
@@ -2328,7 +2328,7 @@ class catalog extends BaseModule
      * @return string
      * @access public
      */
-    public function pub_catalog_show_cats($template, $fromcat = 0, $fromlevel = 1, $openlevels = 1, $showlevels = 1, $items_pagename='')
+    public function pub_catalog_show_cats($template, $fromcat = 0, $fromlevel = 1, $openlevels = 1, $showlevels = 1, $items_pagename = '')
     {
         global $kernel;
 
@@ -2342,7 +2342,7 @@ class catalog extends BaseModule
 
         $parsed_template = $kernel->pub_template_parse($template);
         $this->set_templates($parsed_template);
-        $fromcat  = intval($fromcat);
+        $fromcat = intval($fromcat);
         $curr_cid = $this->get_current_catid(true);
         $cway = array();
         $need_add_way = true;
@@ -2351,26 +2351,26 @@ class catalog extends BaseModule
             $itemid = $kernel->pub_httpget_get($this->frontend_param_item_id_name);
             if (!empty($itemid))
             {
-                $cway =$this->get_max_catway2item(intval($itemid));
-                if (count($cway)>0)
+                $cway = $this->get_max_catway2item(intval($itemid));
+                if (count($cway) > 0)
                 {
-                    $curr_cid = $cway[count($cway)-1]['id'];
-                    array_unshift($cway, array('depth'=>0, 'id'=>0,'name'=>'root'));
+                    $curr_cid = $cway[count($cway) - 1]['id'];
+                    array_unshift($cway, array('depth' => 0, 'id' => 0, 'name' => 'root'));
                 }
             }
             if ($curr_cid == 0)
             {
                 $need_add_way = false;
-                $curr_cid= $this->get_default_catid();
+                $curr_cid = $this->get_default_catid();
                 if ($curr_cid == 0)
                     $curr_cid = $this->get_random_catid();
             }
         }
 
         if (empty($cway))
-            $cway  = $this->get_way2cat($curr_cid);
-        if (count($cway)>0)
-            $curr_cat = $cway[count($cway)-1];
+            $cway = $this->get_way2cat($curr_cid);
+        if (count($cway) > 0)
+            $curr_cat = $cway[count($cway) - 1];
         else
             $curr_cat = false;
         if ($need_add_way)
@@ -2380,19 +2380,20 @@ class catalog extends BaseModule
         $fromcat_depth_in_way = intval($this->is_cat_in_array($fromcat, $cway));
 
         if ($fromcat_depth_in_way >= 0)
-        {//Категория начала построения присутствует в пути
+        { //Категория начала построения присутствует в пути
             if (count($cway) < $fromcat_depth_in_way + $fromlevel)
-                return '';//пользователь не дошёл до нужной глубины - меню не нужно
+                return '';
+            //пользователь не дошёл до нужной глубины - меню не нужно
 
-            $catid = $cway[$fromcat_depth_in_way+$fromlevel-1]['id'];
-            $cats  = $this->get_child_categories2($catid, 0, array(), $showlevels, $cway, $openlevels);
+            $catid = $cway[$fromcat_depth_in_way + $fromlevel - 1]['id'];
+            $cats = $this->get_child_categories2($catid, 0, array(), $showlevels, $cway, $openlevels);
         }
         else
-        {//Категория начала построения НЕ присутствует в пути
+        { //Категория начала построения НЕ присутствует в пути
             if ($fromlevel != 1)
                 return '';
             $catid = $fromcat;
-            $cats  = $this->get_child_categories($catid, 0, array(), $showlevels);
+            $cats = $this->get_child_categories($catid, 0, array(), $showlevels);
         }
 
         $content = '';
@@ -2407,7 +2408,7 @@ class catalog extends BaseModule
             {
                 if ($prev_depth > $cat['depth'])
                 {
-                    for($pd = $prev_depth;$pd>$cat['depth'];$pd--)
+                    for ($pd = $prev_depth; $pd > $cat['depth']; $pd--)
                     {
                         $content .= $this->get_template_block_with_depth('end', $pd);
                     }
@@ -2430,14 +2431,14 @@ class catalog extends BaseModule
             if ($first)
                 $cblock = '';
             else
-                $cblock =  $this->get_template_block_with_depth('delimiter', $cat['depth']);
+                $cblock = $this->get_template_block_with_depth('delimiter', $cat['depth']);
 
             if ($curr_cid == $cat['id'])
-            {//это текущая категория
+            { //это текущая категория
                 $cblock .= $this->get_template_block_with_depth('activelink', $cat['depth']);
             }
-            elseif ($this->is_cat_in_array($cat['id'], $cway)>=0)
-            {//эта категория присутствует в пути от корня
+            elseif ($this->is_cat_in_array($cat['id'], $cway) >= 0)
+            { //эта категория присутствует в пути от корня
                 $cblock .= $this->get_template_block_with_depth('passiveactive', $cat['depth']);
             }
             else
@@ -2450,30 +2451,30 @@ class catalog extends BaseModule
                 if (isset($cat[$cat_prop['name_db']]))
                     $prop_value = $cat[$cat_prop['name_db']];
                 if (empty($prop_value))
-                    $cblock = str_replace("%".$cat_prop['name_db']."%", $this->get_template_block($cat_prop['name_db'].'_null') , $cblock);
+                    $cblock = str_replace("%".$cat_prop['name_db']."%", $this->get_template_block($cat_prop['name_db'].'_null'), $cblock);
                 else
                 {
                     $cblock = str_replace("%".$cat_prop['name_db']."%", $this->get_template_block($cat_prop['name_db']), $cblock);
                     $cblock = str_replace("%".$cat_prop['name_db']."_value%", $prop_value, $cblock);
 
-                    if ($cat_prop['type'] =='pict')
+                    if ($cat_prop['type'] == 'pict')
                     {
                         $size = @getimagesize($prop_value);
                         if ($size === false)
-                            $size = array(0=>"", 1=>"");
-                        $cblock = str_replace('%'.$cat_prop['name_db'].'_width%' , $size[0], $cblock);
+                            $size = array(0 => "", 1 => "");
+                        $cblock = str_replace('%'.$cat_prop['name_db'].'_width%', $size[0], $cblock);
                         $cblock = str_replace('%'.$cat_prop['name_db'].'_height%', $size[1], $cblock);
 
                         //кроме этого надо добавить переменные для малого и исходного изображения
-                        $path_parts  = pathinfo($prop_value);
-                        $path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
+                        $path_parts = pathinfo($prop_value);
+                        $path_small = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
                         $path_source = $path_parts['dirname'].'/source/'.$path_parts['basename'];
 
                         $cblock = str_replace('%'.$cat_prop['name_db'].'_small%', $path_small, $cblock);
                         $cblock = str_replace('%'.$cat_prop['name_db'].'_source%', $path_source, $cblock);
                     }
                 }
-                $cblock = str_replace('%'.$cat_prop['name_db'].'_name%' , $cat_prop['name_full'] , $cblock);
+                $cblock = str_replace('%'.$cat_prop['name_db'].'_name%', $cat_prop['name_full'], $cblock);
 
             }
 
@@ -2485,7 +2486,7 @@ class catalog extends BaseModule
                 foreach ($matches[1] as $prop)
                 {
                     if (isset($cat[$prop]))
-                        $cblock = str_ireplace("%".$prop."_value%", $cat[$prop],$cblock);
+                        $cblock = str_ireplace("%".$prop."_value%", $cat[$prop], $cblock);
                 }
             }
 
@@ -2501,13 +2502,13 @@ class catalog extends BaseModule
                 $this->set_templates($parsed_template);
                 $cblock = str_replace($match[0], $items_block, $cblock);
             }
-            $cblock = str_replace('%cat_items_count%',$cat['_items_count'],$cblock);
+            $cblock = str_replace('%cat_items_count%', $cat['_items_count'], $cblock);
             $content .= $cblock;
             $prev_depth = $cat['depth'];
         }
         arsort($opened_depths);
         //закроем все открытые "глубины"
-        foreach ($opened_depths as $ok=>$ov)
+        foreach ($opened_depths as $ok => $ov)
         {
             $content .= $this->get_template_block_with_depth('end', $ok);
         }
@@ -2516,7 +2517,7 @@ class catalog extends BaseModule
         {
             if (isset($curr_cat['name']))
                 $content = str_replace("%curr_category_name%", $curr_cat['name'], $content);
-            $content = $this->cats_props_out($curr_cat['id'],$content);
+            $content = $this->cats_props_out($curr_cat['id'], $content);
         }
         $content = $this->process_variables_out($content);
         //очистим оставшиеся метки
@@ -2533,7 +2534,7 @@ class catalog extends BaseModule
      */
     function cleanup_number($num)
     {
-        return preg_replace("/\\.([0]+)$/","", $num);
+        return preg_replace("/\\.([0]+)$/", "", $num);
     }
 
     /**
@@ -2543,16 +2544,16 @@ class catalog extends BaseModule
      * @param boolean  $http_only  "искать" только в хттт-параметре?
      * @return integer id-шник текущей категории
      */
-    private function get_current_catid($http_only=false)
+    private function get_current_catid($http_only = false)
     {
         global $kernel;
         $catid = intval($kernel->pub_httpget_get($this->frontend_param_cat_id_name));
         if ($http_only)
-            return ($catid<1)?0:$catid;
+            return ($catid < 1) ? 0 : $catid;
 
-        if ($catid>0)
+        if ($catid > 0)
         {
-            $kernel->pub_session_set("curr_cat_id",$catid);
+            $kernel->pub_session_set("curr_cat_id", $catid);
             return $catid;
         }
         elseif (!is_null($catid = $kernel->pub_session_get("curr_cat_id")))
@@ -2607,23 +2608,23 @@ class catalog extends BaseModule
     {
         global $kernel;
 
-        if (mb_strlen($name)==0)
+        if (mb_strlen($name) == 0)
             return 0;
 
-        if (mb_strlen($namedb)==0)
+        if (mb_strlen($namedb) == 0)
             $namedb = $name;
 
-        $namedb     = strtolower($this->translate_string2db($namedb));
+        $namedb = strtolower($this->translate_string2db($namedb));
         $list_items = $kernel->pub_httppost_get('list_items');
-        $one_items  = $kernel->pub_httppost_get('one_items');
+        $one_items = $kernel->pub_httppost_get('one_items');
 
-        if ($namedb=='items')//это название зарезервировано, т.к. используется как алиас в выборках
-            $namedb='gitems';
+        if ($namedb == 'items') //это название зарезервировано, т.к. используется как алиас в выборках
+            $namedb = 'gitems';
 
-        $n=2;
-        $namedb0=$namedb;
+        $n = 2;
+        $namedb0 = $namedb;
         while ($this->is_group_exists($namedb))
-            $namedb=$namedb0.$n++;
+            $namedb = $namedb0.$n++;
 
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_item_groups`'.
             ' (`module_id`,`name_db`,`name_full`, `template_items_list`, `template_items_one`) '.
@@ -2640,9 +2641,9 @@ class catalog extends BaseModule
         }
 
         $query = 'CREATE TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.$namedb.'` ( '
-            . ' `id` int(10) unsigned NOT NULL auto_increment, '
-            . ' PRIMARY KEY  (`id`) '
-            . ' ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT=1';
+            .' `id` int(10) unsigned NOT NULL auto_increment, '
+            .' PRIMARY KEY  (`id`) '
+            .' ) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT=1';
         $kernel->runSQL($query);
         return $id;
     }
@@ -2657,9 +2658,9 @@ class catalog extends BaseModule
      */
     private function save_group($id, $name, $namedb)
     {
-        if (mb_strlen($name)==0)
+        if (mb_strlen($name) == 0)
             return 0;
-        if (mb_strlen($namedb)==0)
+        if (mb_strlen($namedb) == 0)
             $namedb = $name;
         global $kernel;
         if ($id < 1)
@@ -2670,28 +2671,28 @@ class catalog extends BaseModule
 
         //Кроме этого, получим значение выбранных для групп шаблонов
         $list_items = $kernel->pub_httppost_get('list_items');
-        $one_items  = $kernel->pub_httppost_get('one_items');
+        $one_items = $kernel->pub_httppost_get('one_items');
 
-        $namedb   = $this->translate_string2db($namedb);
-        $namedb   = strtolower($namedb);
+        $namedb = $this->translate_string2db($namedb);
+        $namedb = strtolower($namedb);
 
 
-        $ccbs = isset($_POST['ccb'])?$_POST['ccb']:array();
+        $ccbs = isset($_POST['ccb']) ? $_POST['ccb'] : array();
 
         $catids = array();
-        foreach ($ccbs as $catid=>$value)
+        foreach ($ccbs as $catid => $value)
         {
-            if ($value==1)
+            if ($value == 1)
                 $catids[] = $catid;
         }
-        $defcatids = implode(",",$catids);
+        $defcatids = implode(",", $catids);
         if ($namedb != $group['name_db'])
-        {//изменилось БД-имя товарной группы
-            $n=1;
+        { //изменилось БД-имя товарной группы
+            $n = 1;
             while ($this->is_group_exists($namedb))
-                $namedb.=$n++;
-            if ($namedb=='items')//это название зарезервировано, т.к. используется как алиас в выборках
-                $namedb='gitems';
+                $namedb .= $n++;
+            if ($namedb == 'items') //это название зарезервировано, т.к. используется как алиас в выборках
+                $namedb = 'gitems';
             $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db'].'` '.
                 'RENAME `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.$namedb.'` ';
             $kernel->runSQL($query);
@@ -2716,11 +2717,11 @@ class catalog extends BaseModule
      * @param boolean $needDefault добавлять первое дефолтовое значение?
      * @return array массив со значениями enum
      */
-    private function get_enum_set_prop_values($str, $needDefault=true)
+    private function get_enum_set_prop_values($str, $needDefault = true)
     {
-        $str = preg_replace('~^(enum|set)~','',$str);
-        $elems = explode("','",mb_substr($str,2, -2));
-        $res   = array();
+        $str = preg_replace('~^(enum|set)~', '', $str);
+        $elems = explode("','", mb_substr($str, 2, -2));
+        $res = array();
         //Добавим сюда сразу 0-вое значение
         //при выводе оно будет пропускаться
         //и при сохранении снова же добавляться.
@@ -2728,7 +2729,7 @@ class catalog extends BaseModule
             $res[0] = 'Не выбран';
 
         foreach ($elems as $el)
-            $res[] = str_replace("''","'",stripslashes($el));
+            $res[] = str_replace("''", "'", stripslashes($el));
         $res = array_unique($res);
         return $res;
     }
@@ -2820,7 +2821,8 @@ class catalog extends BaseModule
         $list_prop_addon = "\n\n";
 
         if (isset($template['cat_way_block']) && isset($template['cat_way_separator']) &&
-            isset($template['cat_way_active']) && isset($template['cat_way_passive']))
+            isset($template['cat_way_active']) && isset($template['cat_way_passive'])
+        )
         {
             $list_prop_addon .= "<!-- @cat_way_block -->\n".$template['cat_way_block']."\n\n";
             $list_prop_addon .= "<!-- @cat_way_separator -->\n".$template['cat_way_separator']."\n\n";
@@ -2830,7 +2832,7 @@ class catalog extends BaseModule
         $prop_names_block = '';
         foreach ($props as $prop)
         {
-            if ($prop['type']=='html' && !$include_html)
+            if ($prop['type'] == 'html' && !$include_html)
                 continue;
             if (isset($template[$prop['name_db']]))
                 continue;
@@ -2855,17 +2857,17 @@ class catalog extends BaseModule
             $list_prop_addon .= $template[$prop['type'].'_null'];
 
             //Заменим в самом свойстве в строке эти переменные
-            $field = str_replace('%prop_name_full%'   , $prop['name_full']             ,$field);
-            $field = str_replace('%prop_value%'       , '%'.$prop['name_db'].'_value%' ,$field);
-            $field = str_replace('%prop%'             , '%'.$prop['name_db'].'%'       ,$field);
-            $field = str_replace('%prop_name_db%'     , $prop['name_db']       ,$field);
+            $field = str_replace('%prop_name_full%', $prop['name_full'], $field);
+            $field = str_replace('%prop_value%', '%'.$prop['name_db'].'_value%', $field);
+            $field = str_replace('%prop%', '%'.$prop['name_db'].'%', $field);
+            $field = str_replace('%prop_name_db%', $prop['name_db'], $field);
             $only_values .= "<!-- @".$prop['name_db']." -->\n".$field."\n";
 
             //И ещё заменим в доп свойствах, если они там есть
-            $list_prop_addon = str_replace('%prop_name_full%' , $prop['name_full']             , $list_prop_addon);
-            $list_prop_addon = str_replace('%prop_value%'     , '%'.$prop['name_db'].'_value%' , $list_prop_addon);
+            $list_prop_addon = str_replace('%prop_name_full%', $prop['name_full'], $list_prop_addon);
+            $list_prop_addon = str_replace('%prop_value%', '%'.$prop['name_db'].'_value%', $list_prop_addon);
         }
-        return array('only_values' => $only_values, 'addon' => $list_prop_addon, 'only_names'=>$only_names);
+        return array('only_values' => $only_values, 'addon' => $list_prop_addon, 'only_names' => $only_names);
     }
 
 
@@ -2878,7 +2880,7 @@ class catalog extends BaseModule
      * @param boolean $force требуется ли принудительное пересоздание шаблонов, даже если они были изменены
      * @return boolean
      */
-    private function regenerate_group_tpls($groupid, $for_item_card = false, $force=false)
+    private function regenerate_group_tpls($groupid, $for_item_card = false, $force = false)
     {
         global $kernel;
         if ($groupid == 0)
@@ -2891,10 +2893,10 @@ class catalog extends BaseModule
             $viewfilename = CatalogCommons::get_templates_user_prefix().$kernel->pub_module_id_get().'_'.$group['name_db'].'_list.html';
 
         $props = CatalogCommons::get_props($groupid, true);
-        $visible_props=array_keys($this->get_group_visible_props($groupid));
-        foreach($props as $k=>$prop)
+        $visible_props = array_keys($this->get_group_visible_props($groupid));
+        foreach ($props as $k => $prop)
         {
-            if ($prop['group_id']==0 && !in_array($prop['name_db'],$visible_props))
+            if ($prop['group_id'] == 0 && !in_array($prop['name_db'], $visible_props))
                 unset($props[$k]);
         }
         //Пока уберём это проверку, так как она должна будет делаться в форме, и подтвержаться там
@@ -2918,10 +2920,10 @@ class catalog extends BaseModule
         if ($for_item_card)
         {
             $viewfh .= "<!-- @item -->\n";
-            $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('item'));
+            $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'], $this->get_template_block('item'));
         }
         else
-        {//шаблон списка
+        { //шаблон списка
             $viewfh .= "<!-- @list -->\n";
             $viewfh .= $this->get_template_block('list');
             $cats_props = CatalogCommons::get_cats_props();
@@ -2941,23 +2943,22 @@ class catalog extends BaseModule
         }
 
 
-
         //Теперь собственно добавим это в результирующий шаблон
         if (!$for_item_card)
         {
             $row_odd = $this->get_template_block('row_odd');
-            $row_even= $this->get_template_block('row_even');
+            $row_even = $this->get_template_block('row_even');
             if (!empty($row_odd) && !empty($row_even))
             {
                 $viewfh .= "\n\n\n<!-- @row_odd -->\n";
-                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('row_odd'));
+                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'], $this->get_template_block('row_odd'));
                 $viewfh .= "\n\n\n<!-- @row_even -->\n";
-                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('row_even'));
+                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'], $this->get_template_block('row_even'));
             }
             else
             {
                 $viewfh .= "\n\n\n<!-- @row -->\n";
-                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'],$this->get_template_block('row'));
+                $viewfh .= str_replace('%list_prop%', $arr_prop['only_names'], $this->get_template_block('row'));
             }
 
         }
@@ -3114,13 +3115,13 @@ class catalog extends BaseModule
         {
             $val = trim($val);
             if (mb_strlen($val) == 0)
-            return 'NULL';
+                return 'NULL';
         }
-        switch($type)
+        switch ($type)
         {
             case 'number':
-                $val = str_replace(',','.',$val);
-                $val = str_replace(' ','',$val);
+                $val = str_replace(',', '.', $val);
+                $val = str_replace(' ', '', $val);
                 if (!is_numeric($val))
                     $val = 0;
                 break;
@@ -3130,14 +3131,14 @@ class catalog extends BaseModule
                 break;
             case 'set':
                 $elems = array();
-                foreach(array_keys($val) as $el)
+                foreach (array_keys($val) as $el)
                 {
-                    $elems[]=mysql_real_escape_string($el);
+                    $elems[] = mysql_real_escape_string($el);
                 }
-                $val="'".implode(",",$elems)."'";
+                $val = "'".implode(",", $elems)."'";
                 break;
             default:
-                $val='"'.$kernel->pub_str_prepare_set($val).'"';
+                $val = '"'.$kernel->pub_str_prepare_set($val).'"';
                 break;
         }
         return $val;
@@ -3158,30 +3159,30 @@ class catalog extends BaseModule
         if ($type == 'number')
         {
             //$ret = str_replace(',','.',$ret);
-            $ret = preg_replace('/[^\d\\.,]/','',$ret); //уберём всё кроме цифр, точек и запятых
+            $ret = preg_replace('/[^\d\\.,]/', '', $ret); //уберём всё кроме цифр, точек и запятых
             $pos = mb_strpos($ret, '.');
             if ($pos)
-            {//если нашлась точка, разобъём на целую и дробную части по ней
-                $part1 = mb_substr($ret,0, $pos);
-                $part2 = mb_substr($ret, $pos+1);
+            { //если нашлась точка, разобъём на целую и дробную части по ней
+                $part1 = mb_substr($ret, 0, $pos);
+                $part2 = mb_substr($ret, $pos + 1);
             }
             else
-            {//если точка не нашлась, попробуем разбить запятой
+            { //если точка не нашлась, попробуем разбить запятой
                 $pos = mb_strpos($ret, ',');
                 if ($pos)
                 {
-                    $part1 = mb_substr($ret,0, $pos);
-                    $part2 = mb_substr($ret, $pos+1);
+                    $part1 = mb_substr($ret, 0, $pos);
+                    $part2 = mb_substr($ret, $pos + 1);
                 }
                 else
-                {//не нашлась ни точка, ни запятая
+                { //не нашлась ни точка, ни запятая
                     $part1 = $ret;
                     $part2 = '0';
                 }
             }
 
-            $part1 = preg_replace('/[^\d]/','',$part1); //ещё раз уберём всё кроме цифр (,.) в обоих частях
-            $part2 = preg_replace('/[^\d]/','',$part2);
+            $part1 = preg_replace('/[^\d]/', '', $part1); //ещё раз уберём всё кроме цифр (,.) в обоих частях
+            $part2 = preg_replace('/[^\d]/', '', $part2);
             $ret = $part1.'.'.$part2;
 
             //if (!is_numeric($ret)) $ret = 0;
@@ -3201,7 +3202,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         if ($kernel->pub_httppost_get('isdefault'))
-        {//значит эта категория будет по-умолчанию, сбрасываем другую
+        { //значит эта категория будет по-умолчанию, сбрасываем другую
             $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `is_default`=0 WHERE `is_default`=1';
             $kernel->runSQL($query);
             $isdef = 1;
@@ -3209,21 +3210,21 @@ class catalog extends BaseModule
         else
             $isdef = 0;
         if ($kernel->pub_httppost_get('_hide_from_waysite'))
-            $_hide_from_waysite=1;
+            $_hide_from_waysite = 1;
         else
-            $_hide_from_waysite=0;
+            $_hide_from_waysite = 0;
 
         $props = CatalogCommons::get_cats_props();
-        $cat   = $this->get_category($id);
+        $cat = $this->get_category($id);
         $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `_hide_from_waysite`= '.$_hide_from_waysite.', ';
-        for ($i=0; $i<count($props); $i++)
+        for ($i = 0; $i < count($props); $i++)
         {
-            $prop   = $props[$i];
-            if ($prop['type']=='file' || $prop['type']=='pict')
+            $prop = $props[$i];
+            if ($prop['type'] == 'file' || $prop['type'] == 'pict')
             {
                 if (isset($_FILES[$prop['name_db']]))
                 {
-                    if ($prop['type']=='pict')
+                    if ($prop['type'] == 'pict')
                         $val = $this->process_pict_upload($_FILES[$prop['name_db']], $prop);
                     else
                         $val = $this->process_file_upload($_FILES[$prop['name_db']]);
@@ -3235,12 +3236,12 @@ class catalog extends BaseModule
             }
             else
                 $val = $kernel->pub_httppost_get($prop['name_db'], false);
-            $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val,$prop['type']).',';
+            $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val, $prop['type']).',';
         }
         $query .= ' `is_default`='.$isdef.' WHERE `id`='.$id;
         $kernel->runSQL($query);
         $this->regenerate_all_groups_tpls(false);
-        return $kernel->pub_httppost_response('[#common_saved_label#]','category_items&id='.$id);
+        return $kernel->pub_httppost_response('[#common_saved_label#]', 'category_items&id='.$id);
     }
 
     /**
@@ -3277,7 +3278,7 @@ class catalog extends BaseModule
         if (!empty($val)) //сохраняем порядок товаров?
         {
             $iorders = $kernel->pub_httppost_get("iorder");
-            foreach ($iorders as $itemid=>$order)
+            foreach ($iorders as $itemid => $order)
             {
                 if (is_numeric($order))
                 {
@@ -3289,7 +3290,7 @@ class catalog extends BaseModule
         }
 
         $val = $kernel->pub_httppost_get("saveselected");
-        if (!empty($val))// производим действие с отмеченными?
+        if (!empty($val)) // производим действие с отмеченными?
         {
             $vals = $kernel->pub_httppost_get("icb");
             $itemids = array();
@@ -3303,7 +3304,7 @@ class catalog extends BaseModule
                 case "remove_from_current":
                     if (count($itemids))
                     {
-                        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
+                        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',', $itemids).')';
                         $kernel->runSQL($query);
                     }
                     break;
@@ -3313,7 +3314,7 @@ class catalog extends BaseModule
                     {
                         if (count($itemids))
                         {
-                            $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
+                            $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',', $itemids).')';
                             $kernel->runSQL($query);
                         }
 
@@ -3377,7 +3378,7 @@ class catalog extends BaseModule
         $i = 0;
         while (file_exists($dir.$filename))
         {
-            $filename = $only_name.'_'.$i.'.'.$file_ext;//$i."_".$filename;
+            $filename = $only_name.'_'.$i.'.'.$file_ext; //$i."_".$filename;
             $i++;
         }
 
@@ -3419,15 +3420,15 @@ class catalog extends BaseModule
         if ($prop['add_param']['big']['isset'])
         {
             $big = array(
-                'width'  => $prop['add_param']['big']['width'],
+                'width' => $prop['add_param']['big']['width'],
                 'height' => $prop['add_param']['big']['height']
             );
         }
         //Параметры водяной марки для большого изображения...
         $watermark_image_big = 0;
-        $_tmp                = $prop['add_param']['big'];
-        $_tmp['water_path']  = $kernel->priv_file_full_patch($_tmp['water_path']);
-        $_is_add 			 = $kernel->pub_httppost_get($prop['name_db'].'_need_add_big_water');
+        $_tmp = $prop['add_param']['big'];
+        $_tmp['water_path'] = $kernel->priv_file_full_patch($_tmp['water_path']);
+        $_is_add = $kernel->pub_httppost_get($prop['name_db'].'_need_add_big_water');
 
         if (isset($_tmp['water_add']) &&
             //(file_exists($_tmp['water_path'])) &&
@@ -3436,7 +3437,7 @@ class catalog extends BaseModule
         )
         {
             $watermark_image_big = array(
-                'path' =>  $_tmp['water_path'],
+                'path' => $_tmp['water_path'],
                 'place' => $_tmp['water_position'],
                 'transparency' => 25 //@todo use field settings
             );
@@ -3446,17 +3447,17 @@ class catalog extends BaseModule
         $source_res = 0;
         if ($prop['add_param']['source']['isset'])
         {
-            $source_res  = array(
-                'width'  => $prop['add_param']['source']['width'],
+            $source_res = array(
+                'width' => $prop['add_param']['source']['width'],
                 'height' => $prop['add_param']['source']['height']
             );
         }
 
         //... может и знак надо к нему добавить
         $watermark_image_source = 0;
-        $_tmp                  = $prop['add_param']['source'];
-        $_tmp['water_path']    = $kernel->priv_file_full_patch($_tmp['water_path']);
-        $_is_add 			   = $kernel->pub_httppost_get($prop['name_db'].'_need_add_source_water');
+        $_tmp = $prop['add_param']['source'];
+        $_tmp['water_path'] = $kernel->priv_file_full_patch($_tmp['water_path']);
+        $_is_add = $kernel->pub_httppost_get($prop['name_db'].'_need_add_source_water');
 
         if (isset($_tmp['water_add']) &&
             file_exists($_tmp['water_path']) &&
@@ -3464,9 +3465,9 @@ class catalog extends BaseModule
         )
         {
             $watermark_image_source = array(
-                'path'  => $_tmp['water_path'],
+                'path' => $_tmp['water_path'],
                 'place' => $_tmp['water_position'],
-                'transparency' => 25//@todo use field settings
+                'transparency' => 25 //@todo use field settings
             );
         }
 
@@ -3475,20 +3476,20 @@ class catalog extends BaseModule
         if ($prop['add_param']['small']['isset'])
         {
             $thumb = array(
-                'width'  => $prop['add_param']['small']['width'],
+                'width' => $prop['add_param']['small']['width'],
                 'height' => $prop['add_param']['small']['height']
             );
         }
 
         //Задаём путь для сохранения обработанных изображений.
         //такой путь должен существовать
-        $path_to_save   = 'content/files/'.$kernel->pub_module_id_get();
+        $path_to_save = 'content/files/'.$kernel->pub_module_id_get();
         $path_to_create = $kernel->pub_module_id_get();
 
         if (!empty($prop['add_param']['pict_path']))
         {
             $path_to_create .= "/".$prop['add_param']['pict_path'];
-            $path_to_save   .= "/".$prop['add_param']['pict_path'];
+            $path_to_save .= "/".$prop['add_param']['pict_path'];
         }
 
         //Теперь вызовим созданий директорий, что бы они точно были
@@ -3511,17 +3512,17 @@ class catalog extends BaseModule
         $kv = $_POST['iv'];
         if (!is_array($kv))
             return;
-        foreach ($kv as $itemid=>$idata)
+        foreach ($kv as $itemid => $idata)
         {
             $udata = array();
-            foreach ($idata as $k=>$v)
+            foreach ($idata as $k => $v)
             {
                 if (empty($v))
-                    $udata[]= "`".$k."`=NULL";
+                    $udata[] = "`".$k."`=NULL";
                 else
-                    $udata[]= "`".$k."`='".mysql_real_escape_string($v)."'";
+                    $udata[] = "`".$k."`='".mysql_real_escape_string($v)."'";
             }
-            $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` SET '.implode(",",$udata).' WHERE id='.$itemid;
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` SET '.implode(",", $udata).' WHERE id='.$itemid;
             $kernel->runSQL($query);
         }
     }
@@ -3546,11 +3547,11 @@ class catalog extends BaseModule
                 $this->delete_items($itemids);
                 break;
             default: //добавление в категорию, параметр- айдишник категории
-                if (count($itemids)>0)
+                if (count($itemids) > 0)
                 {
                     $cat_itemids = $this->get_cat_itemids($action);
                     $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` (`item_id`, `cat_id`, `order`) VALUES ';
-                    $vals  = array();
+                    $vals = array();
                     $order = $this->get_next_order_in_cat($action);
                     foreach ($itemids as $itemid)
                     {
@@ -3559,7 +3560,7 @@ class catalog extends BaseModule
                         $vals[] = ' ('.$itemid.','.$action.', '.$order.')';
                         $order += $this->order_inc;
                     }
-                    if (count($vals)>0)
+                    if (count($vals) > 0)
                     {
                         $query .= implode(',', $vals);
                         $kernel->runSQL($query);
@@ -3582,25 +3583,25 @@ class catalog extends BaseModule
         //а потом вызовем стандартную функцию сохранения
         if (intval($itemid) == 0)
         {
-            $itemid  = $this->add_item();
+            $itemid = $this->add_item();
             if (!$itemid)
-                return $kernel->pub_httppost_errore('[#interface_global_label_error#]',true);
+                return $kernel->pub_httppost_errore('[#interface_global_label_error#]', true);
         }
-        $item  = $this->get_item_full_data($itemid);
+        $item = $this->get_item_full_data($itemid);
 
-        $moduleid=$kernel->pub_module_id_get();
-        $main_prop=$this->get_common_main_prop();
+        $moduleid = $kernel->pub_module_id_get();
+        $main_prop = $this->get_common_main_prop();
         //сначала сохраним common-свойства
-        $props  = CatalogCommons::get_common_props($kernel->pub_module_id_get());
+        $props = CatalogCommons::get_common_props($kernel->pub_module_id_get());
         $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items` SET ';
-        for ($i=0; $i<count($props); $i++)
+        for ($i = 0; $i < count($props); $i++)
         {
-            $prop   = $props[$i];
-            if ($prop['type']=='file' || $prop['type']=='pict')
+            $prop = $props[$i];
+            if ($prop['type'] == 'file' || $prop['type'] == 'pict')
             {
                 if (isset($_FILES[$prop['name_db']]))
                 {
-                    if ($prop['type']=='pict')
+                    if ($prop['type'] == 'pict')
                         $val = $this->process_pict_upload($_FILES[$prop['name_db']], $prop);
                     else
                         $val = $this->process_file_upload($_FILES[$prop['name_db']]);
@@ -3612,17 +3613,17 @@ class catalog extends BaseModule
             }
             else
                 $val = $kernel->pub_httppost_get($prop['name_db'], false);
-            if ($val && $main_prop==$prop['name_db'])
+            if ($val && $main_prop == $prop['name_db'])
             {
-                $exrec=$kernel->db_get_record_simple("_catalog_".$moduleid."_items","`".$prop['name_db']."`='".mysql_real_escape_string($val)."'","id");
-                if ($exrec && $exrec['id']!=$itemid)
+                $exrec = $kernel->db_get_record_simple("_catalog_".$moduleid."_items", "`".$prop['name_db']."`='".mysql_real_escape_string($val)."'", "id");
+                if ($exrec && $exrec['id'] != $itemid)
                 {
-                    $msg=$kernel->pub_page_textlabel_replace('[#catalog_not_uniq_main_prop_save#]');
-                    $msg = str_replace('%fieldname%',$prop['name_full'],$msg);
-                    return $kernel->pub_httppost_errore($msg,true);
+                    $msg = $kernel->pub_page_textlabel_replace('[#catalog_not_uniq_main_prop_save#]');
+                    $msg = str_replace('%fieldname%', $prop['name_full'], $msg);
+                    return $kernel->pub_httppost_errore($msg, true);
                 }
             }
-            $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val,$prop['type']).',';
+            $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val, $prop['type']).',';
         }
         $aval = $kernel->pub_httppost_get("available");
         if (empty($aval))
@@ -3634,20 +3635,20 @@ class catalog extends BaseModule
 
         //теперь custom-свойства этой товарной группы
         //если они есть у этой товарной группы
-        $props = CatalogCommons::get_props($item['group_id'],false);
+        $props = CatalogCommons::get_props($item['group_id'], false);
         $group = CatalogCommons::get_group($item['group_id']);
 
         if (count($props) > 0)
         {
             $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_items_'.$moduleid.'_'.strtolower($group['name_db']).'` SET ';
-            for ($i=0; $i<count($props); $i++)
+            for ($i = 0; $i < count($props); $i++)
             {
-                $prop   = $props[$i];
-                if ($prop['type']=='file' || $prop['type']=='pict')
+                $prop = $props[$i];
+                if ($prop['type'] == 'file' || $prop['type'] == 'pict')
                 {
                     if (isset($_FILES[$prop['name_db']]))
                     {
-                        if ($prop['type']=='pict')
+                        if ($prop['type'] == 'pict')
                             $val = $this->process_pict_upload($_FILES[$prop['name_db']], $prop);
                         else
                             $val = $this->process_file_upload($_FILES[$prop['name_db']]);
@@ -3659,9 +3660,9 @@ class catalog extends BaseModule
                 }
                 else
                     $val = $kernel->pub_httppost_get($prop['name_db'], false);
-                $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val,$prop['type']);
+                $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val, $prop['type']);
 
-                if ($i != count($props)-1)
+                if ($i != count($props) - 1)
                     $query .= ',';
             }
             $query .= ' WHERE `id`='.$item['ext_id'];
@@ -3676,30 +3677,30 @@ class catalog extends BaseModule
         foreach ($cats as $cat)
         {
             $ccb = $kernel->pub_httppost_get("ccb_".$cat['id']);
-            if (!empty($ccb) )
-            {//добавляем запись, только если отмечен чекбокс...
+            if (!empty($ccb))
+            { //добавляем запись, только если отмечен чекбокс...
                 if (!array_key_exists($cat['id'], $item_catids))
-                {//...и товар ещё не принадлежит к категории
-                    $order  = $this->get_next_order_in_cat($cat['id']);
+                { //...и товар ещё не принадлежит к категории
+                    $order = $this->get_next_order_in_cat($cat['id']);
                     $vals[] = ' ('.$itemid.','.$cat['id'].', '.$order.')';
                 }
             }
             else
-            {//чекбокс не отмечен
+            { //чекбокс не отмечен
                 if (array_key_exists($cat['id'], $item_catids))
-                {//товар был в категории, но чекбокс снят - удалим
+                { //товар был в категории, но чекбокс снят - удалим
                     $del_q = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_item2cat`
                               WHERE  `item_id`='.$itemid.' AND `cat_id`='.$cat['id'];
                     $kernel->runSQL($del_q);
                 }
             }
         }
-        if (count($vals)>0)
+        if (count($vals) > 0)
         {
             $query .= implode(',', $vals);
             $kernel->runSQL($query);
         }
-        return $kernel->pub_httppost_response('[#common_saved_label#]',$kernel->pub_httppost_get('redir2'));
+        return $kernel->pub_httppost_response('[#common_saved_label#]', $kernel->pub_httppost_get('redir2'));
     }
 
 
@@ -3721,7 +3722,7 @@ class catalog extends BaseModule
             ' (`id`) VALUES (NULL)';
         $kernel->runSQL($query);
         $ext_id = mysql_insert_id();
-        $query  = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` '.
+        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` '.
             '(`ext_id`,`group_id`) VALUES '.
             '('.$ext_id.','.$groupid.')';
         $kernel->runSQL($query);
@@ -3743,7 +3744,7 @@ class catalog extends BaseModule
     private function save_prop($pid, $name_full, $name_db, $cb_inlist, $sort, $cb_ismain)
     {
         global $kernel;
-        $prop     = $this->get_prop($pid);
+        $prop = $this->get_prop($pid);
 
         if (empty($cb_inlist))
             $inlist = 0;
@@ -3755,16 +3756,16 @@ class catalog extends BaseModule
             $ismain = 1;
 
         $name_db = $this->translate_string2db($name_db);
-        $moduleid=$kernel->pub_module_id_get();
+        $moduleid = $kernel->pub_module_id_get();
         //изменилось ли БД-имя?
         if ($name_db != $prop['name_db'])
         {
-            $n=1;
+            $n = 1;
             while ($this->is_prop_exists($prop['group_id'], $name_db) || $this->is_prop_exists(0, $name_db))
                 $name_db .= $n++;
             $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `name_db`="'.$name_db.'" WHERE `id`='.$pid;
             $kernel->runSQL($query);
-            if ($prop['group_id']>0)
+            if ($prop['group_id'] > 0)
             {
                 $group = CatalogCommons::get_group($prop['group_id']);
                 $table = '_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']);
@@ -3795,13 +3796,13 @@ class catalog extends BaseModule
         if ($name_full != $prop['name_full'] || $inlist != $prop['showinlist'] || $sort != $prop['sorted'] || $ismain != $prop['ismain'])
         {
             if ($sort > 0)
-            {//сбросим `sorted` для остальных полей
-                $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0 AND `module_id`="'.$moduleid.'"';
+            { //сбросим `sorted` для остальных полей
+                $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0 AND `module_id`="'.$moduleid.'"';
                 $kernel->runSQL($query);
             }
             if ($ismain == 1)
-            {//сбросим `ismain` для остальных полей
-                $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0 AND `module_id`="'.$moduleid.'"';
+            { //сбросим `ismain` для остальных полей
+                $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0 AND `module_id`="'.$moduleid.'"';
                 $kernel->runSQL($query);
             }
 
@@ -3826,22 +3827,22 @@ class catalog extends BaseModule
             else
                 $prop['add_param']['source']['isset'] = false;
 
-            $prop['add_param']['source']['width']          = intval($kernel->pub_httppost_get('pict_source_width'));
-            $prop['add_param']['source']['height']         = intval($kernel->pub_httppost_get('pict_source_height'));
-            $prop['add_param']['source']['water_add']      = intval($kernel->pub_httppost_get('pict_source_water_add'));
-            $prop['add_param']['source']['water_path']     = $kernel->pub_httppost_get('path_source_water_path');
+            $prop['add_param']['source']['width'] = intval($kernel->pub_httppost_get('pict_source_width'));
+            $prop['add_param']['source']['height'] = intval($kernel->pub_httppost_get('pict_source_height'));
+            $prop['add_param']['source']['water_add'] = intval($kernel->pub_httppost_get('pict_source_water_add'));
+            $prop['add_param']['source']['water_path'] = $kernel->pub_httppost_get('path_source_water_path');
             $prop['add_param']['source']['water_position'] = intval($kernel->pub_httppost_get('pict_source_water_position'));
 
             // большое изображение
             if ($kernel->pub_httppost_get('pict_big_isset'))
-                $prop['add_param']['big']['isset']          = true;
+                $prop['add_param']['big']['isset'] = true;
             else
-                $prop['add_param']['big']['isset']         = false;
+                $prop['add_param']['big']['isset'] = false;
 
-            $prop['add_param']['big']['width']          = intval($kernel->pub_httppost_get('pict_big_width'));
-            $prop['add_param']['big']['height']         = intval($kernel->pub_httppost_get('pict_big_height'));
-            $prop['add_param']['big']['water_add']      = intval($kernel->pub_httppost_get('pict_big_water_add'));
-            $prop['add_param']['big']['water_path']     = $kernel->pub_httppost_get('path_big_water_path');
+            $prop['add_param']['big']['width'] = intval($kernel->pub_httppost_get('pict_big_width'));
+            $prop['add_param']['big']['height'] = intval($kernel->pub_httppost_get('pict_big_height'));
+            $prop['add_param']['big']['water_add'] = intval($kernel->pub_httppost_get('pict_big_water_add'));
+            $prop['add_param']['big']['water_path'] = $kernel->pub_httppost_get('path_big_water_path');
             $prop['add_param']['big']['water_position'] = intval($kernel->pub_httppost_get('pict_big_water_position'));
 
             //Малое изображение
@@ -3850,7 +3851,7 @@ class catalog extends BaseModule
             else
                 $prop['add_param']['small']['isset'] = false;
 
-            $prop['add_param']['small']['width']  = intval($kernel->pub_httppost_get('pict_small_width'));
+            $prop['add_param']['small']['width'] = intval($kernel->pub_httppost_get('pict_small_width'));
             $prop['add_param']['small']['height'] = intval($kernel->pub_httppost_get('pict_small_height'));
 
             //Теперь обновим и запишим этот массив в mysql
@@ -3861,18 +3862,18 @@ class catalog extends BaseModule
             $kernel->runSQL($query);
         }
 
-        if (($name_full != $prop['name_full'] || $name_db != $prop['name_db']) && in_array($prop['type'],array( 'string','text','html','number','enum')))
-        {//изменилось что-то, что требует регенерации шаблона поиска
-            if ($prop['group_id']==0)
-            {//изменилось общее свойство
-                $groups=CatalogCommons::get_groups($kernel->pub_module_id_get());
-                foreach($groups as $group)
+        if (($name_full != $prop['name_full'] || $name_db != $prop['name_db']) && in_array($prop['type'], array('string', 'text', 'html', 'number', 'enum')))
+        { //изменилось что-то, что требует регенерации шаблона поиска
+            if ($prop['group_id'] == 0)
+            { //изменилось общее свойство
+                $groups = CatalogCommons::get_groups($kernel->pub_module_id_get());
+                foreach ($groups as $group)
                 {
-                    $this->generate_search_form($group['id'],array());
+                    $this->generate_search_form($group['id'], array());
                 }
             }
             else //изменилось свойство группы
-                $this->generate_search_form($prop['group_id'],array());
+                $this->generate_search_form($prop['group_id'], array());
         }
 
         //Перегенерацию шаблонов убираем пока, она будет ручной
@@ -3900,14 +3901,14 @@ class catalog extends BaseModule
     {
         global $kernel;
         $prop = $this->get_cat_prop($pid);
-        if(isset($prop['add_param']))
+        if (isset($prop['add_param']))
             $prop['add_param'] = @unserialize($prop['add_param']);
         $table = "_catalog_".$kernel->pub_module_id_get()."_cats_props";
 
         //изменилось ли БД-имя?
         if ($name_db != $prop['name_db'])
         {
-            $n=1;
+            $n = 1;
             while ($this->is_cat_prop_exists($name_db))
                 $name_db .= $n++;
             $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET '.
@@ -3943,10 +3944,10 @@ class catalog extends BaseModule
             else
                 $prop['add_param']['source']['isset'] = false;
 
-            $prop['add_param']['source']['width']          = intval($kernel->pub_httppost_get('pict_source_width'));
-            $prop['add_param']['source']['height']         = intval($kernel->pub_httppost_get('pict_source_height'));
-            $prop['add_param']['source']['water_add']      = intval($kernel->pub_httppost_get('pict_source_water_add'));
-            $prop['add_param']['source']['water_path']     = $kernel->pub_httppost_get('path_source_water_path');
+            $prop['add_param']['source']['width'] = intval($kernel->pub_httppost_get('pict_source_width'));
+            $prop['add_param']['source']['height'] = intval($kernel->pub_httppost_get('pict_source_height'));
+            $prop['add_param']['source']['water_add'] = intval($kernel->pub_httppost_get('pict_source_water_add'));
+            $prop['add_param']['source']['water_path'] = $kernel->pub_httppost_get('path_source_water_path');
             $prop['add_param']['source']['water_position'] = intval($kernel->pub_httppost_get('pict_source_water_position'));
 
             // большое изображение
@@ -3955,10 +3956,10 @@ class catalog extends BaseModule
             else
                 $prop['add_param']['big']['isset'] = false;
 
-            $prop['add_param']['big']['width']          = intval($kernel->pub_httppost_get('pict_big_width'));
-            $prop['add_param']['big']['height']         = intval($kernel->pub_httppost_get('pict_big_height'));
-            $prop['add_param']['big']['water_add']      = intval($kernel->pub_httppost_get('pict_big_water_add'));
-            $prop['add_param']['big']['water_path']     = $kernel->pub_httppost_get('path_big_water_path');
+            $prop['add_param']['big']['width'] = intval($kernel->pub_httppost_get('pict_big_width'));
+            $prop['add_param']['big']['height'] = intval($kernel->pub_httppost_get('pict_big_height'));
+            $prop['add_param']['big']['water_add'] = intval($kernel->pub_httppost_get('pict_big_water_add'));
+            $prop['add_param']['big']['water_path'] = $kernel->pub_httppost_get('path_big_water_path');
             $prop['add_param']['big']['water_position'] = intval($kernel->pub_httppost_get('pict_big_water_position'));
 
             //Малое изображение
@@ -3967,7 +3968,7 @@ class catalog extends BaseModule
             else
                 $prop['add_param']['small']['isset'] = false;
 
-            $prop['add_param']['small']['width']  = intval($kernel->pub_httppost_get('pict_small_width'));
+            $prop['add_param']['small']['width'] = intval($kernel->pub_httppost_get('pict_small_width'));
             $prop['add_param']['small']['height'] = intval($kernel->pub_httppost_get('pict_small_height'));
 
 
@@ -3987,14 +3988,14 @@ class catalog extends BaseModule
     {
         global $kernel;
         //Взяли параметры из формы
-        $pvalues  = $kernel->pub_httppost_get('enum_values', false);
-        $pname    = $kernel->pub_httppost_get('name_full');
-        $pnamedb  = $kernel->pub_httppost_get('name_db');
+        $pvalues = $kernel->pub_httppost_get('enum_values', false);
+        $pname = $kernel->pub_httppost_get('name_full');
+        $pnamedb = $kernel->pub_httppost_get('name_db');
         $group_id = $kernel->pub_httppost_get('group_id');
-        $ptype    = $kernel->pub_httppost_get('ptype');
-        $inlist   = $kernel->pub_httppost_get('inlist');
-        $sorted   = $kernel->pub_httppost_get('sorted');
-        $ismain   = $kernel->pub_httppost_get('ismain');
+        $ptype = $kernel->pub_httppost_get('ptype');
+        $inlist = $kernel->pub_httppost_get('inlist');
+        $sorted = $kernel->pub_httppost_get('sorted');
+        $ismain = $kernel->pub_httppost_get('ismain');
         $group_id = intval($group_id);
         if (empty($inlist))
             $inlist = 0;
@@ -4007,12 +4008,12 @@ class catalog extends BaseModule
             $ismain = 1;
 
         //Проверим и проставим значения
-        $group  = CatalogCommons::get_group($group_id);
+        $group = CatalogCommons::get_group($group_id);
         if (mb_strlen($pnamedb) == 0)
             $pnamedb = $pname;
         $namedb = $this->translate_string2db($pnamedb);
         $n = 2;
-        $namedb0=$namedb;
+        $namedb0 = $namedb;
         while ($this->is_prop_exists($group_id, $namedb) || $this->is_prop_exists(0, $namedb))
             $namedb = $namedb0.$n++;
 
@@ -4020,7 +4021,7 @@ class catalog extends BaseModule
             $values = "NULL";
         else
         {
-            $pva =  explode("\n",$pvalues);
+            $pva = explode("\n", $pvalues);
             $values = array();
             foreach ($pva as $v)
             {
@@ -4035,26 +4036,26 @@ class catalog extends BaseModule
         //узнаем order у последнего св-ва в этой группе и добавим 10
         $gprops = CatalogCommons::get_props($group_id, true);
         $props_count = count($gprops);
-        if ($props_count==0)
+        if ($props_count == 0)
             $order = 10;
         else
-            $order = $gprops[$props_count-1]['order']+10;
+            $order = $gprops[$props_count - 1]['order'] + 10;
         $moduleid = $kernel->pub_module_id_get();
         if ($ismain == 1)
-        {//сбросим `ismain` для остальных полей
-            $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0 AND module_id="'.$moduleid.'"';
+        { //сбросим `ismain` для остальных полей
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0 AND module_id="'.$moduleid.'"';
             $kernel->runSQL($query);
         }
         if ($sorted > 0)
-        {//сбросим `sorted` для остальных полей
-            $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0 AND module_id="'.$moduleid.'"';
+        { //сбросим `sorted` для остальных полей
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0 AND module_id="'.$moduleid.'"';
             $kernel->runSQL($query);
         }
 
-        if ($ptype=='pict')
-            $add_param='"'.mysql_real_escape_string(serialize(self::make_default_pict_prop_addparam())).'"';
+        if ($ptype == 'pict')
+            $add_param = '"'.mysql_real_escape_string(serialize(self::make_default_pict_prop_addparam())).'"';
         else
-            $add_param="NULL";
+            $add_param = "NULL";
         //Собственно запросы по добавлению
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_item_props`
                  (`module_id`,`group_id`,`name_db`,`name_full`,`type`, `showinlist`, `sorted`,`order`, `ismain`,`add_param`)
@@ -4064,13 +4065,13 @@ class catalog extends BaseModule
 
         if ($group_id > 0)
         {
-            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$moduleid.'_'.strtolower($group['name_db']).'` ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$moduleid.'_'.strtolower($group['name_db']).'` ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype, $values);
             @unlink($kernel->pub_site_root_get()."/modules/catalog/templates_admin/items_search_form_".$group['name_db'].".html");
         }
         else
-        {//common-свойство
+        { //common-свойство
             $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items`
-                      ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+                      ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype, $values);
             //по-умолчанию добавляем как видимое для всех тов. групп
             $groups = CatalogCommons::get_groups();
             foreach ($groups as $agroup)
@@ -4088,18 +4089,18 @@ class catalog extends BaseModule
             CatalogCommons::regenerate_frontend_item_common_block($kernel->pub_module_id_get(), false);
         }*/
 
-        if (in_array($ptype,array('string','text','html','number','enum')))
-        {//тип свойства такой, который используется в шаблоне поиска
-            if ($group_id==0)
-            {//добавили общее свойство
-                $groups=CatalogCommons::get_groups($moduleid);
-                foreach($groups as $group)
+        if (in_array($ptype, array('string', 'text', 'html', 'number', 'enum')))
+        { //тип свойства такой, который используется в шаблоне поиска
+            if ($group_id == 0)
+            { //добавили общее свойство
+                $groups = CatalogCommons::get_groups($moduleid);
+                foreach ($groups as $group)
                 {
-                    $this->generate_search_form($group['id'],array());
+                    $this->generate_search_form($group['id'], array());
                 }
             }
             else //добавили свойство группы
-                $this->generate_search_form($group_id,array());
+                $this->generate_search_form($group_id, array());
         }
         return $namedb;
     }
@@ -4128,7 +4129,7 @@ class catalog extends BaseModule
             $values = "NULL";
         else
         {
-            $pva =  explode("\n",$pvalues);
+            $pva = explode("\n", $pvalues);
             $values = array();
             foreach ($pva as $v)
             {
@@ -4139,10 +4140,10 @@ class catalog extends BaseModule
             if (count($values) == 0)
                 $values = "NULL";
         }
-        if ($ptype=='pict')
-            $add_param='"'.mysql_real_escape_string(serialize(self::make_default_pict_prop_addparam())).'"';
+        if ($ptype == 'pict')
+            $add_param = '"'.mysql_real_escape_string(serialize(self::make_default_pict_prop_addparam())).'"';
         else
-            $add_param="NULL";
+            $add_param = "NULL";
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props`
                  (`name_db`,`name_full`,`type`,`add_param`)
                  VALUES
@@ -4150,7 +4151,7 @@ class catalog extends BaseModule
         $kernel->runSQL($query);
 
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats`
-                  ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+                  ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype, $values);
         $kernel->runSQL($query);
         return $namedb;
     }
@@ -4165,7 +4166,7 @@ class catalog extends BaseModule
      * @param boolean $only_visible  только видимые?
      * @return array
      */
-    private function get_items($offset=0, $limit=100, $group_id=0, $only_visible=true)
+    private function get_items($offset = 0, $limit = 100, $group_id = 0, $only_visible = true)
     {
         global $kernel;
         $where = array();
@@ -4174,7 +4175,7 @@ class catalog extends BaseModule
         if ($only_visible)
             $where[] = ' `available`=1';
         if (count($where) > 0)
-            $query = implode(" AND ",$where);
+            $query = implode(" AND ", $where);
         else
             $query = "true";
 
@@ -4185,7 +4186,7 @@ class catalog extends BaseModule
             if ($sort_field['sorted'] == 2)
                 $query .= " DESC ";
         }
-        if ($limit==0)
+        if ($limit == 0)
             $limit = null;
         $items = $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_items', $query, "*", $offset, $limit);
         return $items;
@@ -4198,7 +4199,7 @@ class catalog extends BaseModule
      * @param integer $limit         лимит
      * @return array
      */
-    private function get_items_without_cat($offset=0, $limit=100)
+    private function get_items_without_cat($offset = 0, $limit = 100)
     {
         global $kernel;
         $items = array();
@@ -4212,7 +4213,7 @@ class catalog extends BaseModule
             if ($sort_field['sorted'] == 2)
                 $query .= " DESC ";
         }
-        if ($limit!=0)
+        if ($limit != 0)
             $query .= ' LIMIT '.$offset.','.$limit;
         $result = $kernel->runSQL($query);
         while ($row = mysql_fetch_assoc($result))
@@ -4248,7 +4249,7 @@ class catalog extends BaseModule
      * @param boolean $only_visible  только видимые?
      * @return array
      */
-    private function get_items_count($group_id=0, $only_visible=false)
+    private function get_items_count($group_id = 0, $only_visible = false)
     {
         global $kernel;
         $where = array();
@@ -4277,8 +4278,8 @@ class catalog extends BaseModule
     private function get_cat_prop($id)
     {
         global $kernel;
-        $res    = false;
-        $query  = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props` WHERE `id` ='.$id.' LIMIT 1';
+        $res = false;
+        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props` WHERE `id` ='.$id.' LIMIT 1';
         $result = $kernel->runSQL($query);
         if ($row = mysql_fetch_assoc($result))
         {
@@ -4299,7 +4300,7 @@ class catalog extends BaseModule
     private function get_prop($id)
     {
         global $kernel;
-        $res = $kernel->db_get_record_simple('_catalog_item_props','id='.$id);
+        $res = $kernel->db_get_record_simple('_catalog_item_props', 'id='.$id);
         //Если свойство стипом картинка, то сразу вытащим из дополнительных парараметров
         //информацию по картинке
         if ($res['type'] == 'pict')
@@ -4307,7 +4308,7 @@ class catalog extends BaseModule
             if (isset($res['add_param']) && !empty($res['add_param']))
                 $res['add_param'] = @unserialize($res['add_param']);
             else
-                $res['add_param']=self::make_default_pict_prop_addparam();
+                $res['add_param'] = self::make_default_pict_prop_addparam();
         }
         return $res;
     }
@@ -4321,7 +4322,7 @@ class catalog extends BaseModule
     private function get_item($id)
     {
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_items','`id` ="'.intval($id).'"');
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_items', '`id` ="'.intval($id).'"');
     }
 
     /**
@@ -4332,7 +4333,7 @@ class catalog extends BaseModule
      */
     private function get_item_full_data($id = 0)
     {
-        $id=intval($id);
+        $id = intval($id);
         //Сначала получаем общие свойства
         $item1 = $this->get_item($id);
         if (!$item1)
@@ -4361,7 +4362,7 @@ class catalog extends BaseModule
     private function get_item_group_fields($id, $group_name)
     {
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group_name),'`id`='.$id);
+        return $kernel->db_get_record_simple('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group_name), '`id`='.$id);
     }
 
 
@@ -4378,7 +4379,6 @@ class catalog extends BaseModule
     }
 
 
-
     /**
      * Проверяет, существует ли товарная группа с указанным именем для текущего модуля
      *
@@ -4388,9 +4388,8 @@ class catalog extends BaseModule
     private function is_group_exists($name)
     {
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_item_groups','`name_db` = "'.$name.'"'.' AND `module_id` = "'.$kernel->pub_module_id_get().'"');
+        return $kernel->db_get_record_simple('_catalog_item_groups', '`name_db` = "'.$name.'"'.' AND `module_id` = "'.$kernel->pub_module_id_get().'"');
     }
-
 
 
     /**
@@ -4402,11 +4401,11 @@ class catalog extends BaseModule
      */
     private function is_cat_prop_exists($pname)
     {
-        $reserved = array('id','parent_id','is_default','order','_hide_from_waysite','_items_count','_subcats_count','depth');
-        if (in_array($pname,$reserved))
+        $reserved = array('id', 'parent_id', 'is_default', 'order', '_hide_from_waysite', '_items_count', '_subcats_count', 'depth');
+        if (in_array($pname, $reserved))
             return true;
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_cats_props','`name_db` ="'.$pname.'"');
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_cats_props', '`name_db` ="'.$pname.'"');
     }
 
     /**
@@ -4419,14 +4418,14 @@ class catalog extends BaseModule
      */
     private function is_prop_exists($group_id, $pname)
     {
-        $reservedCommon = array('id','module_id','group_id','available','ext_id');
+        $reservedCommon = array('id', 'module_id', 'group_id', 'available', 'ext_id');
         $reservedCustom = array('id');
-        if ($group_id == 0 && in_array($pname,$reservedCommon))
+        if ($group_id == 0 && in_array($pname, $reservedCommon))
             return true;
-        elseif (in_array($pname,$reservedCustom))
+        elseif (in_array($pname, $reservedCustom))
             return true;
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_item_props','`name_db` ="'.$pname.'" AND `group_id`='.$group_id);
+        return $kernel->db_get_record_simple('_catalog_item_props', '`name_db` ="'.$pname.'" AND `group_id`='.$group_id);
     }
 
 
@@ -4439,7 +4438,7 @@ class catalog extends BaseModule
     private function get_cat_itemids($catid)
     {
         global $kernel;
-        $rows= $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_item2cat','`cat_id`='.$catid.' ORDER BY `order`','item_id');
+        $rows = $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_item2cat', '`cat_id`='.$catid.' ORDER BY `order`', 'item_id');
         $ret = array();
         foreach ($rows as $row)
         {
@@ -4496,7 +4495,7 @@ class catalog extends BaseModule
      * @param boolean $only_visible  только видимые?
      * @return array
      */
-    private function get_cat_items($catid, $offset=0, $limit=20, $only_visible=false)
+    private function get_cat_items($catid, $offset = 0, $limit = 20, $only_visible = false)
     {
         global $kernel;
 
@@ -4533,7 +4532,7 @@ class catalog extends BaseModule
      * @param boolean $only_visible  только видимые?
      * @return integer
      */
-    private function get_cat_items_count($catid, $only_visible=true)
+    private function get_cat_items_count($catid, $only_visible = true)
     {
         global $kernel;
         $query = 'SELECT COUNT(*) AS count FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` AS i2c '.
@@ -4550,24 +4549,25 @@ class catalog extends BaseModule
     }
 
 
-    protected function get_categories_tree($node_id, $module_id=false)
+    protected function get_categories_tree($node_id, $module_id = false)
     {
         global $kernel;
         if (!$module_id)
             $module_id = $kernel->pub_module_id_get();
-        $data  = array();
-        $rows = CatalogCommons::get_child_cats_with_count($module_id,$node_id,'cats.id,cats.name',true);
-        foreach($rows as $row)
+        $data = array();
+        $rows = CatalogCommons::get_child_cats_with_count($module_id, $node_id, 'cats.id,cats.name', true);
+        foreach ($rows as $row)
         {
             $array = array(
-                'data'=>htmlspecialchars($row['name']).'&nbsp;('.$row['_items_count'].')',
-                'attr'=>array("id"=>$row['id'],'rel'=>'default'),
+                'data' => htmlspecialchars($row['name']).'&nbsp;('.$row['_items_count'].')',
+                'attr' => array("id" => $row['id'], 'rel' => 'default'),
             );
             if ($row['_subcats_count'] == 0)
                 $array['leaf'] = true;
             else
             {
-                $array['children'] = $this->get_categories_tree($row['id'], $module_id);;
+                $array['children'] = $this->get_categories_tree($row['id'], $module_id);
+                ;
                 $array['leaf'] = false;
                 $array['attr']['rel'] = "folder";
             }
@@ -4585,9 +4585,9 @@ class catalog extends BaseModule
      */
     private function is_cat_in_array($catid, $cats)
     {
-        for ($i=0;$i<count($cats);$i++)
+        for ($i = 0; $i < count($cats); $i++)
         {
-            if ($cats[$i]['id']==$catid)
+            if ($cats[$i]['id'] == $catid)
                 return $i;
         }
         return -1;
@@ -4612,13 +4612,13 @@ class catalog extends BaseModule
         $currdepth = $depth++;
         if (!$module_id)
             $module_id = $kernel->pub_module_id_get();
-        $rows = CatalogCommons::get_child_cats_with_count($module_id,$node_id,'cats.*',true);
-        foreach($rows as $row)
+        $rows = CatalogCommons::get_child_cats_with_count($module_id, $node_id, 'cats.*', true);
+        foreach ($rows as $row)
         {
             $row['depth'] = $currdepth;
             $data[] = $row;
-            if ($row['_subcats_count']>0)
-                $data = $this->get_child_categories($row['id'],$depth, $data, $maxdepth, $module_id);
+            if ($row['_subcats_count'] > 0)
+                $data = $this->get_child_categories($row['id'], $depth, $data, $maxdepth, $module_id);
         }
         return $data;
     }
@@ -4640,14 +4640,14 @@ class catalog extends BaseModule
         if ($depth >= $maxdepth)
             return $data;
         $currdepth = $depth++;
-        $rows = CatalogCommons::get_child_cats_with_count($kernel->pub_module_id_get(),$node_id,'cats.*',true);
-        foreach($rows as $row)
+        $rows = CatalogCommons::get_child_cats_with_count($kernel->pub_module_id_get(), $node_id, 'cats.*', true);
+        foreach ($rows as $row)
         {
             $row['depth'] = $currdepth;
             $data[] = $row;
             $wpos = $this->is_cat_in_array($row['id'], $way);
-            if (($wpos>=0 || $depth<$openlevels) && $row['_subcats_count']>0)
-                $data = $this->get_child_categories2($row['id'],$depth, $data, $maxdepth, $way, $openlevels);
+            if (($wpos >= 0 || $depth < $openlevels) && $row['_subcats_count'] > 0)
+                $data = $this->get_child_categories2($row['id'], $depth, $data, $maxdepth, $way, $openlevels);
         }
         return $data;
     }
@@ -4681,8 +4681,8 @@ class catalog extends BaseModule
             case 'set':
                 $arr = array();
                 foreach ($values as $val)
-                    $arr[] = "'".mysql_real_escape_string(str_replace(',','',$val))."'";
-                return 'set ('.implode(',',array_unique($arr)).')';
+                    $arr[] = "'".mysql_real_escape_string(str_replace(',', '', $val))."'";
+                return 'set ('.implode(',', array_unique($arr)).')';
             case 'html':
                 return 'text';
             case 'file':
@@ -4695,7 +4695,7 @@ class catalog extends BaseModule
                 $arr = array();
                 foreach ($values as $val)
                     $arr[] = "'".mysql_real_escape_string($val)."'";
-                return 'enum ('.implode(',',array_unique($arr)).')';
+                return 'enum ('.implode(',', array_unique($arr)).')';
             case 'number':
                 return 'decimal(12,2)';
             default:
@@ -4715,10 +4715,10 @@ class catalog extends BaseModule
         global $kernel;
         //Получим все необхоимые данные
         $offset = $this->get_offset_admin();
-        $limit  = $this->get_limit_admin();
+        $limit = $this->get_limit_admin();
         $groups = CatalogCommons::get_groups();
         //$purl='show_items&group_id='.$group_id.'&'.$this->admin_param_offset_name.'=';
-        $purl='show_items';
+        $purl = 'show_items';
         if (isset($_GET['search_results']) && $kernel->pub_session_get("search_items_query"))
         {
             //пока без ограничения
@@ -4726,44 +4726,44 @@ class catalog extends BaseModule
             $limit = 10000;
             $squery = $kernel->pub_session_get("search_items_query");
             $result = $kernel->runSQL($squery);
-            $items=array();
+            $items = array();
             while ($row = mysql_fetch_assoc($result))
                 $items[] = $row;
             mysql_free_result($result);
             $total = count($items);
-            $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_search_results_mainlabel#]");
-            $purl.='&search_results=1&group_id='.$group_id;
+            $header_label = $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_search_results_mainlabel#]");
+            $purl .= '&search_results=1&group_id='.$group_id;
         }
         else
         {
             $kernel->pub_session_unset("search_items_query");
             if ($group_id == -1) //показываем товары без категории
             {
-                $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
-                $items  = $this->get_items_without_cat($offset, $limit);
-                $total  = $this->get_items_without_cat_count();
+                $header_label = $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
+                $items = $this->get_items_without_cat($offset, $limit);
+                $total = $this->get_items_without_cat_count();
             }
             else
-            {//groupid >= 0
-                $purl.='&group_id='.$group_id;
-                if (count($groups)==1)
-                {//если у нас только одна тов. группа, её и выберем
+            { //groupid >= 0
+                $purl .= '&group_id='.$group_id;
+                if (count($groups) == 1)
+                { //если у нас только одна тов. группа, её и выберем
                     $groupsTmp = $groups;
                     $firstGroup = array_shift($groupsTmp);
                     $group_id = $firstGroup['id'];
                 }
 
-                $header_label =  $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
-                $total  = $this->get_items_count($group_id, false);
-                $items  = $this->get_items($offset, $limit, $group_id, false);
+                $header_label = $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
+                $total = $this->get_items_count($group_id, false);
+                $items = $this->get_items($offset, $limit, $group_id, false);
             }
         }
-        $count  = count($items);
-        $purl.='&'.$this->admin_param_offset_name.'=';
+        $count = count($items);
+        $purl .= '&'.$this->admin_param_offset_name.'=';
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_list.html'));
         $content = '';
         // Сформируем список доступных товарных групп
-        if (count($groups)>0)
+        if (count($groups) > 0)
         {
             $content .= $this->get_template_block('header');
             $groups_vals = $this->get_template_block('group_value');
@@ -4784,8 +4784,8 @@ class catalog extends BaseModule
             foreach ($groups as $group)
             {
                 $option = $this->get_template_block('group_value');
-                $option = str_replace('%group_id%', $group['id'],$option);
-                $option = str_replace('%group_name%', $group['name_full'],$option);
+                $option = str_replace('%group_id%', $group['id'], $option);
+                $option = str_replace('%group_name%', $group['name_full'], $option);
                 if ($group_id == $group['id'])
                     $option = str_replace('%gselected%', 'selected', $option);
                 else
@@ -4797,7 +4797,7 @@ class catalog extends BaseModule
 
         $search_form = "";
         $search_link_display = "none";
-        if ($group_id>0)
+        if ($group_id > 0)
         {
             $curr_group = $groups[$group_id];
             $group_form_filename = "modules/catalog/templates_admin/items_search_form_".$curr_group['name_db'].".html";
@@ -4808,8 +4808,8 @@ class catalog extends BaseModule
                 $search_form = $this->generate_search_form($curr_group['id'], array());
                 //заново установим шаблон
                 $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_list.html'));
-                $search_form = str_replace("%search_form_action%",$kernel->pub_redirect_for_form('show_items'), $search_form);
-                $search_form = str_replace("%groupid%",$curr_group['id'], $search_form);
+                $search_form = str_replace("%search_form_action%", $kernel->pub_redirect_for_form('show_items'), $search_form);
+                $search_form = str_replace("%groupid%", $curr_group['id'], $search_form);
                 $kernel->pub_file_save($group_form_filename, $search_form);
             }
             $search_link_display = "block";
@@ -4825,17 +4825,17 @@ class catalog extends BaseModule
         else
         {
             $content .= $this->get_template_block('table_header');
-            $content = str_replace('%form_action%',$kernel->pub_redirect_for_form('save_selected_items'),$content);
+            $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('save_selected_items'), $content);
             $cprops = CatalogCommons::get_common_props($kernel->pub_module_id_get(), true);
             $cfields_block = '';
             foreach ($cprops as $cprop)
             {
                 $block = $this->get_template_block('list_prop_name');
-                $block = str_replace('%list_prop_name%', $cprop['name_full'],$block);
+                $block = str_replace('%list_prop_name%', $cprop['name_full'], $block);
                 $cfields_block .= $block;
             }
             $content = str_replace('%list_prop_names%', $cfields_block, $content);
-            $num = $offset+1;
+            $num = $offset + 1;
             $common_table_info = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
             $enum_props_cache = array();
             foreach ($items as $item)
@@ -4844,36 +4844,36 @@ class catalog extends BaseModule
                 $cvals = '';
                 foreach ($cprops as $cprop)
                 {
-                    $prop_value='';
+                    $prop_value = '';
                     if ($cprop['type'] == 'number' || $cprop['type'] == "string")
                     {
                         $prop_line = $this->get_template_block('list_prop_value_edit');
                         $prop_value = htmlspecialchars($item[$cprop['name_db']]);
                     }
-                    elseif($cprop['type']=='enum')
+                    elseif ($cprop['type'] == 'enum')
                     {
                         $prop_line = $this->get_template_block('list_prop_value_select_edit');
-                        $cache_key= $cprop['name_db'];
+                        $cache_key = $cprop['name_db'];
                         if (isset($enum_props_cache[$cache_key]))
                             $enum_props = $enum_props_cache[$cache_key];
                         else
                         {
-                            $enum_props=$this->get_enum_set_prop_values($common_table_info[$cprop['name_db']]['Type']);
-                            $enum_props_cache[$cache_key]=$enum_props;
+                            $enum_props = $this->get_enum_set_prop_values($common_table_info[$cprop['name_db']]['Type']);
+                            $enum_props_cache[$cache_key] = $enum_props;
                         }
-                        $optlines='';
-                        foreach($enum_props as $enum_option)
+                        $optlines = '';
+                        foreach ($enum_props as $enum_option)
                         {
-                            if ($item[$cprop['name_db']]==$enum_option)
-                                $optline=$this->get_template_block('list_prop_value_select_option_selected_edit');
+                            if ($item[$cprop['name_db']] == $enum_option)
+                                $optline = $this->get_template_block('list_prop_value_select_option_selected_edit');
                             else
-                                $optline=$this->get_template_block('list_prop_value_select_option_edit');
+                                $optline = $this->get_template_block('list_prop_value_select_option_edit');
 
-                            $optline = str_replace('%option_value%', $enum_option,$optline);
+                            $optline = str_replace('%option_value%', $enum_option, $optline);
                             $optline = str_replace('%option_value_escaped%', htmlspecialchars($enum_option), $optline);
-                            $optlines.=$optline;
+                            $optlines .= $optline;
                         }
-                        $prop_line = str_replace('%options%',$optlines,$prop_line);
+                        $prop_line = str_replace('%options%', $optlines, $prop_line);
                     }
                     else
                     {
@@ -4881,8 +4881,8 @@ class catalog extends BaseModule
                         $prop_value = $item[$cprop['name_db']];
                         if ($cprop['type'] == 'pict' && !empty($prop_value))
                         {
-                            $path_parts  = pathinfo($prop_value);
-                            $path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
+                            $path_parts = pathinfo($prop_value);
+                            $path_small = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
                             if (file_exists($path_small))
                                 $prop_value = "<img src='/".$path_small."' width=50 />";
                         }
@@ -4890,11 +4890,11 @@ class catalog extends BaseModule
                     }
                     $prop_line = str_replace("%name_db%", $cprop['name_db'], $prop_line);
                     $prop_line = str_replace('%list_prop_value%', $prop_value, $prop_line);
-                    $cvals     .= $prop_line;
+                    $cvals .= $prop_line;
                 }
                 $line = str_replace('%list_prop_values%', $cvals, $line);
                 $line = str_replace('%id%', $item['id'], $line);
-                $line = str_replace('%group%', $groups[$item['group_id']]['name_full'] , $line);
+                $line = str_replace('%group%', $groups[$item['group_id']]['name_full'], $line);
 
                 $line = str_replace('%number%', $num++, $line);
                 $content .= $line;
@@ -4906,7 +4906,7 @@ class catalog extends BaseModule
             foreach ($cats as $cat)
             {
                 $cat_line = $this->get_template_block('category_value');
-                $cat_line = str_replace("%shift%"      , str_repeat("&nbsp;&nbsp;",$cat['depth']), $cat_line);
+                $cat_line = str_replace("%shift%", str_repeat("&nbsp;&nbsp;", $cat['depth']), $cat_line);
                 $cat_line = str_replace("%category_id%", $cat['id'], $cat_line);
                 $cat_line = str_replace("%category_name%", $cat['name'], $cat_line);
                 $cat_lines .= $cat_line;
@@ -4915,10 +4915,10 @@ class catalog extends BaseModule
             $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $purl, 0, 'url'), $content);
         }
 
-        if (count($groups)>0)
+        if (count($groups) > 0)
         {
-            $content    .= $this->get_template_block('addform');
-            $content     = str_replace('%form_action%', $kernel->pub_redirect_for_form('item_add'), $content);
+            $content .= $this->get_template_block('addform');
+            $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('item_add'), $content);
             $groups_vals = '';
             $last_add_item_groupid = 0;
             if (isset($_COOKIE['last_add_item_groupid']))
@@ -4926,8 +4926,8 @@ class catalog extends BaseModule
             foreach ($groups as $group)
             {
                 $option = $this->get_template_block('group_value');
-                $option = str_replace('%group_id%', $group['id'],$option);
-                $option = str_replace('%group_name%', $group['name_full'],$option);
+                $option = str_replace('%group_id%', $group['id'], $option);
+                $option = str_replace('%group_name%', $group['name_full'], $option);
                 if ($last_add_item_groupid == $group['id'])
                     $option = str_replace('%gselected%', 'selected', $option);
                 else
@@ -4958,7 +4958,7 @@ class catalog extends BaseModule
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'inner_filters.html'));
         $html = $this->get_template_block('header');
         $content = '';
-        if (count($filters)>0)
+        if (count($filters) > 0)
         {
             $content .= $this->get_template_block('table_header');
             //$content     = str_replace('%form_action%', $kernel->pub_redirect_for_form('regen_tpls4groups'), $content);
@@ -5003,25 +5003,25 @@ class catalog extends BaseModule
     private function show_groups()
     {
         global $kernel;
-        $groups = CatalogCommons::get_groups(null,true);
+        $groups = CatalogCommons::get_groups(null, true);
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'groups_list.html'));
 
         $html = $this->get_template_block('header');
         $content = '';
-        if (count($groups)>0)
+        if (count($groups) > 0)
         {
             $content .= $this->get_template_block('table_header');
-            $content     = str_replace('%form_action%', $kernel->pub_redirect_for_form('regen_tpls4groups'), $content);
+            $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('regen_tpls4groups'), $content);
             $num = 1;
             foreach ($groups as $group)
             {
                 $line = $this->get_template_block('table_body');
-                if ($group['_items_count']==0)
-                    $delete_block=$this->get_template_block('delete_block');
+                if ($group['_items_count'] == 0)
+                    $delete_block = $this->get_template_block('delete_block');
                 else
-                    $delete_block='';
-                $line = str_replace('%delete_block%',$delete_block,$line);
-                $line = $kernel->pub_array_key_2_value($line,$group);
+                    $delete_block = '';
+                $line = str_replace('%delete_block%', $delete_block, $line);
+                $line = $kernel->pub_array_key_2_value($line, $group);
                 $line = str_replace('%number%', $num++, $line);
                 $content .= $line;
             }
@@ -5038,12 +5038,12 @@ class catalog extends BaseModule
     }
 
     /**
-     *	Форма редактирования товара в админке
+     *    Форма редактирования товара в админке
      *
-     *   @param integer $id       - idшник товара
-     *   @param integer $group_id - idшник шруппы, если идёт добавление нового товара
-     *   @param integer $id_cat   - При ID = 0, сюда может передаваться ID категории, в которой создаётся товар
-     *	@return string
+     * @param integer $id       - idшник товара
+     * @param integer $group_id - idшник шруппы, если идёт добавление нового товара
+     * @param integer $id_cat   - При ID = 0, сюда может передаваться ID категории, в которой создаётся товар
+     * @return string
      */
     private function show_item_form($id = 0, $group_id = 0, $id_cat = 0)
     {
@@ -5060,11 +5060,11 @@ class catalog extends BaseModule
             //Новый товар
             $item = array();
             $item['available'] = 1;
-            $item['id']  = 0;
+            $item['id'] = 0;
             $group = CatalogCommons::get_group($group_id);
-            $item_catids = explode(",",$group['defcatids']);
+            $item_catids = explode(",", $group['defcatids']);
         }
-        $moduleid=$kernel->pub_module_id_get();
+        $moduleid = $kernel->pub_module_id_get();
         $tinfo = $kernel->db_get_table_info('_catalog_items_'.$moduleid.'_'.$group['name_db']);
         $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$moduleid.'_items');
         $props = CatalogCommons::get_props($group['id'], true);
@@ -5072,101 +5072,101 @@ class catalog extends BaseModule
         //Произведём первичную сортировку массива со свойствами, чтобы шаблон был
         //оптимизирован изначально. В дальнейшем пользователь его самостоятельно поменяет
         //Получим свойства, которые
-        $sort_def =  array();
+        $sort_def = array();
         $sort_def['string'] = '01';
-        $sort_def['enum']   = '02';
+        $sort_def['enum'] = '02';
         $sort_def['number'] = '03';
-        $sort_def['pict']   = '04';
-        $sort_def['text']   = '05';
-        $sort_def['html']   = '06';
-        $sort_def['file']   = '07';
-        $sort_def['date']   = '08';
-        $sort_def['set']    = '09';
+        $sort_def['pict'] = '04';
+        $sort_def['text'] = '05';
+        $sort_def['html'] = '06';
+        $sort_def['file'] = '07';
+        $sort_def['date'] = '08';
+        $sort_def['set'] = '09';
 
         $visible_props = $this->get_group_visible_props($group['id']);
         //Прежде всего сформируем массив свойств, преобразованных для HTML вывода
         $lines = array();
         foreach ($props as $prop)
         {
-            if ($prop['group_id']==0 &&  !array_key_exists($prop['name_db'], $visible_props))
+            if ($prop['group_id'] == 0 && !array_key_exists($prop['name_db'], $visible_props))
                 continue;
             $template_line = $this->get_template_block('prop_'.$prop['type']);
             //Запишим значения заменяемых переменных
             //для большенства свойств
-            $pname_db   = $prop['name_db'];
+            $pname_db = $prop['name_db'];
             $pname_full = $prop['name_full'];
-            $origValue = isset($item[$pname_db])?$item[$pname_db]:"";
+            $origValue = isset($item[$pname_db]) ? $item[$pname_db] : "";
             $pvalue = htmlspecialchars($origValue);
 
             $need_add_water_marka = "";
             //Теперь, для более сложных свойств нужно сделать чуть больше
             //и возможно изменить переменную $pvalue а может и $template_line
 
-            switch($prop['type'])
+            switch ($prop['type'])
             {
                 case 'enum':
-                //Получили значения для перечечления
-                    $enum_vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
-                $enum_options = array();
-                $not_selected_lang_var=$kernel->priv_page_textlabels_replace("[#catalog_prop_type_enum_notselect#]");
-                foreach ($enum_vals as $enum_val)
-                {
+                    //Получили значения для перечечления
+                    $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
+                    $enum_options = array();
+                    $not_selected_lang_var = $kernel->priv_page_textlabels_replace("[#catalog_prop_type_enum_notselect#]");
+                    foreach ($enum_vals as $enum_val)
+                    {
                         if (isset($item[$prop['name_db']]) && $item[$prop['name_db']] == $enum_val)
                             $enum_templ = $this->get_template_block('prop_enum_value_selected');
                         else
-                    $enum_templ = $this->get_template_block('prop_enum_value');
-                    if ($enum_val != $not_selected_lang_var)
-                        $enum_templ = str_replace("%enum_key%", $enum_val  , $enum_templ);
-                    else
-                        $enum_templ = str_replace("%enum_key%", ""  , $enum_templ);
-                    $enum_templ = str_replace("%enum_val%", $enum_val  , $enum_templ);
-                    $enum_options[] = $enum_templ;
-                }
-                $pvalue = join("", $enum_options);
+                            $enum_templ = $this->get_template_block('prop_enum_value');
+                        if ($enum_val != $not_selected_lang_var)
+                            $enum_templ = str_replace("%enum_key%", $enum_val, $enum_templ);
+                        else
+                            $enum_templ = str_replace("%enum_key%", "", $enum_templ);
+                        $enum_templ = str_replace("%enum_val%", $enum_val, $enum_templ);
+                        $enum_options[] = $enum_templ;
+                    }
+                    $pvalue = join("", $enum_options);
                     break;
                 case 'set':
                     //Получили значения для перечечления
-                    $enum_vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'],false);
+                    $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
                     $enum_options = array();
-                    $currValues = explode(",",$origValue);
+                    $currValues = explode(",", $origValue);
                     foreach ($enum_vals as $enum_val)
                     {
-                        if (in_array($enum_val,$currValues))
+                        if (in_array($enum_val, $currValues))
                             $enum_templ = $this->get_template_block('prop_set_value_checked');
                         else
                             $enum_templ = $this->get_template_block('prop_set_value');
                         $enum_templ = str_replace("%value%", $enum_val, $enum_templ);
                         $enum_templ = str_replace("%value_escaped%", htmlspecialchars($enum_val), $enum_templ);
                         $enum_options[] = $enum_templ;
-            }
+                    }
                     $pvalue = join("", $enum_options);
                     break;
                 case 'html':
                     //Создадим редактор контента
-                $editor = new edit_content();
-                $editor->set_edit_name($prop['name_db']);
-                $editor->set_simple_theme(true);
-                if (isset($item[$prop['name_db']]))
-                    $editor->set_content($item[$prop['name_db']]);
-                $pvalue = $editor->create();
+                    $editor = new edit_content();
+                    $editor->set_edit_name($prop['name_db']);
+                    $editor->set_simple_theme(true);
+                    if (isset($item[$prop['name_db']]))
+                        $editor->set_content($item[$prop['name_db']]);
+                    $pvalue = $editor->create();
                     break;
                 case 'number':
-                if (isset($item[$prop['name_db']]))
-                    $pvalue = $this->cleanup_number($item[$prop['name_db']]);
+                    if (isset($item[$prop['name_db']]))
+                        $pvalue = $this->cleanup_number($item[$prop['name_db']]);
                     break;
                 case 'file':
                 case 'pict':
                     if ($pvalue)
-                    {//Изменения нужно вносить только в том случае, если есть какой-то загруженный файл
+                    { //Изменения нужно вносить только в том случае, если есть какой-то загруженный файл
                         $template_line = $this->get_template_block('prop_'.$prop['type'].'_edit');
-                        $pvalue     = "/".$item[$prop['name_db']];
+                        $pvalue = "/".$item[$prop['name_db']];
                         //Нужно проставить id свойсвта, что бы можно было удалить файл
-                        $template_line = str_replace('%id%'    , $id , $template_line);
+                        $template_line = str_replace('%id%', $id, $template_line);
                         //Для файлов картинок нужно вставить вопросы о необходимости
                         //добавлять водяной знак к исходной картинке, или большой картинке
                     }
                     //Если это картинка и стоит запрос на добавление вопроса о водяном знаки - добавим его
-                    if ($prop['type']=='pict' && isset($prop['add_param']))
+                    if ($prop['type'] == 'pict' && isset($prop['add_param']))
                     {
                         $prop['add_param'] = unserialize($prop['add_param']);
                         if (isset($prop['add_param']['source']['water_add']) && (intval($prop['add_param']['source']['water_add']) == 2))
@@ -5182,7 +5182,7 @@ class catalog extends BaseModule
                         $tvalue = strtotime($pvalue);
                     else
                         $tvalue = time();
-                    $pvalue = date("d.m.Y",$tvalue);
+                    $pvalue = date("d.m.Y", $tvalue);
                     break;
             }
 
@@ -5190,9 +5190,9 @@ class catalog extends BaseModule
             $template_line = str_replace('%need_add_water_marka%', $need_add_water_marka, $template_line);
 
             //Всё прошли, теперь просто заменим
-            $template_line = str_replace('%prop_value%'    , $pvalue    , $template_line);
+            $template_line = str_replace('%prop_value%', $pvalue, $template_line);
             $template_line = str_replace('%prop_name_full%', $pname_full, $template_line);
-            $template_line = str_replace('%prop_name_db%'  , $pname_db  , $template_line);
+            $template_line = str_replace('%prop_name_db%', $pname_db, $template_line);
             $lines[$sort_def[$prop['type']].'_'.$prop['id']] = $template_line;
         }
         //Отсортируем свойства пока в автоматическом режиме
@@ -5201,14 +5201,14 @@ class catalog extends BaseModule
         $num = 1;
         foreach ($lines as $key => $val)
         {
-            $lines[$key] = str_replace("%class%", $kernel->pub_table_tr_class($num),$val);
+            $lines[$key] = str_replace("%class%", $kernel->pub_table_tr_class($num), $val);
             $num++;
         }
         //Начнём строить итоговоую форму
-        $content  = $this->get_template_block('form');
+        $content = $this->get_template_block('form');
         $linked_block = "";
-        if ($id>0)
-        {//связанные товары только при редактировании
+        if ($id > 0)
+        { //связанные товары только при редактировании
             $main_prop = $this->get_common_main_prop();
             $linked_vals = "";
             if ($main_prop)
@@ -5221,10 +5221,10 @@ class catalog extends BaseModule
                     $linked_val = str_replace("%namestring%", htmlspecialchars($litem[$main_prop]), $linked_val);
                     $linked_vals .= $linked_val;
                 }
-                $linked_data=$this->get_template_block('linked_search_block');
+                $linked_data = $this->get_template_block('linked_search_block');
             }
             else
-                $linked_data=$this->get_template_block('linked_no_main_prop_block');
+                $linked_data = $this->get_template_block('linked_no_main_prop_block');
             $linked_block = $this->get_template_block('linked');
             $linked_block = str_replace("%linked_data%", $linked_data, $linked_block);
             $linked_block = str_replace("%linked_items%", $linked_vals, $linked_block);
@@ -5237,39 +5237,39 @@ class catalog extends BaseModule
             $content = str_replace('%isavalchecked%', '', $content);
         $content = str_replace("%group.name%", $group['name_full'], $content);
         $checkedIDs = $item_catids;
-        $checkedIDs[]=$id_cat;
+        $checkedIDs[] = $id_cat;
 
         $all_cats = CatalogCommons::get_all_categories($moduleid);
         $opened_cats = array();
-        foreach($checkedIDs as $chid)
+        foreach ($checkedIDs as $chid)
         {
-            $way=$this->get_way2cat($chid,true,$all_cats);
-            foreach($way as $wel)
+            $way = $this->get_way2cat($chid, true, $all_cats);
+            foreach ($way as $wel)
             {
-                $opened_cats[$wel['id']]=true;
+                $opened_cats[$wel['id']] = true;
             }
         }
         $opened_cats = array_keys($opened_cats);
-        $catsblock = $this->build_item_categories_block(0,$checkedIDs,$opened_cats);
+        $catsblock = $this->build_item_categories_block(0, $checkedIDs, $opened_cats);
         $form_action = $kernel->pub_redirect_for_form('item_save');
-        $redir2=$kernel->pub_httpget_get('redir2');
+        $redir2 = $kernel->pub_httpget_get('redir2');
         if (!$redir2)
-            $redir2='show_items';
-        $content  = str_replace('%props%', implode("\n", $lines), $content);
-        $content  = str_replace('%categories%', $catsblock, $content);
-        $content  = str_replace('%form_action%', $form_action, $content);
-        $content  = str_replace('%id%', $id, $content);
-        $content  = str_replace('%group_id%', $group_id, $content);
-        $content  = str_replace('%redir2%', urlencode($redir2), $content);
+            $redir2 = 'show_items';
+        $content = str_replace('%props%', implode("\n", $lines), $content);
+        $content = str_replace('%categories%', $catsblock, $content);
+        $content = str_replace('%form_action%', $form_action, $content);
+        $content = str_replace('%id%', $id, $content);
+        $content = str_replace('%group_id%', $group_id, $content);
+        $content = str_replace('%redir2%', urlencode($redir2), $content);
         return $content;
     }
 
 
-    private function build_item_categories_block($pid,array $checkedIDs = array(),$opened_cats=array())
+    private function build_item_categories_block($pid, array $checkedIDs = array(), $opened_cats = array())
     {
         global $kernel;
         $moduleid = $kernel->pub_module_id_get();
-        $prfx=$kernel->pub_prefix_get();
+        $prfx = $kernel->pub_prefix_get();
         $sql = 'SELECT cats.id,cats.name, COUNT(subcats.id) AS _subcats_count FROM `'.$prfx.'_catalog_'.$moduleid.'_cats` AS cats
                 LEFT JOIN '.$prfx.'_catalog_'.$moduleid.'_cats AS subcats ON subcats.parent_id=cats.id
                 WHERE cats.`parent_id` = '.$pid.'
@@ -5279,23 +5279,23 @@ class catalog extends BaseModule
         $categories = array();
         foreach ($cats as $cat)
         {
-            $opened=in_array($cat['id'],$opened_cats);
-            if ($cat['_subcats_count']==0 || $opened)
-                $bname='category_line_no_childs';
+            $opened = in_array($cat['id'], $opened_cats);
+            if ($cat['_subcats_count'] == 0 || $opened)
+                $bname = 'category_line_no_childs';
             else
-                $bname='category_line';
+                $bname = 'category_line';
             if (in_array($cat['id'], $checkedIDs))
-                $bname.='_checked';
+                $bname .= '_checked';
 
             $catline = $this->get_template_block($bname);
-            if ($opened && $cat['_subcats_count']>0)
+            if ($opened && $cat['_subcats_count'] > 0)
             {
-                $blockstart=$this->get_template_block('subcats_block_start');
-                $blockstart = str_replace("%id%",$cat['id'],$blockstart);
-                $placeholder=$blockstart.$this->build_item_categories_block($cat['id'],$checkedIDs,$opened_cats).$this->get_template_block('subcats_block_end');
+                $blockstart = $this->get_template_block('subcats_block_start');
+                $blockstart = str_replace("%id%", $cat['id'], $blockstart);
+                $placeholder = $blockstart.$this->build_item_categories_block($cat['id'], $checkedIDs, $opened_cats).$this->get_template_block('subcats_block_end');
             }
             else
-                $placeholder='';
+                $placeholder = '';
             $catline = str_replace("%placeholder%", $placeholder, $catline);
             $catline = str_replace("%id%", $cat["id"], $catline);
             $catline = str_replace("%name%", $cat["name"], $catline);
@@ -5313,7 +5313,7 @@ class catalog extends BaseModule
      * @param integer $limit
      * @return array
      */
-    private function get_linked_items($itemid, $only_visible=false, $offset=0, $limit=0)
+    private function get_linked_items($itemid, $only_visible = false, $offset = 0, $limit = 0)
     {
         global $kernel;
         $return = array();
@@ -5331,7 +5331,7 @@ class catalog extends BaseModule
             if ($sort_field['sorted'] == 2)
                 $query .= " DESC ";
         }
-        if ($limit>0)
+        if ($limit > 0)
             $query .= " LIMIT ".$offset.",".$limit;
         $result = $kernel->runSQL($query);
         while ($row = mysql_fetch_assoc($result))
@@ -5347,7 +5347,7 @@ class catalog extends BaseModule
      * @param boolean $only_visible только видимые?
      * @return integer
      */
-    private function get_linked_items_count($itemid, $only_visible=false)
+    private function get_linked_items_count($itemid, $only_visible = false)
     {
         global $kernel;
         $count = 0;
@@ -5366,15 +5366,15 @@ class catalog extends BaseModule
     }
 
     /**
-     *	Выводит свойства категорий в админке
+     *    Выводит свойства категорий в админке
      *
-     *	@return string
+     * @return string
      */
     private function show_cat_props()
     {
         global $kernel;
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'category_props.html'));
-        $tinfo   = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
+        $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
 
         $props = CatalogCommons::get_cats_props();
         $content = $this->get_template_block('header');
@@ -5386,30 +5386,30 @@ class catalog extends BaseModule
             {
                 if ($prop['type'] == 'enum')
                 {
-                    $line  = $this->get_template_block('property_enum');
-                    $property_enum_values=array();
+                    $line = $this->get_template_block('property_enum');
+                    $property_enum_values = array();
                     $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
-                    foreach($enum_vals as $ev)
+                    foreach ($enum_vals as $ev)
                     {
-                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
+                        $property_enum_values[] = str_replace("%val%", $ev, $this->get_template_block('property_enum_value'));
                     }
-                    $line = str_replace('%property_enum_values%',implode($this->get_template_block('property_enum_sep'),$property_enum_values),$line);
+                    $line = str_replace('%property_enum_values%', implode($this->get_template_block('property_enum_sep'), $property_enum_values), $line);
                 }
                 else
-                    $line  = $this->get_template_block('property');
-                $line  = str_replace('%property_name%', $prop['name_full'], $line);
-                $line  = str_replace('%property_dbname%', $prop['name_db'], $line);
-                $line  = str_replace('%num%', $num, $line);
+                    $line = $this->get_template_block('property');
+                $line = str_replace('%property_name%', $prop['name_full'], $line);
+                $line = str_replace('%property_dbname%', $prop['name_db'], $line);
+                $line = str_replace('%num%', $num, $line);
                 $line = str_replace('%property_type%', "[#catalog_prop_type_".$prop['type']."#]", $line);
 
-                if ($prop['name_db']=='name')
+                if ($prop['name_db'] == 'name')
                     $line = str_replace('%actions%', '', $line);
                 else
                 {
                     $actions = $this->get_template_block('property_del_link').$this->get_template_block('property_edit_link');
                     $actions = str_replace('%property_id%', $prop['id'], $actions);
                     $actions = str_replace('%property_name%', $prop['name_full'], $actions);
-                    $line    = str_replace('%actions%', $actions, $line);
+                    $line = str_replace('%actions%', $actions, $line);
                 }
                 $content .= $line;
                 $num++;
@@ -5443,11 +5443,11 @@ class catalog extends BaseModule
     }
 
     /**
-     *	Выводит свойства товарной группы в админке
+     *    Выводит свойства товарной группы в админке
      *   в вывод попадают все свойства товарной группы, как общие так и не общие
      *
-     * 	@param $id integer - idшник товарной группы (= 0 для общих свойств)
-     *	@return string
+     * @param $id integer - idшник товарной группы (= 0 для общих свойств)
+     * @return string
      */
     private function show_group_props($id)
     {
@@ -5456,7 +5456,7 @@ class catalog extends BaseModule
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'group_props_list.html'));
 
         $html = $this->get_template_block('header');
-        $html = str_replace('%form_action%',$kernel->pub_redirect_for_form('save_gprops_order'),$html);
+        $html = str_replace('%form_action%', $kernel->pub_redirect_for_form('save_gprops_order'), $html);
         $html = str_replace('%gid%', $id, $html);
         $content = '';
 
@@ -5466,16 +5466,16 @@ class catalog extends BaseModule
         {
             //Если формируется только общий список свойств
             $html = str_replace('%label_table%', $this->get_template_block('label_table_global'), $html);
-            $gvisprops=array();
-            $tinfo_group=array();
+            $gvisprops = array();
+            $tinfo_group = array();
         }
         else
         {
             //Список свойств формируется из категории
-            $group       = CatalogCommons::get_group($id);
+            $group = CatalogCommons::get_group($id);
             $tinfo_group = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
             $html = str_replace('%label_table%', $this->get_template_block('label_table_group'), $html);
-            $html = str_replace('%name%'       , $group['name_full']                           , $html);
+            $html = str_replace('%name%', $group['name_full'], $html);
             $gvisprops = $this->get_group_visible_props($id);
         }
         //Возьмём все свойства, общие и не общие
@@ -5499,36 +5499,35 @@ class catalog extends BaseModule
                 }
 
 
-
-                if ($prop['type']=='enum' || $prop['type']=='set')
-                {//для ENUM и SET - спецобработка
-                    $line  = $this->get_template_block('property_'.$prop['type']);
-                    $property_enum_values=array();
-                    $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'],false);
-                    foreach($enum_vals as $ev)
+                if ($prop['type'] == 'enum' || $prop['type'] == 'set')
+                { //для ENUM и SET - спецобработка
+                    $line = $this->get_template_block('property_'.$prop['type']);
+                    $property_enum_values = array();
+                    $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
+                    foreach ($enum_vals as $ev)
                     {
-                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_'.$prop['type'].'_value'));
+                        $property_enum_values[] = str_replace("%val%", $ev, $this->get_template_block('property_'.$prop['type'].'_value'));
                     }
-                    $line = str_replace('%property_'.$prop['type'].'_values%',implode($this->get_template_block('property_'.$prop['type'].'_sep'),$property_enum_values),$line);
+                    $line = str_replace('%property_'.$prop['type'].'_values%', implode($this->get_template_block('property_'.$prop['type'].'_sep'), $property_enum_values), $line);
                 }
                 else
                     $line = $this->get_template_block('property');
 
                 //Добавим возможные действия
                 $actions = $this->get_template_block('property_del_link').$this->get_template_block('property_edit_link');
-                $actions = str_replace('%property_id%'  , $prop['id']       , $actions);
+                $actions = str_replace('%property_id%', $prop['id'], $actions);
                 $actions = str_replace('%property_name%', $prop['name_full'], $actions);
-                $actions = str_replace('%groupid%'      , $prop['group_id'] , $actions);
+                $actions = str_replace('%groupid%', $prop['group_id'], $actions);
                 //Кроме того добавим id именно той группы, для готорой мы всё этос строим
                 //что бы было понятно куда возвращаться после того как было вызвано редактирование
                 //или удаление свойства.
-                $actions = str_replace('%idg_control%', $id , $actions);
+                $actions = str_replace('%idg_control%', $id, $actions);
 
 
-                if ($prop['group_id'] == 0 && $id!=0)
-                {//выводим чекбокс только для общих свойств и при редактировании какой-либо товарной группы
+                if ($prop['group_id'] == 0 && $id != 0)
+                { //выводим чекбокс только для общих свойств и при редактировании какой-либо товарной группы
                     $viscb = $this->get_template_block('visible_in_group_checkbox');
-                    if(array_key_exists($prop['name_db'], $gvisprops))
+                    if (array_key_exists($prop['name_db'], $gvisprops))
                         $viscb = str_replace("%grprop_checked%", " checked", $viscb);
                     else
                         $viscb = str_replace("%grprop_checked%", " ", $viscb);
@@ -5538,14 +5537,14 @@ class catalog extends BaseModule
                 else
                     $line = str_replace('%visible_in_group_checkbox%', '', $line);
 
-                $line = str_replace('%property_name%'  , $prop['name_full'], $line);
-                $line = str_replace('%property_dbname%', $prop['name_db']  , $line);
-                $line = str_replace('%property_global%', $is_global        , $line);
-                $line = str_replace('%num%'            , $num              , $line);
-                $line = str_replace('%property_type%'  , "[#catalog_prop_type_".$prop['type']."#]", $line);
-                $line = str_replace('%actions%'        , $actions          , $line);
-                $line = str_replace('%order%'          , $prop['order'], $line);
-                $line = str_replace('%property_id%'    , $prop['id'], $line);
+                $line = str_replace('%property_name%', $prop['name_full'], $line);
+                $line = str_replace('%property_dbname%', $prop['name_db'], $line);
+                $line = str_replace('%property_global%', $is_global, $line);
+                $line = str_replace('%num%', $num, $line);
+                $line = str_replace('%property_type%', "[#catalog_prop_type_".$prop['type']."#]", $line);
+                $line = str_replace('%actions%', $actions, $line);
+                $line = str_replace('%order%', $prop['order'], $line);
+                $line = str_replace('%property_id%', $prop['id'], $line);
 
                 $content .= $line;
                 $num++;
@@ -5555,8 +5554,8 @@ class catalog extends BaseModule
         else
             $content .= $this->get_template_block('no_props');
 
-        $html = str_replace('%table%'  , $content, $html);
-        $html = str_replace('%groupid%', $id     , $html);
+        $html = str_replace('%table%', $content, $html);
+        $html = str_replace('%groupid%', $id, $html);
         return $html;
     }
 
@@ -5567,10 +5566,10 @@ class catalog extends BaseModule
      * @param boolean $hide_not_selected спрятать "не выбрано"?
      * @return array
      */
-    private function get_template_file($path = 'modules/catalog/templates_user', $hide_not_selected=false)
+    private function get_template_file($path = 'modules/catalog/templates_user', $hide_not_selected = false)
     {
         $array_select = array();
-        $exts   = array('html','htm');
+        $exts = array('html', 'htm');
         $d = dir($path);
         while ($entry = $d->read())
         {
@@ -5588,7 +5587,7 @@ class catalog extends BaseModule
         }
         $d->close();
         if (!$hide_not_selected)
-            $array_select['']='[#label_properties_no_select_option#]';
+            $array_select[''] = '[#label_properties_no_select_option#]';
         ksort($array_select);
         return $array_select;
     }
@@ -5608,7 +5607,7 @@ class catalog extends BaseModule
         //чтобы спрятать в админке
         $query = preg_replace("/REMOVE_NOT_SET\\[(.+)\\]/sU", " $1 ", $query);
         if (stripos($query, "LIKE") !== false)
-        {//LIKE [ресивер] меняем на LIKE '%ресивер%'
+        { //LIKE [ресивер] меняем на LIKE '%ресивер%'
             $query = preg_replace("/LIKE(?:\\s*)\\[(.+)\\]/iU", "LIKE  '%$1%'", $query);
         }
 
@@ -5636,15 +5635,15 @@ class catalog extends BaseModule
 
         $cprops = CatalogCommons::get_props2(0);
         $cfields = "items.id ";
-        if (count($cprops)>0)
+        if (count($cprops) > 0)
             $cfields .= ", items.".implode(", items.", array_keys($cprops));
-        $moduleid=$kernel->pub_module_id_get();
+        $moduleid = $kernel->pub_module_id_get();
         if ($group)
-        {//фильтр по товарной группе
+        { //фильтр по товарной группе
             $gprops = CatalogCommons::get_props2($group['id']);
 
             $gfields = "";
-            if (count($gprops)>0)
+            if (count($gprops) > 0)
                 $gfields = ", ".$group['name_db'].".".implode(", ".$group['name_db'].".", array_keys($gprops));
 
             $queryPrefix = "SELECT ".$cfields.$gfields." FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items AS items ".
@@ -5654,58 +5653,58 @@ class catalog extends BaseModule
 
         }
         else
-        {//фильтр по всем товарам (общие свойства)
+        { //фильтр по всем товарам (общие свойства)
             $queryPrefix = "SELECT ".$cfields." FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items AS items ";
             $query = " items.`available`=1 ) AND  (".$query;
 
         }
         if (!$closed)
-            $query.=")";
+            $query .= ")";
 
         // если все категории - никаких условий не добавляется
         // в текущей - определяем текущую и добавляем  LEFT JOIN sf_catalog_catalog1_cats AS cats ON cats.id =curcatid
         //   если текущая ==0, берём из всех
         // в выбранных LEFT JOIN sf_catalog_catalog1_cats AS cats ON cats.id IN (catid1,catid2,catid3)
-        if ($filter['catids']!="0") //все категории
+        if ($filter['catids'] != "0") //все категории
         {
-            if (strlen($filter['catids'])==0) //показывать товары из текущей
+            if (strlen($filter['catids']) == 0) //показывать товары из текущей
             {
-                $curr_cat_id=$this->get_current_catIDs();
+                $curr_cat_id = $this->get_current_catIDs();
                 if ($curr_cat_id)
                 {
                     if (is_array($curr_cat_id))
-                        $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id  WHERE ( i2c.cat_id IN (".implode(",",$curr_cat_id).") AND ".$query;
+                        $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id  WHERE ( i2c.cat_id IN (".implode(",", $curr_cat_id).") AND ".$query;
                     else
                         $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$curr_cat_id." AND ".$query;
                 }
                 else
                 {
-                    $catid=intval($kernel->pub_httpget_get("fcid"));//доп.возможность передать фильтру айдишник категории, незаметный для других методов
+                    $catid = intval($kernel->pub_httpget_get("fcid")); //доп.возможность передать фильтру айдишник категории, незаметный для других методов
 
-                    if ($catid==0 && isset($this->current_cat_IDs[$moduleid])) //не нашли ранее, но есть catid, заполненный в карточке товара
-                        $catid=$this->current_cat_IDs[$moduleid];
-                    if ($catid==0) //"выбранная категория", но категорий ни в каком виде не передано
+                    if ($catid == 0 && isset($this->current_cat_IDs[$moduleid])) //не нашли ранее, но есть catid, заполненный в карточке товара
+                        $catid = $this->current_cat_IDs[$moduleid];
+                    if ($catid == 0) //"выбранная категория", но категорий ни в каком виде не передано
                         return null;
                     $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id WHERE ( i2c.cat_id=".$catid." AND ".$query;
                 }
 
             }
-            else  //выбранные категории
+            else //выбранные категории
                 $query = " LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat AS i2c ON i2c.item_id=items.id  WHERE ( i2c.cat_id IN (".$filter['catids'].") AND ".$query;
         }
         else
             $query = " WHERE (".$query;
         $query = $queryPrefix." ".$query;
 
-        $query=iconv("UTF-8","UTF-8//IGNORE",$query);
+        $query = iconv("UTF-8", "UTF-8//IGNORE", $query);
         return $query;
     }
 
     /**
-     *	Сохранение внутреннего фильтра в админке
+     *    Сохранение внутреннего фильтра в админке
      *
-     * 	@param $id integer - idшник внутреннего фильтра ( -1 == добавление)
-     *	@return mixed если всё ок - вернёт false, иначе - сообщение об ошибке
+     * @param $id integer - idшник внутреннего фильтра ( -1 == добавление)
+     * @return mixed если всё ок - вернёт false, иначе - сообщение об ошибке
      */
     private function save_inner_filter($id)
     {
@@ -5726,7 +5725,7 @@ class catalog extends BaseModule
 
 
         $exFilter = CatalogCommons::get_inner_filter_by_stringid($stringid);
-        if ($stringid=="null" || ($exFilter && $exFilter['id']!=$id))
+        if ($stringid == "null" || ($exFilter && $exFilter['id'] != $id))
             return "[#catalog_edit_inner_filter_save_msg_error#] [#catalog_edit_inner_filter_save_msg_stringid_exists#]";
 
         $cattype = $kernel->pub_httppost_get('cattype');
@@ -5743,7 +5742,7 @@ class catalog extends BaseModule
             default:
                 $ccbs = $_POST['ccb'];
                 $cids_arr = array();
-                foreach ($ccbs as $catID=>$ischecked)
+                foreach ($ccbs as $catID => $ischecked)
                 {
                     if ($ischecked == 1)
                         $cids_arr[] = $catID;
@@ -5752,7 +5751,7 @@ class catalog extends BaseModule
                 break;
 
         }
-        if ($id>0)
+        if ($id > 0)
         {
             $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_inner_filters` '.
                 'SET `name`="'.$name.'", '.
@@ -5778,10 +5777,10 @@ class catalog extends BaseModule
     }
 
     /**
-     *	Форма редактирования внутреннего фильтра в админке
+     *    Форма редактирования внутреннего фильтра в админке
      *
-     * 	@param $id integer - idшник внутреннего фильтра ( -1 == добавление)
-     *	@return string
+     * @param $id integer - idшник внутреннего фильтра ( -1 == добавление)
+     * @return string
      */
     private function show_inner_filter_form($id)
     {
@@ -5791,23 +5790,23 @@ class catalog extends BaseModule
         $content = $this->get_template_block('form_header');
 
         //По умолчанию создаём новую
-        $item['name']       = '';
-        $item['stringid']   = '';
-        $item['template']   = '';
-        $item['query']      = '';
-        $item['maxpages']   = '10';
-        $item['limit']      = '';
-        $item['perpage']    = '10';
-        $item['catids']     = '';
+        $item['name'] = '';
+        $item['stringid'] = '';
+        $item['template'] = '';
+        $item['query'] = '';
+        $item['maxpages'] = '10';
+        $item['limit'] = '';
+        $item['perpage'] = '10';
+        $item['catids'] = '';
         $item['targetpage'] = '';
-        $item['groupid']    = 0;
+        $item['groupid'] = 0;
 
         $name_form = '[#catalog_edit_inner_filter_label_add#]';
 
         //А если редактирование - то переопределим.
         if ($id > 0)
         {
-            $item      = CatalogCommons::get_inner_filter($id);
+            $item = CatalogCommons::get_inner_filter($id);
             $name_form = '[#catalog_edit_inner_filter_label_edit#]';
         }
 
@@ -5820,16 +5819,16 @@ class catalog extends BaseModule
         foreach ($groups as $group)
         {
             $chk = "";
-            if ($item['groupid']==$group['id'])
+            if ($item['groupid'] == $group['id'])
             {
                 $chk = ' selected="selected"';
                 $selected_group = $group;
             }
 
             $line = $this->get_template_block('group_option_for_select');
-            $line = str_replace('%name%' , $group['name_full'], $line);
-            $line = str_replace('%id%'  , $group['id'], $line);
-            $line = str_replace('%sel%'  , $chk  , $line);
+            $line = str_replace('%name%', $group['name_full'], $line);
+            $line = str_replace('%id%', $group['id'], $line);
+            $line = str_replace('%sel%', $chk, $line);
             $groupselectlist .= $line;
 
         }
@@ -5849,9 +5848,9 @@ class catalog extends BaseModule
                 $chk = ' selected="selected"';
 
             $line = $this->get_template_block('option_for_select');
-            $line = str_replace('%name%' , $val, $line);
-            $line = str_replace('%key%'  , $key, $line);
-            $line = str_replace('%sel%'  , $chk  , $line);
+            $line = str_replace('%name%', $val, $line);
+            $line = str_replace('%key%', $key, $line);
+            $line = str_replace('%sel%', $chk, $line);
             $html_template_list .= $line;
         }
 
@@ -5865,10 +5864,10 @@ class catalog extends BaseModule
             if (in_array($cat['id'], $item_catids))
                 $repl = ' checked="checked"';
             $catline = $this->get_template_block('category_item');
-            $catline = str_replace("%checked%", $repl                             , $catline);
-            $catline = str_replace("%id%",      $cat["id"]                        , $catline);
-            $catline = str_replace("%catname%", $cat["name"]                      , $catline);
-            $catline = str_replace("%shift%"  , str_repeat("&nbsp;&nbsp;&nbsp;",$cat['depth']), $catline);
+            $catline = str_replace("%checked%", $repl, $catline);
+            $catline = str_replace("%id%", $cat["id"], $catline);
+            $catline = str_replace("%catname%", $cat["name"], $catline);
+            $catline = str_replace("%shift%", str_repeat("&nbsp;&nbsp;&nbsp;", $cat['depth']), $catline);
             $categories[] = $catline;
         }
 
@@ -5902,16 +5901,16 @@ class catalog extends BaseModule
                 break;
         }
 
-        $content = str_replace('%template%'     , $html_template_list, $content);
-        $content = str_replace('%id%'           , $id                , $content);
-        $content = str_replace('%name%'         , $item['name']      , $content);
-        $content = str_replace('%groupselectlist%', $groupselectlist   , $content);
-        $content = str_replace('%stringid%'     , $item['stringid']  , $content);
-        $content = str_replace('%query%'        , $item['query']     , $content);
-        $content = str_replace('%limit%'        , $item['limit']     , $content);
-        $content = str_replace('%perpage%'      , $item['perpage']   , $content);
-        $content = str_replace('%maxpages%'     , $item['maxpages']  , $content);
-        $content = str_replace('%targetpage%'   , $item['targetpage'], $content);
+        $content = str_replace('%template%', $html_template_list, $content);
+        $content = str_replace('%id%', $id, $content);
+        $content = str_replace('%name%', $item['name'], $content);
+        $content = str_replace('%groupselectlist%', $groupselectlist, $content);
+        $content = str_replace('%stringid%', $item['stringid'], $content);
+        $content = str_replace('%query%', $item['query'], $content);
+        $content = str_replace('%limit%', $item['limit'], $content);
+        $content = str_replace('%perpage%', $item['perpage'], $content);
+        $content = str_replace('%maxpages%', $item['maxpages'], $content);
+        $content = str_replace('%targetpage%', $item['targetpage'], $content);
 
         if ($selected_group)
         {
@@ -5920,22 +5919,22 @@ class catalog extends BaseModule
         }
         else
             $sql_val = 'n/a';
-        $content = str_replace('%sql%'   , $sql_val, $content);
+        $content = str_replace('%sql%', $sql_val, $content);
 
-        $content = str_replace('%categories%'   , join("\n", $categories), $content);
-        $content = str_replace('%groups_props%' , CatalogCommons::get_all_group_props_html(), $content);
-        $content = str_replace('%form_header_txt%', $name_form     , $content);
-        $content = str_replace('%form_action%'    , $kernel->pub_redirect_for_form('inner_filter_save'), $content);
+        $content = str_replace('%categories%', join("\n", $categories), $content);
+        $content = str_replace('%groups_props%', CatalogCommons::get_all_group_props_html(), $content);
+        $content = str_replace('%form_header_txt%', $name_form, $content);
+        $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('inner_filter_save'), $content);
 
         return $content;
     }
 
 
     /**
-     *	Форма редактирования товарной группы в админке
+     *    Форма редактирования товарной группы в админке
      *
-     * 	@param $id integer - idшник товарной группы (0 : общие свойства, -1 : добавление)
-     *	@return string
+     * @param $id integer - idшник товарной группы (0 : общие свойства, -1 : добавление)
+     * @return string
      */
     private function show_group_form($id)
     {
@@ -5945,9 +5944,9 @@ class catalog extends BaseModule
         $content = $this->get_template_block('form_header');
         //По умолчанию создаём новую
         $group['name_full'] = '';
-        $group['name_db']   = '';
-        $group['template_items_list']   = '';
-        $group['template_items_one']   = '';
+        $group['name_db'] = '';
+        $group['template_items_list'] = '';
+        $group['template_items_one'] = '';
         $group['defcatids'] = '';
 
         $name_form = '[#catalog_edit_group_label_add#]';
@@ -5955,7 +5954,7 @@ class catalog extends BaseModule
         //А если редактирование - то переопределим.
         if ($id > 0)
         {
-            $group     = CatalogCommons::get_group($id);
+            $group = CatalogCommons::get_group($id);
             $name_form = '[#catalog_edit_group_label_edit#]';
         }
 
@@ -5974,9 +5973,9 @@ class catalog extends BaseModule
                 $chk = ' selected="selected"';
 
             $line = $this->get_template_block('option_for_select');
-            $line = str_replace('%name%' , $val, $line);
-            $line = str_replace('%key%'  , $key, $line);
-            $line = str_replace('%sel%'  , $chk  , $line);
+            $line = str_replace('%name%', $val, $line);
+            $line = str_replace('%key%', $key, $line);
+            $line = str_replace('%sel%', $chk, $line);
             $html_template_list .= $line;
         }
 
@@ -5989,46 +5988,46 @@ class catalog extends BaseModule
                 $chk = ' selected="selected"';
 
             $line = $this->get_template_block('option_for_select');
-            $line = str_replace('%name%' , $val, $line);
-            $line = str_replace('%key%'  , $key, $line);
-            $line = str_replace('%sel%'  , $chk  , $line);
+            $line = str_replace('%name%', $val, $line);
+            $line = str_replace('%key%', $key, $line);
+            $line = str_replace('%sel%', $chk, $line);
             $html_template_item .= $line;
         }
 
         $cats = $this->get_child_categories(0);
         //$item_catids = $this->get_item_catids($id);
         $categories = array();
-        $defcatids = explode(",",$group['defcatids']);
+        $defcatids = explode(",", $group['defcatids']);
         foreach ($cats as $cat)
         {
             $repl = "";
             if (in_array($cat['id'], $defcatids))
                 $repl = ' checked="checked"';
             $catline = $this->get_template_block('category_item');
-            $catline = str_replace("%checked%", $repl                             , $catline);
-            $catline = str_replace("%id%",      $cat["id"]                        , $catline);
-            $catline = str_replace("%catname%", $cat["name"]                      , $catline);
-            $catline = str_replace("%shift%"  , str_repeat("&nbsp;&nbsp;&nbsp;",$cat['depth']), $catline);
+            $catline = str_replace("%checked%", $repl, $catline);
+            $catline = str_replace("%id%", $cat["id"], $catline);
+            $catline = str_replace("%catname%", $cat["name"], $catline);
+            $catline = str_replace("%shift%", str_repeat("&nbsp;&nbsp;&nbsp;", $cat['depth']), $catline);
             $categories[] = $catline;
         }
 
-        $content = str_replace('%template_list%' , $html_template_list, $content);
-        $content = str_replace('%template_item%' , $html_template_item, $content);
-        $content = str_replace('%groupid%'    , $id                , $content);
-        $content = str_replace('%name%'       , $group['name_full'], $content);
-        $content = str_replace('%dbname%'     , $group['name_db']  , $content);
-        $content  = str_replace('%categories%' , join("\n", $categories), $content);
+        $content = str_replace('%template_list%', $html_template_list, $content);
+        $content = str_replace('%template_item%', $html_template_item, $content);
+        $content = str_replace('%groupid%', $id, $content);
+        $content = str_replace('%name%', $group['name_full'], $content);
+        $content = str_replace('%dbname%', $group['name_db'], $content);
+        $content = str_replace('%categories%', join("\n", $categories), $content);
 
-        $content = str_replace('%form_header_txt%', $name_form     , $content);
-        $content = str_replace('%form_action%'    , $kernel->pub_redirect_for_form('group_save'), $content);
-        $content = str_replace('%form_action2%'   , $kernel->pub_redirect_for_form('regen_tpls4groups&id_group='.$id), $content);
+        $content = str_replace('%form_header_txt%', $name_form, $content);
+        $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('group_save'), $content);
+        $content = str_replace('%form_action2%', $kernel->pub_redirect_for_form('regen_tpls4groups&id_group='.$id), $content);
         return $content;
     }
 
     /**
-     *	Вывод товаров категории в админке
+     *    Вывод товаров категории в админке
      *
-     *	@return string
+     * @return string
      */
     private function show_category_items()
     {
@@ -6042,7 +6041,7 @@ class catalog extends BaseModule
         $id_cat = $kernel->pub_httpget_get("id");
         $id_cat = intval($id_cat);
         if ($id_cat <= 0)
-            return  $this->get_template_block('not_select_cat');
+            return $this->get_template_block('not_select_cat');
 
 
         $cdata = $this->get_category($id_cat);
@@ -6055,12 +6054,12 @@ class catalog extends BaseModule
         $selected_groupid = 0;
         if (isset($_COOKIE['last_add_item_groupid']))
             $selected_groupid = $_COOKIE['last_add_item_groupid'];
-        if (count($groups)>0)
+        if (count($groups) > 0)
         {
             foreach ($groups as $group)
             {
                 $option = $this->get_template_block('group_value');
-                $option = str_replace('%group_id%'  , $group['id']       , $option);
+                $option = str_replace('%group_id%', $group['id'], $option);
                 $option = str_replace('%group_name%', $group['name_full'], $option);
                 if ($selected_groupid == $group['id'])
                     $option = str_replace('%gselected%', 'selected', $option);
@@ -6076,14 +6075,14 @@ class catalog extends BaseModule
         foreach ($cprops as $cprop)
             $colum_th .= '<th>'.$cprop['name_full'].'</th>';
 
-        $offset =  $this->get_offset_admin();
-        $limit  =  $this->get_limit_admin();
+        $offset = $this->get_offset_admin();
+        $limit = $this->get_limit_admin();
 
         $total = $this->get_cat_items_count($id_cat, false);
 
         //Сформируем список товаров
         //товары категории
-        $items = $this->get_cat_items($cdata['id'],$offset,$limit,false);
+        $items = $this->get_cat_items($cdata['id'], $offset, $limit, false);
         $count = count($items);
         //По умолчанию вернём что нет товаров тут
         $items_html = $this->get_template_block('cat_items_empty');
@@ -6097,7 +6096,7 @@ class catalog extends BaseModule
             $enum_props_cache = array();
             foreach ($items as $item)
             {
-                $line =  $this->get_template_block('cat_items_line');
+                $line = $this->get_template_block('cat_items_line');
                 $colum_td = '';
                 foreach ($cprops as $cprop)
                 {
@@ -6110,36 +6109,36 @@ class catalog extends BaseModule
                     }
                     */
 
-                    $prop_value='';
+                    $prop_value = '';
                     if ($cprop['type'] == 'number' || $cprop['type'] == "string")
                     {
                         $prop_line = $this->get_template_block('list_prop_value_edit');
                         $prop_value = htmlspecialchars($item[$cprop['name_db']]);
                     }
-                    elseif($cprop['type']=='enum')
+                    elseif ($cprop['type'] == 'enum')
                     {
                         $prop_line = $this->get_template_block('list_prop_value_select_edit');
-                        $cache_key= $cprop['name_db'];
+                        $cache_key = $cprop['name_db'];
                         if (isset($enum_props_cache[$cache_key]))
                             $enum_props = $enum_props_cache[$cache_key];
                         else
                         {
-                            $enum_props=$this->get_enum_set_prop_values($common_table_info[$cprop['name_db']]['Type']);
-                            $enum_props_cache[$cache_key]=$enum_props;
+                            $enum_props = $this->get_enum_set_prop_values($common_table_info[$cprop['name_db']]['Type']);
+                            $enum_props_cache[$cache_key] = $enum_props;
                         }
-                        $optlines='';
-                        foreach($enum_props as $enum_option)
+                        $optlines = '';
+                        foreach ($enum_props as $enum_option)
                         {
-                            if ($item[$cprop['name_db']]==$enum_option)
-                                $optline=$this->get_template_block('list_prop_value_select_option_selected_edit');
+                            if ($item[$cprop['name_db']] == $enum_option)
+                                $optline = $this->get_template_block('list_prop_value_select_option_selected_edit');
                             else
-                                $optline=$this->get_template_block('list_prop_value_select_option_edit');
+                                $optline = $this->get_template_block('list_prop_value_select_option_edit');
 
-                            $optline = str_replace('%option_value%', $enum_option,$optline);
+                            $optline = str_replace('%option_value%', $enum_option, $optline);
                             $optline = str_replace('%option_value_escaped%', htmlspecialchars($enum_option), $optline);
-                            $optlines.=$optline;
+                            $optlines .= $optline;
                         }
-                        $prop_line = str_replace('%options%',$optlines,$prop_line);
+                        $prop_line = str_replace('%options%', $optlines, $prop_line);
                     }
                     else
                     {
@@ -6147,8 +6146,8 @@ class catalog extends BaseModule
                         $prop_value = $item[$cprop['name_db']];
                         if ($cprop['type'] == 'pict' && !empty($prop_value))
                         {
-                            $path_parts  = pathinfo($prop_value);
-                            $path_small  = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
+                            $path_parts = pathinfo($prop_value);
+                            $path_small = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
                             if (file_exists($path_small))
                                 $prop_value = "<img src='/".$path_small."' width=50 />";
                         }
@@ -6157,21 +6156,21 @@ class catalog extends BaseModule
                     $prop_line = str_replace('%list_prop_value%', $prop_value, $prop_line);
                     $colum_td .= $prop_line;
                 }
-                $line = str_replace('%colum_td%'  ,$colum_td     , $line);
-                $line = str_replace('%item_order%',$item['order'], $line);
-                $line = str_replace('%item_id%'   ,$item['id']   , $line);
-                $line = str_replace('%group_name%'  ,$groups[$item['group_id']]['name_full']    , $line);
+                $line = str_replace('%colum_td%', $colum_td, $line);
+                $line = str_replace('%item_order%', $item['order'], $line);
+                $line = str_replace('%item_id%', $item['id'], $line);
+                $line = str_replace('%group_name%', $groups[$item['group_id']]['name_full'], $line);
                 $lines[] = $line;
             }
             //Теперь возьмём форму самой таблицы и вставим туда эти строки
             $items_html = $this->get_template_block('cat_items');
             $items_html = str_replace('%form_action%', $kernel->pub_redirect_for_form('category_items_save'), $items_html);
             $items_html = str_replace('%cat_items_line%', join("\n", $lines), $items_html);
-            $pblock = $this->build_pages_nav($total, $offset, $limit, $purl, 0,'url');
-            $search_block=$this->get_template_block('search_block');
+            $pblock = $this->build_pages_nav($total, $offset, $limit, $purl, 0, 'url');
+            $search_block = $this->get_template_block('search_block');
         }
         else
-            $search_block='';
+            $search_block = '';
         //Построим список категорий куда пользователь может перенести товар
         $cats = $this->get_child_categories(0, 0, array());
         $options = '';
@@ -6179,35 +6178,35 @@ class catalog extends BaseModule
         foreach ($cats as $cat)
         {
             $option = $this->get_template_block('cat_option');
-            $option = str_replace('%cat_id%'  ,$cat['id']  ,$option);
-            $option = str_replace('%cat_name%',str_repeat($cat_shift,$cat['depth']).$cat['name'],$option);
+            $option = str_replace('%cat_id%', $cat['id'], $option);
+            $option = str_replace('%cat_name%', str_repeat($cat_shift, $cat['depth']).$cat['name'], $option);
             $options .= $option;
         }
         //Получили то, что всегда будет выводиться, несмотря ни на что
         $content = $this->get_template_block('header');
 
         //сначала итемсы, так как там ещё есть переменные
-        $content = str_replace('%items%'        , $items_html   , $content);
+        $content = str_replace('%items%', $items_html, $content);
         //Теперь всё остальное
-        $content = str_replace('%colum_th%'     , $colum_th        , $content);
-        $content = str_replace('%cname%'        , $cdata['name']   , $content);
-        $content = str_replace('%cid%'          , $cdata['id']     , $content);
-        $content = str_replace('%group_values%' , $groups_vals     , $content);
-        $content = str_replace('%cats_options%' , $options         , $content);
-        $content = str_replace('%numcolspan%'   , count($cprops)+2 , $content);
-        $content = str_replace('%pages%'        , $pblock          , $content);
-        $content = str_replace('%catid%'        , $id_cat          , $content);
-        $content = str_replace('%search_block%' , $search_block    , $content);
-        $content = str_replace('%redir2%'       , urlencode($purl.$offset), $content);
+        $content = str_replace('%colum_th%', $colum_th, $content);
+        $content = str_replace('%cname%', $cdata['name'], $content);
+        $content = str_replace('%cid%', $cdata['id'], $content);
+        $content = str_replace('%group_values%', $groups_vals, $content);
+        $content = str_replace('%cats_options%', $options, $content);
+        $content = str_replace('%numcolspan%', count($cprops) + 2, $content);
+        $content = str_replace('%pages%', $pblock, $content);
+        $content = str_replace('%catid%', $id_cat, $content);
+        $content = str_replace('%search_block%', $search_block, $content);
+        $content = str_replace('%redir2%', urlencode($purl.$offset), $content);
 
         return $content;
     }
 
     /**
-     *	Форма редактирования категории в админке
+     *    Форма редактирования категории в админке
      *
-     * 	@param $id integer - id-шник категории
-     *	@return string
+     * @param $id integer - id-шник категории
+     * @return string
      */
     private function show_category_form($id)
     {
@@ -6247,7 +6246,7 @@ class catalog extends BaseModule
                     if ($cat[$prop['name_db']])
                     {
                         $prop_val = $this->get_template_block('prop_file_value');
-                        $prop_val = str_replace('%path%','/'.$cat[$prop['name_db']],$prop_val);
+                        $prop_val = str_replace('%path%', '/'.$cat[$prop['name_db']], $prop_val);
                     }
                     else
                         $prop_val = $this->get_template_block('prop_file_value_null');
@@ -6260,7 +6259,7 @@ class catalog extends BaseModule
                     if ($cat[$prop['name_db']])
                     {
                         $prop_val = $this->get_template_block('prop_pict_value');
-                        $prop_val = str_replace('%path%','/'.$cat[$prop['name_db']],$prop_val);
+                        $prop_val = str_replace('%path%', '/'.$cat[$prop['name_db']], $prop_val);
                     }
                     else
                         $prop_val = $this->get_template_block('prop_pict_value_null');
@@ -6269,7 +6268,7 @@ class catalog extends BaseModule
 
                 //Перечесление
                 case 'enum':
-                    $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'],false);
+                    $vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
                     $options = $this->get_template_block('prop_enum_value');
                     $options = str_replace('%enum_value%', '', $options);
                     $options = str_replace('%enum_name%', '[#catalog_edit_category_need_select_label#]', $options);
@@ -6308,8 +6307,8 @@ class catalog extends BaseModule
     /**
      *  Удаляет категорию из БД
      *
-     *  @param $cat array удаляемая категория
-     *  @return void
+     * @param $cat array удаляемая категория
+     * @return void
      */
     private function delete_category($cat)
     {
@@ -6327,14 +6326,14 @@ class catalog extends BaseModule
     /**
      *  Удаляет свойство из БД
      *
-     *  @param $propid  integer id-шник свойства
-     *  @param $groupid integer id-шник товарной группы
-     *  @return void
+     * @param $propid  integer id-шник свойства
+     * @param $groupid integer id-шник товарной группы
+     * @return void
      */
     private function delete_prop($propid, $groupid = 0)
     {
         global $kernel;
-        $prop  = $this->get_prop($propid);
+        $prop = $this->get_prop($propid);
 
         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_item_props` WHERE `id`='.$propid;
         $kernel->runSQL($query);
@@ -6347,7 +6346,7 @@ class catalog extends BaseModule
             @unlink($kernel->pub_site_root_get()."/modules/catalog/templates_admin/items_search_form_".$group['name_db'].".html");
         }
         else
-        {//общее свойство
+        { //общее свойство
             $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` DROP COLUMN `'.$prop['name_db']."`";
             $kernel->runSQL($query);
 
@@ -6360,50 +6359,50 @@ class catalog extends BaseModule
             //CatalogCommons::regenerate_frontend_item_common_block($kernel->pub_module_id_get(), false);
         }
 
-        if (in_array($prop['type'],array( 'string','text','html','number','enum')))
-        {//тип свойства был такой, который используется в шаблоне поиска
-            if ($prop['group_id']==0)
-            {//это было общее свойство
-                $groups=CatalogCommons::get_groups($kernel->pub_module_id_get());
-                foreach($groups as $group)
+        if (in_array($prop['type'], array('string', 'text', 'html', 'number', 'enum')))
+        { //тип свойства был такой, который используется в шаблоне поиска
+            if ($prop['group_id'] == 0)
+            { //это было общее свойство
+                $groups = CatalogCommons::get_groups($kernel->pub_module_id_get());
+                foreach ($groups as $group)
                 {
-                    $this->generate_search_form($group['id'],array());
+                    $this->generate_search_form($group['id'], array());
                 }
             }
             else //это было свойство группы
-                $this->generate_search_form($prop['group_id'],array());
+                $this->generate_search_form($prop['group_id'], array());
         }
     }
 
     /**
      *  Удаляет свойство КАТЕГОРИИ
      *
-     *  @param $propid  integer id-шник свойства категории
-     *  @return void
+     * @param $propid  integer id-шник свойства категории
+     * @return void
      */
     private function delete_cat_prop($propid)
     {
         global $kernel;
-        $prop     = $this->get_cat_prop($propid);
+        $prop = $this->get_cat_prop($propid);
         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props` WHERE `id`='.$propid;
         $kernel->runSQL($query);
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats`'
-            . ' DROP COLUMN `'.$prop['name_db']."`";
+            .' DROP COLUMN `'.$prop['name_db']."`";
         $kernel->runSQL($query);
     }
 
     /**
-     *	Форма редактирования свойства КАТЕГОРИИ в админке
+     *    Форма редактирования свойства КАТЕГОРИИ в админке
      *
-     * 	@param $id integer - id-шник свойства
-     *	@return string
+     * @param $id integer - id-шник свойства
+     * @return string
      */
     private function show_cat_prop_form($id)
     {
         global $kernel;
         $prop = $this->get_cat_prop($id);
 
-        if(isset($prop['add_param']))
+        if (isset($prop['add_param']))
             $prop['add_param'] = @unserialize($prop['add_param']);
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'category_property_form.html'));
 
@@ -6413,17 +6412,17 @@ class catalog extends BaseModule
         {
             case 'enum':
                 $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
-                $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
+                $vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                 $lines = '';
                 foreach ($vals as $val)
                 {
                     $line = $this->get_template_block('enum_val');
-                    $line = str_replace('%val_name%',$val, $line);
-                    $line = str_replace('%val_name_urlencoded%',urlencode($val), $line);
+                    $line = str_replace('%val_name%', $val, $line);
+                    $line = str_replace('%val_name_urlencoded%', urlencode($val), $line);
                     $lines .= $line;
                 }
                 $block_addparam = $this->get_template_block('enum_vals');
-                $block_addparam = str_replace('%lines%'   , $lines, $block_addparam);
+                $block_addparam = str_replace('%lines%', $lines, $block_addparam);
                 $block_addparam = str_replace('%add_enum%', $kernel->pub_redirect_for_form('cat_enum_prop_add'), $block_addparam);
                 break;
             case 'pict':
@@ -6433,20 +6432,20 @@ class catalog extends BaseModule
                 if ($prop['add_param']['source']['isset'])
                     $source_check = ' checked="checked"';
                 //Отметим тек значение по дабавлению водяного знака
-                $_tmp_array = array("pswas0"=> "", "pswas1"=> "",  "pswas2" => "");
+                $_tmp_array = array("pswas0" => "", "pswas1" => "", "pswas2" => "");
                 $_tmp_array['pswas'.intval($prop['add_param']['source']['water_add'])] = ' selected="selected"';
                 $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
 
                 //Аналогично обрабатываем список возможного расположения водяного знака
-                $_tmp_array = array("pswps0"=> "","pswps1"=> "","pswps2" => "","pswps3" => "","pswps4" => "");
+                $_tmp_array = array("pswps0" => "", "pswps1" => "", "pswps2" => "", "pswps3" => "", "pswps4" => "");
                 $_tmp_array['pswps'.intval($prop['add_param']['source']['water_position'])] = ' selected="selected"';
                 $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
 
                 //Теперь оставшиеся простые значения
-                $addons_param = str_replace('%source_check%'          , $source_check                             , $addons_param);
+                $addons_param = str_replace('%source_check%', $source_check, $addons_param);
                 $addons_param = str_replace('%path_source_water_path%', $prop['add_param']['source']['water_path'], $addons_param);
-                $addons_param = str_replace('%pict_source_width%'     , $prop['add_param']['source']['width']     , $addons_param);
-                $addons_param = str_replace('%pict_source_height%'    , $prop['add_param']['source']['height']    , $addons_param);
+                $addons_param = str_replace('%pict_source_width%', $prop['add_param']['source']['width'], $addons_param);
+                $addons_param = str_replace('%pict_source_height%', $prop['add_param']['source']['height'], $addons_param);
 
                 //Теперь всё, что касается большого изображения
                 $big_check = "";
@@ -6454,32 +6453,32 @@ class catalog extends BaseModule
                     $big_check = ' checked="checked"';
 
                 //Отметим тек значение по дабавлению водяного знака
-                $_tmp_array = array("pbwas0"=> "", "pbwas1"=> "",  "pbwas2" => "");
+                $_tmp_array = array("pbwas0" => "", "pbwas1" => "", "pbwas2" => "");
                 $_tmp_array['pbwas'.intval($prop['add_param']['big']['water_add'])] = ' selected="selected"';
                 $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
 
                 //Аналогично обрабатываем список возможного расположения водяного знака
-                $_tmp_array = array("pbwps0"=> "","pbwps1"=> "","pbwps2" => "","pbwps3" => "","pbwps4" => "");
+                $_tmp_array = array("pbwps0" => "", "pbwps1" => "", "pbwps2" => "", "pbwps3" => "", "pbwps4" => "");
                 $_tmp_array['pbwps'.intval($prop['add_param']['big']['water_position'])] = ' selected="selected"';
                 $addons_param = $kernel->pub_array_key_2_value($addons_param, $_tmp_array);
 
                 //Теперь оставшиеся простые значения
-                $addons_param = str_replace('%big_check%'          , $big_check                             , $addons_param);
+                $addons_param = str_replace('%big_check%', $big_check, $addons_param);
                 $addons_param = str_replace('%path_big_water_path%', $prop['add_param']['big']['water_path'], $addons_param);
-                $addons_param = str_replace('%pict_big_width%'     , $prop['add_param']['big']['width']     , $addons_param);
-                $addons_param = str_replace('%pict_big_height%'    , $prop['add_param']['big']['height']    , $addons_param);
+                $addons_param = str_replace('%pict_big_width%', $prop['add_param']['big']['width'], $addons_param);
+                $addons_param = str_replace('%pict_big_height%', $prop['add_param']['big']['height'], $addons_param);
 
                 //Теперь всё, что касается малого изображения
                 $small_check = "";
                 if ($prop['add_param']['small']['isset'])
                     $small_check = ' checked="checked"';
 
-                $addons_param = str_replace('%small_check%'          , $small_check                             , $addons_param);
-                $addons_param = str_replace('%pict_small_width%'     , $prop['add_param']['small']['width']     , $addons_param);
-                $addons_param = str_replace('%pict_small_height%'    , $prop['add_param']['small']['height']    , $addons_param);
+                $addons_param = str_replace('%small_check%', $small_check, $addons_param);
+                $addons_param = str_replace('%pict_small_width%', $prop['add_param']['small']['width'], $addons_param);
+                $addons_param = str_replace('%pict_small_height%', $prop['add_param']['small']['height'], $addons_param);
 
                 //Общее для всех параметров
-                $addons_param = str_replace('%pict_path%'      , $prop['add_param']['pict_path']                  , $addons_param);
+                $addons_param = str_replace('%pict_path%', $prop['add_param']['pict_path'], $addons_param);
                 $addons_param = str_replace('%pict_path_start%', 'content/files/'.$kernel->pub_module_id_get().'/', $addons_param);
                 $block_addparam = $addons_param; //added
                 break;
@@ -6492,10 +6491,10 @@ class catalog extends BaseModule
         $content = str_replace('%block_addparam%', $block_addparam, $content);
 
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('cat_prop_save'), $content);
-        $content = str_replace('%name_full%'  , $prop['name_full'], $content);
-        $content = str_replace('%name_db%'    , $prop['name_db'], $content);
-        $content = str_replace('%prop_type%'  , $kernel->pub_page_textlabel_replace('[#catalog_prop_type_'.$prop['type'].'#]'), $content);
-        $content = str_replace('%id%'         , $prop['id'], $content);
+        $content = str_replace('%name_full%', $prop['name_full'], $content);
+        $content = str_replace('%name_db%', $prop['name_db'], $content);
+        $content = str_replace('%prop_type%', $kernel->pub_page_textlabel_replace('[#catalog_prop_type_'.$prop['type'].'#]'), $content);
+        $content = str_replace('%id%', $prop['id'], $content);
 
         //$content = str_replace('%group_id%', $prop['group_id'], $content);
         return $content;
@@ -6503,19 +6502,19 @@ class catalog extends BaseModule
 
 
     /**
-     *	Форма редактирования и добавления свойства в админке
+     *    Форма редактирования и добавления свойства в админке
      *
-     * 	@param integer $id_prop - id-шник свойства
-     * 	@param integer $id_group - id-шник группы
-     * 	@param integer $id_group_control  - id-шник
-     *	@return string
+     * @param integer $id_prop - id-шник свойства
+     * @param integer $id_group - id-шник группы
+     * @param integer $id_group_control  - id-шник
+     * @return string
      */
-    private function show_prop_form($id_prop = 0 , $id_group = 0, $id_group_control = 0)
+    private function show_prop_form($id_prop = 0, $id_group = 0, $id_group_control = 0)
     {
         global $kernel;
 
-        $id_prop          = intval($id_prop);
-        $id_group         = intval($id_group);
+        $id_prop = intval($id_prop);
+        $id_group = intval($id_group);
         $id_group_control = intval($id_group_control);
 
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'property_form.html'));
@@ -6525,7 +6524,7 @@ class catalog extends BaseModule
         $_tmp_label = "_add";
         $action = "prop_add";
         $off_type = '';
-        $prop = array(  "id" => 0,
+        $prop = array("id" => 0,
             "group_id" => $id_group,
             "name_db" => "",
             "name_full" => "",
@@ -6535,7 +6534,7 @@ class catalog extends BaseModule
             "ismain" => 0
         );
 
-        if ($id_prop > 0 )
+        if ($id_prop > 0)
         {
             $prop = $this->get_prop($id_prop);
             $action = "prop_save";
@@ -6554,12 +6553,12 @@ class catalog extends BaseModule
         if ($id_group > 0)
         {
             $arr = CatalogCommons::get_group($id_group);
-            $form_label = str_replace('%name%',$arr['name_full'], $form_label);
+            $form_label = str_replace('%name%', $arr['name_full'], $form_label);
         }
 
         //Определим какой тип поля должен быть выбран, и заменим в шаблоне
         $select_type = $this->get_template_block('prop_type');
-        $select_type = str_replace('value="'.$prop['type'].'"','value="'.$prop['type'].'" selected="selected"', $select_type);
+        $select_type = str_replace('value="'.$prop['type'].'"', 'value="'.$prop['type'].'" selected="selected"', $select_type);
         $content = $this->get_template_block('header');
         if ($prop['group_id'] == 0)
         {
@@ -6586,17 +6585,17 @@ class catalog extends BaseModule
         $sort_params = "";
         $sort_param = $this->get_template_block('sort_param');
         $sort_param = str_replace("%sort_value%", 0, $sort_param);
-        $sort_param = str_replace("%sort_checked%", $prop['sorted']==0?" selected":"", $sort_param);
+        $sort_param = str_replace("%sort_checked%", $prop['sorted'] == 0 ? " selected" : "", $sort_param);
         $sort_param = str_replace("%sort_name%", $kernel->pub_page_textlabel_replace("[#catalog_prop_sort_no#]"), $sort_param);
         $sort_params .= $sort_param;
         $sort_param = $this->get_template_block('sort_param');
         $sort_param = str_replace("%sort_value%", 1, $sort_param);
-        $sort_param = str_replace("%sort_checked%", $prop['sorted']==1?" selected":"", $sort_param);
+        $sort_param = str_replace("%sort_checked%", $prop['sorted'] == 1 ? " selected" : "", $sort_param);
         $sort_param = str_replace("%sort_name%", $kernel->pub_page_textlabel_replace("[#catalog_prop_sort_asc#]"), $sort_param);
         $sort_params .= $sort_param;
         $sort_param = $this->get_template_block('sort_param');
         $sort_param = str_replace("%sort_value%", 2, $sort_param);
-        $sort_param = str_replace("%sort_checked%", $prop['sorted']==2?" selected":"", $sort_param);
+        $sort_param = str_replace("%sort_checked%", $prop['sorted'] == 2 ? " selected" : "", $sort_param);
         $sort_param = str_replace("%sort_name%", $kernel->pub_page_textlabel_replace("[#catalog_prop_sort_desc#]"), $sort_param);
         $sort_params .= $sort_param;
         $content = str_replace("%sort_params%", $sort_params, $content);
@@ -6605,7 +6604,7 @@ class catalog extends BaseModule
         //Теперь, в зависимости от того, какое это поле, возможно нам нужно показать
         //что-то дополнительное
         $addons_param = '';
-        switch($prop['type'])
+        switch ($prop['type'])
         {
             case 'set':
             case 'enum':
@@ -6616,32 +6615,32 @@ class catalog extends BaseModule
                     $group = CatalogCommons::get_group($prop['group_id']);
                     $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
                 }
-                    $addons_param = $this->get_template_block($prop['type'].'_vals');
-                    $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
+                $addons_param = $this->get_template_block($prop['type'].'_vals');
+                $vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                 $lines = '';
                 foreach ($vals as $num_val => $val)
                 {
                     //пропускаем нулевое (не выбранное значение)
                     if ($num_val == 0)
                         continue;
-                        $line = $this->get_template_block($prop['type'].'_val');
-                    $line = str_replace('%action_del%','enum_prop_delete&enumval='.urlencode($val).'&propid=%id%&id_group_control='.$id_group_control, $line);
-                    $line = str_replace('%val_name%',$val, $line);
+                    $line = $this->get_template_block($prop['type'].'_val');
+                    $line = str_replace('%action_del%', 'enum_prop_delete&enumval='.urlencode($val).'&propid=%id%&id_group_control='.$id_group_control, $line);
+                    $line = str_replace('%val_name%', $val, $line);
                     $lines .= $line;
                 }
-                $addons_param = str_replace('%vals%'       , $lines, $addons_param);
+                $addons_param = str_replace('%vals%', $lines, $addons_param);
                 $addons_param = str_replace('%form_action%', $kernel->pub_redirect_for_form('enum_prop_add&id_group_control='.$id_group_control), $addons_param);
                 break;
             case 'pict':
                 $addons_param = $this->get_template_block('addons_pict');
                 if (isset($prop['add_param']['big']['water_position']))
-                    $prop['add_param']['big']['place']=$prop['add_param']['big']['water_position'];
+                    $prop['add_param']['big']['place'] = $prop['add_param']['big']['water_position'];
                 if (isset($prop['add_param']['source']['water_position']))
-                    $prop['add_param']['source']['place']=$prop['add_param']['source']['water_position'];
-                $addons_param = self::process_image_settings_block($addons_param,$prop['add_param']);
+                    $prop['add_param']['source']['place'] = $prop['add_param']['source']['water_position'];
+                $addons_param = self::process_image_settings_block($addons_param, $prop['add_param']);
 
                 //Общее для всех параметров
-                $addons_param = str_replace('%pict_path%'      , $prop['add_param']['pict_path']                  , $addons_param);
+                $addons_param = str_replace('%pict_path%', $prop['add_param']['pict_path'], $addons_param);
                 $addons_param = str_replace('%pict_path_start%', 'content/files/'.$kernel->pub_module_id_get().'/', $addons_param);
                 break;
         }
@@ -6651,21 +6650,21 @@ class catalog extends BaseModule
         //для картинки например новые парметры будут стоять в двух местах, так как способ их
         //ввода не отличается ни при заведении нового, ни при вводе старого
 
-        $content = str_replace('%addons_param%', $addons_param , $content);
+        $content = str_replace('%addons_param%', $addons_param, $content);
 
         //Теперь, если это поле "изображение" то тут ещё толпа параметров, которые надо
         //получить из свойств модуля
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form($action.'&id_group_control='.$id_group_control), $content);
-        $content = str_replace('%form_label%' , $form_label       , $content);
-        $content = str_replace('%name_full%'  , $prop['name_full'], $content);
-        $content = str_replace('%name_db%'    , $prop['name_db']  , $content);
-        $content = str_replace('%prop_type%'  , $select_type      , $content);
-        $content = str_replace('%id%'         , $prop['id']       , $content);
-        $content = str_replace('%group_id%'   , $prop['group_id'] , $content);
-        $content = str_replace('%off_type%'   , $off_type         , $content);
+        $content = str_replace('%form_label%', $form_label, $content);
+        $content = str_replace('%name_full%', $prop['name_full'], $content);
+        $content = str_replace('%name_db%', $prop['name_db'], $content);
+        $content = str_replace('%prop_type%', $select_type, $content);
+        $content = str_replace('%id%', $prop['id'], $content);
+        $content = str_replace('%group_id%', $prop['group_id'], $content);
+        $content = str_replace('%off_type%', $off_type, $content);
 
         //$content = str_replace('%sorted_checked%' , $sorted_checked  , $content);
-        $content = str_replace('%inlist_checked%' , $inlist_checked  , $content);
+        $content = str_replace('%inlist_checked%', $inlist_checked, $content);
 
         return $content;
     }
@@ -6680,7 +6679,7 @@ class catalog extends BaseModule
         global $kernel;
         $nodes = $this->get_categories_tree(0);
 
-        $tree  = new data_tree('[#catalog_menu_label_cats#]', '0', $nodes);
+        $tree = new data_tree('[#catalog_menu_label_cats#]', '0', $nodes);
         $tree->set_action_click_node('category_items');
         $tree->set_action_move_node('category_move');
         $tree->set_drag_and_drop(true);
@@ -6708,7 +6707,7 @@ class catalog extends BaseModule
         $menu->set_menu_block('[#catalog_menu_label_cats#]');
         $menu->set_tree($this->create_categories_tree());
         $menu->set_menu_block('[#catalog_menu_label#]');
-        $menu->set_menu("[#catalog_menu_all_props#]", "show_group_props&id=0"/*, array('flush' => 1)*/);
+        $menu->set_menu("[#catalog_menu_all_props#]", "show_group_props&id=0" /*, array('flush' => 1)*/);
         $menu->set_menu("[#catalog_menu_groups#]", "show_groups", array('flush' => 1));
         $menu->set_menu("[#catalog_menu_cat_props#]", "show_cat_props", array('flush' => 1));
         $menu->set_menu("[#catalog_menu_items#]", "show_items", array('flush' => 1));
@@ -6731,10 +6730,10 @@ class catalog extends BaseModule
      * @param integer $skip сколько категорий пропустить
      * @return integer
      */
-    public function get_last_order_in_cat($pid, $skip=-1)
+    public function get_last_order_in_cat($pid, $skip = -1)
     {
         global $kernel;
-        $sql   = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` WHERE `parent_id` = '.$pid;
+        $sql = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` WHERE `parent_id` = '.$pid;
         if ($skip == -1) //просто последнюю, с упорядоченные по убыванию
             $sql .= ' ORDER BY `order` DESC LIMIT 1';
         else
@@ -6760,7 +6759,7 @@ class catalog extends BaseModule
         $filter = CatalogCommons::get_inner_filter($id);
         if (!$filter)
             return "not found";
-        if ($filter['catids']=="") //показывать товары из текущей
+        if ($filter['catids'] == "") //показывать товары из текущей
             return "Ошибка - невозможно показать товары из ТЕКУЩЕЙ категории";
         if (preg_match("/param\\[(.+)\\]/iU", $filter['query']))
             return "Ошибка - невозможно показать товары без параметров формы";
@@ -6782,23 +6781,23 @@ class catalog extends BaseModule
         $html = $this->get_template_block('header');
         $content = '';
         $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
-        $html = str_replace('%form_action%',$kernel->pub_redirect_for_form('save_order_fields_order'),$html);
+        $html = str_replace('%form_action%', $kernel->pub_redirect_for_form('save_order_fields_order'), $html);
         $num = 1;
-        if (count($fields)>0)
+        if (count($fields) > 0)
         {
             $content .= $this->get_template_block('table_header');
             foreach ($fields as $field)
             {
-                if ($field['type']=='enum')
+                if ($field['type'] == 'enum')
                 {
                     $line = $this->get_template_block('line_enum');
-                    $property_enum_values=array();
+                    $property_enum_values = array();
                     $enum_vals = $this->get_enum_set_prop_values($tinfo[$field['name_db']]['Type']);
-                    foreach($enum_vals as $ev)
+                    foreach ($enum_vals as $ev)
                     {
-                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
+                        $property_enum_values[] = str_replace("%val%", $ev, $this->get_template_block('property_enum_value'));
                     }
-                    $line = str_replace('%property_enum_values%',implode($this->get_template_block('property_enum_sep'),$property_enum_values),$line);
+                    $line = str_replace('%property_enum_values%', implode($this->get_template_block('property_enum_sep'), $property_enum_values), $line);
                 }
                 else
                     $line = $this->get_template_block('line');
@@ -6813,7 +6812,7 @@ class catalog extends BaseModule
                 $line = str_replace('%property_type%', "[#catalog_prop_type_".$field['type']."#]", $line);
                 //Добавим возможные действия
                 $actions = $this->get_template_block('property_del_link').$this->get_template_block('property_edit_link');
-                $actions = str_replace('%id%'  , $field['id']       , $actions);
+                $actions = str_replace('%id%', $field['id'], $actions);
                 $actions = str_replace('%name_full%', $field['name_full'], $actions);
                 $line = str_replace('%actions%', $actions, $line);
                 $line = str_replace('%num%', $num, $line);
@@ -6830,26 +6829,26 @@ class catalog extends BaseModule
     }
 
     /**
-     *	Форма редактирования и добавления поля
+     *    Форма редактирования и добавления поля
      *  корзины (заказа) в админке
      *
-     * 	@param $id integer - id-шник поля
-     *	@return string
+     * @param $id integer - id-шник поля
+     * @return string
      */
     private function show_order_field_form($id)
     {
         global $kernel;
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'order_field_form.html'));
         //Если $id == 0 значит это новое поле
-        if ($id > 0 )
-        {//редактирование
+        if ($id > 0)
+        { //редактирование
             $prop = CatalogCommons::get_order_field($id);
             $action = "order_field_save";
             $off_type = 'disabled="disabled"'; //если это редактирование, запрещаем менять тип
             $form_label = "label_form_edit";
         }
         else
-        {//добавление
+        { //добавление
             $action = "order_field_add";
             $off_type = '';
             $form_label = "label_form_add";
@@ -6865,7 +6864,7 @@ class catalog extends BaseModule
 
         //Определим какой тип поля должен быть выбран, и заменим в шаблоне
         $select_type = $this->get_template_block('prop_type');
-        $select_type = str_replace('value="'.$prop['type'].'"','value="'.$prop['type'].'" selected="selected"', $select_type);
+        $select_type = str_replace('value="'.$prop['type'].'"', 'value="'.$prop['type'].'" selected="selected"', $select_type);
         $content = $this->get_template_block('header');
         $content .= $this->get_template_block('footer');
 
@@ -6877,7 +6876,7 @@ class catalog extends BaseModule
             $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
 
             $addons_param = $this->get_template_block('enum_vals');
-            $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
+            $vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
             $lines = '';
             foreach ($vals as $num_val => $val)
             {
@@ -6885,25 +6884,25 @@ class catalog extends BaseModule
                 if ($num_val == 0)
                     continue;
                 $line = $this->get_template_block('enum_val');
-                $line = str_replace('%action_del%','order_enum_field_delete&enumval='.urlencode($val).'&id=%id%', $line);
-                $line = str_replace('%val_name%',$val, $line);
+                $line = str_replace('%action_del%', 'order_enum_field_delete&enumval='.urlencode($val).'&id=%id%', $line);
+                $line = str_replace('%val_name%', $val, $line);
                 $lines .= $line;
             }
-            $addons_param = str_replace('%vals%'       , $lines, $addons_param);
+            $addons_param = str_replace('%vals%', $lines, $addons_param);
             $addons_param = str_replace('%form_action%', $kernel->pub_redirect_for_form('order_enum_field_add'), $addons_param);
         }
         else
             $addons_param = $this->get_template_block('enum_new');
 
-        $content = str_replace('%addons_param%', $addons_param , $content);
-        $content = str_replace('%form_action%' , $kernel->pub_redirect_for_form($action), $content);
-        $content = str_replace('%form_label%'  , $form_label       , $content);
-        $content = str_replace('%name_full%'   , $prop['name_full'], $content);
-        $content = str_replace('%name_db%'     , $prop['name_db']  , $content);
-        $content = str_replace('%prop_type%'   , $select_type      , $content);
-        $content = str_replace('%id%'          , $prop['id']       , $content);
-        $content = str_replace('%off_type%'    , $off_type         , $content);
-        $content = str_replace('%regexp%'      , $prop['regexp']   , $content);
+        $content = str_replace('%addons_param%', $addons_param, $content);
+        $content = str_replace('%form_action%', $kernel->pub_redirect_for_form($action), $content);
+        $content = str_replace('%form_label%', $form_label, $content);
+        $content = str_replace('%name_full%', $prop['name_full'], $content);
+        $content = str_replace('%name_db%', $prop['name_db'], $content);
+        $content = str_replace('%prop_type%', $select_type, $content);
+        $content = str_replace('%id%', $prop['id'], $content);
+        $content = str_replace('%off_type%', $off_type, $content);
+        $content = str_replace('%regexp%', $prop['regexp'], $content);
         if ($prop['isrequired'] == 1)
             $content = str_replace('%req_checked%', "checked", $content);
         else
@@ -6925,7 +6924,7 @@ class catalog extends BaseModule
     private function save_order_field($id, $name_full, $name_db, $regexp, $cb_req)
     {
         global $kernel;
-        $prop     = CatalogCommons::get_order_field($id);
+        $prop = CatalogCommons::get_order_field($id);
         if (empty($cb_req))
             $req = 0;
         else
@@ -6936,7 +6935,7 @@ class catalog extends BaseModule
         //изменилось ли БД-имя?
         if ($name_db != $prop['name_db'])
         {
-            $n=1;
+            $n = 1;
             while (CatalogCommons::is_order_field_exists($name_db))
                 $name_db .= $n++;
             $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_order_fields` SET '.
@@ -6989,14 +6988,14 @@ class catalog extends BaseModule
             $name_db = $name_full;
         $namedb = $this->translate_string2db($name_db);
         $n = 2;
-        $namedb0=$namedb;
+        $namedb0 = $namedb;
         while (CatalogCommons::is_order_field_exists($namedb))
             $namedb = $namedb0.$n++;
         if (empty($value))
             $values = "NULL";
         else
         {
-            $pva =  explode("\n",$value);
+            $pva = explode("\n", $value);
             $values = array();
             foreach ($pva as $v)
             {
@@ -7011,10 +7010,10 @@ class catalog extends BaseModule
         //узнаем order у последнего св-ва и добавим 10
         $gprops = CatalogCommons::get_order_fields();
         $props_count = count($gprops);
-        if ($props_count==0)
+        if ($props_count == 0)
             $order = 10;
         else
-            $order = $gprops[$props_count-1]['order']+10;
+            $order = $gprops[$props_count - 1]['order'] + 10;
 
         //Собственно запросы по добавлению
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_order_fields`
@@ -7024,7 +7023,7 @@ class catalog extends BaseModule
         $kernel->runSQL($query);
 
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_orders`
-                  ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+                  ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype, $values);
         $kernel->runSQL($query);
 
         return $namedb;
@@ -7040,7 +7039,7 @@ class catalog extends BaseModule
     private function delete_order_field($id)
     {
         global $kernel;
-        $prop  = CatalogCommons::get_order_field($id);
+        $prop = CatalogCommons::get_order_field($id);
         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_order_fields` WHERE `id`='.$id;
         $kernel->runSQL($query);
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_orders` '.
@@ -7058,12 +7057,12 @@ class catalog extends BaseModule
     private function delete_order_enum_field($id)
     {
         global $kernel;
-        $enumval = $kernel->pub_httpget_get("enumval",false);
+        $enumval = $kernel->pub_httpget_get("enumval", false);
         $prop = CatalogCommons::get_order_field($id);
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
-        $tinfo   = $kernel->db_get_table_info($table);
-        $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
-        $newevals= array();
+        $tinfo = $kernel->db_get_table_info($table);
+        $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
+        $newevals = array();
         foreach ($evals as $eval)
         {
             if ($eval != $enumval)
@@ -7072,7 +7071,7 @@ class catalog extends BaseModule
         $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL '.
             'WHERE `'.$prop['name_db'].'`="'.$kernel->pub_str_prepare_set($enumval).'"';
         $kernel->runSQL($query);
-        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
+        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum', $newevals);
         $kernel->runSQL($query);
     }
 
@@ -7080,19 +7079,19 @@ class catalog extends BaseModule
     /**
      *  К уже существующему полю таблицы заказов (корзины)
      *  типа enum  добавляет новое значение
-     *  @param $id  integer id-шник поля
-     *  @return void
+     * @param $id  integer id-шник поля
+     * @return void
      */
     private function add_order_enum_field($id)
     {
         global $kernel;
-        $enumval = $kernel->pub_httppost_get("enumval",false);
+        $enumval = $kernel->pub_httppost_get("enumval", false);
         $prop = CatalogCommons::get_order_field($id);
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
-        $tinfo   = $kernel->db_get_table_info($table);
-        $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
+        $tinfo = $kernel->db_get_table_info($table);
+        $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
         $evals[] = $enumval;
-        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
+        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum', $evals);
         $kernel->runSQL($query);
     }
 
@@ -7108,7 +7107,7 @@ class catalog extends BaseModule
         global $kernel;
 
         if (empty($out_filename))
-            return ;
+            return;
         $outfilename = CatalogCommons::get_templates_user_prefix().$out_filename;
 
         //только общие свойства
@@ -7124,7 +7123,7 @@ class catalog extends BaseModule
         $outfh .= $this->get_template_block('list_null')."\n\n\n";
 
         $row_odd = $this->get_template_block('row_odd');
-        $row_even= $this->get_template_block('row_even');
+        $row_even = $this->get_template_block('row_even');
         if (!empty($row_odd) && !empty($row_even))
         {
             $row_block = "\n\n\n<!-- @row_odd -->\n";
@@ -7169,7 +7168,7 @@ class catalog extends BaseModule
         global $kernel;
 
         if (empty($out_filename))
-            return ;
+            return;
         $outfilename = CatalogCommons::get_templates_user_prefix().$out_filename;
 
         $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
@@ -7185,8 +7184,8 @@ class catalog extends BaseModule
             $block = $this->get_template_block('prop_'.$prop['type'])."\n\n";
             if ($prop['type'] == 'enum')
             {
-                $enum_vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
-                $str  = "\n";
+                $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
+                $str = "\n";
                 foreach ($enum_vals as $eval)
                 {
                     $line = $this->get_template_block("enum_item")."\n";
@@ -7236,7 +7235,7 @@ class catalog extends BaseModule
      * @param string $template шаблон
      * @return string
      */
-    private function show_csv_export_form($template='')
+    private function show_csv_export_form($template = '')
     {
         global $kernel;
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'export_csv.html'));
@@ -7246,13 +7245,13 @@ class catalog extends BaseModule
         $content = str_replace('%all_props%', $props_html, $content);
         $content = str_replace('%template_value%', htmlspecialchars($template), $content);
         $filters = CatalogCommons::get_inner_filters();
-        $filter_lines='';
-        foreach($filters as $filter)
+        $filter_lines = '';
+        foreach ($filters as $filter)
         {
             $filter_line = $this->get_template_block('filter_items');
-            $filter_line = str_replace('%filterid%',$filter['id'],$filter_line);
-            $filter_line = str_replace('%filtername%',htmlspecialchars($filter['name']),$filter_line);
-            $filter_lines.=$filter_line;
+            $filter_line = str_replace('%filterid%', $filter['id'], $filter_line);
+            $filter_line = str_replace('%filtername%', htmlspecialchars($filter['name']), $filter_line);
+            $filter_lines .= $filter_line;
         }
         $content = str_replace('%filter_items%', $filter_lines, $content);
         return $content;
@@ -7265,7 +7264,7 @@ class catalog extends BaseModule
      * @param integer $filterid
      * @return string
      */
-    private function make_csv_export($template,$filterid)
+    private function make_csv_export($template, $filterid)
     {
         global $kernel;
         //сначала создадим заголовок
@@ -7273,7 +7272,7 @@ class catalog extends BaseModule
         $matches = false;
         $match = false;
 
-        $fields_separator=";";
+        $fields_separator = ";";
         $hitems = explode($fields_separator, $template);
         $gprops = CatalogCommons::get_all_group_props_array();
         $allprops = array();
@@ -7287,7 +7286,7 @@ class catalog extends BaseModule
             if (empty($hitem))
                 continue;
             if (preg_match("|\\%linked_items\\[(.+)\\]\\%|iU", $hitem, $match))
-            {//для связанных товаров, %linked_items[/]%
+            { //для связанных товаров, %linked_items[/]%
 
                 $hitem = str_replace($match[0], $kernel->pub_page_textlabel_replace('[#catalog_linked_items_list_label#]'), $hitem);
                 $headers[] = $hitem;
@@ -7307,10 +7306,10 @@ class catalog extends BaseModule
                 $headers[] = $hitem;
             }
         }
-        if (count($headers)==0)
+        if (count($headers) == 0)
             return "";
         $lines = implode($fields_separator, $headers)."\n";
-        if ($filterid==0)
+        if ($filterid == 0)
             $items = $this->get_items(0, 0, 0, false);
         else
         {
@@ -7319,9 +7318,9 @@ class catalog extends BaseModule
             if (empty($filter['groupid']))
                 $group = false;
             else
-                $group =  CatalogCommons::get_group(intval($filter['groupid']));
+                $group = CatalogCommons::get_group(intval($filter['groupid']));
             $sql = $this->process_variables_out($filter['query']);
-            $tmpStr="";
+            $tmpStr = "";
             $sql = $this->prepare_inner_filter_sql($sql, array(), $tmpStr);
             $filter['query'] = $sql;
             $query = $this->convert_inner_filter_query2sql($filter, $group);
@@ -7338,23 +7337,23 @@ class catalog extends BaseModule
         {
             $itemFD = $this->get_item_full_data($item['id']);
             $line = $template;
-            foreach ($itemFD as $prop=>$value)
+            foreach ($itemFD as $prop => $value)
             {
                 if ($prop == "id") //чтобы айдишник был общий, а не из таблицы тов. группы
                     $value = $itemFD["commonid"];
                 elseif (is_string($value))
-                    $value='"'.str_replace('"','\\"',$value).'"';
+                    $value = '"'.str_replace('"', '\\"', $value).'"';
                 $line = str_replace("%".$prop."%", $value, $line);
 
             }
             if ($main_prop && preg_match("|\\%linked_items\\[(.+)\\]\\%|iU", $line, $match))
-            {//
+            { //
                 $separator = $match[1];
-                $linked_items = $this->get_linked_items($itemFD["commonid"], false,0, 0);
+                $linked_items = $this->get_linked_items($itemFD["commonid"], false, 0, 0);
                 $linked_names = array();
                 foreach ($linked_items as $litem)
                 {
-                    $linked_names[] = '"'.str_replace('"','\\"',$litem[$main_prop]).'"';
+                    $linked_names[] = '"'.str_replace('"', '\\"', $litem[$main_prop]).'"';
                 }
                 $line = str_replace($match[0], implode($separator, $linked_names), $line);
             }
@@ -7436,7 +7435,7 @@ class catalog extends BaseModule
             foreach ($props as $prop)
             {
 
-                if ($prop['group_id']==0 &&  !array_key_exists($prop['name_db'], $visible_props))
+                if ($prop['group_id'] == 0 && !array_key_exists($prop['name_db'], $visible_props))
                     continue;
 
                 if ($prop['type'] == 'string' || $prop['type'] == 'text' || $prop['type'] == 'html')
@@ -7449,10 +7448,10 @@ class catalog extends BaseModule
         }
 
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'search_form_tpl.html'));
-        $all_group_props = CatalogCommons::get_props2($groupid)+CatalogCommons::get_props2(0);
+        $all_group_props = CatalogCommons::get_props2($groupid) + CatalogCommons::get_props2(0);
         $group = CatalogCommons::get_group($groupid);
         $content = $this->get_template_block("header");
-        foreach ($genprops as $propname=>$processtype)
+        foreach ($genprops as $propname => $processtype)
         {
             if ($processtype == "ignore")
                 continue;
@@ -7460,7 +7459,7 @@ class catalog extends BaseModule
             switch ($dbtype)
             {
                 case 'number':
-                    if ($processtype=="accurate")
+                    if ($processtype == "accurate")
                         $block = $this->get_template_block("numberinput");
                     else
                     { //diapazon
@@ -7480,10 +7479,10 @@ class catalog extends BaseModule
                     $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
                     $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
                     if ($processtype == "checkbox")
-                        $enum_vals  = $this->get_enum_set_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], false);
+                        $enum_vals = $this->get_enum_set_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], false);
                     else
                     {
-                        $enum_vals  = $this->get_enum_set_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], true);
+                        $enum_vals = $this->get_enum_set_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], true);
                         if (!empty($enum_vals))
                             $enum_vals[0] = "";
                     }
@@ -7502,14 +7501,14 @@ class catalog extends BaseModule
                     //processtype = select | radio | checkbox
                     $block = $this->get_template_block($processtype);
                     if ($processtype == "checkbox")
-                    {//чекбокс в данном случае один
+                    { //чекбокс в данном случае один
                         $string = $this->get_template_block($processtype."s");
                         $string = str_replace("%valuekey%", $propname, $string);
                         $string = str_replace("%value%", $kernel->pub_page_textlabel_replace("[#catalog_gen_search_form_file_necessary_label#]"), $string);
                         $block = str_replace("%".$processtype."s%", $string, $block);
                     }
                     else
-                    {//а селектов и радио - 2
+                    { //а селектов и радио - 2
                         $strings = "";
                         $string = $this->get_template_block($processtype."s");
                         $string = str_replace("%value%", $kernel->pub_page_textlabel_replace("[#catalog_gen_search_form_file_necessary_label#]"), $string);
@@ -7523,7 +7522,7 @@ class catalog extends BaseModule
                     }
                     break;
                 default:
-                    $block='';
+                    $block = '';
                     break;
             }
 
@@ -7546,14 +7545,14 @@ class catalog extends BaseModule
      */
     private function generate_inner_filter_query($groupid, $props)
     {
-        $all_group_props = CatalogCommons::get_props2($groupid)+CatalogCommons::get_props2(0);
+        $all_group_props = CatalogCommons::get_props2($groupid) + CatalogCommons::get_props2(0);
         $group = CatalogCommons::get_group($groupid);
         $conditions = array("true");
-        $prfx  = " AND ";
+        $prfx = " AND ";
 
-        $all_group_props['id'] = array('type'=>'number', 'group_id'=>0);//для ID-шника товара
+        $all_group_props['id'] = array('type' => 'number', 'group_id' => 0); //для ID-шника товара
 
-        foreach ($props as $propname=>$processtype)
+        foreach ($props as $propname => $processtype)
         {
             if ($processtype == "ignore" || !isset($all_group_props[$propname]))
                 continue;
@@ -7611,7 +7610,7 @@ class catalog extends BaseModule
         global $kernel;
         $stringid0 = $kernel->pub_translit_string($name);
         $stringid = $stringid0;
-        $i=1;
+        $i = 1;
         while (CatalogCommons::get_inner_filter_by_stringid($stringid))
         {
             $stringid = $stringid0.++$i;
@@ -7635,7 +7634,7 @@ class catalog extends BaseModule
     private function get_common_sort_prop()
     {
         global $kernel;
-        return $kernel->db_get_record_simple('_catalog_item_props','`group_id`=0 AND `sorted`>0 AND module_id="'.$kernel->pub_module_id_get().'"','`name_db`,`sorted`');
+        return $kernel->db_get_record_simple('_catalog_item_props', '`group_id`=0 AND `sorted`>0 AND module_id="'.$kernel->pub_module_id_get().'"', '`name_db`,`sorted`');
     }
 
     /**
@@ -7649,15 +7648,16 @@ class catalog extends BaseModule
     {
         global $kernel;
         $itemid = intval($kernel->pub_httpget_get($this->frontend_param_item_id_name));
-        if ($itemid<1)
-            return "";//если нет параметра - айдишника товара, нам нечего выводить
+        if ($itemid < 1)
+            return "";
+        //если нет параметра - айдишника товара, нам нечего выводить
 
         $this->set_templates($kernel->pub_template_parse($template));
 
         $offset = $this->get_offset_user();
-        $items  = array_values($this->get_linked_items($itemid, true, $offset, $limit));
+        $items = array_values($this->get_linked_items($itemid, true, $offset, $limit));
 
-        $count  = count($items);
+        $count = count($items);
         $total = $this->get_linked_items_count($itemid, true);
 
 
@@ -7704,7 +7704,7 @@ class catalog extends BaseModule
         //картинки, то нужно продублировать их свойствами большого
         //и маленького изображения
 
-        for ($p=0;$p<count($props); $p++)
+        for ($p = 0; $p < count($props); $p++)
         {
             if (isset($props[$p]['add_param']))
                 $props[$p]['add_param'] = unserialize($props[$p]['add_param']);
@@ -7720,9 +7720,9 @@ class catalog extends BaseModule
             else
                 $odd_even = "odd";
             //Взяли блок строчки
-            $block  = $this->get_template_block('row_'.$odd_even);
+            $block = $this->get_template_block('row_'.$odd_even);
             if (empty($block))
-                $block  = $this->get_template_block('row');
+                $block = $this->get_template_block('row');
             $block = str_replace("%odd_even%", $odd_even, $block);
             //Теперь ищем переменные свойств и заменяем их
             $block = $this->process_item_props_out($item, $props, $block, CatalogCommons::get_group($groupid));
@@ -7734,7 +7734,7 @@ class catalog extends BaseModule
         $content = $this->get_template_block('list');
         $content = str_replace("%row%", $rows, $content);
         $content = str_replace("%total_in_cat%", $total, $content);
-        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $kernel->pub_page_current_get().'.html?'.$this->frontend_param_item_id_name.'='.$itemid.'&'.$this->frontend_param_offset_name.'=',0,'link'), $content);
+        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $kernel->pub_page_current_get().'.html?'.$this->frontend_param_item_id_name.'='.$itemid.'&'.$this->frontend_param_offset_name.'=', 0, 'link'), $content);
         $content = $this->process_variables_out($content);
         $content = $this->replace_current_page_url($content);
         //очистим оставшиеся метки
@@ -7750,7 +7750,7 @@ class catalog extends BaseModule
     private function get_common_main_prop()
     {
         global $kernel;
-        $row = $kernel->db_get_record_simple('_catalog_item_props','`module_id`="'.$kernel->pub_module_id_get().'" AND `group_id`=0 AND `ismain`=1','name_db');
+        $row = $kernel->db_get_record_simple('_catalog_item_props', '`module_id`="'.$kernel->pub_module_id_get().'" AND `group_id`=0 AND `ismain`=1', 'name_db');
         if ($row)
             return $row['name_db'];
         return false;
@@ -7763,7 +7763,7 @@ class catalog extends BaseModule
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'variables.html'));
         $html = $this->get_template_block('header');
         $content = '';
-        if (count($items)>0)
+        if (count($items) > 0)
         {
             $content .= $this->get_template_block('table_header');
             //$content     = str_replace('%form_action%', $kernel->pub_redirect_for_form('regen_tpls4groups'), $content);
@@ -7790,7 +7790,7 @@ class catalog extends BaseModule
         if (empty($name_db))
         {
             $form_header_txt = '[#catalog_edit_variable_header_label#]';
-            $item = array("name_db"=>"","name_full"=>"","value"=>"");
+            $item = array("name_db" => "", "name_full" => "", "value" => "");
         }
         else
         {
@@ -7811,18 +7811,18 @@ class catalog extends BaseModule
     /**
      *  сохраняет настройки для импорта commerceml
      *  пока в сессии, позже в БД
-     *  @param $settings array
-     *  @return void
+     * @param $settings array
+     * @return void
      */
     private function save_import_commerceml_settings($settings)
     {
-        $_SESSION['import_commerceml_settings']=serialize($settings);
+        $_SESSION['import_commerceml_settings'] = serialize($settings);
     }
 
     /**
      *  возвращает настройки для импорта commerceml
      *  пока в сессии, позже в БД
-     *  @return array
+     * @return array
      */
     private function get_import_commerceml_settings()
     {
@@ -7838,7 +7838,7 @@ class catalog extends BaseModule
         if (isset($_SESSION['import_commerceml_settings']))
             return unserialize($_SESSION['import_commerceml_settings']);
         else
-            return array('groupid'=>-1,'catid'=>-1,'assoc'=>array(),'priceField'=>'','pricePerField'=>'','priceType'=>'','ID_field'=>'','name_field'=>'');
+            return array('groupid' => -1, 'catid' => -1, 'assoc' => array(), 'priceField' => '', 'pricePerField' => '', 'priceType' => '', 'ID_field' => '', 'name_field' => '');
     }
 
     private function import_commerceml_buildprops_select($commonProps, $selected)
@@ -7863,166 +7863,167 @@ class catalog extends BaseModule
         global $kernel;
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'import_commerceml.html'));
 
-        $msg='';
-        $settings=$this->get_import_commerceml_settings();
+        $msg = '';
+        $settings = $this->get_import_commerceml_settings();
         if (isset($_POST['upload_import_file']))
         {
             //сначала заполнение всех настроек из POST, чтобы они сохранились даже в случае ошибки
-            $settings['catid']=intval($kernel->pub_httppost_get('catid'));
-            $settings['groupid']=intval($kernel->pub_httppost_get('groupid'));
-            $settings['priceField']=$kernel->pub_httppost_get('price_field',false);
-            $settings['pricePerField']=$kernel->pub_httppost_get('price_per_field',false);
-            $settings['ID_field']=$kernel->pub_httppost_get('ID_field',false);
-            $settings['name_field']=$kernel->pub_httppost_get('name_field',false);
-            $settings['priceType']=trim($kernel->pub_httppost_get('priceType',false));
-            $settings['assoc']=array();//очистим, и заполним данными из POST
+            $settings['catid'] = intval($kernel->pub_httppost_get('catid'));
+            $settings['groupid'] = intval($kernel->pub_httppost_get('groupid'));
+            $settings['priceField'] = $kernel->pub_httppost_get('price_field', false);
+            $settings['pricePerField'] = $kernel->pub_httppost_get('price_per_field', false);
+            $settings['ID_field'] = $kernel->pub_httppost_get('ID_field', false);
+            $settings['name_field'] = $kernel->pub_httppost_get('name_field', false);
+            $settings['priceType'] = trim($kernel->pub_httppost_get('priceType', false));
+            $settings['assoc'] = array(); //очистим, и заполним данными из POST
             if (isset($_POST['assocprops']))
             {
                 foreach ($_POST['assocprops'] as $aprop)
                 {
                     if (isset($aprop['name']) && isset($aprop['propid']) && !empty($aprop['name']) && !empty($aprop['propid']))
-                        $settings['assoc'][trim($aprop['name'])]=$aprop['propid'];
+                        $settings['assoc'][trim($aprop['name'])] = $aprop['propid'];
                 }
             }
 
             $this->save_import_commerceml_settings($settings);
 
-            if ($kernel->pub_httppost_get('import_type',false)=='import')
-                $import_type='import';//информация о товарах
+            if ($kernel->pub_httppost_get('import_type', false) == 'import')
+                $import_type = 'import'; //информация о товарах
             else
-                $import_type='offers';//цены
-            $shouldProcess=true;
+                $import_type = 'offers';
+            //цены
+            $shouldProcess = true;
             if (!isset($_FILES['commerceml_file']) || !is_uploaded_file($_FILES['commerceml_file']['tmp_name']))
             {
-                $shouldProcess=false;
-                $msg.='[#catalog_commerceml_error_nofile#]';
+                $shouldProcess = false;
+                $msg .= '[#catalog_commerceml_error_nofile#]';
             }
-            elseif(!$settings['ID_field'])
+            elseif (!$settings['ID_field'])
             {
-                $shouldProcess=false;
-                $msg='[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
+                $shouldProcess = false;
+                $msg = '[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
             }
             else
             {
                 //для разных типов импорта разные обязательные поля
-                if ($import_type=='import')
+                if ($import_type == 'import')
                 {
                     if (!$settings['groupid'] || !$settings['name_field'])
                     {
-                        $shouldProcess=false;
-                        $msg='[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
+                        $shouldProcess = false;
+                        $msg = '[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
                     }
                 }
                 else
                 {
                     if (!$settings['priceField'] || !$settings['priceType'])
                     {
-                        $shouldProcess=false;
-                        $msg='[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
+                        $shouldProcess = false;
+                        $msg = '[#catalog_commerceml_error_reqfields_not_filled#]'; //не заполнены обязательные поля
                     }
                 }
             }
 
             if ($shouldProcess)
             {
-                libxml_use_internal_errors(true);//чтобы не было ворнингов
+                libxml_use_internal_errors(true); //чтобы не было ворнингов
                 $xml = simplexml_load_file($_FILES['commerceml_file']['tmp_name']);
 
-                $moduleid=$kernel->pub_module_id_get();
-                if ($import_type=='import')
+                $moduleid = $kernel->pub_module_id_get();
+                if ($import_type == 'import')
                 {
                     $group = CatalogCommons::get_group($settings['groupid']);
                     if (!$group)
-                        $msg='[#catalog_commerceml_error_no_group#]';
+                        $msg = '[#catalog_commerceml_error_no_group#]';
                     elseif (!$xml || !isset($xml->{'Классификатор'}->{'Свойства'}) || !isset($xml->{'Каталог'}->{'Товары'}))
-                        $msg='[#catalog_commerceml_error_malformed_xml#]';
+                        $msg = '[#catalog_commerceml_error_malformed_xml#]';
                     else
                     {
                         //пройдём по свойствам, запомним ID
-                        $assocs=array();
+                        $assocs = array();
                         foreach ($xml->{'Классификатор'}->{'Свойства'}[0] as $prop)
                         {
-                            $propID=(string)$prop->{'Ид'};
-                            $propName=(string)$prop->{'Наименование'};
-                            if (isset($settings['assoc'][$propName]))//
-                                $assocs[$propID]=$propName;
+                            $propID = (string)$prop->{'Ид'};
+                            $propName = (string)$prop->{'Наименование'};
+                            if (isset($settings['assoc'][$propName])) //
+                                $assocs[$propID] = $propName;
                         }
-                        $updated=0;
-                        $added=0;
+                        $updated = 0;
+                        $added = 0;
                         foreach ($xml->{'Каталог'}->{'Товары'}[0] as $item)
                         {
-                            $item1Cid=(string)$item->{'Ид'};
-                            $item1Cname=(string)$item->{'Наименование'};
-                            $commonFields=array("`".$settings['name_field']."`"=>"'".mysql_real_escape_string($item1Cname)."'");
-                            $groupFields=array();
+                            $item1Cid = (string)$item->{'Ид'};
+                            $item1Cname = (string)$item->{'Наименование'};
+                            $commonFields = array("`".$settings['name_field']."`" => "'".mysql_real_escape_string($item1Cname)."'");
+                            $groupFields = array();
                             if (isset($item->{'ЗначенияСвойств'}[0]))
                             {
                                 foreach ($item->{'ЗначенияСвойств'}[0] as $fvalue)
                                 {
-                                    $propID=(string)$fvalue->{'Ид'};
+                                    $propID = (string)$fvalue->{'Ид'};
                                     if (!isset($assocs[$propID]))
                                         continue;
 
-                                    $propValue=(string)$fvalue->{'Значение'};
-                                    $propDbName=$settings['assoc'][$assocs[$propID]];
-                                    if (preg_match('~^group0_~',$propDbName))
+                                    $propValue = (string)$fvalue->{'Значение'};
+                                    $propDbName = $settings['assoc'][$assocs[$propID]];
+                                    if (preg_match('~^group0_~', $propDbName))
                                     {
-                                        $propDbName=substr($propDbName,7);
-                                        $commonFields["`".$propDbName."`"]="'".mysql_real_escape_string($propValue)."'";
+                                        $propDbName = substr($propDbName, 7);
+                                        $commonFields["`".$propDbName."`"] = "'".mysql_real_escape_string($propValue)."'";
                                     }
                                     else
-                                        $groupFields["`".$propDbName."`"]="'".mysql_real_escape_string($propValue)."'";
+                                        $groupFields["`".$propDbName."`"] = "'".mysql_real_escape_string($propValue)."'";
                                 }
                             }
-                            $exRec=$kernel->db_get_record_simple('_catalog_'.$moduleid.'_items',"`".$settings['ID_field']."`='".mysql_real_escape_string($item1Cid)."'");
+                            $exRec = $kernel->db_get_record_simple('_catalog_'.$moduleid.'_items', "`".$settings['ID_field']."`='".mysql_real_escape_string($item1Cid)."'");
 
 
                             if ($exRec)
                             {
                                 if (count($groupFields))
                                 {
-                                    $q="UPDATE `".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($group['name_db'])."`
+                                    $q = "UPDATE `".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($group['name_db'])."`
                                     SET ";
-                                    foreach ($groupFields as $k=>$v)
+                                    foreach ($groupFields as $k => $v)
                                     {
-                                        $q.=$k."=".$v.", ";
+                                        $q .= $k."=".$v.", ";
                                     }
-                                    $q.=" id=".$exRec['ext_id']." WHERE id='".$exRec['ext_id']."'";
+                                    $q .= " id=".$exRec['ext_id']." WHERE id='".$exRec['ext_id']."'";
                                     $kernel->runSQL($q);
                                 }
                                 //в $commonFields как минимум одно свойство из-за name
-                                $q="UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
+                                $q = "UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
                                     SET ";
-                                foreach ($commonFields as $k=>$v)
+                                foreach ($commonFields as $k => $v)
                                 {
-                                    $q.=$k."=".$v.", ";
+                                    $q .= $k."=".$v.", ";
                                 }
-                                $q.=" id=".$exRec['id']." WHERE id='".$exRec['id']."'";
+                                $q .= " id=".$exRec['id']." WHERE id='".$exRec['id']."'";
                                 $kernel->runSQL($q);
                                 $updated++;
                             }
                             else
                             {
-                                $groupFields["`id`"]="NULL";
-                                $commonFields["`".$settings['ID_field']."`"]="'".mysql_real_escape_string($item1Cid)."'";
+                                $groupFields["`id`"] = "NULL";
+                                $commonFields["`".$settings['ID_field']."`"] = "'".mysql_real_escape_string($item1Cid)."'";
                                 $query = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($group['name_db'])."`
-                                          (".implode(",",array_keys($groupFields)).")
+                                          (".implode(",", array_keys($groupFields)).")
                                           VALUES
-                                          (".implode(",",$groupFields).")";
+                                          (".implode(",", $groupFields).")";
                                 $kernel->runSQL($query);
                                 $ext_id = mysql_insert_id();
 
                                 //в $commonFields как минимум одно свойство из-за name и 1СID
-                                $q="INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
-                                    (".implode(",",array_keys($commonFields)).",`available`,`group_id`,`ext_id`)
+                                $q = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
+                                    (".implode(",", array_keys($commonFields)).",`available`,`group_id`,`ext_id`)
                                     VALUES
-                                    (".implode(",",$commonFields).",'1','".$settings['groupid']."','".$ext_id."')";
+                                    (".implode(",", $commonFields).",'1','".$settings['groupid']."','".$ext_id."')";
                                 $kernel->runSQL($q);
 
                                 if ($settings['catid'])
-                                {//если надо - добавляем в категорию
-                                    $newItemID=mysql_insert_id();
-                                    $newOrdr=$this->get_next_order_in_cat($settings['catid']);
+                                { //если надо - добавляем в категорию
+                                    $newItemID = mysql_insert_id();
+                                    $newOrdr = $this->get_next_order_in_cat($settings['catid']);
                                     $query = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat` ".
                                         "(`cat_id`,`item_id`,`order`) VALUES ".
                                         "(".$settings['catid'].", ".$newItemID.", ".$newOrdr.")";
@@ -8031,97 +8032,97 @@ class catalog extends BaseModule
                                 $added++;
                             }
                         }
-                        $msg=$kernel->pub_page_textlabel_replace("[#catalog_commerceml_import_completed#]");
-                        $msg=str_replace('%added%',$added,$msg);
-                        $msg=str_replace('%updated%',$updated,$msg);
+                        $msg = $kernel->pub_page_textlabel_replace("[#catalog_commerceml_import_completed#]");
+                        $msg = str_replace('%added%', $added, $msg);
+                        $msg = str_replace('%updated%', $updated, $msg);
 
                     }
                 }
                 else
-                {//offers.xml
-                    if (!$xml || !isset($xml->{'ПакетПредложений'}->{'Предложения'})|| !isset($xml->{'ПакетПредложений'}->{'ТипыЦен'}))
-                        $msg='[#catalog_commerceml_error_malformed_xml#]';
+                { //offers.xml
+                    if (!$xml || !isset($xml->{'ПакетПредложений'}->{'Предложения'}) || !isset($xml->{'ПакетПредложений'}->{'ТипыЦен'}))
+                        $msg = '[#catalog_commerceml_error_malformed_xml#]';
                     else
                     {
 
-                        $priceTypeID=false;
-                        foreach($xml->{'ПакетПредложений'}->{'ТипыЦен'}[0] as $priceType)
+                        $priceTypeID = false;
+                        foreach ($xml->{'ПакетПредложений'}->{'ТипыЦен'}[0] as $priceType)
                         {
-                            if ((string)$priceType->{'Наименование'}==$settings['priceType'])
+                            if ((string)$priceType->{'Наименование'} == $settings['priceType'])
                             {
-                                $priceTypeID=(string)$priceType->{'Ид'};
+                                $priceTypeID = (string)$priceType->{'Ид'};
                                 break;
                             }
                         }
                         if (!$priceTypeID)
-                            $msg='[#catalog_commerceml_error_no_pricetype_found#]';
+                            $msg = '[#catalog_commerceml_error_no_pricetype_found#]';
                         else
                         {
-                            $updated=0;
-                            foreach($xml->{'ПакетПредложений'}->{'Предложения'}[0] as $offer)
+                            $updated = 0;
+                            foreach ($xml->{'ПакетПредложений'}->{'Предложения'}[0] as $offer)
                             {
-                                $offerID=(string)$offer->{'Ид'};
+                                $offerID = (string)$offer->{'Ид'};
 
 
                                 if (!isset($offer->{'Цены'}[0]))
                                     continue;
 
-                                $oprice=false;
+                                $oprice = false;
                                 foreach ($offer->{'Цены'}[0] as $opriceElem)
                                 {
-                                    if ($priceTypeID==(string)$opriceElem->{'ИдТипаЦены'})
+                                    if ($priceTypeID == (string)$opriceElem->{'ИдТипаЦены'})
                                     {
-                                        $oprice=$opriceElem;
+                                        $oprice = $opriceElem;
                                         break;
                                     }
                                 }
                                 if (!$oprice)
                                     continue;
 
-                                $price=$oprice->{'ЦенаЗаЕдиницу'};
-                                $q="UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
+                                $price = $oprice->{'ЦенаЗаЕдиницу'};
+                                $q = "UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items`
                                 SET `".$settings['priceField']."`='".mysql_real_escape_string($price)."' ";
                                 if ($settings['pricePerField'])
-                                    $q.=",`".$settings['pricePerField']."`='".(string)$oprice->{'Единица'}."'";
-                                $q.=" WHERE `".$settings['ID_field']."`='".mysql_real_escape_string($offerID)."'";
+                                    $q .= ",`".$settings['pricePerField']."`='".(string)$oprice->{'Единица'}."'";
+                                $q .= " WHERE `".$settings['ID_field']."`='".mysql_real_escape_string($offerID)."'";
                                 $kernel->runSQL($q);
                                 $updated++;
                             }
-                            $msg=$kernel->pub_page_textlabel_replace("[#catalog_commerceml_offers_completed#]");
-                            $msg=str_replace('%updated%',$updated,$msg);
+                            $msg = $kernel->pub_page_textlabel_replace("[#catalog_commerceml_offers_completed#]");
+                            $msg = str_replace('%updated%', $updated, $msg);
                         }
                     }
                 }
 
             }
 
-            $_SESSION['import_commerceml_msg']=$msg;
+            $_SESSION['import_commerceml_msg'] = $msg;
             $kernel->pub_redirect_refresh_reload("import_commerceml");
         }
 
         if (isset($_SESSION['import_commerceml_msg']) && !empty($_SESSION['import_commerceml_msg']))
         {
-            $msg=$_SESSION['import_commerceml_msg'];
+            $msg = $_SESSION['import_commerceml_msg'];
             unset($_SESSION['import_commerceml_msg']);
         }
 
-        $content=$this->get_template_block('content');
+        $content = $this->get_template_block('content');
 
-        $currGroupProps=array();
-        $gprops='';
+        $currGroupProps = array();
+        $gprops = '';
         $groups = CatalogCommons::get_groups();
         $gblock = '';
         foreach ($groups as $group)
         {
             $props = CatalogCommons::get_props($group['id'], true);
-            if ($group['id']==$settings['groupid'])
+            if ($group['id'] == $settings['groupid'])
             {
                 foreach ($props as $prop)
                 {
-                    $opt_name=$prop['name_db'];
+                    $opt_name = $prop['name_db'];
                     if ($prop['group_id'] == 0)
                         $opt_name = 'group0_'.$opt_name;
-                    $currGroupProps[$opt_name]=$prop['name_full'];
+                    $currGroupProps[$opt_name] = $prop['name_full'];
                 }
                 $gblock .= $this->get_template_block('group_item_selected');
 
@@ -8132,67 +8133,66 @@ class catalog extends BaseModule
             $gblock = str_replace('%group_name%', htmlspecialchars($group['name_full']), $gblock);
 
 
-
-            $thisGroupProps=array();
+            $thisGroupProps = array();
             foreach ($props as $prop)
             {
-                if ($prop['type']=='file' || $prop['type']=='pict')
+                if ($prop['type'] == 'file' || $prop['type'] == 'pict')
                     continue;
-                $opt_name=$prop['name_db'];
+                $opt_name = $prop['name_db'];
                 if ($prop['group_id'] == 0)
                     $opt_name = 'group0_'.$opt_name;
-                $thisGroupProps[]='{"name_db":"'.$opt_name.'","name_full":"'.$prop['name_full'].'"}';
+                $thisGroupProps[] = '{"name_db":"'.$opt_name.'","name_full":"'.$prop['name_full'].'"}';
             }
-            $gprops.='"'.$group['id'].'":['.implode(",",$thisGroupProps).'],'."\n";
+            $gprops .= '"'.$group['id'].'":['.implode(",", $thisGroupProps).'],'."\n";
         }
 
-        $props_assoc_lines='';
-        $assocLinesCount=0;
-        foreach ($settings['assoc'] as $name1C=>$nameDB)
+        $props_assoc_lines = '';
+        $assocLinesCount = 0;
+        foreach ($settings['assoc'] as $name1C => $nameDB)
         {
-            if (!array_key_exists($nameDB,$currGroupProps))
+            if (!array_key_exists($nameDB, $currGroupProps))
                 continue;
             $assocLinesCount++;
-            $line=$this->get_template_block('props_assoc_line');
+            $line = $this->get_template_block('props_assoc_line');
 
-            $proplines='';
-            foreach($currGroupProps as $propNameDB=>$propNameFull)
+            $proplines = '';
+            foreach ($currGroupProps as $propNameDB => $propNameFull)
             {
-                if ($propNameDB==$nameDB)
+                if ($propNameDB == $nameDB)
                     $propline = $this->get_template_block('propline_selected');
                 else
                     $propline = $this->get_template_block('propline');
-                $propline = str_replace('%namedb%',$propNameDB,$propline);
-                $propline = str_replace('%namefull%',$propNameFull,$propline);
-                $proplines.=$propline;
+                $propline = str_replace('%namedb%', $propNameDB, $propline);
+                $propline = str_replace('%namefull%', $propNameFull, $propline);
+                $proplines .= $propline;
             }
-            $line=str_replace('%proplines%',$proplines,$line);
-            $line=str_replace('%name1C%',htmlspecialchars($name1C),$line);
+            $line = str_replace('%proplines%', $proplines, $line);
+            $line = str_replace('%name1C%', htmlspecialchars($name1C), $line);
 
-            $props_assoc_lines.=$line;
+            $props_assoc_lines .= $line;
         }
 
         $commonProps = CatalogCommons::get_common_props($kernel->pub_module_id_get());
 
-        $price_per_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['pricePerField']);
-        $price_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['priceField']);
-        $ID_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['ID_field']);
-        $name_field_options=$this->import_commerceml_buildprops_select($commonProps,$settings['name_field']);
+        $price_per_field_options = $this->import_commerceml_buildprops_select($commonProps, $settings['pricePerField']);
+        $price_field_options = $this->import_commerceml_buildprops_select($commonProps, $settings['priceField']);
+        $ID_field_options = $this->import_commerceml_buildprops_select($commonProps, $settings['ID_field']);
+        $name_field_options = $this->import_commerceml_buildprops_select($commonProps, $settings['name_field']);
 
         $cats = $this->get_child_categories(0, 0, array());
         $options = '';
         $cat_shift = $this->get_template_block('cat_shift');
         foreach ($cats as $cat)
         {
-            if ($cat['id']==$settings['catid'])
+            if ($cat['id'] == $settings['catid'])
                 $option = $this->get_template_block('cat_option_selected');
             else
                 $option = $this->get_template_block('cat_option');
-            $option = str_replace('%cat_id%'  ,$cat['id']  ,$option);
-            $option = str_replace('%cat_name%',str_repeat($cat_shift,$cat['depth']).$cat['name'],$option);
+            $option = str_replace('%cat_id%', $cat['id'], $option);
+            $option = str_replace('%cat_name%', str_repeat($cat_shift, $cat['depth']).$cat['name'], $option);
             $options .= $option;
         }
-        $content = str_replace('%cats_options%', $options , $content);
+        $content = str_replace('%cats_options%', $options, $content);
         $content = str_replace('var currAssocLines=0;', 'var currAssocLines='.$assocLinesCount.';', $content);
         $content = str_replace('%props_assoc_lines%', $props_assoc_lines, $content);
         $content = str_replace('%groups%', $gblock, $content);
@@ -8204,8 +8204,8 @@ class catalog extends BaseModule
         $content = str_replace('%priceType%', htmlspecialchars($settings['priceType']), $content);
 
 
-        $content = str_replace('%form_action%',$kernel->pub_redirect_for_form('import_commerceml'),$content);
-        $content = str_replace('%msg%',$msg,$content);
+        $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('import_commerceml'), $content);
+        $content = str_replace('%msg%', $msg, $content);
         return $content;
     }
 
@@ -8216,19 +8216,19 @@ class catalog extends BaseModule
         $group = CatalogCommons::get_group($groupid);
         if (!$group)
             return;
-        $modid=$kernel->pub_module_id_get();
-        $crec = $kernel->db_get_record_simple("_catalog_".$modid."_items","group_id=".$group['id'],"COUNT(*) AS count");
+        $modid = $kernel->pub_module_id_get();
+        $crec = $kernel->db_get_record_simple("_catalog_".$modid."_items", "group_id=".$group['id'], "COUNT(*) AS count");
         //не удаляем, если есть товары в группе
-        if ($crec['count']>0)
+        if ($crec['count'] > 0)
             return;
-        $prfx=$kernel->pub_prefix_get();
-        $q="DELETE FROM ".$prfx."_catalog_item_props WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
+        $prfx = $kernel->pub_prefix_get();
+        $q = "DELETE FROM ".$prfx."_catalog_item_props WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
         $kernel->runSQL($q);
-        $q="DELETE FROM ".$prfx."_catalog_visible_gprops WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
+        $q = "DELETE FROM ".$prfx."_catalog_visible_gprops WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
         $kernel->runSQL($q);
-        $q="DELETE FROM ".$prfx."_catalog_item_groups WHERE id='".$group['id']."'";
+        $q = "DELETE FROM ".$prfx."_catalog_item_groups WHERE id='".$group['id']."'";
         $kernel->runSQL($q);
-        $q="DELETE FROM  ".$prfx."_catalog_".$modid."_inner_filters WHERE groupid='".$group['id']."'";
+        $q = "DELETE FROM  ".$prfx."_catalog_".$modid."_inner_filters WHERE groupid='".$group['id']."'";
         $kernel->runSQL($q);
         $this->generate_search_form($groupid, array());
     }
@@ -8239,69 +8239,68 @@ class catalog extends BaseModule
      * @param array $ignoreItemIds айдишники товаров, которые НЕ надо включать в результаты
      * @return array
      */
-    public function get_quicksearch_results($term, $catid=null, $ignoreItemIds=array())
+    public function get_quicksearch_results($term, $catid = null, $ignoreItemIds = array())
     {
         global $kernel;
-        $terms = explode(" ",trim($term));
+        $terms = explode(" ", trim($term));
         if (!$terms)
             return array();
         $moduleid = $kernel->pub_module_id_get();
-        $props = CatalogCommons::get_props(0,true);
+        $props = CatalogCommons::get_props(0, true);
 
 
-        $addcond="";
+        $addcond = "";
         if ($catid)
-            $addcond.=" AND id IN (SELECT item_id FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat WHERE cat_id=".$catid.")";
+            $addcond .= " AND id IN (SELECT item_id FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_item2cat WHERE cat_id=".$catid.")";
         if ($ignoreItemIds)
-            $addcond.=" AND id NOT IN (".implode(",",$ignoreItemIds).")";
+            $addcond .= " AND id NOT IN (".implode(",", $ignoreItemIds).")";
 
         //сначала пробуем найти товары со ВСЕМИ словами из запроса (AND-логика)
-        $cond = $this->get_like_condition_for_terms($terms,$props,"AND");
-        $results=$kernel->db_get_list_simple("_catalog_".$moduleid."_items",$cond.$addcond,"*",0,100);
+        $cond = $this->get_like_condition_for_terms($terms, $props, "AND");
+        $results = $kernel->db_get_list_simple("_catalog_".$moduleid."_items", $cond.$addcond, "*", 0, 100);
         if (!$results)
-        {//если не нашли, пробуем найти хотя бы с одним словом из запроса (OR-логика)
-            $cond = $this->get_like_condition_for_terms($terms,$props,"OR");
-            $results=$kernel->db_get_list_simple("_catalog_".$moduleid."_items",$cond.$addcond,"*",0,100);
+        { //если не нашли, пробуем найти хотя бы с одним словом из запроса (OR-логика)
+            $cond = $this->get_like_condition_for_terms($terms, $props, "OR");
+            $results = $kernel->db_get_list_simple("_catalog_".$moduleid."_items", $cond.$addcond, "*", 0, 100);
         }
 
-        $sep=" | ";
-        foreach($results as &$r)
+        $sep = " | ";
+        foreach ($results as &$r)
         {
-            $stringBlocks=array();
+            $stringBlocks = array();
             foreach ($props as $prop)
             {
-                if (!$prop['showinlist'] || $prop['type']=='file' || $prop['type']=='pict')
+                if (!$prop['showinlist'] || $prop['type'] == 'file' || $prop['type'] == 'pict')
                     continue;
-                $strval=$r[$prop['name_db']];
-                if (mb_strlen($strval)==0)
+                $strval = $r[$prop['name_db']];
+                if (mb_strlen($strval) == 0)
                     continue;
-                $stringBlocks[]=$strval;
+                $stringBlocks[] = $strval;
             }
-            $r['_string']=strip_tags(implode($sep,$stringBlocks));
+            $r['_string'] = strip_tags(implode($sep, $stringBlocks));
         }
         return $results;
     }
 
 
-
-    private function get_like_condition_for_terms($terms,$props,$separator="OR")
+    private function get_like_condition_for_terms($terms, $props, $separator = "OR")
     {
-        $tblocks=array();
+        $tblocks = array();
         foreach ($terms as $t)
         {
-            $t=trim($t);
-            if (mb_strlen($t)==0)
+            $t = trim($t);
+            if (mb_strlen($t) == 0)
                 continue;
-            $propsblocks=array();
+            $propsblocks = array();
             foreach ($props as $prop)
             {
-                if (!in_array($prop['type'],array('enum','string','number')))
+                if (!in_array($prop['type'], array('enum', 'string', 'number')))
                     continue;
-                $propsblocks[]="`".$prop['name_db']."` LIKE '%".mysql_real_escape_string($t)."%'";
+                $propsblocks[] = "`".$prop['name_db']."` LIKE '%".mysql_real_escape_string($t)."%'";
             }
-            $tblocks[]="(".implode(" OR ",$propsblocks).")";
+            $tblocks[] = "(".implode(" OR ", $propsblocks).")";
         }
-        return "(".implode(" ".$separator." ",$tblocks).")";
+        return "(".implode(" ".$separator." ", $tblocks).")";
     }
 
     /**
@@ -8312,33 +8311,33 @@ class catalog extends BaseModule
     public function start_admin()
     {
         global $kernel;
-        $action=$kernel->pub_section_leftmenu_get();
+        $action = $kernel->pub_section_leftmenu_get();
         //если это не работа с деревом, "забудем" куку с выделенной нодой
-        if (!in_array($action,array('category_items','category_move','category_items_save','save_selected_items','item_edit','item_save')))
-            setcookie($this->structure_cookie_name,"");
+        if (!in_array($action, array('category_items', 'category_move', 'category_items_save', 'save_selected_items', 'item_edit', 'item_save')))
+            setcookie($this->structure_cookie_name, "");
         $moduleid = $kernel->pub_module_id_get();
         switch ($action)
         {
             case 'get_item_subcats_block':
                 $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
-                $cid=intval($kernel->pub_httpget_get('cid'));
+                $cid = intval($kernel->pub_httpget_get('cid'));
                 $catsblock = $this->build_item_categories_block($cid);
                 return "<ul>".$catsblock."</ul>";
 
             //ajax-поиск товаров
             case 'get_items_quicksearch_result':
-                $term=$kernel->pub_httpget_get('term',false);
-                $catid=intval($kernel->pub_httpget_get('catid',false));
-                $ignoredid=intval($kernel->pub_httpget_get('ignored',false));
+                $term = $kernel->pub_httpget_get('term', false);
+                $catid = intval($kernel->pub_httpget_get('catid', false));
+                $ignoredid = intval($kernel->pub_httpget_get('ignored', false));
                 if ($ignoredid)
                     $ignored = array($ignoredid);
                 else
                     $ignored = array();
-                $results=$this->get_quicksearch_results($term,$catid,$ignored);
-                $jdata=array();
-                foreach($results as $result)
+                $results = $this->get_quicksearch_results($term, $catid, $ignored);
+                $jdata = array();
+                foreach ($results as $result)
                 {
-                    $jdata[]=array("label"=>$result['_string'],"value"=>$result['id']);
+                    $jdata[] = array("label" => $result['_string'], "value" => $result['id']);
                 }
                 return $kernel->pub_json_encode($jdata);
                 break;
@@ -8365,20 +8364,20 @@ class catalog extends BaseModule
                 return $this->show_variables();
 
             case 'variable_delete':
-                $namedb=$kernel->pub_httpget_get('name_db');
+                $namedb = $kernel->pub_httpget_get('name_db');
                 $kernel->runSQL("DELETE FROM `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` WHERE `name_db`='".$namedb."'");
                 $kernel->pub_redirect_refresh('show_variables');
                 break;
 
             case 'show_variable_form':
                 $name_db = $kernel->pub_httpget_get("name_db");
-                return  $this->show_variable_form($name_db);
+                return $this->show_variable_form($name_db);
 
             case 'variable_save':
-                $name_full    = trim($kernel->pub_httppost_get('name_full'));
-                $name_db      = trim($kernel->pub_httppost_get('name_db'));
+                $name_full = trim($kernel->pub_httppost_get('name_full'));
+                $name_db = trim($kernel->pub_httppost_get('name_db'));
                 $prev_name_db = trim($kernel->pub_httppost_get('prev_name_db'));
-                $value        = trim($kernel->pub_httppost_get('value'));
+                $value = trim($kernel->pub_httppost_get('value'));
                 if (!preg_match("/^([0-9a-z_]+)$/i", $name_db))
                     return $kernel->pub_httppost_response("[#catalog_variable_save_msg_incorrect_namedb#]");
                 elseif (empty($name_full))
@@ -8388,15 +8387,15 @@ class catalog extends BaseModule
                 else
                 {
                     if (empty($prev_name_db))
-                        $query ="REPLACE INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` ".
+                        $query = "REPLACE INTO `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` ".
                             "(`name_db`,`name_full`,`value`) VALUES ".
                             "('".$name_db."','".$name_full."','".$value."')";
                     else
-                        $query ="UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` ".
+                        $query = "UPDATE `".$kernel->pub_prefix_get()."_catalog_".$moduleid."_variables` ".
                             "SET `name_db`='".$name_db."',`name_full`='".$name_full."',`value`='".$value."' ".
                             "WHERE `name_db`='".$prev_name_db."'";
                     $kernel->runSQL($query);
-                    return $kernel->pub_httppost_response("[#catalog_variable_save_msg_ok#]","show_variables");
+                    return $kernel->pub_httppost_response("[#catalog_variable_save_msg_ok#]", "show_variables");
                 }
 
             case 'show_gen_search_form':
@@ -8409,7 +8408,7 @@ class catalog extends BaseModule
                 $groupid = $kernel->pub_httppost_get('id', false);
                 $outfile = $kernel->pub_httppost_get('outfile');
                 $filtername = $kernel->pub_httppost_get('filtername');
-                $filtertpl= $kernel->pub_httppost_get('filtertpl');
+                $filtertpl = $kernel->pub_httppost_get('filtertpl');
                 $props = $_POST['prop'];
                 if (!empty($outfile))
                 {
@@ -8432,14 +8431,14 @@ class catalog extends BaseModule
             case 'make_csv_export':
                 $template = $kernel->pub_httppost_get('template', false);
                 $filterid = intval($kernel->pub_httppost_get('filterid', false));
-                $exported = $this->make_csv_export($template,$filterid);
+                $exported = $this->make_csv_export($template, $filterid);
                 header('Content-type: application/vnd.ms-excel');
                 header('Content-Disposition: attachment; filename=export.csv');
                 header('Content-Transfer-Encoding: binary');
                 header('Expires: 0');
                 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
                 header('Pragma: public');
-                header('Content-Length: ' . mb_strlen($exported));
+                header('Content-Length: '.mb_strlen($exported));
                 //ob_clean();
                 flush();
                 print $exported;
@@ -8455,27 +8454,27 @@ class catalog extends BaseModule
 
             //Вызов формы редактирования добавления/конкретного поля корзины
             case 'order_field_edit':
-                $id  = $kernel->pub_httpget_get('id');
+                $id = $kernel->pub_httpget_get('id');
                 return $this->show_order_field_form($id);
 
             case 'order_field_save':
-                $id        = $kernel->pub_httppost_get('id', false);
-                $name_db   = $kernel->pub_httppost_get('name_db', false);
+                $id = $kernel->pub_httppost_get('id', false);
+                $name_db = $kernel->pub_httppost_get('name_db', false);
                 $name_full = $kernel->pub_httppost_get('name_full', false);
-                $req       = $kernel->pub_httppost_get('req', false);
-                $regexp    = $kernel->pub_httppost_get('regexp', false);
+                $req = $kernel->pub_httppost_get('req', false);
+                $regexp = $kernel->pub_httppost_get('regexp', false);
                 $this->save_order_field($id, $name_full, $name_db, $regexp, $req);
-                return $kernel->pub_httppost_response("[#catalog_order_field_saved_msg#]","show_order_fields");
+                return $kernel->pub_httppost_response("[#catalog_order_field_saved_msg#]", "show_order_fields");
 
             case 'order_field_add':
-                $name_db   = $kernel->pub_httppost_get('name_db', false);
+                $name_db = $kernel->pub_httppost_get('name_db', false);
                 $name_full = $kernel->pub_httppost_get('name_full', false);
-                $req       = $kernel->pub_httppost_get('req', false);
-                $regexp    = $kernel->pub_httppost_get('regexp', false);
-                $ptype     = $kernel->pub_httppost_get('ptype', false);
-                $values    = $kernel->pub_httppost_get('enum_values', false);
+                $req = $kernel->pub_httppost_get('req', false);
+                $regexp = $kernel->pub_httppost_get('regexp', false);
+                $ptype = $kernel->pub_httppost_get('ptype', false);
+                $values = $kernel->pub_httppost_get('enum_values', false);
                 $this->add_order_field($name_full, $name_db, $regexp, $req, $ptype, $values);
-                return $kernel->pub_httppost_response("[#catalog_order_field_saved_msg#]","show_order_fields");
+                return $kernel->pub_httppost_response("[#catalog_order_field_saved_msg#]", "show_order_fields");
                 break;
             case 'order_field_delete':
                 $this->delete_order_field($kernel->pub_httpget_get('id'));
@@ -8483,12 +8482,12 @@ class catalog extends BaseModule
                 break;
 
             case 'order_enum_field_delete':
-                $id  = $kernel->pub_httpget_get("id");
+                $id = $kernel->pub_httpget_get("id");
                 $this->delete_order_enum_field($id);
                 return $this->show_order_field_form($id);
 
             case 'order_enum_field_add':
-                $id  = $kernel->pub_httppost_get("id");
+                $id = $kernel->pub_httppost_get("id");
                 $this->add_order_enum_field($id);
                 $str = "order_field_edit&id=".$id;
                 return $kernel->pub_httppost_response("[#catalog_edit_property_enum_add_msg#]", $str);
@@ -8507,7 +8506,7 @@ class catalog extends BaseModule
                 $this->regenerate_basket_items_tpl($basket_items_tpl_translit);
                 $this->regenerate_basket_order_tpl($basket_order_tpl_translit);
                 //значит была транслитерация
-                if ($basket_order_tpl_translit != $basket_order_tpl || $basket_items_tpl_translit!=$basket_items_tpl)
+                if ($basket_order_tpl_translit != $basket_order_tpl || $basket_items_tpl_translit != $basket_items_tpl)
                     return $kernel->pub_httppost_response("[#catalog_order_tpls_regenerated_translit_msg#]", "show_order_fields");
                 else
                     return $kernel->pub_httppost_response("[#catalog_order_tpls_regenerated_msg#]", "show_order_fields");
@@ -8525,22 +8524,22 @@ class catalog extends BaseModule
 
             case 'show_inner_filter_form':
                 $id = $kernel->pub_httpget_get("id");
-                return  $this->show_inner_filter_form($id);
+                return $this->show_inner_filter_form($id);
 
             case 'inner_filter_save':
                 $id = $kernel->pub_httppost_get("id");
                 $saveError = $this->save_inner_filter($id);
                 if (!$saveError)
-                    return $kernel->pub_httppost_response("[#catalog_edit_inner_filter_save_msg_ok#]","show_inner_filters");
+                    return $kernel->pub_httppost_response("[#catalog_edit_inner_filter_save_msg_ok#]", "show_inner_filters");
                 else
-                    return $kernel->pub_httppost_response("[#catalog_edit_inner_filter_save_msg_error#]",$saveError);
+                    return $kernel->pub_httppost_response("[#catalog_edit_inner_filter_save_msg_error#]", $saveError);
 
             case 'category_move':
                 $cid = $kernel->pub_httppost_get("node");
                 $parentNew = $kernel->pub_httppost_get("newParent");
                 $indexNew = $kernel->pub_httppost_get("index");
                 $order2replace = $this->get_last_order_in_cat($parentNew, $indexNew);
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `order`='.($order2replace+1).' WHERE `parent_id`='.$parentNew.' AND `order`='.$order2replace;
+                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `order`='.($order2replace + 1).' WHERE `parent_id`='.$parentNew.' AND `order`='.$order2replace;
                 $kernel->runSQL($query);
                 $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `parent_id`='.$parentNew.', `order`='.$order2replace.' WHERE `id`='.$cid;
                 $kernel->runSQL($query);
@@ -8556,32 +8555,32 @@ class catalog extends BaseModule
                 $kernel->pub_redirect_refresh_reload('show_items&group_id='.$group_id);
                 break;
 
-            case 'import_csv'://первый шаг - показываем форму для upload
+            case 'import_csv': //первый шаг - показываем форму для upload
                 $newfilename = $kernel->pub_session_get('importcsv_filename');
-                $group_id    = $kernel->pub_session_get('importcsv_groupid');
-                $separator   = $kernel->pub_session_get('importcsv_separator');
+                $group_id = $kernel->pub_session_get('importcsv_groupid');
+                $separator = $kernel->pub_session_get('importcsv_separator');
                 //если в сессии есть значения для второго шага импорта, покажем таблицу с первыми 10 эл-тами
                 if (!is_null($newfilename) && !is_null($group_id) && !is_null($separator))
                     return $this->show_import_csv_table($group_id, $newfilename, $separator);
                 else //иначе - начальную форму
                     return $this->show_import_csv_form();
 
-            case 'import_csv2'://сохраняем в сессии данные для импорта
-                $group_id    = $kernel->pub_httppost_get('group');
-                $separator   = $kernel->pub_httppost_get('separator');
-                $cat_id      = intval($kernel->pub_httppost_get('cat'));
-                $cat_id4new  = intval($kernel->pub_httppost_get('cat4new'));
+            case 'import_csv2': //сохраняем в сессии данные для импорта
+                $group_id = $kernel->pub_httppost_get('group');
+                $separator = $kernel->pub_httppost_get('separator');
+                $cat_id = intval($kernel->pub_httppost_get('cat'));
+                $cat_id4new = intval($kernel->pub_httppost_get('cat4new'));
                 $import_from = $kernel->pub_httppost_get("importfrom");
                 if ($separator == 'tab')
                     $sep = "\t";
                 else
                     $sep = ";";
                 $need_save = false;
-                $newfilename='';
+                $newfilename = '';
                 if ($import_from == "textarea")
-                {//через буфер обмена
+                { //через буфер обмена
                     $buffer = trim($kernel->pub_httppost_get("textarea", false));
-                    if (mb_strlen($buffer)>0)
+                    if (mb_strlen($buffer) > 0)
                     {
                         $buffer = str_replace('\r\n', "\n", $buffer);
                         $newfilename = 'content/files/'.$moduleid.'/buffer_'.time().'.txt';
@@ -8589,28 +8588,28 @@ class catalog extends BaseModule
                         $need_save = true;
                     }
                 }
-                else if (isset($_FILES['importcsv']) && is_uploaded_file($_FILES['importcsv']['tmp_name']) )
-                {//из файла, если он закачан
+                else if (isset($_FILES['importcsv']) && is_uploaded_file($_FILES['importcsv']['tmp_name']))
+                { //из файла, если он закачан
                     $newfilename = $this->process_file_upload($_FILES['importcsv']);
                     $need_save = true;
                 }
                 if ($need_save)
                 {
                     $kernel->pub_session_set('importcsv_filename', $newfilename);
-                    $kernel->pub_session_set('importcsv_groupid',  $group_id);
-                    $kernel->pub_session_set('importcsv_separator',$sep);
-                    $kernel->pub_session_set('importcsv_catid',$cat_id);
-                    $kernel->pub_session_set('importcsv_catid4new',$cat_id4new);
+                    $kernel->pub_session_set('importcsv_groupid', $group_id);
+                    $kernel->pub_session_set('importcsv_separator', $sep);
+                    $kernel->pub_session_set('importcsv_catid', $cat_id);
+                    $kernel->pub_session_set('importcsv_catid4new', $cat_id4new);
                 }
                 $kernel->pub_redirect_refresh_reload('import_csv');
                 break;
 
-            case 'import_csv3'://импортируем весь файл на основе настроек, выбранных админом
+            case 'import_csv3': //импортируем весь файл на основе настроек, выбранных админом
                 $newfilename = $kernel->pub_session_get('importcsv_filename');
-                $group_id    = $kernel->pub_session_get('importcsv_groupid');
-                $cat_id      = $kernel->pub_session_get('importcsv_catid');
-                $cat_id4new  = $kernel->pub_session_get('importcsv_catid4new');
-                $separator   = $kernel->pub_session_get('importcsv_separator');
+                $group_id = $kernel->pub_session_get('importcsv_groupid');
+                $cat_id = $kernel->pub_session_get('importcsv_catid');
+                $cat_id4new = $kernel->pub_session_get('importcsv_catid4new');
+                $separator = $kernel->pub_session_get('importcsv_separator');
                 $this->make_csv_import($group_id, $newfilename, $separator, $cat_id, $cat_id4new);
                 $kernel->pub_session_unset('importcsv_filename');
                 $kernel->pub_session_unset('importcsv_groupid');
@@ -8629,7 +8628,7 @@ class catalog extends BaseModule
             //Вызов формы редактирования добавления/конкртеного свойства
             case 'prop_edit':
                 $id_group = $kernel->pub_httpget_get('id_group');
-                $id_prop  = $kernel->pub_httpget_get('id');
+                $id_prop = $kernel->pub_httpget_get('id');
                 //ID группы, из которой было вызвано редактирование, так как
                 //из группы могут вызваны на редактирования и общие свойства
                 $id_group_control = $kernel->pub_httpget_get('idg_control');
@@ -8637,25 +8636,25 @@ class catalog extends BaseModule
 
             //Сохраняем значения свойства
             case 'prop_save':
-                $id        = $kernel->pub_httppost_get('id');
-                $name_db   = $kernel->pub_httppost_get('name_db');
+                $id = $kernel->pub_httppost_get('id');
+                $name_db = $kernel->pub_httppost_get('name_db');
                 $name_full = $kernel->pub_httppost_get('name_full');
-                $inlist    = $kernel->pub_httppost_get('inlist');
-                $sorted    = intval($kernel->pub_httppost_get('sorted'));
-                $ismain    = $kernel->pub_httppost_get('ismain');
+                $inlist = $kernel->pub_httppost_get('inlist');
+                $sorted = intval($kernel->pub_httppost_get('sorted'));
+                $ismain = $kernel->pub_httppost_get('ismain');
                 $this->save_prop($id, $name_full, $name_db, $inlist, $sorted, $ismain);
                 //Теперь опредилим, куда нужно вернуться
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
                 $id_group_control = intval($id_group_control);
-                return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]","show_group_props&id=".$id_group_control);
+                return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]", "show_group_props&id=".$id_group_control);
 
             //Сохраняем свойство КАТЕГОРИИ
             case 'cat_prop_save':
-                $id        = $kernel->pub_httppost_get('id');
-                $name_db   = $kernel->pub_httppost_get('name_db');
+                $id = $kernel->pub_httppost_get('id');
+                $name_db = $kernel->pub_httppost_get('name_db');
                 $name_full = $kernel->pub_httppost_get('name_full');
                 $this->save_cat_prop($id, $name_full, $name_db);
-                return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]","show_cat_props");
+                return $kernel->pub_httppost_response("[#catalog_prop_saved_msg#]", "show_cat_props");
 
             //Добавляем новое свойтво и общее и в группу
             case 'prop_add':
@@ -8663,12 +8662,12 @@ class catalog extends BaseModule
                 //Теперь определим, куда нужно вернуться
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
                 $id_group_control = intval($id_group_control);
-                return $kernel->pub_httppost_response("[#catalog_edit_property_added_msg#]","show_group_props&id=".$id_group_control);
+                return $kernel->pub_httppost_response("[#catalog_edit_property_added_msg#]", "show_group_props&id=".$id_group_control);
 
             //Удаляем свойство товарной группы
             case 'prop_delete':
                 $groupid = $kernel->pub_httpget_get("groupid");
-                $propid  = $kernel->pub_httpget_get("id");
+                $propid = $kernel->pub_httpget_get("id");
                 $this->delete_prop($propid, $groupid);
 
                 //Теперь опрделим, куда нужно вернуться
@@ -8680,9 +8679,9 @@ class catalog extends BaseModule
             //Вызывается при добавлении к уже существующему перечислению нового значения
             case 'enum_prop_add':
 
-                $enumval = $kernel->pub_httppost_get("enumval",false);
-                $propid  = $kernel->pub_httppost_get("id");
-                $prop    = $this->get_prop($propid);
+                $enumval = $kernel->pub_httppost_get("enumval", false);
+                $propid = $kernel->pub_httppost_get("id");
+                $prop = $this->get_prop($propid);
                 if ($prop['group_id'] == 0)
                     $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
                 else
@@ -8692,22 +8691,22 @@ class catalog extends BaseModule
                 }
                 $tinfo = $kernel->db_get_table_info($table);
                 $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
-                if (substr($tinfo[$prop['name_db']]['Type'],0,3)=='set')
+                if (substr($tinfo[$prop['name_db']]['Type'], 0, 3) == 'set')
                 {
-                    $ptype='set';
-                    if (count($evals)==64)
-                        return $kernel->pub_httppost_errore('[#catalog_set_type_64_max_error_msg#]',true);
+                    $ptype = 'set';
+                    if (count($evals) == 64)
+                        return $kernel->pub_httppost_errore('[#catalog_set_type_64_max_error_msg#]', true);
                 }
                 else
-                    $ptype='enum';
+                    $ptype = 'enum';
 
                 $evals[] = $enumval;
-                $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db($ptype,$evals);
+                $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db($ptype, $evals);
                 $kernel->runSQL($query);
 
                 //ID группы, из которой было вызвано редактирование, так как
                 //из группы могут вызваны на редактирования и общие свойства
-                $group_id  = $kernel->pub_httppost_get('group_id');
+                $group_id = $kernel->pub_httppost_get('group_id');
                 $id_group_control = intval($kernel->pub_httpget_get('id_group_control'));
 
                 $url = "prop_edit&id=".$propid."&id_group=".$group_id."&idg_control=$id_group_control";
@@ -8715,8 +8714,8 @@ class catalog extends BaseModule
 
             case 'enum_prop_delete':
                 $this->enum_set_prop_delete();
-                $id_prop          = $kernel->pub_httpget_get('propid');
-                $group_id         = $kernel->pub_httppost_get('group_id');
+                $id_prop = $kernel->pub_httpget_get('propid');
+                $group_id = $kernel->pub_httppost_get('group_id');
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
                 $id_group_control = intval($id_group_control);
                 $str = "prop_edit&id=".$id_prop."&id_group=".$group_id."&idg_control=$id_group_control";
@@ -8734,17 +8733,17 @@ class catalog extends BaseModule
                 return $this->show_group_form($id);
 
             case 'group_save':
-                $id      = intval($kernel->pub_httppost_get('id'));
-                $name    = $kernel->pub_httppost_get('name');
-                $namedb  = $kernel->pub_httppost_get('namedb');
+                $id = intval($kernel->pub_httppost_get('id'));
+                $name = $kernel->pub_httppost_get('name');
+                $namedb = $kernel->pub_httppost_get('namedb');
                 if ($id == -1)
                     $groupid = $this->add_group($name, $namedb);
                 else
                     $groupid = $this->save_group($id, $name, $namedb);
                 if ($groupid > 0)
-                    return $kernel->pub_httppost_response("[#catalog_edit_group_save_msg_ok#]","show_groups");
+                    return $kernel->pub_httppost_response("[#catalog_edit_group_save_msg_ok#]", "show_groups");
                 else
-                    return $kernel->pub_httppost_response("[#catalog_edit_group_save_msg_err#]","show_groups");
+                    return $kernel->pub_httppost_response("[#catalog_edit_group_save_msg_err#]", "show_groups");
                 break;
             case 'save_gprops_order':
                 //$gid = $kernel->pub_httppost_get('group_id');
@@ -8764,39 +8763,39 @@ class catalog extends BaseModule
 
             //Добавляет новое свойство к категории
             case 'cat_prop_add':
-                $values  = $kernel->pub_httppost_get('values',false);
-                $pname   = $kernel->pub_httppost_get('pname');
-                $ptype   = $kernel->pub_httppost_get('ptype');
+                $values = $kernel->pub_httppost_get('values', false);
+                $pname = $kernel->pub_httppost_get('pname');
+                $ptype = $kernel->pub_httppost_get('ptype');
                 $pnamedb = $kernel->pub_httppost_get('pnamedb');
-                $this->add_prop_in_cat($pname,$ptype,$values, $pnamedb);
-                return $kernel->pub_httppost_response("[#catalog_edit_property_cat_add_new_prop_msg#]","show_cat_props");
+                $this->add_prop_in_cat($pname, $ptype, $values, $pnamedb);
+                return $kernel->pub_httppost_response("[#catalog_edit_property_cat_add_new_prop_msg#]", "show_cat_props");
 
             case 'cat_prop_delete':
-                $propid  = $kernel->pub_httpget_get("id");
+                $propid = $kernel->pub_httpget_get("id");
                 $this->delete_cat_prop($propid);
                 $kernel->pub_redirect_refresh("show_cat_props");
                 break;
 
             case 'cat_enum_prop_add':
-                $enumval = $kernel->pub_httppost_get("enumval",false);
-                $propid  = $kernel->pub_httppost_get("id");
-                $prop    = $this->get_cat_prop($propid);
-                $table   = '_catalog_'.$moduleid.'_cats';
-                $tinfo   = $kernel->db_get_table_info($table);
-                $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
+                $enumval = $kernel->pub_httppost_get("enumval", false);
+                $propid = $kernel->pub_httppost_get("id");
+                $prop = $this->get_cat_prop($propid);
+                $table = '_catalog_'.$moduleid.'_cats';
+                $tinfo = $kernel->db_get_table_info($table);
+                $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                 $evals[] = $enumval;
-                $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
+                $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum', $evals);
                 $kernel->runSQL($query);
-                return $kernel->pub_httppost_response("[#catalog_edit_property_cat_enum_addnew_msg#]","cat_prop_edit&id=".$propid);
+                return $kernel->pub_httppost_response("[#catalog_edit_property_cat_enum_addnew_msg#]", "cat_prop_edit&id=".$propid);
 
             case 'cat_enum_prop_delete':
-                $enumval = $kernel->pub_httpget_get("enumval",false);
-                $propid  = $kernel->pub_httpget_get("propid");
-                $prop    = $this->get_cat_prop($propid);
-                $table   = '_catalog_'.$moduleid.'_cats';
-                $tinfo   = $kernel->db_get_table_info($table);
-                $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
-                $newevals= array();
+                $enumval = $kernel->pub_httpget_get("enumval", false);
+                $propid = $kernel->pub_httpget_get("propid");
+                $prop = $this->get_cat_prop($propid);
+                $table = '_catalog_'.$moduleid.'_cats';
+                $tinfo = $kernel->db_get_table_info($table);
+                $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
+                $newevals = array();
                 foreach ($evals as $eval)
                 {
                     if ($eval != $enumval)
@@ -8804,7 +8803,7 @@ class catalog extends BaseModule
                 }
                 $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL WHERE `'.$prop['name_db'].'`="'.$kernel->pub_str_prepare_set($enumval).'"';
                 $kernel->runSQL($query);
-                $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
+                $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum', $newevals);
                 $kernel->runSQL($query);
                 $kernel->pub_redirect_refresh("cat_prop_edit&id=".$propid);
                 break;
@@ -8813,11 +8812,11 @@ class catalog extends BaseModule
 
             //Добавляем новую категорию через дерево
             case 'category_add':
-                $pid  = $kernel->pub_httppost_get("node");
+                $pid = $kernel->pub_httppost_get("node");
                 $name = $kernel->pub_page_textlabel_replace('[#catalog_category_new_name#]');
                 if ($pid == 'index')
                     $pid = 0;
-                $order = $this->get_last_order_in_cat($pid)+2;
+                $order = $this->get_last_order_in_cat($pid) + 2;
                 $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` (`parent_id`,`name`,`order`) '.
                     'VALUES ('.$pid.',"'.$kernel->pub_str_prepare_set($name).'", '.$order.')';
                 $kernel->runSQL($query);
@@ -8837,7 +8836,7 @@ class catalog extends BaseModule
 
             //Удаление категории
             case 'category_delete':
-                $cat=$this->get_category(intval($kernel->pub_httppost_get('node')));
+                $cat = $this->get_category(intval($kernel->pub_httppost_get('node')));
                 if (!$cat)
                     $kernel->pub_redirect_refresh_reload('show_items');
                 $this->delete_category($cat);
@@ -8846,9 +8845,9 @@ class catalog extends BaseModule
 
             //Удаляет файл и очищает поле файл и изображения в категории
             case 'cat_clear_field':
-                $id    = $kernel->pub_httpget_get('id');
+                $id = $kernel->pub_httpget_get('id');
                 $dprop = $kernel->pub_httpget_get('field');
-                $cat   = $this->get_category($id);
+                $cat = $this->get_category($id);
                 $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `'.$dprop.'`=NULL WHERE `id`='.intval($id);
                 $kernel->runSQL($query);
                 $kernel->pub_file_delete($cat[$dprop]);
@@ -8866,7 +8865,7 @@ class catalog extends BaseModule
                     $this->save_category_items($catid);
                 else
                     $this->change_selected_items();
-                return $kernel->pub_httppost_response('[#catalog_variable_save_msg_ok#]','category_items&id='.$catid);
+                return $kernel->pub_httppost_response('[#catalog_variable_save_msg_ok#]', 'category_items&id='.$catid);
 
             //Выводит форму всех товаров, с фильтром по товарной группе
             case 'show_items':
@@ -8889,7 +8888,7 @@ class catalog extends BaseModule
                     unset($postprops['search']);
                     $search_props = array();
                     $matches = false;
-                    foreach ($postprops as $ppname=>$ppvalue)
+                    foreach ($postprops as $ppname => $ppvalue)
                     {
                         if (preg_match("/([a-z0-9_-]+)_(to|from)$/", $ppname, $matches))
                         {
@@ -8901,7 +8900,7 @@ class catalog extends BaseModule
                         if ($ppname == "id")
                             $search_props[$ppname] = "accurate";
                         elseif (is_array($ppvalue))
-                        {//enum-checkboxes
+                        { //enum-checkboxes
                             $search_props[$ppname] = "checkbox";
                         }
                         else
@@ -8910,13 +8909,13 @@ class catalog extends BaseModule
                         }
                     }
                     $squery = $this->generate_inner_filter_query($group_id, $search_props);
-                    $link ='';
+                    $link = '';
                     $squery = $this->prepare_inner_filter_sql($squery, array(), $link);
 
                     $squery = "SELECT items.* FROM ".$kernel->pub_prefix_get()."_catalog_".$moduleid."_items AS items ".
                         "LEFT JOIN ".$kernel->pub_prefix_get()."_catalog_items_".$moduleid."_".strtolower($groups[$group_id]['name_db'])." AS `".strtolower($groups[$group_id]['name_db'])."` ON items.ext_id = `".strtolower($groups[$group_id]['name_db'])."`.id ".
                         "WHERE items.`group_id`=".$group_id." AND (".$squery.")";
-                    $kernel->pub_session_set("search_items_query",$squery);
+                    $kernel->pub_session_set("search_items_query", $squery);
                     $kernel->pub_redirect_refresh_reload('show_items&search_results=1&group_id='.$group_id);
                     die();
                 }
@@ -8925,9 +8924,9 @@ class catalog extends BaseModule
             case 'add_linked_item':
                 $id1 = intval($kernel->pub_httppost_get('itemid'));
                 $id2 = intval($kernel->pub_httppost_get('addlinkedid'));
-                if ($id2>0)
+                if ($id2 > 0)
                     $this->add_items_link($id1, $id2);
-                return $kernel->pub_httppost_response("[#catalog_linked_item_added_msg#]","item_edit&id=".$id1);
+                return $kernel->pub_httppost_response("[#catalog_linked_item_added_msg#]", "item_edit&id=".$id1);
                 //$kernel->pub_redirect_refresh_reload("item_edit&id=".$id1);
                 break;
 
@@ -8964,10 +8963,10 @@ class catalog extends BaseModule
 
             //Очистка поля с файлом в товаре
             case 'item_clear_field':
-                $id_tovar    = $kernel->pub_httpget_get('id');
-                $dprop       = $kernel->pub_httpget_get('field');
-                $id_tovar    = intval($id_tovar);
-                $item  = $this->get_item_full_data($id_tovar);
+                $id_tovar = $kernel->pub_httpget_get('id');
+                $dprop = $kernel->pub_httpget_get('field');
+                $id_tovar = intval($id_tovar);
+                $item = $this->get_item_full_data($id_tovar);
                 //определяем, common-свойство или нет
                 $tinfo = $kernel->db_get_table_info('_catalog_'.$moduleid.'_items');
                 if (array_key_exists($dprop, $tinfo))
@@ -8990,7 +8989,7 @@ class catalog extends BaseModule
             //Удаление товара
             case 'item_delete':
                 $groupid = $kernel->pub_httpget_get('group_id');
-                $itemid  = $kernel->pub_httpget_get('id');
+                $itemid = $kernel->pub_httpget_get('id');
                 $this->delete_item($itemid);
                 //Если указана ID категории, то нужно вренуться в неё
                 $id_cat = $kernel->pub_httpget_get('id_cat');
@@ -9049,20 +9048,20 @@ class catalog extends BaseModule
         if (!$group)
             return false;
 
-        $modid=$kernel->pub_module_id_get();
+        $modid = $kernel->pub_module_id_get();
 
         //удаление картинок и файлов
-        $props=CatalogCommons::get_props($item['group_id'],true);
-        foreach($props as $prop)
+        $props = CatalogCommons::get_props($item['group_id'], true);
+        foreach ($props as $prop)
         {
-            if (!in_array($prop['type'],array('file','pict')) || !$item[$prop['name_db']])
+            if (!in_array($prop['type'], array('file', 'pict')) || !$item[$prop['name_db']])
                 continue;
             $kernel->pub_file_delete($item[$prop['name_db']]);
-            if ($prop['type']=='pict')
+            if ($prop['type'] == 'pict')
             {
                 //надо также удалить source и tn изображения
-                $kernel->pub_file_delete(str_replace($modid.'/',$modid.'/tn/',$item[$prop['name_db']]));
-                $kernel->pub_file_delete(str_replace($modid.'/',$modid.'/source/',$item[$prop['name_db']]));
+                $kernel->pub_file_delete(str_replace($modid.'/', $modid.'/tn/', $item[$prop['name_db']]));
+                $kernel->pub_file_delete(str_replace($modid.'/', $modid.'/source/', $item[$prop['name_db']]));
             }
         }
         //из общей таблицы товаров
@@ -9089,7 +9088,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $property = $kernel->pub_modul_properties_get('catalog_terms_per_page_admin');
-        if ($property['isset'] && intval($property['value'])>0)
+        if ($property['isset'] && intval($property['value']) > 0)
             return intval($property['value']);
         else
             return 20;
@@ -9119,7 +9118,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $offset = intval($kernel->pub_httpget_get($this->admin_param_offset_name));
-        if ($offset<0)
+        if ($offset < 0)
             $offset = 0;
         return $offset;
     }
@@ -9132,9 +9131,9 @@ class catalog extends BaseModule
     protected function enum_set_prop_delete()
     {
         global $kernel;
-        $val2del = $kernel->pub_httpget_get("enumval",false);
-        $propid  = $kernel->pub_httpget_get("propid");
-        $prop    = $this->get_prop($propid);
+        $val2del = $kernel->pub_httpget_get("enumval", false);
+        $propid = $kernel->pub_httpget_get("propid");
+        $prop = $this->get_prop($propid);
         if ($prop['group_id'] == 0)
             $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
         else
@@ -9144,22 +9143,22 @@ class catalog extends BaseModule
         }
         $tinfo = $kernel->db_get_table_info($table);
         $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
-        $newevals= array();
+        $newevals = array();
         foreach ($evals as $eval)
         {
             if ($eval != $val2del)
                 $newevals[] = $eval;
         }
-        if (substr($tinfo[$prop['name_db']]['Type'],0,3)=='set')
-            $ptype='set';
+        if (substr($tinfo[$prop['name_db']]['Type'], 0, 3) == 'set')
+            $ptype = 'set';
         else
-            $ptype='enum';
-        if ($ptype=='enum')
+            $ptype = 'enum';
+        if ($ptype == 'enum')
             $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL WHERE `'.$prop['name_db'].'`="'.mysql_real_escape_string($val2del).'"';
         else
             $query = "UPDATE `".$kernel->pub_prefix_get().$table."` SET `".$prop['name_db']."`=REPLACE(`".$prop['name_db']."`,'".mysql_real_escape_string($val2del)."','') WHERE `".$prop['name_db']."` LIKE '%".mysql_real_escape_string($val2del)."%' ";
         $kernel->runSQL($query);
-        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db($ptype,$newevals);
+        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db($ptype, $newevals);
         $kernel->runSQL($query);
     }
 
@@ -9177,23 +9176,23 @@ class catalog extends BaseModule
         if (!$olditem)
             return false;
         $newitem = array();
-        foreach ($olditem as $k=>$v)
+        foreach ($olditem as $k => $v)
         {
-            if ($k=="id")
+            if ($k == "id")
                 continue;
-            elseif ($k=="ext_id")
+            elseif ($k == "ext_id")
                 $v = 0;
             elseif ($k == "name")
-                $v.=" копия";
-            if ($k!="ext_id" && mb_strlen($v)==0)
-                $newitem[$k]=null;
+                $v .= " копия";
+            if ($k != "ext_id" && mb_strlen($v) == 0)
+                $newitem[$k] = null;
             else
-                $newitem[$k]=mysql_real_escape_string($v);
+                $newitem[$k] = mysql_real_escape_string($v);
         }
 
         if (!$newitem)
-            $newitem=array("id"=>null);
-        $newID=$kernel->db_add_record('_catalog_'.$kernel->pub_module_id_get().'_items',$newitem);
+            $newitem = array("id" => null);
+        $newID = $kernel->db_add_record('_catalog_'.$kernel->pub_module_id_get().'_items', $newitem);
 
         //теперь в таблице товарной группы
         $group = CatalogCommons::get_group($olditem['group_id']);
@@ -9201,25 +9200,25 @@ class catalog extends BaseModule
         if (!$olditem)
             return false;
         $newitem = array();
-        foreach ($olditem as $k=>$v)
+        foreach ($olditem as $k => $v)
         {
-            if ($k=="id")
+            if ($k == "id")
                 continue;
-            if (mb_strlen($v)==0)
-                $newitem[$k]=null;
+            if (mb_strlen($v) == 0)
+                $newitem[$k] = null;
             else
-                $newitem[$k]=mysql_real_escape_string($v);
+                $newitem[$k] = mysql_real_escape_string($v);
         }
         if (!$newitem)
-            $newitem=array("id"=>null);
-        $newExtID=$kernel->db_add_record('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']),$newitem);
+            $newitem = array("id" => null);
+        $newExtID = $kernel->db_add_record('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']), $newitem);
 
-        $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` SET `ext_id`='.$newExtID.' WHERE id='.$newID;
+        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` SET `ext_id`='.$newExtID.' WHERE id='.$newID;
         $kernel->runSQL($query);
 
         //скопируем принадлежность к категориям
         $catIDs = $this->get_item_catids_with_order($id);
-        foreach ($catIDs as $cid=>$order)
+        foreach ($catIDs as $cid => $order)
         {
             $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` (`cat_id`,`item_id`,`order`) VALUES ('.$cid.','.$newID.','.$order.')';
             $kernel->runSQL($query);
@@ -9228,12 +9227,12 @@ class catalog extends BaseModule
         //скопируем связанные товары
         $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items_links` WHERE itemid1='.$id.' OR itemid2='.$id;
         $res = $kernel->runSQL($query);
-        while($row=mysql_fetch_assoc($res))
+        while ($row = mysql_fetch_assoc($res))
         {
-            if ($row['itemid1']==$id)
-                $lid=$row['itemid2'];
+            if ($row['itemid1'] == $id)
+                $lid = $row['itemid2'];
             else
-                $lid=$row['itemid1'];
+                $lid = $row['itemid1'];
             $this->add_items_link($newID, $lid);
         }
         mysql_free_result($res);
@@ -9245,7 +9244,7 @@ class catalog extends BaseModule
      * @param array $cached_cats массив всех категорий
      * @return array
      */
-    private function get_max_catway2item($itemid, $cached_cats=null)
+    private function get_max_catway2item($itemid, $cached_cats = null)
     {
         $catids = $this->get_item_catids($itemid);
         $max_length = 0;
@@ -9253,7 +9252,7 @@ class catalog extends BaseModule
         foreach ($catids as $catid)
         {
             $way = $this->get_way2cat($catid, true, $cached_cats);
-            if (count($way)>$max_length)
+            if (count($way) > $max_length)
             {
                 $max_way = $way;
                 $max_length = count($way);
@@ -9267,14 +9266,13 @@ class catalog extends BaseModule
      *
      * @param string  $tpl   шаблон
      * @param string  $filterid   строковый ID-шник внутреннего фильтра
-
      * @return string
      */
     public function pub_catalog_show_export($tpl, $filterid)
     {
         global $kernel;
         $categories = false;
-        if ($filterid && $filterid!="null")
+        if ($filterid && $filterid != "null")
         {
             //если указан внутренний фильтр - возьмём товары из него
             //в данном случае будет использоваться шаблон, прописанный в фильтре
@@ -9285,12 +9283,12 @@ class catalog extends BaseModule
         {
             $this->set_templates($kernel->pub_template_parse($tpl));
             $groups = CatalogCommons::get_groups();
-            $groups_props = array();//здесь будем кэшировать свойства групп, чтобы не повторять запросы к БД
+            $groups_props = array(); //здесь будем кэшировать свойства групп, чтобы не повторять запросы к БД
             $items = $this->get_items(0, 0, 0, true);
-            if (count($items)==0)
-                $content= $this->get_template_block('list_null');
+            if (count($items) == 0)
+                $content = $this->get_template_block('list_null');
             else
-                $content= $this->get_template_block('list');
+                $content = $this->get_template_block('list');
             $rows = "";
             foreach ($items as $item)
             {
@@ -9310,20 +9308,20 @@ class catalog extends BaseModule
                 if ($item2)
                     $item = $item + $item2;
 
-                $block  = $this->get_template_block('row');
+                $block = $this->get_template_block('row');
                 $block = $this->process_item_props_out($item, $props, $block, $igroup);
-                $rows.=$block;
+                $rows .= $block;
 
             }
             $content = str_replace("%row%", $rows, $content);
         }
 
         //добавим категории в шаблон, если надо
-        if (mb_strpos($content, "%categories_flat_list%")!==false)
+        if (mb_strpos($content, "%categories_flat_list%") !== false)
         {
             if (!$categories)
                 $categories = CatalogCommons::get_all_categories($kernel->pub_module_id_get());
-            if (count($categories)==0)
+            if (count($categories) == 0)
                 $block = $this->get_template_block('categories_flat_null');
             else
             {
@@ -9332,12 +9330,12 @@ class catalog extends BaseModule
                 foreach ($categories as $cat)
                 {
                     $row = $this->get_template_block('category_flat_row');
-                    foreach ($cat as $ck=>$cv)
+                    foreach ($cat as $ck => $cv)
                     {
                         $row = str_replace("%".$ck."%", $cv, $row);
                         $row = str_replace("%".$ck."_value%", $cv, $row);
                     }
-                    $rows.=$row;
+                    $rows .= $row;
                 }
                 $block = str_replace("%category_row%", $rows, $block);
             }
@@ -9345,7 +9343,7 @@ class catalog extends BaseModule
 
         }
 
-        if (preg_match_all("|\\%single_cat_id\\[(\\d+)\\]\\%|isU",$content, $matches, PREG_SET_ORDER))
+        if (preg_match_all("|\\%single_cat_id\\[(\\d+)\\]\\%|isU", $content, $matches, PREG_SET_ORDER))
         {
             if (!$categories)
                 $categories = CatalogCommons::get_all_categories($kernel->pub_module_id_get());
@@ -9354,8 +9352,8 @@ class catalog extends BaseModule
             {
                 $itemid = intval($match[1]);
                 $max_way = $this->get_max_catway2item($itemid, $categories);
-                if (count($max_way)>0)
-                    $content = str_replace($match[0], $max_way[count($max_way)-1]['id'], $content);
+                if (count($max_way) > 0)
+                    $content = str_replace($match[0], $max_way[count($max_way) - 1]['id'], $content);
                 else
                     $content = str_replace($match[0], "0", $content);
             }
@@ -9375,12 +9373,12 @@ class catalog extends BaseModule
                 return intval($_GET[$this->frontend_param_cat_id_name]);
             if (is_array($_GET[$this->frontend_param_cat_id_name]))
             {
-                $arr=array();
+                $arr = array();
                 foreach (array_keys($_GET[$this->frontend_param_cat_id_name]) as $cid)
                 {
-                    $cid=intval($cid);
-                    if ($cid>0)
-                        $arr[]=$cid;
+                    $cid = intval($cid);
+                    if ($cid > 0)
+                        $arr[] = $cid;
                 }
                 if ($arr)
                     return $arr;
@@ -9392,12 +9390,12 @@ class catalog extends BaseModule
                 return intval($_POST[$this->frontend_param_cat_id_name]);
             if (is_array($_POST[$this->frontend_param_cat_id_name]))
             {
-                $arr=array();
+                $arr = array();
                 foreach (array_keys($_POST[$this->frontend_param_cat_id_name]) as $cid)
                 {
-                    $cid=intval($cid);
-                    if ($cid>0)
-                        $arr[]=$cid;
+                    $cid = intval($cid);
+                    if ($cid > 0)
+                        $arr[] = $cid;
                 }
                 if ($arr)
                     return $arr;
@@ -9407,73 +9405,72 @@ class catalog extends BaseModule
     }
 
 
-
-    public function pub_catalog_show_compare($tpl,$max_items)
+    public function pub_catalog_show_compare($tpl, $max_items)
     {
         global $kernel;
-        $post_cb_name='additems2compare';//параметр для чекбоксов
-        $single_param_name='add2compare';//параметр при единичном добавлении
-        $remove_param_name='remove_from_compare';//параметр для удаления
-        $groupID=0;
+        $post_cb_name = 'additems2compare'; //параметр для чекбоксов
+        $single_param_name = 'add2compare'; //параметр при единичном добавлении
+        $remove_param_name = 'remove_from_compare'; //параметр для удаления
+        $groupID = 0;
         $moduleid = $kernel->pub_module_id_get();
-        $session_name=$moduleid.'_compared_items';
+        $session_name = $moduleid.'_compared_items';
         if (isset($_SESSION[$session_name]) && $_SESSION[$session_name])
         {
-            $items2compare=$_SESSION[$session_name];
-            $groupID=$items2compare[key($items2compare)]['group_id'];
+            $items2compare = $_SESSION[$session_name];
+            $groupID = $items2compare[key($items2compare)]['group_id'];
         }
         else
-            $items2compare=array();
+            $items2compare = array();
 
 
-        $is_modifed_list=false;
-        if (count($items2compare)<$max_items && isset($_POST[$post_cb_name]) && is_array($_POST[$post_cb_name]))
-        {//чекбоксы
-            foreach($_POST[$post_cb_name] as $id)
+        $is_modifed_list = false;
+        if (count($items2compare) < $max_items && isset($_POST[$post_cb_name]) && is_array($_POST[$post_cb_name]))
+        { //чекбоксы
+            foreach ($_POST[$post_cb_name] as $id)
             {
                 if (!CatalogCommons::is_valid_itemid($id))
                     continue;
                 $idata = $this->get_item_full_data($id);
-                if (!$idata || ($groupID && $idata['group_id']!=$groupID))
+                if (!$idata || ($groupID && $idata['group_id'] != $groupID))
                     continue;
 
-                $items2compare[$idata['commonid']]=$idata;
-                $groupID=$idata['group_id'];
-                if (count($items2compare)==$max_items)
+                $items2compare[$idata['commonid']] = $idata;
+                $groupID = $idata['group_id'];
+                if (count($items2compare) == $max_items)
                     break;
             }
-            $is_modifed_list=true;
+            $is_modifed_list = true;
         }
         //добавление единичного товара
-        if (count($items2compare)<$max_items && isset($_REQUEST[$single_param_name]) && CatalogCommons::is_valid_itemid($_REQUEST[$single_param_name]))
+        if (count($items2compare) < $max_items && isset($_REQUEST[$single_param_name]) && CatalogCommons::is_valid_itemid($_REQUEST[$single_param_name]))
         {
             $idata = $this->get_item_full_data($_REQUEST[$single_param_name]);
-            if ($idata && (!$groupID || $groupID==$idata['group_id']))
+            if ($idata && (!$groupID || $groupID == $idata['group_id']))
             {
-                $items2compare[$idata['commonid']]=$idata;
-                $groupID=$idata['group_id'];
+                $items2compare[$idata['commonid']] = $idata;
+                $groupID = $idata['group_id'];
             }
-            $is_modifed_list=true;
+            $is_modifed_list = true;
         }
 
         //удаление из сравнения
         if (isset($_POST[$remove_param_name]) && is_array($_POST[$remove_param_name]))
-        {//чекбоксами
-            foreach($_POST[$remove_param_name] as $riid)
+        { //чекбоксами
+            foreach ($_POST[$remove_param_name] as $riid)
             {
                 if (isset($items2compare[$riid]))
                     unset($items2compare[$riid]);
             }
-            $is_modifed_list=true;
+            $is_modifed_list = true;
         }
-        elseif (isset($_REQUEST[$remove_param_name]) && isset($items2compare[$_REQUEST[$remove_param_name]]))//единичный товар
+        elseif (isset($_REQUEST[$remove_param_name]) && isset($items2compare[$_REQUEST[$remove_param_name]])) //единичный товар
         {
             unset($items2compare[$_REQUEST[$remove_param_name]]);
-            $is_modifed_list=true;
+            $is_modifed_list = true;
         }
 
         //добавим в сессию
-        $_SESSION[$session_name]=$items2compare;
+        $_SESSION[$session_name] = $items2compare;
 
         //редирект назад если надо
         if ($is_modifed_list)
@@ -9481,7 +9478,7 @@ class catalog extends BaseModule
             if (isset($_REQUEST['redir2']) && !empty($_REQUEST['redir2']))
             {
                 $redirURL = $_REQUEST['redir2'];
-                if (substr($redirURL,0,1)!="/")
+                if (substr($redirURL, 0, 1) != "/")
                     $redirURL = "/".$redirURL;
             }
             else
@@ -9493,65 +9490,65 @@ class catalog extends BaseModule
         $this->set_templates($kernel->pub_template_parse($tpl));
         if (!$items2compare)
             return $this->get_template_block('list_null');
-        if (count($items2compare)==1)
+        if (count($items2compare) == 1)
             return $this->get_template_block('less_than_two');
         $content = $this->get_template_block('content');
         $props = CatalogCommons::get_props($groupID, true);
-        foreach($props as $prop)
+        foreach ($props as $prop)
         {
-            $is_same_value=true;
-            $val=null;
-            $inum=0;
-            $pvalues=array();
-            foreach($items2compare as $item)
+            $is_same_value = true;
+            $val = null;
+            $inum = 0;
+            $pvalues = array();
+            foreach ($items2compare as $item)
             {
                 $inum++;
-                if ($inum==1)
-                    $val=$item[$prop['name_db']];
-                elseif ($val!=$item[$prop['name_db']])
-                    $is_same_value=false;
+                if ($inum == 1)
+                    $val = $item[$prop['name_db']];
+                elseif ($val != $item[$prop['name_db']])
+                    $is_same_value = false;
                 $pvalue = $this->get_template_block('prop_value');
-                $pvalue = str_replace('%value%',$item[$prop['name_db']],$pvalue);
-                $pvalues[]=$pvalue;
+                $pvalue = str_replace('%value%', $item[$prop['name_db']], $pvalue);
+                $pvalues[] = $pvalue;
             }
             //различные блоки для одинаковых и разных значений свойств
             if ($is_same_value)
                 $pline = $this->get_template_block('same_value_line');
             else
                 $pline = $this->get_template_block('diff_value_line');
-            $pline = str_replace('%name_full%',$prop['name_full'],$pline);
-            $pline = str_replace('%prop_values%',implode($this->get_template_block('prop_values_separator'),$pvalues),$pline);
-            $content=str_replace('%'.$prop['name_db'].'_line%',$pline,$content);
+            $pline = str_replace('%name_full%', $prop['name_full'], $pline);
+            $pline = str_replace('%prop_values%', implode($this->get_template_block('prop_values_separator'), $pvalues), $pline);
+            $content = str_replace('%'.$prop['name_db'].'_line%', $pline, $content);
         }
         //в заголовке - вывод информации о сравниваемых товарах (название, фото)
         $iheaders = array();
-        foreach($items2compare as $item)
+        foreach ($items2compare as $item)
         {
             $iheader = $this->get_template_block('item_header');
-            $iheader=$this->process_item_props_out($item,$props,$iheader);
-            $iheaders[]=$iheader;
+            $iheader = $this->process_item_props_out($item, $props, $iheader);
+            $iheaders[] = $iheader;
         }
-        $content = str_replace('%items_headers%',implode($this->get_template_block('iheaders_separator'),$iheaders),$content);
+        $content = str_replace('%items_headers%', implode($this->get_template_block('iheaders_separator'), $iheaders), $content);
 
         $content = $this->clear_left_labels($content);
         return $content;
 
     }
 
-    private function cats_props_out($catid,$content)
+    private function cats_props_out($catid, $content)
     {
         $cat = $this->get_category($catid);
         if (!$cat)
             return $content;
-        $content = str_replace("%catid%",$cat['id'],$content);
+        $content = str_replace("%catid%", $cat['id'], $content);
         $cats_props = CatalogCommons::get_cats_props();
         foreach ($cats_props as $cprop)
         {
-            if (mb_strpos($content, '%category_'.$cprop['name_db'].'%')!==false)
+            if (mb_strpos($content, '%category_'.$cprop['name_db'].'%') !== false)
             {
-                $content = str_replace('%category_'.$cprop['name_db'].'%', $this->get_template_block('category_'.$cprop['name_db']),$content);
+                $content = str_replace('%category_'.$cprop['name_db'].'%', $this->get_template_block('category_'.$cprop['name_db']), $content);
                 $content = str_replace('%category_'.$cprop['name_db'].'_value%', $cat[$cprop['name_db']], $content);
-                $content = str_replace('%category_'.$cprop['name_db'].'_name%',  $cprop['name_full'], $content);
+                $content = str_replace('%category_'.$cprop['name_db'].'_name%', $cprop['name_full'], $content);
             }
         }
         return $content;

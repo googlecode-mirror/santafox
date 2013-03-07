@@ -3585,12 +3585,17 @@ class catalog extends BaseModule
             $itemid  = $this->add_item();
             if (!$itemid)
                 return $kernel->pub_httppost_errore('[#interface_global_label_error#]',true);
+            $is_new=true;
         }
+        else
+            $is_new=false;
         $item  = $this->get_item_full_data($itemid);
 
+        $moduleid=$kernel->pub_module_id_get();
+        $main_prop=$this->get_common_main_prop();
         //сначала сохраним common-свойства
         $props  = CatalogCommons::get_common_props($kernel->pub_module_id_get());
-        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` SET ';
+        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items` SET ';
         for ($i=0; $i<count($props); $i++)
         {
             $prop   = $props[$i];
@@ -3610,6 +3615,16 @@ class catalog extends BaseModule
             }
             else
                 $val = $kernel->pub_httppost_get($prop['name_db'], false);
+            if ($val && $main_prop==$prop['name_db'])
+            {
+                $exrec=$kernel->db_get_record_simple("_catalog_".$moduleid."_items","`".$prop['name_db']."`='".mysql_real_escape_string($val)."'","id");
+                if ($exrec && $exrec['id']!=$itemid)
+                {
+                    $msg=$kernel->pub_page_textlabel_replace('[#catalog_not_uniq_main_prop_save#]');
+                    $msg = str_replace('%fieldname%',$prop['name_db'],$msg);
+                    return $kernel->pub_httppost_errore($msg,true);
+                }
+            }
             $query .= '`'.$prop['name_db'].'`='.$this->prepare_property_value($val,$prop['type']).',';
         }
         $aval = $kernel->pub_httppost_get("available");
@@ -3627,7 +3642,7 @@ class catalog extends BaseModule
 
         if (count($props) > 0)
         {
-            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` SET ';
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_items_'.$moduleid.'_'.strtolower($group['name_db']).'` SET ';
             for ($i=0; $i<count($props); $i++)
             {
                 $prop   = $props[$i];
@@ -3658,8 +3673,8 @@ class catalog extends BaseModule
 
         //...и категории
         $item_catids = $this->get_item_catids_with_order($itemid);
-        $cats = CatalogCommons::get_all_categories($kernel->pub_module_id_get());
-        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` (`item_id`, `cat_id`, `order`) VALUES ';
+        $cats = CatalogCommons::get_all_categories($moduleid);
+        $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_item2cat` (`item_id`, `cat_id`, `order`) VALUES ';
         $vals = array();
         foreach ($cats as $cat)
         {
@@ -3676,7 +3691,7 @@ class catalog extends BaseModule
             {//чекбокс не отмечен
                 if (array_key_exists($cat['id'], $item_catids))
                 {//товар был в категории, но чекбокс снят - удалим
-                    $del_q = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat`
+                    $del_q = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_item2cat`
                               WHERE  `item_id`='.$itemid.' AND `cat_id`='.$cat['id'];
                     $kernel->runSQL($del_q);
                 }
@@ -3743,14 +3758,14 @@ class catalog extends BaseModule
             $ismain = 1;
 
         $name_db = $this->translate_string2db($name_db);
+        $moduleid=$kernel->pub_module_id_get();
         //изменилось ли БД-имя?
         if ($name_db != $prop['name_db'])
         {
             $n=1;
             while ($this->is_prop_exists($prop['group_id'], $name_db) || $this->is_prop_exists(0, $name_db))
                 $name_db .= $n++;
-            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET '.
-                '`name_db`="'.$kernel->pub_str_prepare_set($name_db).'" WHERE `id`='.$pid;
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `name_db`="'.$name_db.'" WHERE `id`='.$pid;
             $kernel->runSQL($query);
             if ($prop['group_id']>0)
             {
@@ -3760,11 +3775,11 @@ class catalog extends BaseModule
             }
             else
             {
-                $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
+                $table = '_catalog_'.$moduleid.'_items';
                 //изменилось БД-имя и это общее свойство - обновим таблицу видимых свойств для групп
-                $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_visible_gprops` SET '.
-                    '`prop`="'.$kernel->pub_str_prepare_set($name_db).'" WHERE '.
-                    '`prop`="'.$prop['name_db'].'" AND `module_id`="'.$kernel->pub_module_id_get().'"';
+                $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_visible_gprops`
+                    SET `prop`="'.$kernel->pub_str_prepare_set($name_db).'"
+                    WHERE `prop`="'.$prop['name_db'].'" AND `module_id`="'.$moduleid.'"';
                 $kernel->runSQL($query);
             }
             $values = null;
@@ -3784,20 +3799,21 @@ class catalog extends BaseModule
         {
             if ($sort > 0)
             {//сбросим `sorted` для остальных полей
-                $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0';
+                $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0 AND `module_id`="'.$moduleid.'"';
                 $kernel->runSQL($query);
             }
             if ($ismain == 1)
             {//сбросим `ismain` для остальных полей
-                $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0';
+                $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0 AND `module_id`="'.$moduleid.'"';
                 $kernel->runSQL($query);
             }
 
-            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET '.
-                '`name_full`="'.$kernel->pub_str_prepare_set($name_full).'", '.
-                '`showinlist`='.$inlist.', '.
-                '`ismain`='.$ismain.', '.
-                '`sorted`='.$sort.' WHERE `id`='.$pid;
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET
+                `name_full`="'.$name_full.'",
+                `showinlist`='.$inlist.',
+                `ismain`='.$ismain.',
+                `sorted`='.$sort.'
+                WHERE `id`='.$pid;
             $kernel->runSQL($query);
         }
 
@@ -3805,7 +3821,7 @@ class catalog extends BaseModule
         if ($prop['type'] == 'pict')
         {
 
-            $prop['add_param']['pict_path']           = $kernel->pub_httppost_get('pict_path');
+            $prop['add_param']['pict_path'] = $kernel->pub_httppost_get('pict_path');
 
             //Исходное изображение
             if ($kernel->pub_httppost_get('pict_source_isset'))
@@ -4026,15 +4042,15 @@ class catalog extends BaseModule
             $order = 10;
         else
             $order = $gprops[$props_count-1]['order']+10;
-
+        $moduleid = $kernel->pub_module_id_get();
         if ($ismain == 1)
         {//сбросим `ismain` для остальных полей
-            $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0';
+            $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `ismain`=0 WHERE `group_id`=0 AND module_id="'.$moduleid.'"';
             $kernel->runSQL($query);
         }
         if ($sorted > 0)
         {//сбросим `sorted` для остальных полей
-            $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0';
+            $query  = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_item_props` SET `sorted`=0 WHERE `group_id`=0 AND module_id="'.$moduleid.'"';
             $kernel->runSQL($query);
         }
 
@@ -4051,12 +4067,12 @@ class catalog extends BaseModule
 
         if ($group_id > 0)
         {
-            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).'` ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
+            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_items_'.$moduleid.'_'.strtolower($group['name_db']).'` ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
             @unlink($kernel->pub_site_root_get()."/modules/catalog/templates_admin/items_search_form_".$group['name_db'].".html");
         }
         else
         {//common-свойство
-            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items`
+            $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_items`
                       ADD COLUMN `'.$namedb."` ".$this->convert_field_type_2_db($ptype,$values);
             //по-умолчанию добавляем как видимое для всех тов. групп
             $groups = CatalogCommons::get_groups();
@@ -4079,7 +4095,7 @@ class catalog extends BaseModule
         {//тип свойства такой, который используется в шаблоне поиска
             if ($group_id==0)
             {//добавили общее свойство
-                $groups=CatalogCommons::get_groups($kernel->pub_module_id_get());
+                $groups=CatalogCommons::get_groups($moduleid);
                 foreach($groups as $group)
                 {
                     $this->generate_search_form($group['id'],array());

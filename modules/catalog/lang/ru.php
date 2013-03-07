@@ -479,3 +479,4 @@ $il['catalog_list_group_items_count_label']='Товаров';
 $il['catalog_edit_category_hide_from_waysite_label']='Скрывать в дороге';
 
 $il['catalog_set_type_64_max_error_msg']='Тип данных SET не позволяет иметь более 64 возможных значений';
+$il['catalog_not_uniq_main_prop_save']='Поле %fieldname% помечено как уникальное, но установлено неуникальное значение';

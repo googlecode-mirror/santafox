@@ -45,7 +45,7 @@ class catalog_install extends install_modules
         . ' `module_id` varchar(255) NOT NULL, '
         . ' `name_db` varchar(255) NOT NULL, '
         . ' `name_full` varchar(255) NOT NULL, '
-        . ' `type` enum(\'string\',\'enum\',\'number\',\'text\',\'html\',\'file\',\'pict\',\'date\') NOT NULL, '
+        . ' `type` enum(\'string\',\'enum\',\'number\',\'text\',\'html\',\'file\',\'pict\',\'date\',\'set\') NOT NULL, '
         . ' `showinlist` tinyint(1) unsigned NOT NULL default \'0\', '
         . ' `sorted` tinyint(1) unsigned NOT NULL default \'0\', '
         . ' `ismain` tinyint(1) unsigned NOT NULL default \'0\', '

@@ -226,8 +226,9 @@ $il['catalog_prop_type_date']                      = 'Дата-время';
 $il['catalog_prop_type_file']                      = 'Файл';
 $il['catalog_prop_type_pict']                      = 'Изображение';
 $il['catalog_prop_type_number']                    = 'Числовое';
-$il['catalog_prop_type_enum']                      = 'Набор значений';
+$il['catalog_prop_type_enum']                      = 'Набор значений (ENUM)';
 $il['catalog_prop_type_enum_notselect']            = 'Не выбран';
+$il['catalog_prop_type_set']                       = 'Набор значений (SET)';
 
 //Меню
 $il['catalog_menu_label']                  = 'Настройка каталога';
@@ -476,3 +477,5 @@ $il['catalog_groups_list']='Список товарных групп';
 $il['catalog_groups_list_delete_only_empty']='Удалить возможно только товарную группу без товаров';
 $il['catalog_list_group_items_count_label']='Товаров';
 $il['catalog_edit_category_hide_from_waysite_label']='Скрывать в дороге';
+
+$il['catalog_set_type_64_max_error_msg']='Тип данных SET не позволяет иметь более 64 возможных значений';

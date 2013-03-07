@@ -858,15 +858,9 @@ class catalog extends BaseModule
         if (empty($group['template_items_one']))
             return "У товарной группы не определён шаблон вывода карточки товаров";
         $tpl = CatalogCommons::get_templates_user_prefix().$group['template_items_one'];
-
-
-
         $this->set_templates($kernel->pub_template_parse($tpl));
         //Шаблон карточки
-
-
         $block = $this->get_template_block('item');
-
         $props = CatalogCommons::get_props($idata['group_id'], true);
 
         //Теперь ищем переменные, свойств и заменяем их
@@ -1917,27 +1911,50 @@ class catalog extends BaseModule
             //было использовать везде. В крайнем случае это будут пустые строки, что не страшно.
 
             //Взяли блок для переменной, если его нет - то строка будет пустой
-            if (empty($value))
+            if (mb_strlen($value)==0)
                 $block = str_replace("%".$cp['name_db']."%", $this->get_template_block($cp['name_db']."_null"), $block);
             else
             {
                 $block = str_replace("%".$cp['name_db']."%", $this->get_template_block($cp['name_db']), $block);
-                if ($cp['type']=='number')
-                    $value = $this->cleanup_number($value);
-                elseif($cp['type'] == 'date')
+                switch($cp['type'])
                 {
+                    case 'number':
+                    $value = $this->cleanup_number($value);
+                        break;
+                    case 'date':
                     $dformat = $kernel->pub_modul_properties_get('catalog_property_date_format', $kernel->pub_module_id_get());
                     $dformat = trim($dformat['value']);
                     if (empty($dformat))
                         $dformat = 'd.m.Y';
                     $time_val = strtotime($value);
                     $value = date($dformat, $time_val);
+                        break;
+                    case 'set':
+                        $vblocks = array();
+                        if(isset($this->templates['separator_'.$cp['name_db']]))
+                            $sep=$this->templates['separator_'.$cp['name_db']];
+                        elseif(isset($this->templates['item_sets_separator']))
+                            $sep=$this->templates['item_sets_separator'];
+                        else
+                            $sep="\n";
+                        $set_value_tpl = $this->get_template_block($cp['name_db'].'_val');
+                        if (!$set_value_tpl)
+                            $set_value_tpl='%setvalue%';
+                        foreach(explode(",",$value) as $v)
+                        {
+                            $vblock = $set_value_tpl;
+                            $vblock = str_replace("%setvalue%",$v,$vblock);
+                            $vblocks[]=$vblock;
                 }
+                        $value = implode($sep,$vblocks);
+                        break;
+                }
+
                 $block = str_replace('%'.$cp['name_db'].'_value%', $value, $block);
             }
             $block = str_replace('%'.$cp['name_db'].'_name%' , $cp['name_full'], $block);
 
-            //Здесь нужно будит обработать доп. переменные для блоков
+            //Здесь нужно будет обработать доп. переменные для блоков
             //И теперь, если это картинка, то нужно ещё обработать доп переменные на большое/маленькое изображение
             //и на размеры изображения
             if ($cp['type']=='pict' && !empty($value))
@@ -2693,15 +2710,16 @@ class catalog extends BaseModule
 
 
     /**
-     * Конвертирует строку создания enum-поля в массив
+     * Конвертирует строку создания ENUM или SET-поля в массив
      *
-     * @param string $strстрока типа enum, например "enum('знач1','знач2','знач3')"
+     * @param string $strстрока типа ENUM - "enum('знач1','знач2','знач3')" или SET - "set('1','2','3')"
      * @param boolean $needDefault добавлять первое дефолтовое значение?
      * @return array массив со значениями enum
      */
-    private function get_enum_prop_values($str, $needDefault=true)
+    private function get_enum_set_prop_values($str, $needDefault=true)
     {
-        $elems = explode("','",mb_substr($str,6, -2));
+        $str = preg_replace('~^(enum|set)~','',$str);
+        $elems = explode("','",mb_substr($str,2, -2));
         $res   = array();
         //Добавим сюда сразу 0-вое значение
         //при выводе оно будет пропускаться
@@ -3092,26 +3110,37 @@ class catalog extends BaseModule
     private function prepare_property_value($val, $type)
     {
         global $kernel;
-        $ret = trim($val);
-        if (mb_strlen($ret) == 0)
+        if (!is_array($val))
+        {
+            $val = trim($val);
+            if (mb_strlen($val) == 0)
             return 'NULL';
-        if ($type == 'number')
-        {
-            $ret = str_replace(',','.',$ret);
-            $ret = str_replace(' ','',$ret);
-            if (!is_numeric($ret))
-                $ret = 0;
         }
-        elseif ($type == 'date')
+        switch($type)
         {
-            $dvals = explode(".", $val);
-            $ret = '"'.$dvals[2].'-'.$dvals[1].'-'.$dvals[0].'"';
+            case 'number':
+                $val = str_replace(',','.',$val);
+                $val = str_replace(' ','',$val);
+                if (!is_numeric($val))
+                    $val = 0;
+                break;
+            case 'date':
+                $dvals = explode(".", $val);
+                $val = '"'.$dvals[2].'-'.$dvals[1].'-'.$dvals[0].'"';
+                break;
+            case 'set':
+                $elems = array();
+                foreach(array_keys($val) as $el)
+                {
+                    $elems[]=mysql_real_escape_string($el);
+                }
+                $val="'".implode(",",$elems)."'";
+                break;
+            default:
+                $val='"'.$kernel->pub_str_prepare_set($val).'"';
+                break;
         }
-        elseif ($type == 'enum' && empty($val))
-            $ret = 'NULL';
-        else
-            $ret = '"'.$kernel->pub_str_prepare_set($ret).'"';
-        return $ret;
+        return $val;
     }
 
     /**
@@ -3272,7 +3301,7 @@ class catalog extends BaseModule
             switch ($kernel->pub_httppost_get("withselected"))
             {
                 case "remove_from_current":
-                    if ($itemids)
+                    if (count($itemids))
                     {
                         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
                         $kernel->runSQL($query);
@@ -3282,7 +3311,7 @@ class catalog extends BaseModule
                     $moveid = intval($kernel->pub_httppost_get("cats"));
                     if ($moveid > 0)
                     {
-                        if ($itemids)
+                        if (count($itemids))
                         {
                             $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',',$itemids).')';
                             $kernel->runSQL($query);
@@ -3634,7 +3663,8 @@ class catalog extends BaseModule
         $vals = array();
         foreach ($cats as $cat)
         {
-            if (isset($_POST['ccb'][$cat['id']]) && $_POST['ccb'][$cat['id']])
+            $ccb = $kernel->pub_httppost_get("ccb_".$cat['id']);
+            if (!empty($ccb) )
             {//добавляем запись, только если отмечен чекбокс...
                 if (!array_key_exists($cat['id'], $item_catids))
                 {//...и товар ещё не принадлежит к категории
@@ -3741,7 +3771,7 @@ class catalog extends BaseModule
             if ($prop['type'] == 'enum')
             {
                 $tinfo = $kernel->db_get_table_info($table);
-                $values = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                $values = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
             }
             $db_type = $this->convert_field_type_2_db($prop['type'], $values);
 
@@ -3875,7 +3905,7 @@ class catalog extends BaseModule
             if ($prop['type'] == 'enum')
             {
                 $tinfo = $kernel->db_get_table_info($table);
-                $values = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                $values = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
             }
             $db_type = $this->convert_field_type_2_db($prop['type'], $values);
             $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` CHANGE COLUMN `'.$prop['name_db'].'` `'.$name_db.'` '.$db_type;
@@ -4635,6 +4665,11 @@ class catalog extends BaseModule
         {
             case 'text':
                 return 'text';
+            case 'set':
+                $arr = array();
+                foreach ($values as $val)
+                    $arr[] = "'".mysql_real_escape_string(str_replace(',','',$val))."'";
+                return 'set ('.implode(',',array_unique($arr)).')';
             case 'html':
                 return 'text';
             case 'file':
@@ -4810,7 +4845,7 @@ class catalog extends BaseModule
                             $enum_props = $enum_props_cache[$cache_key];
                         else
                         {
-                            $enum_props=$this->get_enum_prop_values($common_table_info[$cprop['name_db']]['Type']);
+                            $enum_props=$this->get_enum_set_prop_values($common_table_info[$cprop['name_db']]['Type']);
                             $enum_props_cache[$cache_key]=$enum_props;
                         }
                         $optlines='';
@@ -5021,7 +5056,6 @@ class catalog extends BaseModule
         $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$moduleid.'_items');
         $props = CatalogCommons::get_props($group['id'], true);
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
-        //Строить начнём с
         //Произведём первичную сортировку массива со свойствами, чтобы шаблон был
         //оптимизирован изначально. В дальнейшем пользователь его самостоятельно поменяет
         //Получим свойства, которые
@@ -5034,6 +5068,7 @@ class catalog extends BaseModule
         $sort_def['html']   = '06';
         $sort_def['file']   = '07';
         $sort_def['date']   = '08';
+        $sort_def['set']    = '09';
 
         $visible_props = $this->get_group_visible_props($group['id']);
         //Прежде всего сформируем массив свойств, преобразованных для HTML вывода
@@ -5047,81 +5082,97 @@ class catalog extends BaseModule
             //для большенства свойств
             $pname_db   = $prop['name_db'];
             $pname_full = $prop['name_full'];
-            $pvalue = '';
-            if (isset($item[$prop['name_db']]))
-                $pvalue     = htmlspecialchars($item[$prop['name_db']]);
+            $origValue = isset($item[$pname_db])?$item[$pname_db]:"";
+            $pvalue = htmlspecialchars($origValue);
 
+            $need_add_water_marka = "";
             //Теперь, для более сложных свойств нужно сделать чуть больше
             //и возможно изменить переменную $pvalue а может и $template_line
-            if ($prop['type'] == 'enum')
+
+            switch($prop['type'])
             {
+                case 'enum':
                 //Получили значения для перечечления
-                $enum_vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                    $enum_vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                 $enum_options = array();
                 $not_selected_lang_var=$kernel->priv_page_textlabels_replace("[#catalog_prop_type_enum_notselect#]");
                 foreach ($enum_vals as $enum_val)
                 {
+                        if (isset($item[$prop['name_db']]) && $item[$prop['name_db']] == $enum_val)
+                            $enum_templ = $this->get_template_block('prop_enum_value_selected');
+                        else
                     $enum_templ = $this->get_template_block('prop_enum_value');
-                    $repl = "";
-                    if ((isset($item[$prop['name_db']])) && ($item[$prop['name_db']] == $enum_val))
-                        $repl = ' selected="selected"';
                     if ($enum_val != $not_selected_lang_var)
                         $enum_templ = str_replace("%enum_key%", $enum_val  , $enum_templ);
                     else
                         $enum_templ = str_replace("%enum_key%", ""  , $enum_templ);
                     $enum_templ = str_replace("%enum_val%", $enum_val  , $enum_templ);
-                    $enum_templ = str_replace("%selected%", $repl      , $enum_templ);
                     $enum_options[] = $enum_templ;
                 }
                 $pvalue = join("", $enum_options);
+                    break;
+                case 'set':
+                    //Получили значения для перечечления
+                    $enum_vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'],false);
+                    $enum_options = array();
+                    $currValues = explode(",",$origValue);
+                    foreach ($enum_vals as $enum_val)
+                    {
+                        if (in_array($enum_val,$currValues))
+                            $enum_templ = $this->get_template_block('prop_set_value_checked');
+                        else
+                            $enum_templ = $this->get_template_block('prop_set_value');
+                        $enum_templ = str_replace("%value%", $enum_val, $enum_templ);
+                        $enum_templ = str_replace("%value_escaped%", htmlspecialchars($enum_val), $enum_templ);
+                        $enum_options[] = $enum_templ;
             }
-            elseif ($prop['type']=='html')
-            {
-                //Создадаим редактор контента
+                    $pvalue = join("", $enum_options);
+                    break;
+                case 'html':
+                    //Создадим редактор контента
                 $editor = new edit_content();
                 $editor->set_edit_name($prop['name_db']);
                 $editor->set_simple_theme(true);
                 if (isset($item[$prop['name_db']]))
                     $editor->set_content($item[$prop['name_db']]);
                 $pvalue = $editor->create();
-            }
-            elseif ($prop['type']=='number')
-            {
+                    break;
+                case 'number':
                 if (isset($item[$prop['name_db']]))
                     $pvalue = $this->cleanup_number($item[$prop['name_db']]);
-            }
-            elseif (($prop['type']=='file' || $prop['type']=='pict') && (!empty($pvalue)))
-            {
-                //Изменения нужно вносить только в том случае, если есть какой-то
-                //загруженный файл
-                $template_line = $this->get_template_block('prop_'.$prop['type'].'_edit');
-                $pvalue     = "/".$item[$prop['name_db']];
-                //Нужно проставить id свойсвта, что бы можно было удалить файл
-                //$template_line = str_replace('%id%'    , $item['commonid'] , $template_line);
-                $template_line = str_replace('%id%'    , $id , $template_line);
-                //Для файлов картинок нужно вставить вопросы о необходимости
-                //добавлять водяной знак к исходной картинке, или большой картинке
-            }
-            elseif ($prop['type'] == 'date')
-            {
-                if (!empty($pvalue))
-                    $tvalue = strtotime($pvalue);
-                else
-                    $tvalue = time();
-                $pvalue = date("d.m.Y",$tvalue);
+                    break;
+                case 'file':
+                case 'pict':
+                    if ($pvalue)
+                    {//Изменения нужно вносить только в том случае, если есть какой-то загруженный файл
+                        $template_line = $this->get_template_block('prop_'.$prop['type'].'_edit');
+                        $pvalue     = "/".$item[$prop['name_db']];
+                        //Нужно проставить id свойсвта, что бы можно было удалить файл
+                        $template_line = str_replace('%id%'    , $id , $template_line);
+                        //Для файлов картинок нужно вставить вопросы о необходимости
+                        //добавлять водяной знак к исходной картинке, или большой картинке
+                    }
+                    //Если это картинка и стоит запрос на добавление вопроса о водяном знаки - добавим его
+                    if ($prop['type']=='pict' && isset($prop['add_param']))
+                    {
+                        $prop['add_param'] = unserialize($prop['add_param']);
+                        if (isset($prop['add_param']['source']['water_add']) && (intval($prop['add_param']['source']['water_add']) == 2))
+                            $need_add_water_marka .= $this->get_template_block('prop_'.$prop['type'].'_marka_source');
+
+                        if (isset($prop['add_param']['big']['water_add']) && (intval($prop['add_param']['big']['water_add']) == 2))
+                            $need_add_water_marka .= $this->get_template_block('prop_'.$prop['type'].'_marka_big');
+                    }
+                    break;
+
+                case 'date':
+                    if (!empty($pvalue))
+                        $tvalue = strtotime($pvalue);
+                    else
+                        $tvalue = time();
+                    $pvalue = date("d.m.Y",$tvalue);
+                    break;
             }
 
-            //Если это картинка и стоит запрос на добавление вопроса о водяном знаки - добавим его
-            $need_add_water_marka = "";
-            if (isset($prop['add_param']))
-            {
-                $prop['add_param'] = unserialize($prop['add_param']);
-                if (isset($prop['add_param']['source']['water_add']) && (intval($prop['add_param']['source']['water_add']) == 2))
-                    $need_add_water_marka .= $this->get_template_block('prop_'.$prop['type'].'_marka_source');
-
-                if (isset($prop['add_param']['big']['water_add']) && (intval($prop['add_param']['big']['water_add']) == 2))
-                    $need_add_water_marka .= $this->get_template_block('prop_'.$prop['type'].'_marka_big');
-            }
             //сначало это, так как тут у нас есть важные параметры
             $template_line = str_replace('%need_add_water_marka%', $need_add_water_marka, $template_line);
 
@@ -5172,8 +5223,6 @@ class catalog extends BaseModule
         else
             $content = str_replace('%isavalchecked%', '', $content);
         $content = str_replace("%group.name%", $group['name_full'], $content);
-
-
         $checkedIDs = $item_catids;
         $checkedIDs[]=$id_cat;
 
@@ -5326,7 +5375,7 @@ class catalog extends BaseModule
                 {
                     $line  = $this->get_template_block('property_enum');
                     $property_enum_values=array();
-                    $enum_vals = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                    $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                     foreach($enum_vals as $ev)
                     {
                         $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
@@ -5416,11 +5465,8 @@ class catalog extends BaseModule
             $html = str_replace('%name%'       , $group['name_full']                           , $html);
             $gvisprops = $this->get_group_visible_props($id);
         }
-
-
         //Возьмём все свойства, общие и не общие
         $props = CatalogCommons::get_props($id, true);
-
         if (count($props))
         {
             $content .= $this->get_template_block('table_header');
@@ -5439,16 +5485,18 @@ class catalog extends BaseModule
                     $tinfo = $tinfo_global;
                 }
 
-                if ($prop['type']=='enum')
-                {//для enum - спецобработка
-                    $line  = $this->get_template_block('property_enum');
+
+
+                if ($prop['type']=='enum' || $prop['type']=='set')
+                {//для ENUM и SET - спецобработка
+                    $line  = $this->get_template_block('property_'.$prop['type']);
                     $property_enum_values=array();
-                    $enum_vals = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                    $enum_vals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'],false);
                     foreach($enum_vals as $ev)
                     {
-                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
+                        $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_'.$prop['type'].'_value'));
                     }
-                    $line = str_replace('%property_enum_values%',implode($this->get_template_block('property_enum_sep'),$property_enum_values),$line);
+                    $line = str_replace('%property_'.$prop['type'].'_values%',implode($this->get_template_block('property_'.$prop['type'].'_sep'),$property_enum_values),$line);
                 }
                 else
                     $line = $this->get_template_block('property');
@@ -6063,7 +6111,7 @@ class catalog extends BaseModule
                             $enum_props = $enum_props_cache[$cache_key];
                         else
                         {
-                            $enum_props=$this->get_enum_prop_values($common_table_info[$cprop['name_db']]['Type']);
+                            $enum_props=$this->get_enum_set_prop_values($common_table_info[$cprop['name_db']]['Type']);
                             $enum_props_cache[$cache_key]=$enum_props;
                         }
                         $optlines='';
@@ -6208,7 +6256,7 @@ class catalog extends BaseModule
 
                 //Перечесление
                 case 'enum':
-                    $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'],false);
+                    $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'],false);
                     $options = $this->get_template_block('prop_enum_value');
                     $options = str_replace('%enum_value%', '', $options);
                     $options = str_replace('%enum_name%', '[#catalog_edit_category_need_select_label#]', $options);
@@ -6352,7 +6400,7 @@ class catalog extends BaseModule
         {
             case 'enum':
                 $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_cats');
-                $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                 $lines = '';
                 foreach ($vals as $val)
                 {
@@ -6544,50 +6592,51 @@ class catalog extends BaseModule
         //Теперь, в зависимости от того, какое это поле, возможно нам нужно показать
         //что-то дополнительное
         $addons_param = '';
-        if ($prop['type'] == 'enum')
+        switch($prop['type'])
         {
-            //Если это поле "списко значений, получим уже введённые значения
-            //$tinfo = $this->get_dbtable_info('_catalo')
-            if ($prop['group_id'] == 0)
-                $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
-            else
-            {
-                $group = CatalogCommons::get_group($prop['group_id']);
-                $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
-            }
-            $addons_param = $this->get_template_block('enum_vals');
-            $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
-            $lines = '';
-            foreach ($vals as $num_val => $val)
-            {
-                //пропускаем нулевое (не выбранное значение)
-                if ($num_val == 0)
-                    continue;
-                $line = $this->get_template_block('enum_val');
-                $line = str_replace('%action_del%','enum_prop_delete&enumval='.urlencode($val).'&propid=%id%&id_group_control='.$id_group_control, $line);
-                $line = str_replace('%val_name%',$val, $line);
-                $lines .= $line;
-            }
-            $addons_param = str_replace('%vals%'       , $lines, $addons_param);
-            $addons_param = str_replace('%form_action%', $kernel->pub_redirect_for_form('enum_prop_add&id_group_control='.$id_group_control), $addons_param);
-        }
-        elseif ($prop['type'] == 'pict')
-        {
-            $addons_param = $this->get_template_block('addons_pict');
-            if (isset($prop['add_param']['big']['water_position']))
-                $prop['add_param']['big']['place']=$prop['add_param']['big']['water_position'];
-            if (isset($prop['add_param']['source']['water_position']))
-                $prop['add_param']['source']['place']=$prop['add_param']['source']['water_position'];
-            $addons_param = self::process_image_settings_block($addons_param,$prop['add_param']);
+            case 'set':
+            case 'enum':
+                if ($prop['group_id'] == 0)
+                    $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
+                else
+                {
+                    $group = CatalogCommons::get_group($prop['group_id']);
+                    $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
+                }
+                    $addons_param = $this->get_template_block($prop['type'].'_vals');
+                    $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
+                $lines = '';
+                foreach ($vals as $num_val => $val)
+                {
+                    //пропускаем нулевое (не выбранное значение)
+                    if ($num_val == 0)
+                        continue;
+                        $line = $this->get_template_block($prop['type'].'_val');
+                    $line = str_replace('%action_del%','enum_prop_delete&enumval='.urlencode($val).'&propid=%id%&id_group_control='.$id_group_control, $line);
+                    $line = str_replace('%val_name%',$val, $line);
+                    $lines .= $line;
+                }
+                $addons_param = str_replace('%vals%'       , $lines, $addons_param);
+                $addons_param = str_replace('%form_action%', $kernel->pub_redirect_for_form('enum_prop_add&id_group_control='.$id_group_control), $addons_param);
+                break;
+            case 'pict':
+                $addons_param = $this->get_template_block('addons_pict');
+                if (isset($prop['add_param']['big']['water_position']))
+                    $prop['add_param']['big']['place']=$prop['add_param']['big']['water_position'];
+                if (isset($prop['add_param']['source']['water_position']))
+                    $prop['add_param']['source']['place']=$prop['add_param']['source']['water_position'];
+                $addons_param = self::process_image_settings_block($addons_param,$prop['add_param']);
 
-            //Общее для всех параметров
-            $addons_param = str_replace('%pict_path%'      , $prop['add_param']['pict_path']                  , $addons_param);
-            $addons_param = str_replace('%pict_path_start%', 'content/files/'.$kernel->pub_module_id_get().'/', $addons_param);
+                //Общее для всех параметров
+                $addons_param = str_replace('%pict_path%'      , $prop['add_param']['pict_path']                  , $addons_param);
+                $addons_param = str_replace('%pict_path_start%', 'content/files/'.$kernel->pub_module_id_get().'/', $addons_param);
+                break;
         }
+
 
         //Обязательно первым, так там есть ещё переменные
         //для картинки например новые парметры будут стоять в двух местах, так как способ их
-        //вода не отличается ни при заведении нового ни при вводе старого
+        //ввода не отличается ни при заведении нового, ни при вводе старого
 
         $content = str_replace('%addons_param%', $addons_param , $content);
 
@@ -6731,7 +6780,7 @@ class catalog extends BaseModule
                 {
                     $line = $this->get_template_block('line_enum');
                     $property_enum_values=array();
-                    $enum_vals = $this->get_enum_prop_values($tinfo[$field['name_db']]['Type']);
+                    $enum_vals = $this->get_enum_set_prop_values($tinfo[$field['name_db']]['Type']);
                     foreach($enum_vals as $ev)
                     {
                         $property_enum_values[]=str_replace("%val%",$ev,$this->get_template_block('property_enum_value'));
@@ -6815,7 +6864,7 @@ class catalog extends BaseModule
             $tinfo = $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_basket_orders');
 
             $addons_param = $this->get_template_block('enum_vals');
-            $vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+            $vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
             $lines = '';
             foreach ($vals as $num_val => $val)
             {
@@ -6885,7 +6934,7 @@ class catalog extends BaseModule
             if ($prop['type'] == 'enum')
             {
                 $tinfo = $kernel->db_get_table_info($table);
-                $values = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                $values = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
             }
             $db_type = $this->convert_field_type_2_db($prop['type'], $values);
             $query = 'ALTER TABLE `'.$table.'` CHANGE COLUMN `'.$prop['name_db'].'` `'.$name_db.'` '.$db_type;
@@ -7000,7 +7049,7 @@ class catalog extends BaseModule
         $prop = CatalogCommons::get_order_field($id);
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
         $tinfo   = $kernel->db_get_table_info($table);
-        $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
+        $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
         $newevals= array();
         foreach ($evals as $eval)
         {
@@ -7028,7 +7077,7 @@ class catalog extends BaseModule
         $prop = CatalogCommons::get_order_field($id);
         $table = '_catalog_'.$kernel->pub_module_id_get().'_basket_orders';
         $tinfo   = $kernel->db_get_table_info($table);
-        $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
+        $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
         $evals[] = $enumval;
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
         $kernel->runSQL($query);
@@ -7123,7 +7172,7 @@ class catalog extends BaseModule
             $block = $this->get_template_block('prop_'.$prop['type'])."\n\n";
             if ($prop['type'] == 'enum')
             {
-                $enum_vals  = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
+                $enum_vals  = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
                 $str  = "\n";
                 foreach ($enum_vals as $eval)
                 {
@@ -7418,10 +7467,10 @@ class catalog extends BaseModule
                     $tinfo = $kernel->db_get_table_info('_catalog_items_'.$kernel->pub_module_id_get().'_'.$group['name_db']);
                     $tinfo = $tinfo + $kernel->db_get_table_info('_catalog_'.$kernel->pub_module_id_get().'_items');
                     if ($processtype == "checkbox")
-                        $enum_vals  = $this->get_enum_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], false);
+                        $enum_vals  = $this->get_enum_set_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], false);
                     else
                     {
-                        $enum_vals  = $this->get_enum_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], true);
+                        $enum_vals  = $this->get_enum_set_prop_values($tinfo[$all_group_props[$propname]['name_db']]['Type'], true);
                         if (!empty($enum_vals))
                             $enum_vals[0] = "";
                     }
@@ -7662,7 +7711,7 @@ class catalog extends BaseModule
             if (empty($block))
                 $block  = $this->get_template_block('row');
             $block = str_replace("%odd_even%", $odd_even, $block);
-            //Теперь ищем переменные, свойств и заменяем их
+            //Теперь ищем переменные свойств и заменяем их
             $block = $this->process_item_props_out($item, $props, $block, CatalogCommons::get_group($groupid));
             $block = str_replace("%link%", $kernel->pub_page_current_get().'.html?'.$this->frontend_param_item_id_name.'='.$item['id'], $block);
             $rows .= $block;
@@ -8615,25 +8664,44 @@ class catalog extends BaseModule
                 $kernel->pub_redirect_refresh("show_group_props&id=".$id_group_control);
                 break;
 
-            //Вызывается при добавлении к уже существующему
-            //перечеслению нового значения
+            //Вызывается при добавлении к уже существующему перечислению нового значения
             case 'enum_prop_add':
 
-                $this->enum_prop_add();
+                $enumval = $kernel->pub_httppost_get("enumval",false);
+                $propid  = $kernel->pub_httppost_get("id");
+                $prop    = $this->get_prop($propid);
+                if ($prop['group_id'] == 0)
+                    $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
+                else
+                {
+                    $group = CatalogCommons::get_group($prop['group_id']);
+                    $table = '_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']);
+                }
+                $tinfo = $kernel->db_get_table_info($table);
+                $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
+                if (substr($tinfo[$prop['name_db']]['Type'],0,3)=='set')
+                {
+                    $ptype='set';
+                    if (count($evals)==64)
+                        return $kernel->pub_httppost_errore('[#catalog_set_type_64_max_error_msg#]',true);
+                }
+                else
+                    $ptype='enum';
+
+                $evals[] = $enumval;
+                $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db($ptype,$evals);
+                $kernel->runSQL($query);
 
                 //ID группы, из которой было вызвано редактирование, так как
                 //из группы могут вызваны на редактирования и общие свойства
-                $id_prop = $kernel->pub_httppost_get('id');
                 $group_id  = $kernel->pub_httppost_get('group_id');
-                $id_group_control = $kernel->pub_httpget_get('id_group_control');
-                $id_group_control = intval($id_group_control);
+                $id_group_control = intval($kernel->pub_httpget_get('id_group_control'));
 
-                $str = "prop_edit&id=".$id_prop."&id_group=".$group_id."&idg_control=$id_group_control";
-                return $kernel->pub_httppost_response("[#catalog_edit_property_enum_add_msg#]", $str);
-                break;
+                $url = "prop_edit&id=".$propid."&id_group=".$group_id."&idg_control=$id_group_control";
+                return $kernel->pub_httppost_response("[#catalog_edit_property_enum_add_msg#]", $url);
 
             case 'enum_prop_delete':
-                $this->enum_prop_delete();
+                $this->enum_set_prop_delete();
                 $id_prop          = $kernel->pub_httpget_get('propid');
                 $group_id         = $kernel->pub_httppost_get('group_id');
                 $id_group_control = $kernel->pub_httpget_get('id_group_control');
@@ -8702,7 +8770,7 @@ class catalog extends BaseModule
                 $prop    = $this->get_cat_prop($propid);
                 $table   = '_catalog_'.$moduleid.'_cats';
                 $tinfo   = $kernel->db_get_table_info($table);
-                $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                 $evals[] = $enumval;
                 $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
                 $kernel->runSQL($query);
@@ -8714,7 +8782,7 @@ class catalog extends BaseModule
                 $prop    = $this->get_cat_prop($propid);
                 $table   = '_catalog_'.$moduleid.'_cats';
                 $tinfo   = $kernel->db_get_table_info($table);
-                $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type']);
+                $evals   = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
                 $newevals= array();
                 foreach ($evals as $eval)
                 {
@@ -9045,37 +9113,13 @@ class catalog extends BaseModule
 
 
     /**
-     * К уже существующему перечислению добавляет новое значение
-     *
-     */
-    private function enum_prop_add()
-    {
-        global $kernel;
-        $enumval = $kernel->pub_httppost_get("enumval",false);
-        $propid  = $kernel->pub_httppost_get("id");
-        $prop    = $this->get_prop($propid);
-        if ($prop['group_id'] == 0)
-            $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
-        else
-        {
-            $group = CatalogCommons::get_group($prop['group_id']);
-            $table = '_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']);
-        }
-        $tinfo   = $kernel->db_get_table_info($table);
-        $evals   = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
-        $evals[] = $enumval;
-        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$evals);
-        $kernel->runSQL($query);
-    }
-
-    /**
      * Удаляет одно из возможных значений поля типа enum (общее либо товарной группы)
      * @return void
      */
-    function enum_prop_delete()
+    protected function enum_set_prop_delete()
     {
         global $kernel;
-        $enumval = $kernel->pub_httpget_get("enumval",false);
+        $val2del = $kernel->pub_httpget_get("enumval",false);
         $propid  = $kernel->pub_httpget_get("propid");
         $prop    = $this->get_prop($propid);
         if ($prop['group_id'] == 0)
@@ -9086,16 +9130,23 @@ class catalog extends BaseModule
             $table = '_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']);
         }
         $tinfo = $kernel->db_get_table_info($table);
-        $evals = $this->get_enum_prop_values($tinfo[$prop['name_db']]['Type'], false);
+        $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type'], false);
         $newevals= array();
         foreach ($evals as $eval)
         {
-            if ($eval != $enumval)
+            if ($eval != $val2del)
                 $newevals[] = $eval;
         }
-        $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL WHERE `'.$prop['name_db'].'`="'.$kernel->pub_str_prepare_set($enumval).'"';
+        if (substr($tinfo[$prop['name_db']]['Type'],0,3)=='set')
+            $ptype='set';
+        else
+            $ptype='enum';
+        if ($ptype=='enum')
+            $query = 'UPDATE `'.$kernel->pub_prefix_get().$table.'` SET `'.$prop['name_db'].'`=NULL WHERE `'.$prop['name_db'].'`="'.mysql_real_escape_string($val2del).'"';
+        else
+            $query = "UPDATE `".$kernel->pub_prefix_get().$table."` SET `".$prop['name_db']."`=REPLACE(`".$prop['name_db']."`,'".mysql_real_escape_string($val2del)."','') WHERE `".$prop['name_db']."` LIKE '%".mysql_real_escape_string($val2del)."%' ";
         $kernel->runSQL($query);
-        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db('enum',$newevals);
+        $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().$table.'` CHANGE `'.$prop['name_db'].'` `'.$prop['name_db'].'` '.$this->convert_field_type_2_db($ptype,$newevals);
         $kernel->runSQL($query);
     }
 

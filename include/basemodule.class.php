@@ -8,6 +8,11 @@ abstract class BaseModule
      */
     public $templates = array();
 
+    public function __construct()
+    {
+
+    }
+
     protected function get_module_prop_value($propid,$default=null)
     {
         global $kernel;

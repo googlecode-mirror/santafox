@@ -74,6 +74,7 @@
         else
             $('#need_add_big_water').val('1');
     }
+
 </script>
 <style>
 
@@ -138,6 +139,7 @@
                             <div id="incatdialog" style="display:none;"></div>
                         </td>
                     </tr>
+
                     %props%
                 </table>
 
@@ -285,4 +287,27 @@
 <td><select name="%prop_name_db%" style="display:block; margin:0 auto; float:none;">%prop_value%</select></td>
 </tr>
 <!-- @prop_enum_value -->
-<option value="%enum_key%" %selected%>%enum_val%</option>
+<option value="%enum_key%">%enum_val%</option>
+
+<!-- @prop_enum_value_selected -->
+<option value="%enum_key%" selected>%enum_val%</option>
+
+<!-- @prop_set_value -->
+<div style="clear: both;">
+    <input type="checkbox" name="%prop_name_db%[%value_escaped%]"><label>%value%</label><br>
+</div>
+<!-- @prop_set_value_checked -->
+<div style="clear: both;">
+    <input type="checkbox" name="%prop_name_db%[%value_escaped%]" checked><label>%value%</label><br>
+</div>
+<!-- @prop_set -->
+<tr %class%>
+<td align="left">%prop_name_full%:</td>
+<td>%prop_value%</td>
+</tr>
+
+<!-- @category_item -->
+<span class="block clear" style="margin:5px 0;">
+<span class="block fLeft">%shift%</span><input type="checkbox" id="ccb_%id%" class="checkbox" style="float:left; margin:0 5px 0 0;" name="ccb_%id%" %checked%><label for="ccb_%id%" style="width:auto; cursor:pointer; margin-right:0; float:left;">%catname%</label>
+<span class="block clear"></span>
+</span>

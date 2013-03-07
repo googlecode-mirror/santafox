@@ -3585,10 +3585,7 @@ class catalog extends BaseModule
             $itemid  = $this->add_item();
             if (!$itemid)
                 return $kernel->pub_httppost_errore('[#interface_global_label_error#]',true);
-            $is_new=true;
         }
-        else
-            $is_new=false;
         $item  = $this->get_item_full_data($itemid);
 
         $moduleid=$kernel->pub_module_id_get();
@@ -3621,7 +3618,7 @@ class catalog extends BaseModule
                 if ($exrec && $exrec['id']!=$itemid)
                 {
                     $msg=$kernel->pub_page_textlabel_replace('[#catalog_not_uniq_main_prop_save#]');
-                    $msg = str_replace('%fieldname%',$prop['name_db'],$msg);
+                    $msg = str_replace('%fieldname%',$prop['name_full'],$msg);
                     return $kernel->pub_httppost_errore($msg,true);
                 }
             }

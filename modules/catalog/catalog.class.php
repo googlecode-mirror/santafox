@@ -3781,7 +3781,7 @@ class catalog extends BaseModule
                 $kernel->runSQL($query);
             }
             $values = null;
-            if ($prop['type'] == 'enum')
+            if ($prop['type'] == 'enum' || $prop['type'] == 'set')
             {
                 $tinfo = $kernel->db_get_table_info($table);
                 $values = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
@@ -4301,8 +4301,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         $res = $kernel->db_get_record_simple('_catalog_item_props', 'id='.$id);
-        //Если свойство стипом картинка, то сразу вытащим из дополнительных парараметров
-        //информацию по картинке
+        //Если свойство с типом=картинка, то сразу вытащим из дополнительных параметров информацию по картинке
         if ($res['type'] == 'pict')
         {
             if (isset($res['add_param']) && !empty($res['add_param']))

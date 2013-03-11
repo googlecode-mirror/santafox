@@ -2979,12 +2979,13 @@ class kernel
      * @param string $orderby - поле для сортировки
      * @param integer $offset смещение
      * @param integer $limit лимит
+     * @param string $cond условие выборки
      * @access public
      * @return array
      */
-    function pub_users_info_get($id_user = "", $tree = true, $orderby="`login`", $offset=null, $limit=null)
+    function pub_users_info_get($id_user = "", $tree = true, $orderby="`login`", $offset=null, $limit=null,$cond="true")
     {
-        return manager_users::users_info_get($id_user, $tree, $orderby,$offset,$limit);
+        return manager_users::users_info_get($id_user, $tree, $orderby,$offset,$limit,$cond);
     }
 
 

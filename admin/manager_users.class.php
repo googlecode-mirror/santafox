@@ -660,9 +660,10 @@ class manager_users
      * @param string $orderby поле для сортировки
 	 * @param integer $offset смещение
 	 * @param integer $limit лимит
+	 * @param string $cond условие выборки
      * @return array
      */
-    public static function users_info_get($id_user = 0, $tree = true, $orderby="`login`",$offset=null, $limit=null)
+    public static function users_info_get($id_user = 0, $tree = true, $orderby="`login`",$offset=null, $limit=null,$cond='true')
     {
     	global $kernel;
 
@@ -677,7 +678,7 @@ class manager_users
 			$query .= " WHERE (id = $id_user)";
         else
         {
-            $query .= " ORDER BY ".$orderby;
+            $query .= "WHERE ".$cond."  ORDER BY ".$orderby;
             if (!is_null($offset) && !is_null($limit))
                 $query.=" LIMIT ".$offset.",".$limit;
         }

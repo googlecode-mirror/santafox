@@ -5645,6 +5645,8 @@ class kernel
 
     public function pub_add_watermark2image($image, $watermark_image, $size)
     {
+        if (!isset($watermark_image['path']) || !$watermark_image['path'])
+            return $image;
         $copy = ImageCreateFromGIF($watermark_image['path']);
         $cpx = ImageSx($copy);
         $cpy = ImageSy($copy);

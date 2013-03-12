@@ -3674,10 +3674,13 @@ class catalog extends BaseModule
         $cats = CatalogCommons::get_all_categories($moduleid);
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_item2cat` (`item_id`, `cat_id`, `order`) VALUES ';
         $vals = array();
+        if (isset($_POST['ccb']) && is_array($_POST['ccb']))
+            $ccbPost=$_POST['ccb'];
+        else
+            $ccbPost=array();
         foreach ($cats as $cat)
         {
-            $ccb = $kernel->pub_httppost_get("ccb_".$cat['id']);
-            if (!empty($ccb))
+            if (isset($ccbPost[$cat['id']]))
             { //добавляем запись, только если отмечен чекбокс...
                 if (!array_key_exists($cat['id'], $item_catids))
                 { //...и товар ещё не принадлежит к категории
@@ -4006,6 +4009,10 @@ class catalog extends BaseModule
             $ismain = 0;
         else
             $ismain = 1;
+        if (empty($sorted))
+            $sorted = 0;
+        else
+            $sorted = 1;
 
         //Проверим и проставим значения
         $group = CatalogCommons::get_group($group_id);
@@ -6568,8 +6575,6 @@ class catalog extends BaseModule
                 $inlist_checked = ' checked="checked"';
             if ($prop['ismain'] == 1)
                 $content = str_replace("%ismain_checked%", " checked", $content);
-            else
-                $content = str_replace("%ismain_checked%", "", $content);
         }
         else
         {
@@ -6579,6 +6584,7 @@ class catalog extends BaseModule
             //основным может быть только общее свойство
             $content = str_replace("%ismain_enabled%", " disabled='true'", $content);
         }
+        $content = str_replace("%ismain_checked%", "", $content);
 
 
         $sort_params = "";

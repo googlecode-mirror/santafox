@@ -554,10 +554,10 @@ a.html_editor_button { margin:2px 0 0 5px; background:url('../images/editor_butt
 }
 
 
-.admin_table tr { background-color:#f5f5f5; }
-.admin_table tr:hover { background-color:#fefefe; }
-.admin_table .cke_editor tr, .admin_table .cke_editor tr:hover { background-color:none; }
-.cke_editor tr:hover { background-color:none; }
+.admin_table tr { background:#f5f5f5; }
+.admin_table tr:hover { background:#fefefe; }
+.admin_table .cke_editor tr, .admin_table .cke_editor tr:hover { background:none; }
+.cke_editor tr:hover { background:none; }
 
 .admin_table td {
 	text-align:center;
@@ -662,7 +662,7 @@ a.html_editor_button { margin:2px 0 0 5px; background:url('../images/editor_butt
 .welcome_header_box {
 	position:relative;
 	padding:15px 25px 15px 15px; margin:0;
-	background:; display:block;
+    display:block;
 	font-family:Georgia,Serif;
 	font-size:32px; color:#444;
 	line-height:34px;
@@ -674,7 +674,7 @@ a.html_editor_button { margin:2px 0 0 5px; background:url('../images/editor_butt
 .header_box {
 	position:relative;
 	padding:15px 25px 15px 15px; margin:0;
-	background:; display:block;
+	display:block;
 	font-family:Georgia,Serif;
 	font-size:22px; color:#444;
 	line-height:22px;
@@ -757,3 +757,9 @@ a.html_editor_button { margin:2px 0 0 5px; background:url('../images/editor_butt
 #metki_table td input { float:none; clear:both; }
 #metki_table td input[type=checkbox] { margin-top:-1px; }
 #metki_table td .ui-selectmenu { height:24px; text-align: left; }
+
+/* categories list style in dialog box */
+#itemcats { margin: 10px 0; padding: 0 10px; }
+#itemcats li { margin: 5px 0; }
+#itemcats ul { margin: 5px 0; padding: 0 15px; }
+#itemcats input[type=checkbox] { position: relative; top:-6px; }

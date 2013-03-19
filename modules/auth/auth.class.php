@@ -537,38 +537,39 @@ class auth extends basemodule
                     $kernel->pub_users_info_set($user, true);
                     $currUinfo=$kernel->pub_user_info_get(true);
 
-                    $mailbody=$this->get_template_block('email_info_changed_body');
-                    $mailsubj=$this->get_template_block('email_info_changed_subject');
-
-                    $flines='';
-                    $commonFields = array(
-                        'login'=>'Логин',
-                        'password'=>'Пароль',
-                        'name'=>'Имя',
-                        'email'=>'Email',
-                    );
-
-                    foreach ($commonFields as $fk=>$fcaption)
+                    $mailbody=trim($this->get_template_block('email_info_changed_body'));
+                    $mailsubj=trim($this->get_template_block('email_info_changed_subject'));
+                    if ($mailbody && $mailsubj)
                     {
-                        $fline = $this->get_template_block('email_info_changed_field');
-                        $fline = str_replace('%caption%',$fcaption,$fline);
-                        $fline = str_replace('%value%',$currUinfo[$fk],$fline);
-                        $flines.=$fline;
-                    }
+                        $flines='';
+                        $commonFields = array(
+                            'login'=>'Логин',
+                            'password'=>'Пароль',
+                            'name'=>'Имя',
+                            'email'=>'Email',
+                        );
 
-
-                    if (isset($currUinfo['fields']['auth']))
-                    {
-                        foreach ($currUinfo['fields']['auth'] as $uf)
+                        foreach ($commonFields as $fk=>$fcaption)
                         {
                             $fline = $this->get_template_block('email_info_changed_field');
-                            $fline = $kernel->pub_array_key_2_value($fline,$uf);
+                            $fline = str_replace('%caption%',$fcaption,$fline);
+                            $fline = str_replace('%value%',$currUinfo[$fk],$fline);
                             $flines.=$fline;
                         }
-                    }
-                    $mailbody = str_replace('%fields%',$flines,$mailbody);
-                    $kernel->pub_mail(array($prevUinfo['email']),array($prevUinfo['name']),"mail@".$_SERVER['HTTP_HOST'],$_SERVER['HTTP_HOST'],$mailsubj,$mailbody);
 
+
+                        if (isset($currUinfo['fields']['auth']))
+                        {
+                            foreach ($currUinfo['fields']['auth'] as $uf)
+                            {
+                                $fline = $this->get_template_block('email_info_changed_field');
+                                $fline = $kernel->pub_array_key_2_value($fline,$uf);
+                                $flines.=$fline;
+                            }
+                        }
+                        $mailbody = str_replace('%fields%',$flines,$mailbody);
+                        $kernel->pub_mail(array($prevUinfo['email']),array($prevUinfo['name']),"mail@".$_SERVER['HTTP_HOST'],$_SERVER['HTTP_HOST'],$mailsubj,$mailbody);
+                    }
 
                     $content = $this->get_template_block('save_success');
 
@@ -597,7 +598,6 @@ class auth extends basemodule
                     if (!is_array($value))
                         $content = str_replace("%".$key."%", htmlspecialchars($value), $content);
                 }
-                //$add_fields_lines='';
                 if (!empty($fields))
                 {
                     foreach ($fields as $m_key => $m_value)
@@ -616,7 +616,7 @@ class auth extends basemodule
                                     $val = htmlspecialchars($id_value['value']);
                                     break;
                                 case 'image':
-                                    if (empty($id_value['value']))
+                                    if (!$id_value['value'])
                                     {
                                         $line = $this->get_template_block('form_line_'.$id_value['name'].'_empty');
                                         $val='';

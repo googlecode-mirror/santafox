@@ -240,38 +240,20 @@ class manager_interface
 				if ($get_up->update_get(SANTAFOX_VERSION, true) == 1)
 				{
 				    $kernel->priv_section_leftmenu_set();
-				    //$str_update = '<a href="#" onclick="start_interface.link_go(\'info_site&section=global_prop\');">Есть обновления</a>';
 				    $str_update = '<a href="#" onclick="start_interface.main_menu_click(document.getElementById(\'main_menu_global_prop\'),\'global_prop\',\'info_site\');">Есть обновления</a>';
-
-				    //$str_update = '<a href="/admin/index.php?set_left_menu=info_site">Есть обновления</a>';
-
 				}
                 $html = str_replace("[#version_update#]", $str_update, $html);
-
 				//Самым последним вызываем информацию по сообщениям дебага
-				$html = str_replace("[#debug_content#]"      , $kernel->priv_debug_get()  , $html);
-
-			/*
-            case 'content':
-                $manager_modules = new manager_modules();
-                echo '<pre>';
-				//$kernel->priv_output(print_r($manager_modules->return_modules('news'), true));
-                echo '</pre>';
-                exit(0);
+				$html = str_replace("[#debug_content#]", $kernel->priv_debug_get(), $html);
                 break;
-                */
+
         }
-
-
         $kernel->priv_output($html);
-
     }
 
     function top_menu_create()
     {
     	global $kernel;
-
-
         // Для не ROOT'а убираем "лишние" пункты меню
         //Пока отключили, нужно будет перенести в конструктуро
         /*
@@ -286,7 +268,6 @@ class manager_interface
         */
 
 		$modul = $kernel->pub_section_current_get();
-
 		$arr_menu = array();
 
 		$i = 0;
@@ -331,8 +312,6 @@ class manager_interface
 
         //$html = str_replace ("[#admin_trace_count#]", $this->admin_trace(), $html);
         //$html = str_replace ("[#main_top_menu1#]", $this->create_menu_moduls(), $html);
-
-
         return $out;
     }
 
@@ -341,23 +320,17 @@ class manager_interface
      *
      * В зависимости от текущей секции, создаёт разные объекты и вызывает их методы для
      * формирования левого меню
-     * @return HTML
+     * @return string
      */
     function left_menu_create()
     {
         global $kernel;
-
         $inter = new pub_interface();
-
-        //$kernel->debug("--".$kernel->pub_section_current_get()."--", true);
-        //$kernel->debug("--".$id_parent."--", true);
-
 
         //Узнаем, что за секция и в зависимости от этого выведем соответсвующее левое меню
     	switch ($kernel->pub_section_current_get())
         {
             case 'global_prop':
-//                $kernel->debug($kernel->priv_admin_current_get(), true);
                 $manager = new manager_global_properties();
 				break;
 
@@ -419,7 +392,7 @@ class manager_interface
      * Формирует контент центральной части
      *
      * Контент центральной части зависит от текуший секции..
-     * @return HTML
+     * @return string
      */
     function section_get_html()
     {
@@ -481,7 +454,7 @@ class manager_interface
     /**
      * Создаёт панельки для вызова админок модулей
      *
-     * @return javaScript
+     * @return string
      */
     function modules_tabs_create()
     {
@@ -561,4 +534,3 @@ class manager_interface
         return $file_name_lite;
     }
 }
-?>

@@ -423,6 +423,7 @@ function start_include_content(name_area,is_separate_window)
         name_area = 'content_html';
     var config =
     {
+        contentsCss : '/design/styles/screen.css',
         skin : 'moono',
         autoUpdateElement:true,
         width: '100%',

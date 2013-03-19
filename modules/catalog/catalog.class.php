@@ -9167,6 +9167,32 @@ class catalog extends BaseModule
         $kernel->runSQL($query);
     }
 
+    public static function clone_file_field($prop_type,$val)
+    {
+        global $kernel;
+
+        $site_root = $kernel->pub_site_root_get();
+        $full_orig_path=$site_root.'/'.$val;
+        $origFilename=pathinfo($full_orig_path,PATHINFO_FILENAME);
+        $ext='.'.pathinfo($full_orig_path,PATHINFO_EXTENSION);
+        $save_path_rel = pathinfo($val,PATHINFO_DIRNAME);
+        $save_path_full = $site_root.'/'.$save_path_rel;
+        $newname=$origFilename.$ext;
+        $n=1;
+        while (file_exists($save_path_full."/".$newname) || file_exists($save_path_full."/tn/".$newname) || file_exists($save_path_full."/source/".$newname))
+        {
+            $n++;
+            $newname=$origFilename.'_'.$n.$ext;
+        }
+        $newval = $save_path_rel.'/'.$newname;
+        copy($full_orig_path,$save_path_full.'/'.$newname);
+        if($prop_type=='pict')
+        {
+            copy($full_orig_path,$save_path_full.'/tn/'.$newname);
+            copy($full_orig_path,$save_path_full.'/source/'.$newname);
+        }
+        return $newval;
+    }
 
     /**
      * Клонирует товар по переданному айдишнику
@@ -9180,6 +9206,9 @@ class catalog extends BaseModule
         $olditem = $this->get_item($id);
         if (!$olditem)
             return false;
+
+        $props = CatalogCommons::get_props2(0);
+
         $newitem = array();
         foreach ($olditem as $k => $v)
         {
@@ -9189,6 +9218,9 @@ class catalog extends BaseModule
                 $v = 0;
             elseif ($k == "name")
                 $v .= " копия";
+            if ($v && isset($props[$k]) && in_array($props[$k]['type'],array('file','pict')))
+                $v=self::clone_file_field($props[$k]['type'],$v);
+
             if ($k != "ext_id" && mb_strlen($v) == 0)
                 $newitem[$k] = null;
             else
@@ -9204,11 +9236,16 @@ class catalog extends BaseModule
         $olditem = $this->get_item_group_fields($olditem['ext_id'], $group['name_db']);
         if (!$olditem)
             return false;
+
+        $props = CatalogCommons::get_props2($olditem['group_id']);
         $newitem = array();
         foreach ($olditem as $k => $v)
         {
             if ($k == "id")
                 continue;
+            if ($v && isset($props[$k]) && in_array($props[$k]['type'],array('file','pict')))
+                $v=self::clone_file_field($props[$k]['type'],$v);
+
             if (mb_strlen($v) == 0)
                 $newitem[$k] = null;
             else
@@ -9230,9 +9267,8 @@ class catalog extends BaseModule
         }
 
         //скопируем связанные товары
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items_links` WHERE itemid1='.$id.' OR itemid2='.$id;
-        $res = $kernel->runSQL($query);
-        while ($row = mysql_fetch_assoc($res))
+        $linked = $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_items_links','itemid1='.$id.' OR itemid2='.$id);
+        foreach($linked as $row)
         {
             if ($row['itemid1'] == $id)
                 $lid = $row['itemid2'];
@@ -9240,7 +9276,6 @@ class catalog extends BaseModule
                 $lid = $row['itemid1'];
             $this->add_items_link($newID, $lid);
         }
-        mysql_free_result($res);
         return $newID;
     }
 

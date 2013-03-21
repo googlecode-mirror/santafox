@@ -20,17 +20,14 @@ require_once ("admin/manager_users.class.php"); //Менеджер управл�
 require_once ("admin/manager_stat.class.php");
 
 $kernel = new kernel(PREFIX);
-
-// Храним сессию неделю
-session_cache_expire(60*24*7);
-session_start();
-$expiry = 60*60*24*7;
-setcookie(session_name(), session_id(), time()+$expiry, "/");
-
 //Если необходимо то редирект на строку с WWW
 if ((REDIR_WWW == true) && (!preg_match("/^www\\./", $_SERVER['HTTP_HOST'])))
     $kernel->priv_redirect_301("http://www.".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 
+$expiry = 60*24*7;
+ini_set('session.gc_maxlifetime', $expiry);
+session_start();
+setcookie(session_name(), session_id(), time()+$expiry*60, "/");
 
 $front = new frontoffice_manager();
 $front->start();

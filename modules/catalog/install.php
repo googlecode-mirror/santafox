@@ -206,7 +206,8 @@ class catalog_install extends install_modules
           `totalprice` decimal(10,2) unsigned DEFAULT NULL,
           PRIMARY KEY  (`id`),
           UNIQUE KEY `sessionid` (`sessionid`),
-          KEY `userid` (`userid`)
+          KEY `userid` (`userid`),
+          KEY `lastaccess` (`lastaccess`)
         ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
         $kernel->runSQL($query);
 

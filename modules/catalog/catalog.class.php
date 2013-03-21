@@ -125,11 +125,14 @@ class catalog extends BaseModule
 
         if ($this->is_basket_inited)
             return;
+        $moduleid = $kernel->pub_module_id_get();
+        if (rand(1,1000)==1) //чистим старые корзины с вероятностью 1 из 1000
+            CatalogCommons::clean_old_baskets($moduleid);
 
         $this->is_basket_inited = true;
 
         //устанавливаем уникальное имя cookie для этого экземпляра модуля
-        $this->basketid_cookie_name .= $kernel->pub_module_id_get();
+        $this->basketid_cookie_name .= $moduleid;
 
         if (isset($_COOKIE[$this->basketid_cookie_name]))
         {
@@ -1126,13 +1129,10 @@ class catalog extends BaseModule
 
                 $updateSQL .= " `lastaccess`= '".date("Y-m-d H:i:s")."' WHERE `id`='".$currOrder['id']."'";
                 $kernel->runSQL($updateSQL);
-                //return $block;
 
                 //чистим корзину
-                $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` '.
-                    'WHERE `orderid`='.$currOrder['id'];
+                $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` WHERE `orderid`='.$currOrder['id'];
                 $kernel->runSQL($query);
-
 
                 $kernel->pub_redirect_refresh_global("/".$kernel->pub_page_current_get().".html?order_received=true");
             }

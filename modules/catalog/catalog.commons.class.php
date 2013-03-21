@@ -17,6 +17,20 @@ class CatalogCommons
      */
     private static $templates_user_prefix = 'modules/catalog/templates_user/';
 
+
+
+    public static function clean_old_baskets($moduleid)
+    {
+        global $kernel;
+        $prefix = $kernel->pub_prefix_get();
+        $kernel->runSQL("DELETE FROM `".$prefix."_catalog_".$moduleid."_basket_orders` AS `orders` WHERE `orders`.`lastaccess`<'".date("Y-m-d H:i:s",strtotime("-7 days"))."'");
+        $q="DELETE items FROM `".$prefix."_catalog_".$moduleid."_basket_items` AS items
+            LEFT JOIN `".$prefix."_catalog_".$moduleid."_basket_orders` AS `orders` ON orders.id = items.orderid
+            WHERE orders.id IS NULL";
+        $kernel->runSQL($q);
+    }
+
+
     public static function get_child_cats_with_count($moduleid,$parentid,$select_fields="cats.*",$subcats_count=false)
     {
         global $kernel;

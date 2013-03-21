@@ -11,5 +11,6 @@ CREATE TABLE `%PREFIX%_catalog_catalog1_basket_orders` (
   `totalprice` decimal(10,2) unsigned DEFAULT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `sessionid` (`sessionid`),
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  KEY `lastaccess` (`lastaccess`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

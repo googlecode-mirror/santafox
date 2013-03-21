@@ -3698,10 +3698,18 @@ class catalog extends BaseModule
                 }
             }
         }
-        if (count($vals) > 0)
+        if ($vals)
         {
             $query .= implode(',', $vals);
             $kernel->runSQL($query);
+        }
+
+        $addlinkedid = intval($kernel->pub_httppost_get('addlinkedid'));
+        if ($addlinkedid)
+        {
+            $id2 = intval($kernel->pub_httppost_get('addlinkedid'));
+            $this->add_items_link($itemid, $id2);
+            return $kernel->pub_httppost_response("[#catalog_linked_item_added_msg#]", "item_edit&id=".$itemid.'&redir2='.$kernel->pub_httppost_get('redir2'));
         }
         return $kernel->pub_httppost_response('[#common_saved_label#]', $kernel->pub_httppost_get('redir2'));
     }
@@ -8925,15 +8933,6 @@ class catalog extends BaseModule
                     die();
                 }
                 return $this->show_items($group_id);
-
-            case 'add_linked_item':
-                $id1 = intval($kernel->pub_httppost_get('itemid'));
-                $id2 = intval($kernel->pub_httppost_get('addlinkedid'));
-                if ($id2 > 0)
-                    $this->add_items_link($id1, $id2);
-                return $kernel->pub_httppost_response("[#catalog_linked_item_added_msg#]", "item_edit&id=".$id1);
-                //$kernel->pub_redirect_refresh_reload("item_edit&id=".$id1);
-                break;
 
             //Форма редактирования товара
             case 'item_edit':

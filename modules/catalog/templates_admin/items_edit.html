@@ -103,7 +103,7 @@
                 <input type="hidden" name="id" value="%id%">
                 <input type="hidden" name="group_id" value="%group_id%">
 
-                <table class="container" style="margin-bottom:0px;">
+                <table class="container" style="margin-bottom:0;">
                     <tr>
                         <th style="max-width:250px; text-align:left;">[#catalog_item_edit_table_nameprop_label#]</th>
                         <th>[#catalog_item_edit_table_value_label#]</th>
@@ -143,6 +143,7 @@
                     %props%
                 </table>
 
+                <input type="hidden" name="addlinkedid" value="" id="add_linked_itemid">
                 <input type="hidden" name="redir2" value="%redir2%">
                 <fieldset class="page_submit_field">
                     <input type="button" value="[#catalog_item_edit_bt_save_label#]" onclick="santaFormSubmit('saveitemform');">
@@ -183,7 +184,7 @@
             if (ui.item)
             {
                 $('#add_linked_itemid').val(ui.item.value);
-                jspub_form_submit('addlinkedform','/admin/index.php?action=set_left_menu&leftmenu=add_linked_item')
+                santaFormSubmit('saveitemform');
             }
         }
     });
@@ -192,15 +193,10 @@
 <!-- @linked -->
 
 <fieldset style="border-top:1px solid #ededed; padding:10px 0;">
-    <form action="" method="POST" id="addlinkedform">
-        <input type="hidden" name="redir2" value="%redir2%">
-        <input type="hidden" name="itemid" value="%id%">
-        <input type="hidden" name="addlinkedid" value="" id="add_linked_itemid">
       <span class="block clear">
        <label style="width:170px;">[#catalog_add_linked_item_label#]</label>
        %linked_data%
       </span>
-    </form>
 </fieldset>
 
 <table class="admin_table">
@@ -212,7 +208,7 @@
 </table>
 
 <!-- @linked_item -->
-<tr><td colspan="2"><a href="#" onclick="jspub_click('item_edit&id=%lid%&redir2=%redir2%')">%namestring%</a><a href="#" onclick="jspub_click('item_edit&id=%id%&removlinkedid=%lid%')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_remove_linked_item_label#]"/></a></td></tr>
+<tr><td colspan="2"><a href="javascript:void(0);" onclick="jspub_click('item_edit&id=%lid%&redir2=%redir2%')">%namestring%</a><a href="javascript:void(0);" onclick="jspub_click('item_edit&id=%id%&removlinkedid=%lid%')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_remove_linked_item_label#]"/></a></td></tr>
 
 <!-- @prop_string -->
 <tr %class%>
@@ -263,7 +259,7 @@
 <!-- @prop_file_edit -->
 <tr %class%>
 <td align="left">%prop_name_full%:</td>
-<td><b>%prop_value%</b> <a href="#" onclick="jspub_confirm('item_clear_field&id=%id%&redir2=%redir2%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
+<td><b>%prop_value%</b> <a href="javascript:void(0);" onclick="jspub_confirm('item_clear_field&id=%id%&redir2=%redir2%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
 </tr>
 
 <!-- @prop_pict -->
@@ -275,7 +271,7 @@
 <!-- @prop_pict_edit -->
 <tr %class%>
 <td align="left">%prop_name_full%:</td>
-<td><img src="%prop_value%" width="50"><a href="#" onclick="jspub_confirm('item_clear_field&redir2=%redir2%&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
+<td><img src="%prop_value%" width="50"><a href="javascript:void(0);" onclick="jspub_confirm('item_clear_field&redir2=%redir2%&id=%id%&field=%prop_name_db%','[#catalog_item_edit_file_del_alert#]?')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_item_edit_file_del_alert#]"/></a></td>
 </tr>
 <!-- @prop_pict_marka_source -->
 <br><input type="checkbox" name="%prop_name_db%_need_add_source_water" id="%prop_name_db%_need_add_source_water" checked="checked"/><label for="%prop_name_db%_need_add_source_water">[#catalog_item_edit_pict_add_mark_for_source#]</label>

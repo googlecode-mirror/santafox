@@ -22,7 +22,8 @@ class frontoffice_manager
      */
     function __construct()
     {
-        $this->session_tracking_set();
+        if (defined("GENERATE_STATISTIC") && GENERATE_STATISTIC)
+            $this->session_tracking_set();
     }
 
 

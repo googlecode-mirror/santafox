@@ -388,32 +388,42 @@ class auth extends basemodule
                             $kernel->pub_mail($adminEmail, $adminEmail, $mailFrom, $http_host, $admin_subj, $message, 1);
 
 
-                            if ($this->get_module_prop_value('reg_activation_type')=='admin_manual')
+                            $act_type=$this->get_module_prop_value('reg_activation_type');
+                            switch($act_type)
                             {
-                                $msg=$this->get_template_block('wait_for_confirm');
-                                if ($kernel->pub_is_ajax_request())
-                                    return $msg;
-                                $html .= $msg;
-                            }
-                            else
-                            {
-                                $url = $id.md5($reg['email']);
-                                $url = "http://".$http_host."/".$kernel->pub_page_current_get().".html?regaction=confirm&code=".$url;
-                                $umessage = $this->get_template_block('mail');
-                                $umessage = str_replace("%url%", $url, $umessage);
-                                $umessage = str_replace("%name%", $reg['name'], $umessage);
-                                $umessage = str_replace("%host%",$_SERVER['HTTP_HOST'], $umessage);
-                                $umessage = str_replace("%email%", $reg['email'], $umessage);
-                                $usubj = $this->get_module_prop_value('auth_user_subj4reg');
-                                if (!$usubj)
-                                    $usubj = "Регистрация на сайте %host%";
-                                $usubj = str_replace('%host%',$http_host,$usubj);
-                                $kernel->pub_mail(array($reg['email']), array($reg['email']), $mailFrom, $http_host, $usubj, $umessage, 1);
+                                case 'admin_manual':
+                                    $msg=$this->get_template_block('wait_for_confirm');
+                                    if ($kernel->pub_is_ajax_request())
+                                        return $msg;
+                                    $html .= $msg;
+                                    break;
+                                case 'auto_activate':
+                                    $msg=$this->get_template_block('you_are_activated');
+                                    if ($kernel->pub_is_ajax_request())
+                                        return $msg;
+                                    $html .= $msg;
+                                    $kernel->db_update_record("_user",array('verified'=>1),"id=".$id);
+                                    break;
+                                default:
+                                    $url = $id.md5($reg['email']);
+                                    $url = "http://".$http_host."/".$kernel->pub_page_current_get().".html?regaction=confirm&code=".$url;
+                                    $umessage = $this->get_template_block('mail');
+                                    $umessage = str_replace("%url%", $url, $umessage);
+                                    $umessage = str_replace("%name%", $reg['name'], $umessage);
+                                    $umessage = str_replace("%host%",$_SERVER['HTTP_HOST'], $umessage);
+                                    $umessage = str_replace("%email%", $reg['email'], $umessage);
+                                    $usubj = $this->get_module_prop_value('auth_user_subj4reg');
+                                    if (!$usubj)
+                                        $usubj = "Регистрация на сайте %host%";
+                                    $usubj = str_replace('%host%',$http_host,$usubj);
+                                    $kernel->pub_mail(array($reg['email']), array($reg['email']), $mailFrom, $http_host, $usubj, $umessage, 1);
 
-                                $msg = $this->get_template_block('follow_link');
-                                if ($kernel->pub_is_ajax_request())
-                                    return $msg;
-                                $html .= $msg;
+                                    $msg = $this->get_template_block('follow_link');
+                                    if ($kernel->pub_is_ajax_request())
+                                        return $msg;
+                                    $html .= $msg;
+
+                                    break;
                             }
                         }
                         else

@@ -22,7 +22,7 @@
 	define("CACHED_PAGE", false);
 	define("SSL_CONNECTION", false);
 	define("EMAIL_FOR_ERRORE", "");
-	define("SANTAFOX_VERSION", "3.05");
+	define("SANTAFOX_VERSION", "3.06");
 	define("WEBFORM_CODING", true);
 	define("PRINT_MYSQL_ERRORS", false);
 	define("PAGE_FOR_404", "index");

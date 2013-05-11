@@ -1166,11 +1166,11 @@ class catalog extends BaseModule
             {
                 $enum_elems=$this->get_enum_set_prop_values($tinfo[$db_field]['Type'],false);
                 $form = str_replace("%".$db_field."_".$postvar."_selected%", "selected", $form);
-                $form = str_replace("%".$db_field."_".$postvar."_checked%", "checked", $form);//atlant
+                $form = str_replace("%".$db_field."_".$postvar."_checked%", "checked", $form);
                 foreach ($enum_elems as $enum_elem)
                 {
                     $form = str_replace("%".$db_field."_".$enum_elem."_selected%", " ", $form);
-                    $form = str_replace("%".$db_field."_".$enum_elem."_checked%", " ", $form);//atlant
+                    $form = str_replace("%".$db_field."_".$enum_elem."_checked%", " ", $form);
                 }
             }
             else
@@ -1464,7 +1464,10 @@ class catalog extends BaseModule
      */
     private function add_basket_item($itemid, $qty = 1)
     {
-        $qty = abs(intval($qty));
+        $qty = intval($qty);
+        if ($qty<1)
+            return;
+
         //если товар с таким itemid уже есть в корзине
         //просто увеличим кол-во на $qty
         $basket_item = $this->get_basket_item_by_itemid($itemid);
@@ -1474,8 +1477,10 @@ class catalog extends BaseModule
             return;
         }
 
-        if ($qty == 0)
-            return; //не добавляем нулевое кол-во
+        $item = $this->get_item($itemid);
+        if (!$item)
+            return;
+
         global $kernel;
         $currOrder = $this->get_current_basket_order();
         $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_basket_items` '.
@@ -1576,7 +1581,9 @@ class catalog extends BaseModule
                 $url .= "&";
         }
 	*/
-        return str_replace("%current_page_url%", $url, $content);
+        $content = str_replace("%current_page_url%", $url, $content);
+        $content = str_replace("%current_page_url_urlencoded%", urlencode($_SERVER['REQUEST_URI']), $content);
+        return $content;
     }
 
     private function prepare_inner_filter_sql($sql, $params = array(), &$linkParams)
@@ -1696,7 +1703,11 @@ class catalog extends BaseModule
             $tpl = CatalogCommons::get_templates_user_prefix().$filter['template'];
             $linkParams = "";
             if (isset($_REQUEST['filterid']))
+            {
                 $linkParams .= "filterid=".$filter_stringid."&";
+                if(isset($_REQUEST['use_filter_template']))
+                    $linkParams.='use_filter_template=1&';
+            }
         }
         $curr_cat_id = 0;
         if (strlen($filter['catids']) == 0) //показываем товары из текущей - добавляем параметр с категорией
@@ -1741,13 +1752,15 @@ class catalog extends BaseModule
             $countQuery = mb_substr($query, 0, $pos);
 
         $pos = mb_strpos(mb_strtolower($countQuery), " from");
-        $countQuery = "SELECT COUNT(*) AS count ".mb_substr($countQuery, $pos);
+        $countQuery = "SELECT SQL_CALC_FOUND_ROWS items.id ".mb_substr($countQuery, $pos)." LIMIT 1";
         $total = 0;
-        $result = $kernel->runSQL($countQuery);
+        $res=$kernel->runSQL($countQuery);
+        mysql_free_result($res);
 
-        if ($row = mysql_fetch_assoc($result))
-            $total = $row['count'];
-        mysql_free_result($result);
+        $res=$kernel->runSQL("SELECT FOUND_ROWS() AS found");
+        if ($fr=mysql_fetch_assoc($res))
+            $total=$fr['found'];
+        mysql_free_result($res);
 
         /*
         Ограничения по количеству
@@ -2044,11 +2057,12 @@ class catalog extends BaseModule
      * @param integer        $show_cats_if_empty_items выводить ли список категорий, если нет товаров?
      * @param string        $cats_tpl                 файл шаблона для списка категорий
      * @param string        $multi_group_tpl          файл шаблона для разных групп
+     * @param integer       $pages_in_block          мак.кол-во страниц в блоке
      * @param integer|boolean $catid                    idшник категории (для прямого вызова)
      * @param string|boolean  $custom_template          файл шаблона (для прямого вызова)
      * @return string
      */
-    public function pub_catalog_show_items($limit, $show_cats_if_empty_items, $cats_tpl, $multi_group_tpl = '', $catid = false, $custom_template = false)
+    public function pub_catalog_show_items($limit, $show_cats_if_empty_items, $cats_tpl, $multi_group_tpl = '', $pages_in_block=15, $catid = false, $custom_template = false)
     {
         global $kernel;
         if (!$catid)
@@ -2060,8 +2074,8 @@ class catalog extends BaseModule
         else
             $this->add_categories2waysite($this->get_way2cat($catid, true));
 
-        if (isset($_REQUEST['filterid'])) //значит работаем по внешнему фильтру
-            return $this->pub_catalog_show_inner_selection_results($_REQUEST['filterid'], true);
+        if (isset($_REQUEST['filterid'])) //значит работаем по внутреннему фильтру
+            return $this->pub_catalog_show_inner_selection_results($_REQUEST['filterid'], !isset($_REQUEST['use_filter_template']));
 
         if (!$catid)
         {
@@ -2280,7 +2294,7 @@ class catalog extends BaseModule
         $content = str_replace("%row%", $rows, $content);
         $content = str_replace("%total_in_cat%", $total, $content);
         $purl = $kernel->pub_page_current_get().'.html?'.$this->frontend_param_cat_id_name.'='.$catid.'&'.$this->frontend_param_offset_name.'=';
-        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $purl, 15), $content);
+        $content = str_replace('%pages%', $this->build_pages_nav($total, $offset, $limit, $purl, $pages_in_block), $content);
         $content = $this->cats_props_out($category['id'], $content);
         $content = $this->process_variables_out($content);
         $content = $this->process_filters_in_template($content);
@@ -2516,7 +2530,7 @@ class catalog extends BaseModule
             if (preg_match("|\\%show_items_list\\[(.+)\\]\\%|U", $cblock, $match))
             {
                 $items_tpl = $match[1];
-                $items_block = $this->pub_catalog_show_items(0, false, "", "", $cat['id'], $items_tpl);
+                $items_block = $this->pub_catalog_show_items(0, false, "", "", 15, $cat['id'], $items_tpl);
                 $this->set_templates($parsed_template);
                 $cblock = str_replace($match[0], $items_block, $cblock);
             }

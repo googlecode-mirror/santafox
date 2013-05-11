@@ -83,18 +83,10 @@ class catalog_install extends install_modules
 	function uninstall($id_module)
 	{
 		global $kernel;
-
-		//$query = 'DROP TABLE `'.PREFIX.'_catalog_items`';
-		//$kernel->runSQL($query);
-		//$query = 'DROP TABLE `'.PREFIX.'_catalog_cats`';
-		//$kernel->runSQL($query);
-
 		$query = 'DROP TABLE `'.PREFIX.'_catalog_item_groups`';
 		$kernel->runSQL($query);
 		$query = 'DROP TABLE `'.PREFIX.'_catalog_item_props`';
 		$kernel->runSQL($query);
-		//$query = 'DROP TABLE `'.PREFIX.'_catalog_item2cat`';
-		//$kernel->runSQL($query);
 	}
 
 	/**
@@ -443,6 +435,13 @@ $property->set_default(CatalogCommons::get_templates_user_prefix().'list.html');
 $property->set_id('multi_group_tpl');
 $property->set_mask('htm,html');
 $property->set_patch(CatalogCommons::get_templates_user_prefix());
+$install->add_public_metod_parametrs('pub_catalog_show_items', $property);
+
+// макс. кол-во страниц в блоке
+$property = new properties_string();
+$property->set_caption('[#catalog_edit_inner_filter_maxpages_label#]');
+$property->set_default(15);
+$property->set_id('pages_in_block');
 $install->add_public_metod_parametrs('pub_catalog_show_items', $property);
 
 

@@ -262,6 +262,8 @@ abstract class BaseModule
             $page = str_replace('%page%', $p, $page);
             $pages[] = $page;
         }
-        return  str_replace('%pages_block%', implode($this->get_template_block('page_delimeter'), $pages), $pblock);
+        $pblock = str_replace('%pages_block%', implode($this->get_template_block('page_delimeter'), $pages), $pblock);
+        $pblock = str_replace('%total_pages_count%',$pages_count,$pblock);
+        return $pblock;
     }
 }

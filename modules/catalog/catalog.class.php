@@ -9262,13 +9262,14 @@ class catalog extends BaseModule
             $newitem = array("id" => null);
         $newID = $kernel->db_add_record('_catalog_'.$kernel->pub_module_id_get().'_items', $newitem);
 
+        $group_id=$olditem['group_id'];
         //теперь в таблице товарной группы
-        $group = CatalogCommons::get_group($olditem['group_id']);
+        $group = CatalogCommons::get_group($group_id);
         $olditem = $this->get_item_group_fields($olditem['ext_id'], $group['name_db']);
         if (!$olditem)
             return false;
 
-        $props = CatalogCommons::get_props2($olditem['group_id']);
+        $props = CatalogCommons::get_props2($group_id);
         $newitem = array();
         foreach ($olditem as $k => $v)
         {

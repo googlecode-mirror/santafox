@@ -41,5 +41,4 @@ $il['search_admin_table_php_mem']    = 'Размер памяти выделен
 $il['search_admin_table_php_mem_coment'] = 'При индексации больших страниц сайта PHP может не хватить выделенной ему памяти (если её слишком мало)';
 $il['search_admin_table_php_mem_change'] = '<b>(изменено модулем)</b>';
 $il['search_admin_table_time_life'] = 'Время жизни скрипта';
-
-?>
+$il['search_admin_last_index_time'] = 'Последняя индексация';

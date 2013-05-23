@@ -107,6 +107,12 @@ class Indexator
         searchdb::delete_doubles();
         searchdb::optimize_tables();
         $this->delete_state();
+
+        //сохранение времени последней индексации
+        $mprops=$kernel->pub_module_serial_get('search1');
+        $mprops['last_index_time'] = time();
+        $kernel->pub_module_serial_set($mprops, 'search1');
+
         if (isset($_SERVER['HTTP_HOST']))//только если через веб
             $kernel->pub_redirect_refresh('index');
         return $html;

@@ -278,6 +278,13 @@ class search extends BaseModule
                 else
                     $html = str_replace('%is_change%', '', $html);
 
+                $mprops=$kernel->pub_module_serial_get('search1');
+                if (isset($mprops['last_index_time']))
+                    $time = date("d.m.Y H:i:s",$mprops['last_index_time']);
+                else
+                    $time = '-';
+                $html = str_replace('%last_index_time%', $time, $html);
+
 	            break;
 
 	        case 'ignored_delete':

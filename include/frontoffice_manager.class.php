@@ -105,7 +105,7 @@ class frontoffice_manager
             $redirPage = PAGE_FOR_404;
         else
             $redirPage = "index";
-        $kernel->priv_redirect_301("/" . $redirPage . ".html");
+        $kernel->priv_redirect_404("/" . $redirPage . ".html");
     }
 
     /**

@@ -1016,6 +1016,21 @@ class kernel
     }
 
 
+	/**
+	* 404 Редирект (нормальный) на заданный URL
+	*
+	* Отправка 404 ошибки + вывод информации
+	* @access private
+	* @param string $url URL который выводим
+	* @return void
+	*/
+	function priv_redirect_404($url)
+	{
+		header("HTTP/1.1 404 Not Found");
+		readfile('http://'.$_SERVER['SERVER_NAME'].$url);
+		exit();
+	}
+
     /**
      * 301 Редирект на заданный URL
      *

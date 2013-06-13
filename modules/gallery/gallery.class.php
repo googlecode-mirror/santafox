@@ -28,7 +28,7 @@ class gallery  extends basemodule
 
 	//показываем содержимое галереи пользователю
     function pub_create_content($template, $perpage)
-    {				
+    {
         global $kernel;
         $perpage = intval($perpage);
         if ($perpage<1)
@@ -85,6 +85,8 @@ class gallery  extends basemodule
                 $line = str_replace('%name%', $data['name'], $line);
                 $line = str_replace('%link%', $curr_page."?".$this->cat_param_name."=".$data['id'], $line);
                 $line = str_replace('%small_image%',"/content/images/".$moduleid."/tn/".$data['photoimage'], $line);
+                $line = str_replace('%source_image%',"/content/images/".$moduleid."/source/".$data['photoimage'], $line);
+				$line = str_replace('%value_image%',"/content/images/".$moduleid."/".$data['photoimage'], $line);
             }
             else
             {
@@ -146,6 +148,7 @@ class gallery  extends basemodule
             $line = str_replace('%title_image%',  $data['title_image'], $line);
             $line = str_replace('%description%', $data['description'], $line);
             $line = str_replace('%post_date%',   $data['post_date'], $line);
+			$line = str_replace('%cat_id%',   $data['cat_id'], $line);
             $lines .= $line;
         }
         $content = $this->get_template_block('content');
@@ -388,7 +391,10 @@ class gallery  extends basemodule
                 $editor = new edit_content();
                 $editor->set_edit_name('description');
                 $editor->set_simple_theme(true);
-                $editor->set_content($cat['description']);
+				if (isset($cat['description']))
+                	$editor->set_content($cat['description']);
+				else
+					$editor->set_content('');
                 $content =str_replace('%description%',$editor->create(),$content);
 
 
@@ -516,7 +522,7 @@ class gallery  extends basemodule
                 $purl='show_photos&catid='.$catid.'&sortby='.$sortby.'&offset=';
                 $content = str_replace('%pages%', $this->build_pages_nav($total,$offset,$perpage,$purl,0,'url'), $content);
 
-             break; 
+             break;
 		    //выводим форму для добавления или редактирования картинки
 			 case "image_edit":
                 $id = intval($kernel->pub_httpget_get('image_id'));
@@ -548,7 +554,7 @@ class gallery  extends basemodule
                 $content = str_replace('%editor%', $editor->create(), $content);
 			break;
         }
-        
+
         return $content;
     }
 

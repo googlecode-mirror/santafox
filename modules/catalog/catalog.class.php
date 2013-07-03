@@ -8255,7 +8255,7 @@ class catalog extends BaseModule
     }
 
 
-    private function delete_group($groupid)
+    protected function delete_group($groupid)
     {
         global $kernel;
         $group = CatalogCommons::get_group($groupid);
@@ -8267,13 +8267,15 @@ class catalog extends BaseModule
         if ($crec['count'] > 0)
             return;
         $prfx = $kernel->pub_prefix_get();
-        $q = "DELETE FROM ".$prfx."_catalog_item_props WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
+        $q = "DELETE FROM `".$prfx."_catalog_item_props` WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
         $kernel->runSQL($q);
-        $q = "DELETE FROM ".$prfx."_catalog_visible_gprops WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
+        $q = "DELETE FROM `".$prfx."_catalog_visible_gprops` WHERE group_id='".$group['id']."' AND module_id='".$modid."'";
         $kernel->runSQL($q);
-        $q = "DELETE FROM ".$prfx."_catalog_item_groups WHERE id='".$group['id']."'";
+        $q = "DELETE FROM `".$prfx."_catalog_item_groups` WHERE id='".$group['id']."'";
         $kernel->runSQL($q);
-        $q = "DELETE FROM  ".$prfx."_catalog_".$modid."_inner_filters WHERE groupid='".$group['id']."'";
+        $q = "DELETE FROM  `".$prfx."_catalog_".$modid."_inner_filters` WHERE groupid='".$group['id']."'";
+        $kernel->runSQL($q);
+        $q = "DROP TABLE `".$prfx."_catalog_items_".$modid."_".$group['name_db']."`";
         $kernel->runSQL($q);
         $this->generate_search_form($groupid, array());
     }

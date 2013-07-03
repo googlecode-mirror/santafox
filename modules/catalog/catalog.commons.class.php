@@ -88,7 +88,7 @@ class CatalogCommons
     public static function get_inner_filters_kvarray()
     {
         $filters = self::get_inner_filters();
-        $result = array();
+        $result = array(""=>"");
         foreach ($filters as $filter)
         {
         	$result[$filter['stringid']] = htmlspecialchars($filter['name']);

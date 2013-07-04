@@ -580,7 +580,7 @@ class comments extends BaseModule
             $orderby = '`when` ASC';
         else
             $orderby = '`when` DESC';
-        $query = 'SELECT `id` , DATE_FORMAT(`when`, "%d-%m-%Y %H:%i") AS `when`, `name`,`comment`,`rate`,`pros`,`cons`
+        $query = 'SELECT `id` , DATE_FORMAT(`when`, "%d-%m-%Y %H:%i") AS `whenH`, `name`,`comment`,`rate`,`pros`,`cons`
                   FROM `'.$kernel->pub_prefix_get().'_'.$kernel->pub_module_id_get().'_reviews`
                   WHERE '.implode(' AND ', $where).' ORDER BY '.$orderby.' LIMIT '.$limit.' OFFSET '.$offset;
 
@@ -597,6 +597,7 @@ class comments extends BaseModule
             else//if ($type == "new_at_top" or $type == "default")
                 $nums = ($num--) - $offset;
             $row['num']=$nums;
+            $row['when']=$row['whenH'];
             $items[] = $row;
         }
         mysql_free_result($result);

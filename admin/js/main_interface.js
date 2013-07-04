@@ -186,7 +186,7 @@ function santaFormSubmitSuccess(responseText)
         jspub_click(id_link);
 }
 
-function santaFormSubmit(formID,data)
+function santaFormSubmit(formID,data,success)
 {
     for (var i in CKEDITOR.instances)
     {
@@ -194,8 +194,11 @@ function santaFormSubmit(formID,data)
     }
     if (typeof  data === "undefined")
         data={};
+    if (typeof success === "undefined")
+        success =santaFormSubmitSuccess;
+
     var foptions={
-        success: santaFormSubmitSuccess,
+        success: success,
         dataType:  'json',
         data: data
     };

@@ -5300,7 +5300,12 @@ class catalog extends BaseModule
         $form_action = $kernel->pub_redirect_for_form('item_save');
         $redir2 = $kernel->pub_httpget_get('redir2');
         if (!$redir2)
-            $redir2 = 'show_items';
+        {
+            if($id_cat)
+                $redir2 = 'category_items&id='.$id_cat;
+            else
+                $redir2 = 'show_items';
+        }
         $content = str_replace('%props%', implode("\n", $lines), $content);
         $content = str_replace('%categories%', $catsblock, $content);
         $content = str_replace('%form_action%', $form_action, $content);
@@ -8401,11 +8406,12 @@ class catalog extends BaseModule
 
             case 'item_clone':
                 $id = $kernel->pub_httpget_get('id');
+                $cid = intval($kernel->pub_httpget_get('cid'));
                 $newID = $this->item_clone($id);
                 if ($newID)
-                    return $this->show_item_form($newID, 0);
+                    return $this->show_item_form($newID, 0, $cid);
                 else
-                    return $this->show_item_form($id, 0);
+                    return $this->show_item_form($id, 0, $cid);
 
             case 'show_variables':
                 return $this->show_variables();
@@ -9221,8 +9227,13 @@ class catalog extends BaseModule
         copy($full_orig_path,$save_path_full.'/'.$newname);
         if($prop_type=='pict')
         {
-            copy($full_orig_path,$save_path_full.'/tn/'.$newname);
-            copy($full_orig_path,$save_path_full.'/source/'.$newname);
+            $path_parts = pathinfo($val);
+            $path_small = $path_parts['dirname'].'/tn/'.$path_parts['basename'];
+            if(file_exists($path_small))
+                copy($path_small,$save_path_full.'/tn/'.$newname);
+            $path_source = $path_parts['dirname'].'/source/'.$path_parts['basename'];
+            if(file_exists($path_source))
+                copy($path_source,$save_path_full.'/source/'.$newname);
         }
         return $newval;
     }

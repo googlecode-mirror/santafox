@@ -305,7 +305,7 @@ class search extends BaseModule
 	            foreach ($istrings as $istring)
 	            {
 	                $line = $ptemplate['table_line'];
-	                $line = str_replace("%word%", $istring['word'], $line);
+	                $line = str_replace("%word%", htmlspecialchars($istring['word']), $line);
 	                $line = str_replace("%id%", $istring['id'], $line);
 	                $html .= $line;
 	            }

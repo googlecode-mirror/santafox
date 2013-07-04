@@ -67,6 +67,7 @@
         <tr>
             <th width="20"><!-- [#catalog_items_all_list_table_checkbox#] --></th>
             <th>[#catalog_items_all_list_table_num#]</th>
+            <th>[#catalog_onsite_th#]</th>
             %list_prop_names%
             <th>[#catalog_items_all_list_table_group#]</th>
             <th>[#catalog_items_all_list_table_action#]</th>
@@ -92,10 +93,16 @@
 <!-- @list_prop_value_select_option_selected_edit -->
 <option value="%option_value_escaped%" selected>%option_value%</option>
 
+<!-- @not_available_block-->
+   <img src="/admin/templates/default/images/24-em-check-gray.gif" />
+<!-- @available_block-->
+    <img src="/admin/templates/default/images/24-em-check.gif" />
+
 <!-- @table_body-->
         <tr>
             <td><input type="checkbox" id="icb" name="icb[%id%]"></td>
             <td>%number%</td>
+            <td>%ablock%</td>
             %list_prop_values%
             <td>%group%</td>
             <td valign="middle" nowrap>

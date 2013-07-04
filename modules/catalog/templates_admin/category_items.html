@@ -81,6 +81,7 @@
       <tr>
         <th width="20"><!--[#catalog_list_category_item_table_num#]--></th>
         %colum_th%
+        <th>[#catalog_onsite_th#]</th>
         <th width="20">[#catalog_list_category_item_table_order_num#]</th>
         <th>[#catalog_items_all_list_table_group#]</th>
         <th>[#catalog_list_category_item_table_action#]</th>
@@ -142,10 +143,16 @@
      }
  </script>
 
+<!-- @not_available_block-->
+<img src="/admin/templates/default/images/24-em-check-gray.gif" />
+<!-- @available_block-->
+<img src="/admin/templates/default/images/24-em-check.gif" />
+
 <!-- @cat_items_line -->
 <tr>
   <td align="center"><input type="checkbox" name="icb[%item_id%]"></td>
   %colum_td%
+  <td>%ablock%</td>
   <td width="20"><input type="text" name="iorder[%item_id%]" value="%item_order%" style="float:none; margin:0 auto; text-align:center; width:25px;"></td>
   <td>%group_name%</td>
   <td align="center" valign="middle"  nowrap>

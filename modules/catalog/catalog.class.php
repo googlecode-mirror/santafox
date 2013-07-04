@@ -4887,6 +4887,12 @@ class catalog extends BaseModule
             foreach ($items as $item)
             {
                 $line = $this->get_template_block('table_body');
+                if($item['available']==1)
+                    $ablock = $this->get_template_block('available_block');
+                else
+                    $ablock = $this->get_template_block('not_available_block');
+                $line = str_replace('%ablock%',$ablock,$line);
+
                 $cvals = '';
                 foreach ($cprops as $cprop)
                 {
@@ -6148,6 +6154,12 @@ class catalog extends BaseModule
             foreach ($items as $item)
             {
                 $line = $this->get_template_block('cat_items_line');
+                if($item['available']==1)
+                    $ablock = $this->get_template_block('available_block');
+                else
+                    $ablock = $this->get_template_block('not_available_block');
+                $line = str_replace('%ablock%',$ablock,$line);
+
                 $colum_td = '';
                 foreach ($cprops as $cprop)
                 {

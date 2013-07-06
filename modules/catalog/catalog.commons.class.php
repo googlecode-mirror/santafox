@@ -96,6 +96,15 @@ class CatalogCommons
         return $result;
     }
 
+
+    public static function set_items_available($itemids,$available)
+    {
+        if (!$itemids)
+            return;
+        global $kernel;
+        $kernel->db_update_record("_catalog_".$kernel->pub_module_id_get()."_items",array('available'=>$available),"id IN (".implode(",",$itemids).")");
+    }
+
     /**
      * Возвращает внутренний фильтр по ID
      *

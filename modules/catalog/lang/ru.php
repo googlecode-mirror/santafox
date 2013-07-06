@@ -481,3 +481,5 @@ $il['catalog_edit_category_hide_from_waysite_label']='Скрывать в дор
 $il['catalog_set_type_64_max_error_msg']='Тип данных SET не позволяет иметь более 64 возможных значений';
 $il['catalog_not_uniq_main_prop_save']='Поле %fieldname% помечено как уникальное, но установлено неуникальное значение';
 $il['catalog_onsite_th']='На сайте?';
+$il['catalog_list_set_available']='Показывать на сайте';
+$il['catalog_list_set_unavailable']='Не показывать на сайте';

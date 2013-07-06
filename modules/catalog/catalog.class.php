@@ -3328,11 +3328,20 @@ class catalog extends BaseModule
             $itemids = array();
             foreach ($vals as $itemid => $checked)
             {
+                $itemid=intval($itemid);
+                if(!$itemid)
+                    continue;
                 if ($checked)
                     $itemids[] = $itemid;
             }
             switch ($kernel->pub_httppost_get("withselected"))
             {
+                case 'set_available':
+                    CatalogCommons::set_items_available($itemids,1);
+                    break;
+                case 'set_unavailable':
+                    CatalogCommons::set_items_available($itemids,0);
+                    break;
                 case "remove_from_current":
                     if (count($itemids))
                     {
@@ -3571,12 +3580,23 @@ class catalog extends BaseModule
             return;
         $itemids = array();
         foreach ($vals as $itemid => $checked)
+        {
+            $itemid =  intval($itemid);
+            if (!$itemid)
+                continue;
             $itemids[] = $itemid;
+        }
         $action = $kernel->pub_httppost_get('withselected');
         switch ($action)
         {
             case 'delete_selected':
                 $this->delete_items($itemids);
+                break;
+            case 'set_available':
+                CatalogCommons::set_items_available($itemids,1);
+                break;
+            case 'set_unavailable':
+                CatalogCommons::set_items_available($itemids,0);
                 break;
             default: //добавление в категорию, параметр- айдишник категории
                 if (count($itemids) > 0)

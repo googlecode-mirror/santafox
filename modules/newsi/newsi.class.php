@@ -789,11 +789,11 @@ class newsi extends basemodule
             $rss = $kernel->pub_modul_properties_get('rss');
 
             return array(
-                '',
-                '',
-                'checked',
-                (($deliver['value'] == 'on' || $deliver['value'] == 'true') ? ('checked') : ('')),
-                (($lenta['value'] == 'on' || $lenta['value'] == 'true') ? ('checked') : ('')),
+                '',//date
+                '',//time
+                'checked',//available
+                (($lenta['value'] == 'on' || $lenta['value'] == 'true') ? ('checked') : ('')), //lenta
+                (($deliver['value'] == 'on' || $deliver['value'] == 'true') ? ('checked') : ('')), //delivery
                 (($rss['value'] == 'on' || $rss['value'] == 'true') ? ('checked') : ('')),
                 '',
                 '',

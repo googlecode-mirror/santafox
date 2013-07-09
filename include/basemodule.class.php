@@ -13,6 +13,19 @@ abstract class BaseModule
 
     }
 
+    public function get_captcha_img_url()
+    {
+        return '/components/captcha/captcha.php?'.time();
+    }
+
+    public function is_valid_captcha($captcha)
+    {
+        if (!$captcha)
+            return false;
+        require_once(dirname(dirname(__FILE__)).'/components/captcha/php-captcha.inc.php');
+        return PhpCaptcha::Validate($captcha);
+    }
+
     protected function get_module_prop_value($propid,$default=null)
     {
         global $kernel;

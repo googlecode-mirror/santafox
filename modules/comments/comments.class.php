@@ -64,7 +64,10 @@ class comments extends BaseModule
         global $kernel;
         $iscaptcha = $kernel->pub_modul_properties_get('showcaptcha');
         if ($iscaptcha['value']=='true')
+        {
             $content = str_replace('%form_captcha%', $this->get_template_block('captcha'), $content);
+            $content = str_replace('%captcha_img_url%', $this->get_captcha_img_url(), $content);
+        }
         else
             $content = str_replace('%form_captcha%', '', $content);
         return $content;
@@ -276,15 +279,10 @@ class comments extends BaseModule
             $ispremod = $kernel->pub_modul_properties_get('premod');
             if ($ispremod['value']=='true')
                 $aval=0;
-            if ($iscaptcha['value']=='true')
+            if ($iscaptcha['value']=='true' && !$this->is_valid_captcha($kernel->pub_httppost_get('cmnt_captcha')))
             {
-                $cmnt_code = $kernel->pub_httppost_get('cmnt_captcha');
-                require_once(dirname(__FILE__).'/php-captcha.inc.php');
-                if (!PhpCaptcha::Validate($cmnt_code))
-                {
-                    $content .=$this->get_template_block('msg_badcaptcha');
-                    $addok=false;
-                }
+                $content .=$this->get_template_block('msg_badcaptcha');
+                $addok=false;
             }
             $content .=$this->get_template_block('form');
             //$val = $kernel->pub_session_get('cmnt');
@@ -381,15 +379,10 @@ class comments extends BaseModule
             $ispremod = $kernel->pub_modul_properties_get('premod');
             if ($ispremod['value']=='true')
                 $aval=0;
-            if ($iscaptcha['value']=='true')
+            if ($iscaptcha['value']=='true' && !$this->is_valid_captcha($kernel->pub_httppost_get('cmnt_captcha')))
             {
-                $cmnt_code = $kernel->pub_httppost_get('cmnt_captcha');
-                require_once(dirname(__FILE__).'/php-captcha.inc.php');
-                if (!PhpCaptcha::Validate($cmnt_code))
-                {
-                    $content .=$this->get_template_block('msg_badcaptcha');
-                    $addok=false;
-                }
+                $content .=$this->get_template_block('msg_badcaptcha');
+                $addok=false;
             }
             $content .=$this->get_template_block('form');
             $content = str_replace('%r_name%', htmlspecialchars($name), $content);

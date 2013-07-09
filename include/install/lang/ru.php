@@ -437,3 +437,5 @@ $il['common_edit_property_pict_watermark_place']     = 'Место размещ�
 $il['common_edit_property_pict_big_create_label']    = 'Создавать большое изображение';
 $il['common_edit_property_pict_small_create_label'] =  'Создавать малое изображение';
 $il['common_edit_property_pict_transparency'] =  'Прозрачность водяного знака, %';
+
+$il['common_module_tpl']='Шаблон';

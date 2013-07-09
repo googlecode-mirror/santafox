@@ -1,0 +1,117 @@
+<!-- @before_fields -->
+
+%message%
+<form method="post" enctype="multipart/form-data">
+
+
+
+<!-- @field_type_select_option -->
+    <option value="%value%" %feedback2_%id%_%value%_option%>%value%</option>
+
+
+<!-- @field_type_select_required -->
+<div>
+    <label for="ff_%id%">%name% <sup>*</sup></label>
+    <select name="feedback2[%id%]" id="ff_%id%">
+        <option>-- --</option>
+        %options%
+    </select>
+</div>
+
+<!-- @field_type_select -->
+<div>
+    <label for="ff_%id%">%name%</label>
+    <select name="feedback2[%id%]" id="ff_%id%">
+        <option>-- --</option>
+        %options%
+    </select>
+</div>
+
+
+<!-- @field_type_string_required -->
+<div>
+    <label for="ff_%id%">%name% <sup>*</sup></label>
+    <input type="text" name="feedback2[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
+</div>
+
+<!-- @field_type_string -->
+<div>
+    <label for="ff_%id%">%name%</label>
+    <input type="text" name="feedback2[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
+</div>
+
+<!-- @field_type_checkbox -->
+<div>
+    <label for="ff_%id%">%name%</label>
+    <input type="checkbox" name="feedback2[%id%]" id="ff_%id%" value="1" %feedback2_%id%_checked%>
+</div>
+
+<!-- @field_type_checkbox_required -->
+<div>
+    <label for="ff_%id%">%name% <sup>*</sup></label>
+    <input type="checkbox" name="feedback2[%id%]" id="ff_%id%" value="1" %feedback2_%id%_checked%>
+</div>
+
+<!-- @field_type_file -->
+<div>
+    <label for="ff_%id%">%name%</label>
+    <input type="file" name="feedback2[%id%]" id="ff_%id%">
+</div>
+
+
+<!-- @field_type_file_required -->
+<div>
+    <label for="ff_%id%">%name% <sup>*</sup></label>
+    <input type="file" name="feedback2[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
+</div>
+
+<!-- @field_type_textarea_required -->
+<div>
+    <label for="ff_%id%">%name% <sup>*</sup></label>
+    <div style="clear: both;"></div>
+    <textarea name="feedback2[%id%]" id="ff_%id%">%feedback2_%id%_value%</textarea>
+</div>
+<!-- @field_type_textarea -->
+<div>
+    <label for="ff_%id%">%name%</label>
+    <div style="clear: both;"></div>
+    <textarea name="feedback2[%id%]" id="ff_%id%">%feedback2_%id%_value%</textarea>
+</div>
+
+
+
+
+<!-- @fields_separator -->
+
+
+
+<!-- @after_fields -->
+    %captcha%
+    <div>
+        <input type="submit" value="Отправить форму">
+    </div>
+</form>
+<script type="text/javascript">
+    //массив айдишников обязательный полей, для проверки яваскриптом перед сабмитом
+    var reqIds = %json_req_ids%;
+</script>
+
+
+<!-- @form_error_incorrect_select_field_option -->
+<li class="feedback2error">Ошибка: неправильное значение поля %name%</li>
+<!-- @form_error_incorrect_captcha -->
+<li class="feedback2error">Ошибка: неправильные цифры с картинки</li>
+<!-- @form_ok_msg -->
+<strong>Ваше сообщение отправлено администратору</strong>
+
+<!-- @form_error_required_field_not_filled -->
+<li class="feedback2error">Ошибка: не заполнено обязательное поле %name%</li>
+
+
+
+<!-- @captcha -->
+<div>
+    <label for="feedback2captcha"></label>
+    <img src="%captcha_url%" />
+    <input type="text" id="feedback2captcha" name="captcha">
+</div>

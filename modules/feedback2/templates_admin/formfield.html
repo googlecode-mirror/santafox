@@ -1,0 +1,61 @@
+<!-- @content -->
+
+<span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#feedback2_modul_base_name#]</span></span>
+<div id="page_container">
+    <div id="content_container">
+        <div class="content">
+            <h3>[#feedback2_form_field_edit#]</h3>
+
+            <form method="post" action="/admin/index.php?action=set_left_menu&leftmenu=save_field" id="saveformfield">
+                <input type="hidden" name="id" value="%id%">
+                <fieldset>
+                    <label for="name">[#feedback2_field_name_label#]:</label>
+                    <input type="text" id="name" name="name" value="%name%">
+                </fieldset>
+
+                <fieldset>
+                    <label for="required">[#feedback2_field_required_label#]:</label>
+                    <input type="checkbox" id="required" name="required" %reqchecked%>
+                </fieldset>
+
+                <fieldset>
+                    <label for="order">[#feedback2_field_order_label#]:</label>
+                    <input type="text" id="order" name="order" value="%order%">
+                </fieldset>
+                <div>
+                    [#feedback2_field_type_label#]:%human_type%
+                </div>
+
+                <fieldset class="page_submit_field">
+                    <input type="button" value="[#feedback2_save_form_field#]" onclick="santaFormSubmit('saveformfield');">
+                </fieldset>
+
+            </form>
+
+            %type_specific%
+
+         </div>
+    </div>
+</div>
+
+<!-- @type_select -->
+    <strong>[#feedback2_form_field_select_values#]</strong>
+    <ul>
+        %selectvals%
+    </ul>
+    <form method="post" action="/admin/index.php?action=set_left_menu&leftmenu=add_select_val" id="addselectvalueform">
+
+        <strong>[#feedback2_add_select_val#]</strong>
+        <input type="hidden" name="fieldid" value="%id%">
+        <fieldset>
+            <label for="newselectval">[#feedback2_field_name_label#]:</label>
+            <input type="text" id="newselectval" name="newselectval" value="">
+        </fieldset>
+
+        <fieldset class="page_submit_field">
+            <input type="button" value="[#feedback2_add#]" onclick="santaFormSubmit('addselectvalueform');">
+        </fieldset>
+
+    </form>
+<!-- @selectval_line -->
+<li>%value% <a href="#" onclick="jspub_confirm('delete_select_val&id=%id%&value=%value_urlencoded%','[#feedback2_form_field_select_value_delete_confirm#]')"><img src="/admin/templates/default/images/icon_delet.gif" alt="delete"/></a> </li>

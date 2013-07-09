@@ -1,0 +1,91 @@
+<!-- @content -->
+
+<span class="content_header">[#admin_module_label#] &rarr; <span class="black">[#feedback2_modul_base_name#]</span></span>
+<div id="page_container">
+    <div id="content_container">
+        <div class="content">
+            <h3>[#feedback2_form_fields#]</h3>
+            %list%
+
+
+            <form action="/admin/index.php?action=set_left_menu&leftmenu=generate_frontend_form" method="post" id="generate_frontend_form">
+                <strong>[#feedback2_generate_frontend_form#]</strong>
+                <fieldset>
+                    <label for="newtpl">[#feedback2_generated_tpl_label#]:</label>
+                    <input type="text" id="newtpl" name="newtpl" value="">
+                </fieldset>
+
+
+                <fieldset class="page_submit_field">
+                    <p>[#feedback2_generated_by_text#]</p>
+                    <input type="button" value="[#feedback2_generate#]" onclick="santaFormSubmit('generate_frontend_form');">
+                </fieldset>
+
+            </form>
+
+            <strong>[#feedback2_add_field#]</strong>
+            <form action="/admin/index.php?action=set_left_menu&leftmenu=add_field" method="post" id="addfieldform">
+                <fieldset>
+                    <label for="name">[#feedback2_field_name_label#]:</label>
+                    <input type="text" id="name" name="name" value="">
+                </fieldset>
+
+                <fieldset>
+                    <label for="required">[#feedback2_field_required_label#]:</label>
+                    <input type="checkbox" id="required" name="required">
+                </fieldset>
+
+                <fieldset>
+                    <label for="proptype">[#feedback2_field_type_label#]:</label>
+                    <select name="type" id="proptype">
+                        <option value="string">[#feedback2_type_string#]</option>
+                        <option value="select">[#feedback2_type_select#]</option>
+                        <option value="textarea">[#feedback2_type_textarea#]</option>
+                        <option value="file">[#feedback2_type_file#]</option>
+                        <option value="checkbox">[#feedback2_type_checkbox#]</option>
+                    </select>
+                </fieldset>
+
+                <fieldset class="page_submit_field">
+                    <input type="button" value="[#feedback2_add#]" onclick="santaFormSubmit('addfieldform');">
+                </fieldset>
+
+            </form>
+
+
+
+        </div>
+    </div>
+</div>
+<!-- @list_null -->
+
+
+    <strong>[#feedback2_fields_list_null#]</strong>
+
+
+
+
+<!-- @line -->
+<tr>
+    <td>%name%</td>
+    <td>%human_type%</td>
+    <td>%req_label%</td>
+    <td>%order%</td>
+    <td>
+        <a href="#" onclick="jspub_confirm('delete_field&id=%id%','[#feedback2_field_delete_confirm#]')"><img src="/admin/templates/default/images/icon_delet.gif" alt="delete"/></a>
+    </td>
+    <td>
+        <a href="#" onclick="jspub_click('show_field&id=%id%');return false;"><img src="/admin/templates/default/images/icon_edit.gif" /></a>
+    </td>
+</tr>
+<!-- @list -->
+<table class="admin_table">
+    <tr>
+        <th>[#feedback2_field_name_label#]</th>
+        <th>[#feedback2_field_type_label#]</th>
+        <th>[#feedback2_field_required_label#]</th>
+        <th>[#feedback2_field_order_label#]</th>
+        <th colspan="2">...</th>
+    </tr>
+    %lines%
+</table>

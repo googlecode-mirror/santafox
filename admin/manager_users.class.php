@@ -995,14 +995,11 @@ class manager_users
 	private function bof_admin_delete($id_str)
     {
     	global $kernel;
-    	if (empty($id_str))
+    	if (!$id_str)
 			return;
-        $query = 'DELETE FROM '.$kernel->pub_prefix_get().'_admin
-        		  WHERE id  = '.trim($id_str);
-        $kernel->runSQL($query);
-        $query = "DELETE FROM ".$kernel->pub_prefix_get()."_admin_cross_group
-                  WHERE user_id = '".$id_str."'";
-        $kernel->runSQL($query);
+        $kernel->runSQL("DELETE FROM ".$kernel->pub_prefix_get()."_admin WHERE id='".$id_str."'");
+        $kernel->runSQL("DELETE FROM ".$kernel->pub_prefix_get()."_admin_trace WHERE id_admin='".$id_str."'");
+        $kernel->runSQL("DELETE FROM ".$kernel->pub_prefix_get()."_admin_cross_group WHERE user_id = '".$id_str."'");
     }
 
     /**

@@ -115,6 +115,10 @@ class gallery  extends basemodule
                 $content = str_replace('%category_name%', str_replace('%category_name%',$curr_cat['name'],$this->get_template_block('category_name')), $content);
                 $content = str_replace('%category_descr%', str_replace('%category_descr%',$curr_cat['description'],$this->get_template_block('category_descr')), $content);
                 $content = str_replace('%back2cats_link%', str_replace('%link%',$curr_page,$this->get_template_block('back2cats_link')), $content);
+				//Добавим раздел в дорогу сайта
+	            $kernel->pub_waysite_set(array('url' => $curr_page.".html", 'caption' => $curr_cat['name']));
+	            //Добавим в тайтл раздел
+	            $kernel->pub_page_title_add($curr_cat['name']);
             }
             else
             {
@@ -122,6 +126,7 @@ class gallery  extends basemodule
                 $content = str_replace('%back2cats_link%', '', $content);
             }
         }
+		
         return $content;
     }
 

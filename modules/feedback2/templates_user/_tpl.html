@@ -12,7 +12,7 @@
 <!-- @field_type_select_required -->
 <div>
     <label for="ff_%id%">%name% <sup>*</sup></label>
-    <select name="feedback2[%id%]" id="ff_%id%">
+    <select name="%moduleid%[%id%]" id="ff_%id%">
         <option>-- --</option>
         %options%
     </select>
@@ -21,7 +21,7 @@
 <!-- @field_type_select -->
 <div>
     <label for="ff_%id%">%name%</label>
-    <select name="feedback2[%id%]" id="ff_%id%">
+    <select name="%moduleid%[%id%]" id="ff_%id%">
         <option>-- --</option>
         %options%
     </select>
@@ -31,51 +31,51 @@
 <!-- @field_type_string_required -->
 <div>
     <label for="ff_%id%">%name% <sup>*</sup></label>
-    <input type="text" name="feedback2[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
+    <input type="text" name="%moduleid%[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
 </div>
 
 <!-- @field_type_string -->
 <div>
     <label for="ff_%id%">%name%</label>
-    <input type="text" name="feedback2[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
+    <input type="text" name="%moduleid%[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
 </div>
 
 <!-- @field_type_checkbox -->
 <div>
     <label for="ff_%id%">%name%</label>
-    <input type="checkbox" name="feedback2[%id%]" id="ff_%id%" value="1" %feedback2_%id%_checked%>
+    <input type="checkbox" name="%moduleid%[%id%]" id="ff_%id%" value="1" %feedback2_%id%_checked%>
 </div>
 
 <!-- @field_type_checkbox_required -->
 <div>
     <label for="ff_%id%">%name% <sup>*</sup></label>
-    <input type="checkbox" name="feedback2[%id%]" id="ff_%id%" value="1" %feedback2_%id%_checked%>
+    <input type="checkbox" name="%moduleid%[%id%]" id="ff_%id%" value="1" %feedback2_%id%_checked%>
 </div>
 
 <!-- @field_type_file -->
 <div>
     <label for="ff_%id%">%name%</label>
-    <input type="file" name="feedback2[%id%]" id="ff_%id%">
+    <input type="file" name="%moduleid%[%id%]" id="ff_%id%">
 </div>
 
 
 <!-- @field_type_file_required -->
 <div>
     <label for="ff_%id%">%name% <sup>*</sup></label>
-    <input type="file" name="feedback2[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
+    <input type="file" name="%moduleid%[%id%]" id="ff_%id%" value="%feedback2_%id%_value%">
 </div>
 
 <!-- @field_type_textarea_required -->
 <div>
     <label for="ff_%id%">%name% <sup>*</sup></label>
     <div style="clear: both;"></div>
-    <textarea name="feedback2[%id%]" id="ff_%id%">%feedback2_%id%_value%</textarea>
+    <textarea name="%moduleid%[%id%]" id="ff_%id%">%feedback2_%id%_value%</textarea>
 </div>
 <!-- @field_type_textarea -->
 <div>
     <label for="ff_%id%">%name%</label>
     <div style="clear: both;"></div>
-    <textarea name="feedback2[%id%]" id="ff_%id%">%feedback2_%id%_value%</textarea>
+    <textarea name="%moduleid%[%id%]" id="ff_%id%">%feedback2_%id%_value%</textarea>
 </div>
 
 
@@ -113,5 +113,5 @@
 <div>
     <label for="feedback2captcha"></label>
     <img src="%captcha_url%" />
-    <input type="text" id="feedback2captcha" name="captcha">
+    <input type="text" id="feedback2captcha" name="%moduleid%[captcha]">
 </div>

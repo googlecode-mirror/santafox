@@ -96,6 +96,8 @@ class feedback2 extends BaseModule
         global $kernel;
 
         $newtpl = $kernel->pub_httppost_get('newtpl');
+        if (!mb_strlen($newtpl))
+            $newtpl=$kernel->pub_module_id_get();
         if(!preg_match('~\.html?$~',$newtpl))
             $newtpl.='.html';
 
@@ -145,7 +147,7 @@ class feedback2 extends BaseModule
         {
             $content.="\n<!-- @".$block." -->\n".trim($this->get_template_block($block));
         }
-
+        $content = str_replace('%moduleid%', $kernel->pub_module_id_get(), $content);
 
         $kernel->pub_file_save($kernel->pub_site_root_get().'/modules/feedback2/templates_user/'.$newtpl,$content);
         return $kernel->pub_httppost_response('[#feedback2_frontent_form_generated_msg#]','show_form_fields');
@@ -283,11 +285,12 @@ class feedback2 extends BaseModule
 
         $fields = $this->get_fields();
         $filled_fields = array();
+        $moduleid = $kernel->pub_module_id_get();
 
-        if(isset($_POST['feedback2']) && is_array($_POST['feedback2']))
+        if(isset($_POST[$moduleid]) && is_array($_POST[$moduleid]))
         {
             $errors = array();
-            if ($useCaptcha && !$this->is_valid_captcha($kernel->pub_httppost_get('captcha')))
+            if ($useCaptcha && (!isset($_POST[$moduleid]['captcha']) || !$this->is_valid_captcha($_POST[$moduleid]['captcha'])))
                 $errors[] = $this->get_template_block('form_error_incorrect_captcha');
 
             foreach($fields as $field)
@@ -296,17 +299,17 @@ class feedback2 extends BaseModule
 
                 if ($field['ftype']=='file')
                 {
-                    if (!isset($_FILES['feedback2']['tmp_name'][$fieldID]) || !is_uploaded_file($_FILES['feedback2']['tmp_name'][$fieldID]))
+                    if (!isset($_FILES[$moduleid]['tmp_name'][$fieldID]) || !is_uploaded_file($_FILES[$moduleid]['tmp_name'][$fieldID]))
                         $val = null;
                     else
-                        $val = $_FILES['feedback2']['tmp_name'][$fieldID];
+                        $val = $_FILES[$moduleid]['tmp_name'][$fieldID];
                 }
                 else
                 {
-                    if (!array_key_exists($fieldID,$_POST['feedback2']) || !is_scalar($_POST['feedback2'][$fieldID]) || mb_strlen($_POST['feedback2'][$fieldID])==0)
+                    if (!array_key_exists($fieldID,$_POST[$moduleid]) || !is_scalar($_POST[$moduleid][$fieldID]) || mb_strlen($_POST[$moduleid][$fieldID])==0)
                         $val = null;
                     else
-                        $val = $_POST['feedback2'][$fieldID];
+                        $val = $_POST[$moduleid][$fieldID];
                 }
 
                 $error = null;
@@ -331,8 +334,6 @@ class feedback2 extends BaseModule
                     $field['value']=$val;
                     $filled_fields[]=$field;
                 }
-
-
             }
 
             if(!$errors)
@@ -349,7 +350,7 @@ class feedback2 extends BaseModule
                 {
                     if ($field['ftype']=='file')
                     {
-                        $fn = $_FILES['feedback2']['name'][$field['id']];
+                        $fn = $_FILES[$moduleid]['name'][$field['id']];
                         $tmp_path = sys_get_temp_dir().'/'.$fn;
                         //сначала пробуем записать в системную temp-папку
                         if (!@move_uploaded_file($field['value'],$tmp_path))

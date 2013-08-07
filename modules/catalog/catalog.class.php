@@ -8621,13 +8621,21 @@ class catalog extends BaseModule
 
             case 'category_move':
                 $cid = $kernel->pub_httppost_get("node");
-                $parentNew = $kernel->pub_httppost_get("newParent");
+                $parentNew = intval($kernel->pub_httppost_get("newParent"));
                 $indexNew = $kernel->pub_httppost_get("index");
                 $order2replace = $this->get_last_order_in_cat($parentNew, $indexNew);
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `order`='.($order2replace + 1).' WHERE `parent_id`='.$parentNew.' AND `order`='.$order2replace;
+                $catsTable='_catalog_'.$moduleid.'_cats';
+                $query = "UPDATE `".$kernel->pub_prefix_get().$catsTable.'` SET `order`='.($order2replace + 1).' WHERE `parent_id`='.$parentNew.' AND `order`='.$order2replace;
                 $kernel->runSQL($query);
-                $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `parent_id`='.$parentNew.', `order`='.$order2replace.' WHERE `id`='.$cid;
+                $query = "UPDATE `".$kernel->pub_prefix_get().$catsTable.'` SET `parent_id`='.$parentNew.', `order`='.$order2replace.' WHERE `id`='.$cid;
                 $kernel->runSQL($query);
+                $crecs=$kernel->db_get_list_simple($catsTable,"`parent_id`=".$parentNew,"id");
+                $order = 0;
+                foreach($crecs as $crec)
+                {
+                    $catid=$crec['id'];
+                    $kernel->db_update_record($catsTable,array('order'=>$order+=$this->order_inc),"id=".$catid);
+                }
                 break;
 
             case 'save_selected_items':

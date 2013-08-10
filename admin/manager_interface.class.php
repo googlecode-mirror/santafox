@@ -498,7 +498,7 @@ class manager_interface
     private function priv_edit_content_start()
     {
         global $kernel;
-        $file_name = $kernel->pub_translit_string($kernel->pub_httpget_get('file'));
+        $file_name = '/'.$kernel->pub_translit_string($kernel->pub_httpget_get('file'));
         //сначала проверим, что бы файл, открываемый таким способом находился только
         //в области, где лежит весь контент
         $full_name = $kernel->priv_file_full_patch($kernel->pub_path_for_content().$file_name);
@@ -511,7 +511,7 @@ class manager_interface
 
         //Проверим, может нам надо вывести без редактора контнета
         if (intval($kernel->pub_httpget_get("no_redactor")) > 0)
-        	$content->set_form_nothtml();
+            $content->set_form_nothtml();
         return $content->create();
     }
 
@@ -520,7 +520,7 @@ class manager_interface
         global $kernel;
 
         $file_name_lite = $kernel->pub_translit_string($kernel->pub_httppost_get('file'));
-    	$full_name = $kernel->priv_file_full_patch($kernel->pub_path_for_content().$file_name_lite);
+    	$full_name = $kernel->priv_file_full_patch($kernel->pub_path_for_content().'/'.$file_name_lite);
         if (!preg_match("/^[a-zA-Z0-9_\\-\\/\\.\\\\:]+$/",$full_name))
             return "Can not save this file";
         $content = $kernel->pub_httppost_get('content_html');

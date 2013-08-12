@@ -18,6 +18,329 @@ class CatalogCommons
     private static $templates_user_prefix = 'modules/catalog/templates_user/';
 
 
+    /**
+     * Возвращает свойство КАТЕГОРИИ по id-шнику
+     *
+     * @param integer $id  id-шник свойства
+     * @return array
+     */
+    public static function get_cat_prop($id)
+    {
+        global $kernel;
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_cats_props',"id=".$id);
+    }
+
+
+    /**
+     * Возвращает запись товара по id-шнику (только common-свойства)
+     *
+     * @param integer $id id-шник товара
+     * @return array
+     */
+    public static function get_item($id)
+    {
+        global $kernel;
+        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_items', '`id` ="'.intval($id).'"');
+    }
+
+
+    /**
+     *  Перенос товара в другую тов. группу. Сохраняются только общие св-ва
+     * @param $itemid
+     * @param $groupid
+     * @return bool
+     */
+    public static function move_item2group($itemid,$groupid)
+    {
+        global $kernel;
+        $to_group=self::get_group($groupid);
+        if(!$to_group)
+            return false;
+        $item = self::get_item($itemid);
+        if(!$item)
+            return false;
+        if($item['group_id']==$groupid)
+            return false;
+        $from_group = self::get_group($item['group_id']);
+        if (!$from_group)
+            return false;
+        $moduleid = $kernel->pub_module_id_get();
+        $from_group_table = '_catalog_items_'.$moduleid.'_'.strtolower($from_group['name_db']);
+        $to_group_table = '_catalog_items_'.$moduleid.'_'.strtolower($to_group['name_db']);
+        $new_ext_id=$kernel->db_add_record($to_group_table,array("id"=>null));
+        if(!$new_ext_id)
+            return false;
+        $kernel->runSQL("DELETE FROM ".PREFIX.$from_group_table."  WHERE id=".$item['ext_id']);
+        $kernel->db_update_record("_catalog_".$moduleid."_items",array('group_id'=>$groupid,'ext_id'=>$new_ext_id),"id=".$item['id']);
+
+        //удаление картинок и файлов из свойств старой группы
+        $old_group_props = self::get_props($from_group['id'],false);
+        foreach($old_group_props as $old_group_prop)
+        {
+            self::process_item_prop_delete($old_group_prop,$item);
+        }
+
+        return true;
+    }
+
+    /**
+     * Возвращает товар по общему свойству
+     *
+     * @param string $propname
+     * @param string $propval
+     * @return mixed
+     */
+    public static function get_item_by_prop($propname, $propval)
+    {
+        global $kernel;
+        $res = false;
+        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` '.
+            'WHERE `'.$propname.'` ="'.mysql_real_escape_string($propval).'" LIMIT 1';
+        $result = $kernel->runSQL($query);
+        if ($row = mysql_fetch_assoc($result))
+            $res = $row;
+        mysql_free_result($result);
+        return $res;
+    }
+
+    /**
+     * Возвращает товары из БД, не принадлежащие ни к одной категории
+     *
+     * @param integer $offset        смещение
+     * @param integer $limit         лимит
+     * @return array
+     */
+    public static function get_items_without_cat($offset = 0, $limit = 100)
+    {
+        global $kernel;
+        $items = array();
+        $query = 'SELECT items.* FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items '.
+            'LEFT JOIN `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` AS i2c ON i2c.item_id=items.id '.
+            'WHERE i2c.item_id IS NULL';
+        $sort_field = self::get_common_sort_prop();
+        if ($sort_field)
+        {
+            $query .= ' ORDER BY ISNULL(items.`'.$sort_field['name_db'].'`),  items.`'.$sort_field['name_db'].'` ';
+            if ($sort_field['sorted'] == 2)
+                $query .= " DESC ";
+        }
+        if ($limit != 0)
+            $query .= ' LIMIT '.$offset.','.$limit;
+        $result = $kernel->runSQL($query);
+        while ($row = mysql_fetch_assoc($result))
+            $items[] = $row;
+        mysql_free_result($result);
+        return $items;
+    }
+
+    /**
+     * Возвращает общее свойство, по которому вести сортировку
+     * @return array
+     */
+    public static function get_common_sort_prop()
+    {
+        global $kernel;
+        return $kernel->db_get_record_simple('_catalog_item_props', '`group_id`=0 AND `sorted`>0 AND module_id="'.$kernel->pub_module_id_get().'"', '`name_db`,`sorted`');
+    }
+
+    /**
+     * Возвращает кол-во товаров из БД, не принадлежащие ни к одной категории
+     *
+     * @return integer
+     */
+    public static function get_items_without_cat_count()
+    {
+        global $kernel;
+        $query = 'SELECT count(items.id) as count FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items '.
+            'LEFT JOIN `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` AS i2c ON i2c.item_id=items.id '.
+            'WHERE i2c.item_id IS NULL';
+        $result = $kernel->runSQL($query);
+        $total = 0;
+        if ($row = mysql_fetch_assoc($result))
+            $total = $row['count'];
+        mysql_free_result($result);
+        return $total;
+    }
+
+
+    /**
+     * Возвращает кол-во товаров, если $group_id>0, то входящих в указанную тов. группу
+     *
+     * @param integer  $group_id      id-шник товарной группы
+     * @param boolean $only_visible  только видимые?
+     * @return array
+     */
+    public static function get_items_count($group_id = 0, $only_visible = false)
+    {
+        global $kernel;
+        $where = array();
+        $query = 'SELECT COUNT(*) AS count FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items';
+        if ($only_visible)
+            $where[] = 'items.`available`=1';
+        if ($group_id > 0)
+            $where[] = 'items.`group_id`='.$group_id;
+        if (count($where) > 0)
+            $query .= ' WHERE '.implode(' AND ', $where);
+        $count = 0;
+        $result = $kernel->runSQL($query);
+        if ($row = mysql_fetch_assoc($result))
+            $count = $row['count'];
+        mysql_free_result($result);
+        return $count;
+    }
+
+
+    /**
+     * Возвращает категорию по id-шнику
+     *
+     * @param integer $id  id-шник категории
+     * @return array
+     */
+    public static function get_category($id)
+    {
+        global $kernel;
+        return $kernel->db_get_record_simple("_catalog_".$kernel->pub_module_id_get()."_cats", "`id`=".$id);
+    }
+
+    /**
+     * Возвращает только custom-поля товара (из таблицы тов. группы) по id-шнику
+     *
+     * @param integer $id  ext-id-шник товара
+     * @param string  $group_name БД-название товарной группы
+     * @return array
+     */
+    public static function get_item_group_fields($id, $group_name)
+    {
+        global $kernel;
+        return $kernel->db_get_record_simple('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group_name), '`id`='.$id);
+    }
+
+
+    /**
+     * Возвращает запись товара по id-шнику common-свойства + custom
+     *
+     * @param integer $id  id-шник товара
+     * @return array
+     */
+    public static function get_item_full_data($id = 0)
+    {
+        $id = intval($id);
+        //Сначала получаем общие свойства
+        $item1 = self::get_item($id);
+        if (!$item1)
+            return false;
+
+        $group = self::get_group($item1['group_id']);
+        $commonid = $item1['id'];
+        unset($item1['id']);
+        $item1['commonid'] = $commonid;
+
+        //теперь добавим custom-поля из тов. группы
+        $itemc = self::get_item_group_fields($item1['ext_id'], $group['name_db']);
+        if ($itemc)
+            $item1 = $item1 + $itemc;
+        return $item1;
+    }
+
+    public static function process_item_prop_delete($prop,$item)
+    {
+        global $kernel;
+        if (!in_array($prop['type'], array('file', 'pict')) || !$item[$prop['name_db']])
+            return;
+        $modid = $kernel->pub_module_id_get();
+        $kernel->pub_file_delete($item[$prop['name_db']]);
+        if ($prop['type'] == 'pict')
+        {
+            //надо также удалить source и tn изображения
+            $kernel->pub_file_delete(str_replace($modid.'/', $modid.'/tn/', $item[$prop['name_db']]));
+            $kernel->pub_file_delete(str_replace($modid.'/', $modid.'/source/', $item[$prop['name_db']]));
+        }
+    }
+
+    /**
+     * Удаляет товар из БД
+     *
+     * @param $id integer id-шник товара
+     * @return boolean
+     */
+    public static function delete_item($id)
+    {
+        global $kernel;
+        $item = self::get_item_full_data($id);
+        if (!$item)
+            return false;
+        $group = self::get_group($item['group_id']);
+        if (!$group)
+            return false;
+
+        $modid = $kernel->pub_module_id_get();
+
+        //удаление картинок и файлов
+        $props = self::get_props($item['group_id'], true);
+        foreach ($props as $prop)
+        {
+           self::process_item_prop_delete($prop,$item);
+        }
+        //из общей таблицы товаров
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_items` WHERE `id`='.$id;
+        $kernel->runSQL($query);
+        //из таблицы связанных товаров
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_items_links` WHERE `itemid1`='.$id.' OR `itemid2`='.$id;
+        $kernel->runSQL($query);
+        //из таблицы принадлежности к категориям
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_item2cat` WHERE `item_id`='.$id;
+        $kernel->runSQL($query);
+        //из таблицы тов. группы
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_items_'.$modid.'_'.strtolower($group['name_db']).'` WHERE `id`='.$item['ext_id'];
+        $kernel->runSQL($query);
+        return true;
+    }
+
+    /**
+     *  Удаляет категорию из БД
+     *
+     * @param $cat array удаляемая категория
+     * @return void
+     */
+    public static function delete_category($cat)
+    {
+        global $kernel;
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` WHERE `id`='.$cat['id'];
+        $kernel->runSQL($query);
+        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$cat['id'];
+        $kernel->runSQL($query);
+        //переносим child'ы удаляемой категории на уровень выше
+        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `parent_id`='.$cat['parent_id'].' WHERE `parent_id`='.$cat['id'];
+        $kernel->runSQL($query);
+        //удаление картинок и файлов
+        $props = self::get_cats_props();
+        foreach ($props as $prop)
+        {
+            self::process_item_prop_delete($prop,$cat);
+        }
+    }
+
+
+    /**
+     * Возвращает свойство по id-шнику
+     *
+     * @param integer $id id-шник свойства
+     * @return array
+     */
+    public static function get_prop($id)
+    {
+        global $kernel;
+        $res = $kernel->db_get_record_simple('_catalog_item_props', 'id='.$id);
+        //Если свойство с типом=картинка, то сразу вытащим из дополнительных параметров информацию по картинке
+        if ($res['type'] == 'pict')
+        {
+            if (isset($res['add_param']) && !empty($res['add_param']))
+                $res['add_param'] = @unserialize($res['add_param']);
+            else
+                $res['add_param'] = BaseModule::make_default_pict_prop_addparam();
+        }
+        return $res;
+    }
 
     public static function clean_old_baskets($moduleid)
     {
@@ -259,7 +582,7 @@ class CatalogCommons
      */
     public static function get_cats_props_html()
     {
-        $cprops = CatalogCommons::get_cats_props();
+        $cprops = self::get_cats_props();
         $str = "<b>[#catalog_menu_cat_props#]</b><ul>";
         foreach ($cprops as $cprop)
         {
@@ -287,7 +610,7 @@ class CatalogCommons
      */
     public static function get_all_group_props_html($needid = false)
     {
-        $groups = CatalogCommons::get_all_group_props_array();
+        $groups = self::get_all_group_props_array();
         $str = '<ul>';
         foreach ($groups as $gname=>$gprops)
         {
@@ -333,13 +656,13 @@ class CatalogCommons
         $ret = array();
 
         //сначала общие свойства
-        $ret["[#catalog_common_props#]"]=array("id"=>0, "props"=>CatalogCommons::get_props2(0), "name_full"=>"[#catalog_common_props#]");
+        $ret["[#catalog_common_props#]"]=array("id"=>0, "props"=>self::get_props2(0), "name_full"=>"[#catalog_common_props#]");
 
         //теперь свойства для всех товарных групп
-        $groups = CatalogCommons::get_groups();
+        $groups = self::get_groups();
         foreach ($groups as $grop_values)
         {
-            $ret[$grop_values['name_full']] =  array("id"=>$grop_values['id'], "name_full"=>$grop_values["name_full"], "props"=>CatalogCommons::get_props2($grop_values['id']));
+            $ret[$grop_values['name_full']] =  array("id"=>$grop_values['id'], "name_full"=>$grop_values["name_full"], "props"=>self::get_props2($grop_values['id']));
         }
         return $ret;
     }
@@ -454,22 +777,22 @@ class CatalogCommons
     {
         global $kernel;
 
-        $fname = CatalogCommons::get_templates_user_prefix().$id_module.'_'.$group['name_db'].'_card.html';
+        $fname = self::get_templates_user_prefix().$id_module.'_'.$group['name_db'].'_card.html';
 
         $msettings = $kernel->pub_module_serial_get($id_module);
         if (!isset($msettings['frontend_items_list_tpl_md5']))
             $msettings['frontend_items_list_tpl_md5']='';
 
         //Пока без проверок
-        //if ($force || !CatalogCommons::isTemplateChanged($fname, $msettings['frontend_items_list_tpl_md5']))
+        //if ($force || !self::isTemplateChanged($fname, $msettings['frontend_items_list_tpl_md5']))
         //{
             $html = '';
-            $template = $kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'frontend_templates/blank_item_one.html');
+            $template = $kernel->pub_template_parse(self::get_templates_admin_prefix().'frontend_templates/blank_item_one.html');
             //$fh    = fopen($fname, "w");
             //if (!$fh)
             //    return false;
 
-            $props = CatalogCommons::get_common_props($id_module, false);
+            $props = self::get_common_props($id_module, false);
             $lines = '';
             foreach ($props as $prop)
             {

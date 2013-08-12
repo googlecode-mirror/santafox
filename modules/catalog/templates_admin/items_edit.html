@@ -151,8 +151,11 @@
 
             </form>
 
-            %linked%
 
+
+            %move2block%
+
+            %linked%
         </div>
     </div>
 </div>
@@ -206,6 +209,21 @@
 
     %linked_items%
 </table>
+
+
+
+<!-- @m2g_line -->
+<option value="%id%">%name_full%</option>
+<!-- @move2block -->
+<form method="post" id="move2group_form" action="%m2g_action%">
+    <input type="hidden" name="itemid" value="%id%">
+    [#catalog_move2group_header#]:
+    <select name="groupid">
+        %groups%
+    </select>
+    <input type="button" value="[#catalog_move2group_do#]" onclick="santaFormSubmit('move2group_form');">
+</form>
+
 
 <!-- @linked_item -->
 <tr><td colspan="2"><a href="javascript:void(0);" onclick="jspub_click('item_edit&id=%lid%&redir2=%redir2%')">%namestring%</a><a href="javascript:void(0);" onclick="jspub_click('item_edit&id=%id%&removlinkedid=%lid%')"><img src="/admin/templates/default/images/icon_delet.gif" alt="[#catalog_remove_linked_item_label#]"/></a></td></tr>

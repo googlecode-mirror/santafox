@@ -227,7 +227,7 @@ class catalog extends BaseModule
         $itemid = $kernel->pub_httpget_get($this->frontend_param_item_id_name);
         if (!empty($itemid))
         { //товар - используем шаблон
-            $curr_item = $this->get_item_full_data($itemid);
+            $curr_item = CatalogCommons::get_item_full_data($itemid);
             if (!$curr_item) //не нашли товар
                 return '';
             foreach ($curr_item as $iprop => $ival)
@@ -249,7 +249,7 @@ class catalog extends BaseModule
                 if ($curr_cid == 0) //не нашли
                     return '';
             }
-            $curr_cat = $this->get_category($curr_cid);
+            $curr_cat = CatalogCommons::get_category($curr_cid);
             $cprops = CatalogCommons::get_cats_props();
             foreach ($cprops as $cprop)
             {
@@ -259,7 +259,6 @@ class catalog extends BaseModule
             $category_template = $this->clear_left_labels($category_template);
             return $category_template;
         }
-
     }
 
     /**
@@ -347,26 +346,6 @@ class catalog extends BaseModule
     }
 
     /**
-     * Возвращает товар по общему свойству
-     *
-     * @param string $propname
-     * @param string $propval
-     * @return mixed
-     */
-    private function get_item_by_prop($propname, $propval)
-    {
-        global $kernel;
-        $res = false;
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` '.
-            'WHERE `'.$propname.'` ="'.mysql_real_escape_string($propval).'" LIMIT 1';
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $res = $row;
-        mysql_free_result($result);
-        return $res;
-    }
-
-    /**
      * Добавляет связь между товарами
      *
      * @param integer $itemid1
@@ -437,7 +416,7 @@ class catalog extends BaseModule
             $commonid = $gi['id'];
             unset($gi['id']);
             $gi['common_id'] = $commonid;
-            $igf = $this->get_item_group_fields($gi['ext_id'], $group['name_db']);
+            $igf = CatalogCommons::get_item_group_fields($gi['ext_id'], $group['name_db']);
             $newitem = $gi + $igf;
             $group_items[] = $newitem;
         }
@@ -463,7 +442,7 @@ class catalog extends BaseModule
                             $lval = trim($lval);
                             if (empty($lval))
                                 continue;
-                            $litem = $this->get_item_by_prop($main_prop, $lval);
+                            $litem = CatalogCommons::get_item_by_prop($main_prop, $lval);
                             if ($litem)
                                 $linked_ids[] = $litem['id'];
                         }
@@ -501,7 +480,7 @@ class catalog extends BaseModule
                 //сначала обновим таблицу товаров группы, если надо
                 if (count($group_fields) != 0)
                 {
-                    $uitem = $this->get_item($found_item_id);
+                    $uitem = CatalogCommons::get_item($found_item_id);
                     $query = 'UPDATE '.$kernel->pub_prefix_get().'_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group['name_db']).' SET ';
                     $grfields_keys = array_keys($group_fields);
                     for ($j = 0; $j < count($grfields_keys); $j++)
@@ -852,7 +831,7 @@ class catalog extends BaseModule
         global $kernel;
         //Прежде всего инфу по товару
         $itemid = intval($itemid);
-        $idata = $this->get_item_full_data($itemid);
+        $idata = CatalogCommons::get_item_full_data($itemid);
         if (!$idata)
             frontoffice_manager::throw_404_error();
 
@@ -929,7 +908,7 @@ class catalog extends BaseModule
         $last_cat_block = "";
         if (isset($_COOKIE[$moduleid.'_last_catid']))
         {
-            $lastcat = $this->get_category(intval($_COOKIE[$moduleid.'_last_catid']));
+            $lastcat = CatalogCommons::get_category(intval($_COOKIE[$moduleid.'_last_catid']));
             if ($lastcat)
             {
                 $last_cat_block = $this->get_template_block('last_cat_block');
@@ -1281,7 +1260,7 @@ class catalog extends BaseModule
         $last_cat_block = "";
         if (isset($_COOKIE[$kernel->pub_module_id_get().'_last_catid']))
         {
-            $lastcat = $this->get_category(intval($_COOKIE[$kernel->pub_module_id_get().'_last_catid']));
+            $lastcat = CatalogCommons::get_category(intval($_COOKIE[$kernel->pub_module_id_get().'_last_catid']));
             if ($lastcat)
             {
                 $last_cat_block = $this->get_template_block('last_cat_block');
@@ -1477,7 +1456,7 @@ class catalog extends BaseModule
             return;
         }
 
-        $item = $this->get_item($itemid);
+        $item = CatalogCommons::get_item($itemid);
         if (!$item)
             return;
 
@@ -1532,7 +1511,7 @@ class catalog extends BaseModule
         $arr = array();
         foreach ($bitems as $bitem)
         {
-            $bitem['item'] = $this->get_item_full_data($bitem['itemid']);
+            $bitem['item'] = CatalogCommons::get_item_full_data($bitem['itemid']);
             $arr[] = $bitem;
         }
         $this->current_basket_items = $arr;
@@ -2089,7 +2068,7 @@ class catalog extends BaseModule
             else
                 $this->add_categories2waysite($this->get_way2cat($catid, true));
         }
-        $category = $this->get_category($catid);
+        $category = CatalogCommons::get_category($catid);
         if (!$category)
             frontoffice_manager::throw_404_error();
 
@@ -2323,7 +2302,7 @@ class catalog extends BaseModule
         $cid = $id;
         do
         {
-            //$cat = $this->get_category($cid);
+            //$cat = CatalogCommons::get_category($cid);
             if (!isset($cached_cats[$cid]))
                 break;
             $cat = $cached_cats[$cid];
@@ -3247,7 +3226,7 @@ class catalog extends BaseModule
             $_hide_from_waysite = 0;
 
         $props = CatalogCommons::get_cats_props();
-        $cat = $this->get_category($id);
+        $cat = CatalogCommons::get_category($id);
         $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `_hide_from_waysite`= '.$_hide_from_waysite.', ';
         for ($i = 0; $i < count($props); $i++)
         {
@@ -3358,7 +3337,6 @@ class catalog extends BaseModule
                             $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$catid.' AND `item_id` IN ('.implode(',', $itemids).')';
                             $kernel->runSQL($query);
                         }
-
                         foreach ($itemids as $itemid)
                         {
                             $order = $this->get_next_order_in_cat($moveid);
@@ -3388,7 +3366,7 @@ class catalog extends BaseModule
     private function delete_items($itemids)
     {
         foreach ($itemids as $itemid)
-            $this->delete_item($itemid);
+            CatalogCommons::delete_item($itemid);
     }
 
 
@@ -3639,8 +3617,7 @@ class catalog extends BaseModule
             if (!$itemid)
                 return $kernel->pub_httppost_errore('[#interface_global_label_error#]', true);
         }
-        $item = $this->get_item_full_data($itemid);
-
+        $item = CatalogCommons::get_item_full_data($itemid);
         $moduleid = $kernel->pub_module_id_get();
         $main_prop = $this->get_common_main_prop();
         //сначала сохраним common-свойства
@@ -3807,7 +3784,7 @@ class catalog extends BaseModule
     private function save_prop($pid, $name_full, $name_db, $cb_inlist, $sort, $cb_ismain)
     {
         global $kernel;
-        $prop = $this->get_prop($pid);
+        $prop = CatalogCommons::get_prop($pid);
 
         if (empty($cb_inlist))
             $inlist = 0;
@@ -3963,7 +3940,7 @@ class catalog extends BaseModule
     private function save_cat_prop($pid, $name_full, $name_db)
     {
         global $kernel;
-        $prop = $this->get_cat_prop($pid);
+        $prop = CatalogCommons::get_cat_prop($pid);
         if (isset($prop['add_param']))
             $prop['add_param'] = @unserialize($prop['add_param']);
         $table = "_catalog_".$kernel->pub_module_id_get()."_cats_props";
@@ -4246,7 +4223,7 @@ class catalog extends BaseModule
         else
             $query = "true";
 
-        $sort_field = $this->get_common_sort_prop();
+        $sort_field = CatalogCommons::get_common_sort_prop();
         if ($sort_field)
         {
             $query .= ' ORDER BY ISNULL(`'.$sort_field['name_db'].'`)  , `'.$sort_field['name_db'].'` ';
@@ -4258,193 +4235,6 @@ class catalog extends BaseModule
         $items = $kernel->db_get_list_simple('_catalog_'.$kernel->pub_module_id_get().'_items', $query, "*", $offset, $limit);
         return $items;
     }
-
-    /**
-     * Возвращает товары из БД, не принадлежащие ни к одной категории
-     *
-     * @param integer $offset        смещение
-     * @param integer $limit         лимит
-     * @return array
-     */
-    private function get_items_without_cat($offset = 0, $limit = 100)
-    {
-        global $kernel;
-        $items = array();
-        $query = 'SELECT items.* FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items '.
-            'LEFT JOIN `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` AS i2c ON i2c.item_id=items.id '.
-            'WHERE i2c.item_id IS NULL';
-        $sort_field = $this->get_common_sort_prop();
-        if ($sort_field)
-        {
-            $query .= ' ORDER BY ISNULL(items.`'.$sort_field['name_db'].'`),  items.`'.$sort_field['name_db'].'` ';
-            if ($sort_field['sorted'] == 2)
-                $query .= " DESC ";
-        }
-        if ($limit != 0)
-            $query .= ' LIMIT '.$offset.','.$limit;
-        $result = $kernel->runSQL($query);
-        while ($row = mysql_fetch_assoc($result))
-            $items[] = $row;
-        mysql_free_result($result);
-        return $items;
-    }
-
-    /**
-     * Возвращает кол-во товаров из БД, не принадлежащие ни к одной категории
-     *
-     * @return integer
-     */
-    private function get_items_without_cat_count()
-    {
-        global $kernel;
-        $query = 'SELECT count(items.id) as count FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items '.
-            'LEFT JOIN `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` AS i2c ON i2c.item_id=items.id '.
-            'WHERE i2c.item_id IS NULL';
-        $result = $kernel->runSQL($query);
-        $total = 0;
-        if ($row = mysql_fetch_assoc($result))
-            $total = $row['count'];
-        mysql_free_result($result);
-        return $total;
-    }
-
-
-    /**
-     * Возвращает кол-во товаров, если $group_id>0, то входящих в указанную тов. группу
-     *
-     * @param integer  $group_id      id-шник товарной группы
-     * @param boolean $only_visible  только видимые?
-     * @return array
-     */
-    private function get_items_count($group_id = 0, $only_visible = false)
-    {
-        global $kernel;
-        $where = array();
-        $query = 'SELECT COUNT(*) AS count FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_items` AS items';
-        if ($only_visible)
-            $where[] = 'items.`available`=1';
-        if ($group_id > 0)
-            $where[] = 'items.`group_id`='.$group_id;
-        if (count($where) > 0)
-            $query .= ' WHERE '.implode(' AND ', $where);
-        $count = 0;
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-            $count = $row['count'];
-        mysql_free_result($result);
-        return $count;
-    }
-
-
-    /**
-     * Возвращает свойство КАТЕГОРИИ по id-шнику
-     *
-     * @param integer $id  id-шник свойства
-     * @return array
-     */
-    private function get_cat_prop($id)
-    {
-        global $kernel;
-        $res = false;
-        $query = 'SELECT * FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props` WHERE `id` ='.$id.' LIMIT 1';
-        $result = $kernel->runSQL($query);
-        if ($row = mysql_fetch_assoc($result))
-        {
-            $res = $row;
-            //if (isset($res['add_param']))
-            //    $res['add_param'] = @unserialize($res['add_param']);
-        }
-        mysql_free_result($result);
-        return $res;
-    }
-
-    /**
-     * Возвращает свойство по id-шнику
-     *
-     * @param integer $id id-шник свойства
-     * @return array
-     */
-    private function get_prop($id)
-    {
-        global $kernel;
-        $res = $kernel->db_get_record_simple('_catalog_item_props', 'id='.$id);
-        //Если свойство с типом=картинка, то сразу вытащим из дополнительных параметров информацию по картинке
-        if ($res['type'] == 'pict')
-        {
-            if (isset($res['add_param']) && !empty($res['add_param']))
-                $res['add_param'] = @unserialize($res['add_param']);
-            else
-                $res['add_param'] = self::make_default_pict_prop_addparam();
-        }
-        return $res;
-    }
-
-    /**
-     * Возвращает запись товара по id-шнику (только common-свойства)
-     *
-     * @param integer $id id-шник товара
-     * @return array
-     */
-    private function get_item($id)
-    {
-        global $kernel;
-        return $kernel->db_get_record_simple('_catalog_'.$kernel->pub_module_id_get().'_items', '`id` ="'.intval($id).'"');
-    }
-
-    /**
-     * Возвращает запись товара по id-шнику common-свойства + custom
-     *
-     * @param integer $id  id-шник товара
-     * @return array
-     */
-    private function get_item_full_data($id = 0)
-    {
-        $id = intval($id);
-        //Сначала получаем общие свойства
-        $item1 = $this->get_item($id);
-        if (!$item1)
-            return false;
-
-        $group = CatalogCommons::get_group($item1['group_id']);
-        $commonid = $item1['id'];
-        unset($item1['id']);
-        $item1['commonid'] = $commonid;
-
-        //теперь добавим custom-поля из тов. группы
-        $itemc = $this->get_item_group_fields($item1['ext_id'], $group['name_db']);
-        if ($itemc)
-            $item1 = $item1 + $itemc;
-        return $item1;
-    }
-
-
-    /**
-     * Возвращает только custom-поля товара (из таблицы тов. группы) по id-шнику
-     *
-     * @param integer $id  ext-id-шник товара
-     * @param string  $group_name БД-название товарной группы
-     * @return array
-     */
-    private function get_item_group_fields($id, $group_name)
-    {
-        global $kernel;
-        return $kernel->db_get_record_simple('_catalog_items_'.$kernel->pub_module_id_get().'_'.strtolower($group_name), '`id`='.$id);
-    }
-
-
-    /**
-     * Возвращает категорию по id-шнику
-     *
-     * @param integer $id  id-шник категории
-     * @return array
-     */
-    private function get_category($id)
-    {
-        global $kernel;
-        return $kernel->db_get_record_simple("_catalog_".$kernel->pub_module_id_get()."_cats", "`id`=".$id);
-    }
-
-
     /**
      * Проверяет, существует ли товарная группа с указанным именем для текущего модуля
      *
@@ -4572,7 +4362,7 @@ class catalog extends BaseModule
         if ($only_visible)
             $query .= ' AND `available`=1 ';
 
-        $sort_field = $this->get_common_sort_prop();
+        $sort_field = CatalogCommons::get_common_sort_prop();
         if ($sort_field)
         {
             $query .= ' ORDER BY ISNULL(items.`'.$sort_field['name_db'].'`), items.`'.$sort_field['name_db']."` ";
@@ -4806,8 +4596,8 @@ class catalog extends BaseModule
             if ($group_id == -1) //показываем товары без категории
             {
                 $header_label = $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
-                $items = $this->get_items_without_cat($offset, $limit);
-                $total = $this->get_items_without_cat_count();
+                $items = CatalogCommons::get_items_without_cat($offset, $limit);
+                $total = CatalogCommons::get_items_without_cat_count();
             }
             else
             { //groupid >= 0
@@ -4820,7 +4610,7 @@ class catalog extends BaseModule
                 }
 
                 $header_label = $kernel->pub_page_textlabel_replace("[#catalog_items_all_list_filter_mainlabel#]");
-                $total = $this->get_items_count($group_id, false);
+                $total = CatalogCommons::get_items_count($group_id, false);
                 $items = $this->get_items($offset, $limit, $group_id, false);
             }
         }
@@ -5123,7 +4913,7 @@ class catalog extends BaseModule
         //Получим все необходимые данные
         if ($id > 0)
         {
-            $item = $this->get_item_full_data($id);
+            $item = CatalogCommons::get_item_full_data($id);
             $group = CatalogCommons::get_group($item['group_id']);
             $item_catids = $this->get_item_catids($id);
         }
@@ -5278,7 +5068,7 @@ class catalog extends BaseModule
         }
         //Начнём строить итоговоую форму
         $content = $this->get_template_block('form');
-        $linked_block = "";
+        $move2group_block=$linked_block = "";
         if ($id > 0)
         { //связанные товары только при редактировании
             $main_prop = $this->get_common_main_prop();
@@ -5300,8 +5090,29 @@ class catalog extends BaseModule
             $linked_block = $this->get_template_block('linked');
             $linked_block = str_replace("%linked_data%", $linked_data, $linked_block);
             $linked_block = str_replace("%linked_items%", $linked_vals, $linked_block);
+
+
+            $groups = CatalogCommons::get_groups();
+            if(count($groups)==1)//некуда переносить - группа только одна
+                $move2group_block='';
+            else
+            {
+                $move2group_block = $this->get_template_block('move2block');
+                $m2g_lines = array();
+                foreach($groups as $mgroup)
+                {
+                    if($mgroup['id']==$group['id'])
+                        continue;
+                    $gl = $this->get_template_block('m2g_line');
+                    $gl = $kernel->pub_array_key_2_value($gl,$mgroup);
+                    $m2g_lines[]=$gl;
+                }
+                $move2group_block = str_replace('%groups%',implode("\n",$m2g_lines), $move2group_block);
+                $move2group_block = str_replace('%m2g_action%',$kernel->pub_redirect_for_form('move_item2group'),$move2group_block);
+            }
         }
         $content = str_replace("%linked%", $linked_block, $content);
+        $content = str_replace("%move2block%", $move2group_block, $content);
         //Отметка о том, включён товар или нет
         if ($item['available'] == 1)
             $content = str_replace('%isavalchecked%', 'checked', $content);
@@ -5401,7 +5212,7 @@ class catalog extends BaseModule
 
         if ($only_visible)
             $query .= " AND `available`=1";
-        $sort_field = $this->get_common_sort_prop();
+        $sort_field = CatalogCommons::get_common_sort_prop();
         if ($sort_field)
         {
             $query .= ' ORDER BY ISNULL(`'.$sort_field['name_db'].'`), `'.$sort_field['name_db']."` ";
@@ -6121,7 +5932,7 @@ class catalog extends BaseModule
             return $this->get_template_block('not_select_cat');
 
 
-        $cdata = $this->get_category($id_cat);
+        $cdata = CatalogCommons::get_category($id_cat);
 
         //Определим список достпуных товарных групп, для создания новых
         //товаров
@@ -6294,7 +6105,7 @@ class catalog extends BaseModule
     private function show_category_form($id)
     {
         global $kernel;
-        $cat = $this->get_category($id);
+        $cat = CatalogCommons::get_category($id);
         $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'category_form.html'));
         $content = $this->get_template_block('header');
         $content = str_replace('%form_action%', $kernel->pub_redirect_for_form('category_save'), $content);
@@ -6387,25 +6198,7 @@ class catalog extends BaseModule
         return $content;
     }
 
-    /**
-     *  Удаляет категорию из БД
-     *
-     * @param $cat array удаляемая категория
-     * @return void
-     */
-    private function delete_category($cat)
-    {
-        global $kernel;
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` WHERE `id`='.$cat['id'];
-        $kernel->runSQL($query);
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_item2cat` WHERE `cat_id`='.$cat['id'];
-        $kernel->runSQL($query);
-        //переносим child'ы удаляемой категории на уровень выше
-        $query = 'UPDATE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats` SET `parent_id`='.$cat['parent_id'].' WHERE `parent_id`='.$cat['id'];
-        $kernel->runSQL($query);
-        $this->regenerate_all_groups_tpls(false);
-    }
-
+  
     /**
      *  Удаляет свойство из БД
      *
@@ -6416,7 +6209,7 @@ class catalog extends BaseModule
     private function delete_prop($propid, $groupid = 0)
     {
         global $kernel;
-        $prop = $this->get_prop($propid);
+        $prop = CatalogCommons::get_prop($propid);
 
         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_item_props` WHERE `id`='.$propid;
         $kernel->runSQL($query);
@@ -6466,7 +6259,7 @@ class catalog extends BaseModule
     private function delete_cat_prop($propid)
     {
         global $kernel;
-        $prop = $this->get_cat_prop($propid);
+        $prop = CatalogCommons::get_cat_prop($propid);
         $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats_props` WHERE `id`='.$propid;
         $kernel->runSQL($query);
         $query = 'ALTER TABLE `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_cats`'
@@ -6483,7 +6276,7 @@ class catalog extends BaseModule
     private function show_cat_prop_form($id)
     {
         global $kernel;
-        $prop = $this->get_cat_prop($id);
+        $prop = CatalogCommons::get_cat_prop($id);
 
         if (isset($prop['add_param']))
             $prop['add_param'] = @unserialize($prop['add_param']);
@@ -6619,7 +6412,7 @@ class catalog extends BaseModule
 
         if ($id_prop > 0)
         {
-            $prop = $this->get_prop($id_prop);
+            $prop = CatalogCommons::get_prop($id_prop);
             $action = "prop_save";
             $_tmp_label = "";
             $off_type = 'disabled="disabled"';
@@ -7307,9 +7100,7 @@ class catalog extends BaseModule
     private function delete_inner_filter($id)
     {
         global $kernel;
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_inner_filters` '.
-            'WHERE `id`='.intval($id);
-        $kernel->runSQL($query);
+        $kernel->runSQL('DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$kernel->pub_module_id_get().'_inner_filters` WHERE `id`='.intval($id));
     }
 
     /**
@@ -7417,7 +7208,7 @@ class catalog extends BaseModule
         $main_prop = $this->get_common_main_prop();
         foreach ($items as $item)
         {
-            $itemFD = $this->get_item_full_data($item['id']);
+            $itemFD = CatalogCommons::get_item_full_data($item['id']);
             $line = $template;
             foreach ($itemFD as $prop => $value)
             {
@@ -7709,15 +7500,7 @@ class catalog extends BaseModule
         $kernel->runSQL($iquery);
     }
 
-    /**
-     * Возвращает общее свойство, по которому вести сортировку
-     * @return array
-     */
-    private function get_common_sort_prop()
-    {
-        global $kernel;
-        return $kernel->db_get_record_simple('_catalog_item_props', '`group_id`=0 AND `sorted`>0 AND module_id="'.$kernel->pub_module_id_get().'"', '`name_db`,`sorted`');
-    }
+    
 
     /**
      * Публичный метод для вывода списка связанных товаров
@@ -8402,6 +8185,12 @@ class catalog extends BaseModule
         $moduleid = $kernel->pub_module_id_get();
         switch ($action)
         {
+            case 'move_item2group':
+                $itemid = intval($kernel->pub_httppost_get('itemid'));
+                $groupid = intval($kernel->pub_httppost_get('groupid'));
+                CatalogCommons::move_item2group($itemid,$groupid);;
+                return $kernel->pub_httppost_response('[#catalog_item_moved_to_group#]','item_edit&id='.$itemid);
+
             case 'get_item_subcats_block':
                 $this->set_templates($kernel->pub_template_parse(CatalogCommons::get_templates_admin_prefix().'items_edit.html'));
                 $cid = intval($kernel->pub_httpget_get('cid'));
@@ -8774,7 +8563,7 @@ class catalog extends BaseModule
 
                 $enumval = $kernel->pub_httppost_get("enumval", false);
                 $propid = $kernel->pub_httppost_get("id");
-                $prop = $this->get_prop($propid);
+                $prop = CatalogCommons::get_prop($propid);
                 if ($prop['group_id'] == 0)
                     $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
                 else
@@ -8872,7 +8661,7 @@ class catalog extends BaseModule
             case 'cat_enum_prop_add':
                 $enumval = $kernel->pub_httppost_get("enumval", false);
                 $propid = $kernel->pub_httppost_get("id");
-                $prop = $this->get_cat_prop($propid);
+                $prop = CatalogCommons::get_cat_prop($propid);
                 $table = '_catalog_'.$moduleid.'_cats';
                 $tinfo = $kernel->db_get_table_info($table);
                 $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
@@ -8884,7 +8673,7 @@ class catalog extends BaseModule
             case 'cat_enum_prop_delete':
                 $enumval = $kernel->pub_httpget_get("enumval", false);
                 $propid = $kernel->pub_httpget_get("propid");
-                $prop = $this->get_cat_prop($propid);
+                $prop = CatalogCommons::get_cat_prop($propid);
                 $table = '_catalog_'.$moduleid.'_cats';
                 $tinfo = $kernel->db_get_table_info($table);
                 $evals = $this->get_enum_set_prop_values($tinfo[$prop['name_db']]['Type']);
@@ -8929,10 +8718,11 @@ class catalog extends BaseModule
 
             //Удаление категории
             case 'category_delete':
-                $cat = $this->get_category(intval($kernel->pub_httppost_get('node')));
+                $cat = CatalogCommons::get_category(intval($kernel->pub_httppost_get('node')));
                 if (!$cat)
                     $kernel->pub_redirect_refresh_reload('show_items');
-                $this->delete_category($cat);
+                CatalogCommons::delete_category($cat);
+                $this->regenerate_all_groups_tpls(false);
                 $kernel->pub_redirect_refresh_reload('category_edit&id='.$cat['parent_id'].'&selectcat='.$cat['parent_id']);
                 break;
 
@@ -8940,7 +8730,7 @@ class catalog extends BaseModule
             case 'cat_clear_field':
                 $id = $kernel->pub_httpget_get('id');
                 $dprop = $kernel->pub_httpget_get('field');
-                $cat = $this->get_category($id);
+                $cat = CatalogCommons::get_category($id);
                 $query = "UPDATE `".$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` SET `'.$dprop.'`=NULL WHERE `id`='.intval($id);
                 $kernel->runSQL($query);
                 $kernel->pub_file_delete($cat[$dprop]);
@@ -9050,7 +8840,7 @@ class catalog extends BaseModule
                 $id_tovar = $kernel->pub_httpget_get('id');
                 $dprop = $kernel->pub_httpget_get('field');
                 $id_tovar = intval($id_tovar);
-                $item = $this->get_item_full_data($id_tovar);
+                $item = CatalogCommons::get_item_full_data($id_tovar);
                 //определяем, common-свойство или нет
                 $tinfo = $kernel->db_get_table_info('_catalog_'.$moduleid.'_items');
                 if (array_key_exists($dprop, $tinfo))
@@ -9074,7 +8864,7 @@ class catalog extends BaseModule
             case 'item_delete':
                 $groupid = $kernel->pub_httpget_get('group_id');
                 $itemid = $kernel->pub_httpget_get('id');
-                $this->delete_item($itemid);
+                CatalogCommons::delete_item($itemid);
                 //Если указана ID категории, то нужно вренуться в неё
                 $id_cat = $kernel->pub_httpget_get('id_cat');
                 $id_cat = intval($id_cat);
@@ -9116,52 +8906,7 @@ class catalog extends BaseModule
         return null;
     }
 
-    /**
-     * Удаляет товар из БД
-     *
-     * @param $id integer id-шник товара
-     * @return boolean
-     */
-    private function delete_item($id)
-    {
-        global $kernel;
-        $item = $this->get_item_full_data($id);
-        if (!$item)
-            return false;
-        $group = CatalogCommons::get_group($item['group_id']);
-        if (!$group)
-            return false;
-
-        $modid = $kernel->pub_module_id_get();
-
-        //удаление картинок и файлов
-        $props = CatalogCommons::get_props($item['group_id'], true);
-        foreach ($props as $prop)
-        {
-            if (!in_array($prop['type'], array('file', 'pict')) || !$item[$prop['name_db']])
-                continue;
-            $kernel->pub_file_delete($item[$prop['name_db']]);
-            if ($prop['type'] == 'pict')
-            {
-                //надо также удалить source и tn изображения
-                $kernel->pub_file_delete(str_replace($modid.'/', $modid.'/tn/', $item[$prop['name_db']]));
-                $kernel->pub_file_delete(str_replace($modid.'/', $modid.'/source/', $item[$prop['name_db']]));
-            }
-        }
-        //из общей таблицы товаров
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_items` WHERE `id`='.$id;
-        $kernel->runSQL($query);
-        //из таблицы связанных товаров
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_items_links` WHERE `itemid1`='.$id.' OR `itemid2`='.$id;
-        $kernel->runSQL($query);
-        //из таблицы принадлежности к категориям
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_'.$modid.'_item2cat` WHERE `item_id`='.$id;
-        $kernel->runSQL($query);
-        //из таблицы тов. группы
-        $query = 'DELETE FROM `'.$kernel->pub_prefix_get().'_catalog_items_'.$modid.'_'.strtolower($group['name_db']).'` WHERE `id`='.$item['ext_id'];
-        $kernel->runSQL($query);
-        return true;
-    }
+   
 
     /**
      * Возвращает максимальное кол-во терминов на страницу в админке
@@ -9217,7 +8962,7 @@ class catalog extends BaseModule
         global $kernel;
         $val2del = $kernel->pub_httpget_get("enumval", false);
         $propid = $kernel->pub_httpget_get("propid");
-        $prop = $this->get_prop($propid);
+        $prop = CatalogCommons::get_prop($propid);
         if ($prop['group_id'] == 0)
             $table = '_catalog_'.$kernel->pub_module_id_get().'_items';
         else
@@ -9287,7 +9032,7 @@ class catalog extends BaseModule
     {
         global $kernel;
         //сначала клонируем запись в общей таблице товаров
-        $olditem = $this->get_item($id);
+        $olditem = CatalogCommons::get_item($id);
         if (!$olditem)
             return false;
 
@@ -9318,7 +9063,7 @@ class catalog extends BaseModule
         $group_id=$olditem['group_id'];
         //теперь в таблице товарной группы
         $group = CatalogCommons::get_group($group_id);
-        $olditem = $this->get_item_group_fields($olditem['ext_id'], $group['name_db']);
+        $olditem = CatalogCommons::get_item_group_fields($olditem['ext_id'], $group['name_db']);
         if (!$olditem)
             return false;
 
@@ -9429,7 +9174,7 @@ class catalog extends BaseModule
                     $groups_props[$item['group_id']] = $props;
                 }
 
-                $item2 = $this->get_item_group_fields($item['ext_id'], $igroup['name_db']);
+                $item2 = CatalogCommons::get_item_group_fields($item['ext_id'], $igroup['name_db']);
                 if ($item2)
                     $item = $item + $item2;
 
@@ -9555,7 +9300,7 @@ class catalog extends BaseModule
             {
                 if (!CatalogCommons::is_valid_itemid($id))
                     continue;
-                $idata = $this->get_item_full_data($id);
+                $idata = CatalogCommons::get_item_full_data($id);
                 if (!$idata || ($groupID && $idata['group_id'] != $groupID))
                     continue;
 
@@ -9569,7 +9314,7 @@ class catalog extends BaseModule
         //добавление единичного товара
         if (count($items2compare) < $max_items && isset($_REQUEST[$single_param_name]) && CatalogCommons::is_valid_itemid($_REQUEST[$single_param_name]))
         {
-            $idata = $this->get_item_full_data($_REQUEST[$single_param_name]);
+            $idata = CatalogCommons::get_item_full_data($_REQUEST[$single_param_name]);
             if ($idata && (!$groupID || $groupID == $idata['group_id']))
             {
                 $items2compare[$idata['commonid']] = $idata;
@@ -9662,7 +9407,7 @@ class catalog extends BaseModule
 
     private function cats_props_out($catid, $content)
     {
-        $cat = $this->get_category($catid);
+        $cat = CatalogCommons::get_category($catid);
         if (!$cat)
             return $content;
         $content = str_replace("%catid%", $cat['id'], $content);

@@ -483,3 +483,6 @@ $il['catalog_not_uniq_main_prop_save']='Поле %fieldname% помечено к
 $il['catalog_onsite_th']='На сайте?';
 $il['catalog_list_set_available']='Показывать на сайте';
 $il['catalog_list_set_unavailable']='Не показывать на сайте';
+$il['catalog_move2group_header']='Перенести в группу';
+$il['catalog_move2group_do']='Перенести';
+$il['catalog_item_moved_to_group']='Перенесено';

@@ -6010,7 +6010,9 @@ class kernel
             '\\'=>'',
             '`'=>'',
         );
-        return strtr($str, $chars);
+        $str= strtr($str, $chars);
+        $str = preg_replace('~([^a-z0-9_\-\+]+)~i','',$str);
+        return $str;
     }
 
     /**

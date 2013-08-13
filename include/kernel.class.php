@@ -6011,7 +6011,7 @@ class kernel
             '`'=>'',
         );
         $str= strtr($str, $chars);
-        $str = preg_replace('~([^a-z0-9_\-\+]+)~i','',$str);
+        $str = preg_replace('~([^a-z0-9_\-\+\.]+)~i','',$str);
         return $str;
     }
 

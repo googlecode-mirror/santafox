@@ -918,7 +918,7 @@ function saveStructForm(url,isFull,modulesProps)
         postArr.properties_cb = {};
         postArr.properties = {};
         postArr.page_inheritance = {};
-        postArr.page_modules = {};
+        postArr.page_modules = {'':''};
         postArr.page_postprocessors = {};
         var elem,elemName;
         //свойства модулей

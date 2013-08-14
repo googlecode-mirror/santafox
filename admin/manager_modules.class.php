@@ -831,7 +831,7 @@ class manager_modules
         $lang_install = new mysql_table();
 		$lang_install->add_langauge($path.'/lang');
 
-		//Проверим необходимость добавления к пользователю Фротнофиса новых полей базовым модулем
+		//Проверим необходимость добавления к пользователю Фронтофиса новых полей базовым модулем
         manager_users::add_field_for_user($install->get_users_properties_one(), $id_modul);
 
 		//Вызов непосредственного инсталятора для базового модуля
@@ -840,8 +840,6 @@ class manager_modules
         $this->mysqltable_create_list();
 		$install->install($id_modul);
 		$this->mysqltable_set($id_modul);
-
-        //Теперь перепишем файлы шаблонов в папку дизайн
 
 		//Проверим необходимость создания потомков базового модуля.
         $mcopy = $install->get_module_copy();

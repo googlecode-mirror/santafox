@@ -746,16 +746,17 @@ class properties_page
     	{
         	foreach ($inheritance as $key => $value)
         	{
-        	    //if (!empty($value))
+                if(isset($modules[$key]))
         	       unset($modules[$key]);
         	}
     	}
         $is_root = $kernel->priv_admin_is_root();
-    	$link_array = $modules;
     	$serialize = array();
         $system_postprocessors = $kernel->get_postprocessors();
-        foreach ($link_array as $key => $val)
+        foreach ($modules as $key => $val)
         {
+            if(!$key)
+                continue;
             //если это не рут-админ, а метка вида ***_admin - не обрабатываем её
             if (!$is_root && preg_match('~_admin$~',$key))
                 continue;

@@ -175,13 +175,10 @@ class manager_structue
         if (!$only_page_properties)
         {
         	//Теперь сохраним свойства модулей к странице
-        	if (!empty($properties['properties']))
-        	{
-                if (!isset($properties['properties_cb']) || !is_array($properties['properties_cb']))
-        	    	$properties['properties_cb'] = array();
-                $manager->save_properties_addon($properties['properties'], $properties['properties_cb']);
-            	$saved = true;
-        	}
+            if (!isset($properties['properties_cb']) || !is_array($properties['properties_cb']))
+                $properties['properties_cb'] = array();
+            $manager->save_properties_addon(isset($properties['properties'])?$properties['properties']:array(), $properties['properties_cb']);
+            $saved = true;
 
         	if (isset($properties['page_modules']) && !empty($properties['page_modules']))
         	{

@@ -4294,30 +4294,26 @@ class kernel
      *
      * Данная функция вызывается как метод ядра, если действие по замене title
      * указано в административном интерфейсе у конкретной метки
-     * @param string $name_link
      * @return string
      * @access private
      */
-    function priv_page_title_get($name_link)
+    function priv_page_title_get()
     {
-        $arr = $this->pub_page_property_get($this->pub_page_current_get(), "title_other");
+        if ($this->modul_title!="")
+            return $this->modul_title;
+        $curr_page = $this->pub_page_current_get();
+        $arr = $this->pub_page_property_get($curr_page, "title_other");
         if ($arr['value'])
         {
-            $arr = $this->pub_page_property_get($this->pub_page_current_get(), "name_title");
+            $arr = $this->pub_page_property_get($curr_page, "name_title");
             $str = $arr['value'];
         }
         else
         {
-            $arr = $this->pub_page_property_get($this->pub_page_current_get(), "caption");
+            $arr = $this->pub_page_property_get($curr_page, "caption");
             $str = $arr['value'];
         }
-
-        //Теперь добавим информацию по тайтлу от других модулей
-
-        if ($this->modul_title!="")
-            return $this->modul_title;
-
-        return $str.$this->modul_title;
+        return $str;
     }
 
     /**

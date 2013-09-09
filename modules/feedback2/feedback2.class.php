@@ -255,7 +255,7 @@ class feedback2 extends BaseModule
     protected function get_fields()
     {
         global $kernel;
-        return $kernel->db_get_list_simple($this->get_fields_tablename(),"true ORDER BY `order`");
+        return $kernel->db_get_list_simple($this->get_fields_tablename(),"`moduleid`='".$kernel->pub_module_id_get()."' ORDER BY `order`");
     }
 
 

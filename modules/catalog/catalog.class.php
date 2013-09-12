@@ -568,7 +568,7 @@ class catalog extends BaseModule
                     $order += $this->order_inc;
                 }
 
-                if ($cat_id4new > 0)
+                if ($cat_id4new > 0 && $cat_id!=$cat_id4new)
                 { //если указана категория для новых, то добавим и в неё
                     $query = "INSERT INTO `".$kernel->pub_prefix_get()."_catalog_".$kernel->pub_module_id_get()."_item2cat` ".
                         "(`cat_id`,`item_id`,`order`) VALUES ".
@@ -1907,8 +1907,10 @@ class catalog extends BaseModule
         if ($group && isset($group['name_full']))
             $block = str_replace("%group.name%", $group['name_full'], $block);
 
+        $propskv = array();
         foreach ($props as $cp)
         {
+            $propskv[$cp['name_db']] = $cp;
             $value = '';
             if (isset($item[$cp['name_db']]))
                 $value = $item[$cp['name_db']];
@@ -1927,40 +1929,7 @@ class catalog extends BaseModule
             else
             {
                 $block = str_replace("%".$cp['name_db']."%", $this->get_template_block($cp['name_db']), $block);
-                switch ($cp['type'])
-                {
-                    case 'number':
-                        $value = $this->cleanup_number($value);
-                        break;
-                    case 'date':
-                        $dformat = $kernel->pub_modul_properties_get('catalog_property_date_format', $kernel->pub_module_id_get());
-                        $dformat = trim($dformat['value']);
-                        if (empty($dformat))
-                            $dformat = 'd.m.Y';
-                        $time_val = strtotime($value);
-                        $value = date($dformat, $time_val);
-                        break;
-                    case 'set':
-                        $vblocks = array();
-                        if (isset($this->templates['separator_'.$cp['name_db']]))
-                            $sep = $this->templates['separator_'.$cp['name_db']];
-                        elseif (isset($this->templates['item_sets_separator']))
-                            $sep = $this->templates['item_sets_separator'];
-                        else
-                            $sep = "\n";
-                        $set_value_tpl = $this->get_template_block($cp['name_db'].'_val');
-                        if (!$set_value_tpl)
-                            $set_value_tpl = '%setvalue%';
-                        foreach (explode(",", $value) as $v)
-                        {
-                            $vblock = $set_value_tpl;
-                            $vblock = str_replace("%setvalue%", $v, $vblock);
-                            $vblocks[] = $vblock;
-                        }
-                        $value = implode($sep, $vblocks);
-                        break;
-                }
-
+                $value = $this->format_value($value,$cp);
                 $block = str_replace('%'.$cp['name_db'].'_value%', $value, $block);
             }
             $block = str_replace('%'.$cp['name_db'].'_name%', $cp['name_full'], $block);
@@ -2021,11 +1990,58 @@ class catalog extends BaseModule
         {
             foreach ($matches[1] as $prop)
             {
-                if (isset($item[$prop]))
-                    $block = str_ireplace("%".$prop."_value%", $item[$prop], $block);
+                if (isset($item[$prop]) && isset($propskv[$prop['name_db']]))
+                    $block = str_ireplace("%".$prop."_value%", $this->format_value($item[$prop],$propskv[$prop['name_db']]), $block);
             }
         }
         return $block;
+    }
+
+
+    /**
+     * Форматирует $value в шаблоне  в соответствии с его типом  и
+     * возвращает новое значение
+     * @param 	string $value		- переменная, хранящая значение
+     * @param 	array  $prop		- свойство (массив)
+     * @return 	string
+     */
+    protected function format_value($value,array $prop)
+    {
+        global $kernel;
+        switch ($prop['type'])
+        {
+            case 'number':
+                $value = $this->cleanup_number($value);
+                break;
+            case 'date':
+                $dformat = $kernel->pub_modul_properties_get('catalog_property_date_format', $kernel->pub_module_id_get());
+                $dformat = trim($dformat['value']);
+                if (empty($dformat))
+                    $dformat = 'd.m.Y';
+                $time_val = strtotime($value);
+                $value = date($dformat, $time_val);
+                break;
+            case 'set':
+                $vblocks = array();
+                if (isset($this->templates['separator_'.$prop['name_db']]))
+                    $sep = $this->templates['separator_'.$prop['name_db']];
+                elseif (isset($this->templates['item_sets_separator']))
+                    $sep = $this->templates['item_sets_separator'];
+                else
+                    $sep = "\n";
+                $set_value_tpl = $this->get_template_block($prop['name_db'].'_val');
+                if (!$set_value_tpl)
+                    $set_value_tpl = '%setvalue%';
+                foreach (explode(",", $value) as $v)
+                {
+                    $vblock = $set_value_tpl;
+                    $vblock = str_replace("%setvalue%", $v, $vblock);
+                    $vblocks[] = $vblock;
+                }
+                $value = implode($sep, $vblocks);
+                break;
+        }
+        return $value;
     }
 
 

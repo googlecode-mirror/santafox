@@ -93,9 +93,15 @@ $il['news_end_date']                = 'Укажите желаемый диап�
 $il['news_button_show']             = 'Отобразить';
 
 
-$il['news_property_pages_count']    = 'Количество страниц в блоке (N)';
-$il['news_pub_pages_type']          = 'Вид постраничной навигации';
-$il['news_pub_pages_get_block']     = 'Блоками по N страниц';
-$il['news_pub_pages_get_float']     = 'Тек. страница всегда в центре блока из N страниц';
-$il['news_delete_confirm']          = 'Вы действительно хотите удалить новость?';
-$il['news_error_incorrect_datetime']= 'Некорректное значение даты или времени';
+$il['news_property_pages_count']      = 'Количество страниц в блоке (N)';
+$il['news_pub_pages_type']            = 'Вид постраничной навигации';
+$il['news_pub_pages_get_block']       = 'Блоками по N страниц';
+$il['news_pub_pages_get_float']       = 'Тек. страница всегда в центре блока из N страниц';
+$il['news_delete_confirm']            = 'Вы действительно хотите удалить новость?';
+$il['news_pub_show_html_title']       = 'Html title';
+$il['news_pub_show_meta_keywords']    = 'Meta keywords';
+$il['news_pub_show_meta_description'] = 'Meta description';
+
+$il['news_property_html_title_label']       = 'Html title';
+$il['news_property_meta_keywords_label']    = 'Meta keywords';
+$il['news_property_meta_description_label'] = 'Meta description';

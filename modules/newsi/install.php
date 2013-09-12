@@ -10,90 +10,90 @@
  */
 class newsi_install extends install_modules
 {
-	/**
-	 * Инсталяция базового модуля
-	 *
-	 * @param string $id_module Идентификатор создаваемого базового модуля
+    /**
+     * Инсталяция базового модуля
+     *
+     * @param string $id_module Идентификатор создаваемого базового модуля
      * @param boolean $reinstall переинсталяция?
-	 */
-	function install($id_module, $reinstall = false)
-	{
-	    global $kernel;
+     */
+    function install($id_module, $reinstall = false)
+    {
+        global $kernel;
 
-	    $query = 'CREATE TABLE IF NOT EXISTS `'.PREFIX.'_newsi` ( '
-        . ' `id` int(10) unsigned NOT NULL auto_increment, '
-        . ' `module_id` varchar(255) NOT NULL, '
-        . ' `date` date NOT NULL, '
-        . ' `time` time NOT NULL, '
-        . ' `available` tinyint(1) unsigned NOT NULL, '
-        . ' `lenta` tinyint(1) unsigned NOT NULL, '
-        . ' `delivery` tinyint(1) unsigned NOT NULL, '
-        . ' `rss` tinyint(1) unsigned NOT NULL, '
-        . ' `header` varchar(255) NOT NULL, '
-        . ' `description_short` text NOT NULL, '
-        . ' `description_full` text NOT NULL, '
-        . ' `author` varchar(255) NOT NULL, '
-        . ' `source_name` varchar(255) default NULL, '
-        . ' `source_url` varchar(255) default NULL, '
-        . ' `image` varchar(255) NOT NULL, '
-        . ' `post_date` DATETIME default NULL, '
-        . ' PRIMARY KEY  (`id`), '
-        . ' KEY `module_id` (`module_id`), '
-        . ' KEY `date` (`date`), '
-        . ' KEY `time` (`time`), '
-        . ' KEY `available` (`available`), '
-        . ' KEY `lenta` (`lenta`), '
-        . ' KEY `delivery` (`delivery`), '
-        . ' KEY `rss` (`rss`), '
-        . ' KEY `header` (`header`), '
-        . ' KEY `author` (`author`), '
-        . ' KEY `source_name` (`source_name`), '
-        . ' KEY `source_url` (`source_url`), '
-        . ' KEY `post_date` (`post_date`), '
-        . ' KEY `image` (`image`) '
-        . ' ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1';
+        $query = 'CREATE TABLE IF NOT EXISTS `'.PREFIX.'_newsi` ( '
+            . ' `id` int(10) unsigned NOT NULL auto_increment, '
+            . ' `module_id` varchar(255) NOT NULL, '
+            . ' `date` date NOT NULL, '
+            . ' `time` time NOT NULL, '
+            . ' `available` tinyint(1) unsigned NOT NULL, '
+            . ' `lenta` tinyint(1) unsigned NOT NULL, '
+            . ' `delivery` tinyint(1) unsigned NOT NULL, '
+            . ' `rss` tinyint(1) unsigned NOT NULL, '
+            . ' `header` varchar(255) NOT NULL, '
+            . ' `description_short` text NOT NULL, '
+            . ' `description_full` text NOT NULL, '
+            . ' `html_title` text default NULL, '
+            . ' `meta_keywords` text default NULL, '
+            . ' `meta_description` text default NULL, '
+            . ' `author` varchar(255) NOT NULL, '
+            . ' `source_name` varchar(255) default NULL, '
+            . ' `source_url` varchar(255) default NULL, '
+            . ' `image` varchar(255) NOT NULL, '
+            . ' `post_date` DATETIME default NULL, '
+            . ' PRIMARY KEY  (`id`), '
+            . ' KEY `module_id` (`module_id`), '
+            . ' KEY `date` (`date`,`time`), '
+            . ' KEY `available` (`available`), '
+            . ' KEY `lenta` (`lenta`), '
+            . ' KEY `delivery` (`delivery`), '
+            . ' KEY `rss` (`rss`), '
+            . ' KEY `header` (`header`), '
+            . ' KEY `author` (`author`), '
+            . ' KEY `post_date` (`post_date`), '
+            . ' KEY `image` (`image`) '
+            . ' ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1';
         $kernel->runSQL($query);
-	}
+    }
 
-	/**
+    /**
      * Деинсталяция базового модуля
      *
      * @param string $id_module Идентификатор удаляемого базового модуля
      */
-	function uninstall($id_module)
-	{
-		global $kernel;
+    function uninstall($id_module)
+    {
+        global $kernel;
 
-		$query = 'DROP TABLE `'.PREFIX.'_newsi`';
-		$kernel->runSQL($query);
-	}
+        $query = 'DROP TABLE `'.PREFIX.'_newsi`';
+        $kernel->runSQL($query);
+    }
 
-	/**
+    /**
      * Инсталяция дочернего модуля
      *
      * @param string $id_module Идентификатор вновь создаваемого дочернего модуля
      * @param boolean $reinstall переинсталяция?
      */
-	function install_children($id_module, $reinstall = false)
-	{
-		global $kernel;
-		$kernel->pub_dir_create_in_images($id_module);
-		$kernel->pub_dir_create_in_images($id_module.'/tn');
-		$kernel->pub_dir_create_in_images($id_module.'/source');
-	}
+    function install_children($id_module, $reinstall = false)
+    {
+        global $kernel;
+        $kernel->pub_dir_create_in_images($id_module);
+        $kernel->pub_dir_create_in_images($id_module.'/tn');
+        $kernel->pub_dir_create_in_images($id_module.'/source');
+    }
 
-	/**
-	 * Деинсталяция дочернего модуля
-	 *
+    /**
+     * Деинсталяция дочернего модуля
+     *
      *
      * @param string $id_module ID удоляемого дочернего модуля
      */
-	function uninstall_children($id_module)
-	{
-		global $kernel;
+    function uninstall_children($id_module)
+    {
+        global $kernel;
 
-		$kernel->pub_dir_recurs_delete('content/images/'.$id_module);
-	}
+        $kernel->pub_dir_recurs_delete('content/images/'.$id_module);
+    }
 }
 
 $install = new newsi_install();
@@ -269,6 +269,12 @@ $property->set_id('template');
 $property->set_mask('htm,html');
 $property->set_patch('modules/newsi/templates_user');
 $install->add_public_metod_parametrs('pub_show_selection', $property);
+
+
+
+$install->add_public_metod('pub_show_html_title', '[#news_pub_show_html_title#]');
+$install->add_public_metod('pub_show_meta_keywords', '[#news_pub_show_meta_keywords#]');
+$install->add_public_metod('pub_show_meta_description', '[#news_pub_show_meta_description#]');
 
 
 $install->module_copy[0]['name'] = 'newsi_modul_base_name1';

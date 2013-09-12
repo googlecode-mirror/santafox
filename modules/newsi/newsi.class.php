@@ -168,7 +168,7 @@ class newsi extends basemodule
         $limit=intval($limit);
 
 
-        $offset = $this->pub_offset_get();
+        $offset = 0;
         $items = $this->pub_items_get($limit, $offset, true, $type, $id_modules);
         $total = $this->pub_news_avaiable_get($type, null,null,null,$id_modules);
 
@@ -224,6 +224,43 @@ class newsi extends basemodule
         }
 
         return $content;
+    }
+
+    protected function get_current_news_item()
+    {
+        global $kernel;
+        $id=intval($kernel->pub_httpget_get('id'));
+        if (!$id)
+            return null;
+        return $this->pub_item_get($id);
+    }
+
+    protected function get_current_news_item_field_encoded($fieldname)
+    {
+        global $kernel;
+        $item = $this->get_current_news_item();
+        if(!$item)
+        {
+            if($fieldname=='html_title')
+                return $kernel->priv_page_title_get('');
+            return '';
+        }
+        return htmlspecialchars($item[$fieldname]);
+    }
+
+    public function pub_show_html_title()
+    {
+       return $this->get_current_news_item_field_encoded('html_title');
+    }
+
+    public function pub_show_meta_keywords()
+    {
+       return $this->get_current_news_item_field_encoded('meta_keywords');
+    }
+
+    public function pub_show_meta_description()
+    {
+       return $this->get_current_news_item_field_encoded('meta_description');
     }
 
     /**
@@ -663,7 +700,9 @@ class newsi extends basemodule
         global $kernel;
         list($day, $month, $year) = explode('.', $item_data['date']);
         //        if (preg_match('/^\d{1,2}:\d{1,2}:\d{1,2}$/', trim($item_data['time'])) && checkdate($month, $day, $year)) {
-        $query = 'REPLACE `' . $kernel->pub_prefix_get() . '_newsi` (`id`, `module_id`, `date`, `time`, `available`, `lenta`, `delivery`, `rss`, `header`, `description_short`, `description_full`, `author`, `source_name`, `source_url`, `image`) '
+        $query = 'REPLACE `' . $kernel->pub_prefix_get() . '_newsi`
+            (`id`, `module_id`, `date`, `time`, `available`, `lenta`, `delivery`, `rss`, `header`,
+             `description_short`, `description_full`, `author`, `source_name`, `source_url`, `image`,`html_title`,`meta_keywords`,`meta_description`) '
             . ' VALUES (' . $item_data['id'] . '
             ,"' . $kernel->pub_module_id_get() . '"
             ,"' . $year . '-' . $month . '-' . $day . '"
@@ -679,6 +718,9 @@ class newsi extends basemodule
             ,"' . mysql_real_escape_string($item_data['source_name']) . '"
             ,"' . $item_data['source_url'] . '"
             ,"' . $this->priv_get_image_filename($file, ((isset($item_data['remove_image'])) ? (true) : (false)), $item_data['id']) . '"
+             ,"' . mysql_real_escape_string($item_data['html_title']) . '"
+             ,"' . mysql_real_escape_string($item_data['meta_keywords']) . '"
+             ,"' . mysql_real_escape_string($item_data['meta_description']) . '"
             )';
         $kernel->runSQL($query);
         //        }
@@ -769,7 +811,25 @@ class newsi extends basemodule
             $content = str_replace('%time%', date('H:i:s'), $content);
             $content = str_replace('%date%', date('d.m.Y'), $content);
         }
-        $content = str_replace($this->priv_get_item_data_search(), $this->priv_get_item_data_replace($item_id), $content);
+        $search=array(
+            '%date%',
+            '%time%',
+            '%available%',
+            '%lenta%',
+            '%delivery%',
+            '%rss%',
+            '%header%',
+            '%description_short%',
+            '%description_full%',
+            '%author%',
+            '%source_name%',
+            '%source_url%',
+            '%image_url%',
+            '%html_title%',
+            '%meta_keywords%',
+            '%meta_description%',
+        );
+        $content = str_replace($search, $this->priv_get_item_data_replace($item_id), $content);
         return $content;
     }
 
@@ -801,7 +861,10 @@ class newsi extends basemodule
                 '',
                 '',
                 '',
-                ''
+                '',
+                '',//html_title
+                '',//meta_keywords
+                '',//meta_description
             );
         }
         else
@@ -821,31 +884,14 @@ class newsi extends basemodule
                 htmlspecialchars($item_data['author']),
                 htmlspecialchars($item_data['source_name']),
                 $item_data['source_url'],
-                '/content/images/' . $kernel->pub_module_id_get() . '/tn/' . $item_data['image']
+                '/content/images/' . $kernel->pub_module_id_get() . '/tn/' . $item_data['image'],
+                htmlspecialchars($item_data['html_title']),
+                htmlspecialchars($item_data['meta_keywords']),
+                htmlspecialchars($item_data['meta_description']),
             );
         }
     }
 
-    function priv_get_item_data_search()
-    {
-        $array = array(
-            '%date%',
-            '%time%',
-            '%available%',
-            '%lenta%',
-            '%delivery%',
-            '%rss%',
-            '%header%',
-            '%description_short%',
-            '%description_full%',
-            '%author%',
-            '%source_name%',
-            '%source_url%',
-            '%image_url%'
-        );
-
-        return $array;
-    }
 
     /**
      * Возвращает данные по указанному ID

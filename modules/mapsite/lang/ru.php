@@ -13,5 +13,4 @@ $il['module_mapsite_visible_var1'] = 'Отображать';
 $il['module_mapsite_visible_var2'] = 'Не отображать';
 $il['module_mapsite_errore1'] = 'Отсутсвует указанный файл шаблона';
 $il['module_mapsite_errore2'] = 'Не задан шаблон для формирования карты сайта';
-
-?>
+$il['mapsite_domain'] = 'Домен сайта (без http://)';

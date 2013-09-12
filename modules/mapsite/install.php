@@ -1,8 +1,8 @@
 <?php
 /**
  * Инсталятор модуля "карта сайта"
- * @copyright ArtProm (с) 2001-2007
- * @version 1.0
+ * @copyright ArtProm (с) 2001-2013
+ * @version 2.0
  */
 
 
@@ -85,11 +85,12 @@ $param->set_mask("html,htm");
 $param->set_default("modules/mapsite/templates_user/map.html");
 $install->add_public_metod_parametrs('pub_show_mapsite',$param);
 
-
-//Уровни доступа
-//$install->add_admin_acces_label('acces_admin','Доступ в административную часть');
-//$install->add_admin_acces_label('acces_admin2','Доступ в административную часть 2');
-
+//настройка домена
+$property = new properties_string();
+$property->set_caption('[#mapsite_domain#]');
+$property->set_default(isset($_SERVER['HTTP_HOST'])?$_SERVER['HTTP_HOST']:'localhost');
+$property->set_id('domain');
+$install->add_modul_properties($property);
 
 //То, что ставится автоматически при интсляции базового модуля пока оставим так, как есть...
 //Теперь можно прописать дочерние модули, которые будут автоматически созданы при
@@ -102,4 +103,3 @@ $install->module_copy[0]['action'][0]['id_metod'] = 'pub_show_mapsite';
 $install->module_copy[0]['action'][0]['param']['id_page_start'] = 'index';
 $install->module_copy[0]['action'][0]['param']['template'] = 'modules/mapsite/templates_user/map.html';
 $install->module_copy[0]['propertes_in_page']['index']['visible'] = 'true';
-?>

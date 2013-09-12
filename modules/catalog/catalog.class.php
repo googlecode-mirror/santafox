@@ -1990,8 +1990,8 @@ class catalog extends BaseModule
         {
             foreach ($matches[1] as $prop)
             {
-                if (isset($item[$prop]) && isset($propskv[$prop['name_db']]))
-                    $block = str_ireplace("%".$prop."_value%", $this->format_value($item[$prop],$propskv[$prop['name_db']]), $block);
+                if (isset($item[$prop]) && isset($propskv[$prop]))
+                    $block = str_replace("%".$prop."_value%", $this->format_value($item[$prop],$propskv[$prop]), $block);
             }
         }
         return $block;

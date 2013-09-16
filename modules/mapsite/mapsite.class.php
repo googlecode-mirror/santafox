@@ -276,7 +276,7 @@ class mapsite
             //товары категории
             $isql   = 'SELECT items.id,items.name FROM `'.PREFIX.'_catalog_'.$module_id.'_item2cat` AS i2c
                        INNER JOIN `'.PREFIX.'_catalog_'.$module_id.'_items` AS items ON items.id=i2c.item_id
-                       WHERE i2c.`cat_id` = '.$node_id.' AND items.available=1';
+                       WHERE i2c.`cat_id` = '.$row['id'].' AND items.available=1';
             $ir = $kernel->runSQL($isql);
             while($irow = mysql_fetch_assoc($ir))
             {

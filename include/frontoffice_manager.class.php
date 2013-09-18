@@ -119,14 +119,14 @@ class frontoffice_manager
     {
         global $kernel;
         //определим страницу, кторую запрашивают
-        $uri = $_SERVER['REQUEST_URI'];
+        $uri = rtrim($_SERVER['REQUEST_URI'],'?');
         $section_id = null;
         //Проверим корректность задания страницы
         if (isset($_GET['sitepage']) && $kernel->is_valid_sitepage_id($_GET['sitepage'])) //если задан параметр, какую страницу выдать, то выставим её в первую очередь
             $section_id = $_GET['sitepage'];
         elseif (preg_match('~^/([a-zA-Z0-9_\.\-]+)\\.html~i', $uri, $matches))
             $section_id = $matches[1];
-        elseif (preg_match("'^/(\\?.*)?$'", $uri))
+        elseif ($uri=='/index.php' || preg_match("'^/(\\?.*)?$'", $uri))
             $section_id = "index";
         else
             self::throw_404_error();

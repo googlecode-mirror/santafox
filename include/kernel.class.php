@@ -3424,7 +3424,7 @@ class kernel
      *
      * @param string $table Имя таблицы БД без префикса
      * @param array $rec key-value массив полей со значениями
-     * @param string $type тип INSERT или REPLACE
+     * @param string $type тип INSERT, INSERT_IGNORE или REPLACE
      * @return integer
      * @access public
      */
@@ -3433,7 +3433,7 @@ class kernel
         if (strtoupper($type)=="REPLACE")
             $query = "REPLACE";
         else
-            $query = "INSERT";
+            $query = $type;
         $query.=" INTO `".$this->pub_prefix_get().$table."` ";
         $fnames  = array();
         $fvalues = array();

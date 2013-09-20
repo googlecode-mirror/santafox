@@ -278,6 +278,11 @@ class mapsite
                        INNER JOIN `'.PREFIX.'_catalog_'.$module_id.'_items` AS items ON items.id=i2c.item_id
                        WHERE i2c.`cat_id` = '.$row['id'].' AND items.available=1';
             $ir = $kernel->runSQL($isql);
+            
+            $children = $this->catalog_get_tree($row['id'], $module_id, $pagename);
+            $array['include'] = $children;
+            $data[$pagename.".html?cid=".$row['id']] = $array;
+            
             while($irow = mysql_fetch_assoc($ir))
             {
                 $data[$pagename.".html?itemid=".$irow['id']]=array(
@@ -288,9 +293,7 @@ class mapsite
             }
             mysql_free_result($ir);
 
-            $children = $this->catalog_get_tree($row['id'], $module_id, $pagename);
-            $array['include'] = $children;
-            $data[$pagename.".html?cid=".$row['id']] = $array;
+            
         }
 		mysql_free_result($query);
 		return $data;

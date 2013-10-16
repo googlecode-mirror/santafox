@@ -2,7 +2,7 @@
 
 class searchdb
 {
-
+    const MODULEID = 'search1';
 
 	public static function array2str($arr)
 	{
@@ -17,7 +17,7 @@ class searchdb
 	{
         global $kernel;
 	    $sql = "SELECT id, count(*) as cnt
-               FROM `".$kernel->pub_prefix_get()."_".$kernel->pub_module_id_get()."_docs`
+               FROM `".$kernel->pub_prefix_get().self::get_docs_table_name()."`
                GROUP BY contents_hash
                HAVING cnt > 1";
 	    $res=$kernel->runSQL($sql);
@@ -28,21 +28,18 @@ class searchdb
 
 	    if (!$ids2delete)
             return;
-        $sql = "DELETE FROM `".$kernel->pub_prefix_get()."_".$kernel->pub_module_id_get()."_docs`
-                       WHERE id IN (".implode(",",$ids2delete).")";
+        $sql = "DELETE FROM `".$kernel->pub_prefix_get().self::get_docs_table_name()."` WHERE id IN (".implode(",",$ids2delete).")";
         $kernel->runSQL($sql);
 	}
 
 
-	public static function get_word_ids($words,$moduleID=null)
+	public static function get_word_ids($words)
 	{
         global $kernel;
 		if (count($words) == 0)
 			return array();
 		$words_str = self::array2str($words);
-        if (!$moduleID)
-            $moduleID=$kernel->pub_module_id_get();
-        $res=$kernel->runSQL("SELECT id, word FROM `".$kernel->pub_prefix_get()."_".$moduleID."_words` WHERE word IN ($words_str)");
+        $res=$kernel->runSQL("SELECT id, word FROM `".$kernel->pub_prefix_get().self::get_words_table_name()."` WHERE word IN ($words_str)");
 		$result = array();
 		while ($row = mysql_fetch_assoc($res))
 			$result[$row['word']] = $row['id'];
@@ -52,26 +49,22 @@ class searchdb
 
     public static function get_words_table_name()
     {
-        global $kernel;
-        return "_".$kernel->pub_module_id_get()."_words";
+        return "_".self::MODULEID."_words";
     }
 
     public static function get_docs_table_name()
     {
-        global $kernel;
-        return "_".$kernel->pub_module_id_get()."_docs";
+        return "_".self::MODULEID."_docs";
     }
 
     public static function get_index_table_name()
     {
-        global $kernel;
-        return "_".$kernel->pub_module_id_get()."_index";
+        return "_".self::MODULEID."_index";
     }
 
     public static function get_ignored_table_name()
     {
-        global $kernel;
-        return "_".$kernel->pub_module_id_get()."_ignored";
+        return "_".self::MODULEID."_ignored";
     }
 
     public static function clear_index()

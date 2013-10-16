@@ -1,6 +1,12 @@
 RewriteBase /
 RewriteEngine On
 
+### delete the copy of the main page ( http://your_domain.ru/index.html)
+# RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.html\ HTTP/
+# RewriteRule ^index\.html$ http://your_domain.ru/ [R=301,L]
+# RewriteRule ^index$ http://your_domain.ru/ [R=301,L]
+# RewriteRule ^index/$ http://your_domain.ru/ [R=301,L]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-l

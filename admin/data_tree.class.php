@@ -18,19 +18,48 @@
 class data_tree
 {
 
+    protected $is_add_allowed = false;
+
+    protected $nodes_add_disabled = array();
+
+    protected $add_context_label='[#common_add_child#]';
+
+    protected $add_action = null;
+
+    public function set_add_context_label($label)
+    {
+        $this->add_context_label = $label;
+    }
+
+    /**
+     * @param null $add_action
+     */
+    public function set_add_action($add_action)
+    {
+        $this->add_action = $add_action;
+    }
+
+    /**
+     * @return null
+     */
+    public function get_add_action()
+    {
+        return $this->add_action;
+    }
+
     /**
      * Поределяет приоритет выставления текущей ноды
      *
      * Если стоит в false, то при нали
      * @var bool
      */
-    private $prioritet_node_and_other_menu = true;
+    protected $prioritet_node_and_other_menu = true;
     /**
      * Уникальное имя для сохранения куков о текущем положении пользователя
      *
      * @var string
      */
-    private $name_for_cookie = "treecookie";
+    protected $name_for_cookie = "treecookie";
 
     /**
      * Действие для загрузки дерева
@@ -46,44 +75,44 @@ class data_tree
      *
      * @var string
      */
-    private $root_id = 'index';
+    protected $root_id = 'index';
 
     /**
      * Имя главной ноды
      *
      * @var string
      */
-    private $root_name = 'Tree';
+    protected $root_name = 'Tree';
 
     /**
      * Разрешает/запрещает перенос нод
      *
      * @var boolean
      */
-    private $drag_and_drop = false;
+    protected $drag_and_drop = false;
 
     /**
      * Определяет ID действие, которое должно выполнояться при клике по ноде
      *
      * @var string
      */
-    private $action_node = '';
+    protected $action_node = '';
 
     /**
      * ID действия, вызываемого при перемещении ноды
      *
      * @var string
      */
-    private $action_move = '';
+    protected $action_move = '';
 
     /**
      * Шаблон, используемый для построения дерева
      *
      * @var array
      */
-    private $template;
+    protected $template;
 
-    private $treeID=null;
+    protected $treeID=null;
 
     /**
      * Массив действий контекстного меню
@@ -102,14 +131,14 @@ class data_tree
      * @var array
      * @access private
      */
-    private $contextmenu = array();
+    protected $contextmenu = array();
 
     /**
      * ID ноды, которую нужно открыть при первом фомировании списка
      *
      * @var string
      */
-    private $node_default = '';
+    protected $node_default = '';
 
     /**
      * Если параметр установлен в false, то все ссылки (id действий) должны быть указаны вместе
@@ -118,21 +147,21 @@ class data_tree
      *
      * @var boolean
      */
-    private  $relativ_url = true;
+    protected  $relativ_url = true;
 
     /**
      * Массив с нодами дерева
      *
      * @var array
      */
-    private $nodes = null;
+    protected $nodes = null;
 
     /**
      * Признак того, что идёт работа со структурой сайта
      *
      * @var boolean
      */
-    private $is_page_structure = false;
+    protected $is_page_structure = false;
 
     public function set_tree_ID($id)
     {
@@ -364,6 +393,11 @@ class data_tree
         //$this->contextmenu[] = array("type" => "context_empty", "name" => "", "link" => "", "exclude" => "", "confirm" => "");
     }
 
+    public function get_nodes_add_disabled()
+    {
+        return $this->nodes_add_disabled;
+    }
+
     function get_tree()
     {
         global $kernel;
@@ -435,20 +469,38 @@ class data_tree
         $html = str_replace("true/*%direct_click%*/", $direct_click, $html);
         $html = str_replace("//%node_default%", $this->node_default, $html);
 
+        //контекстное меню для добавления
+        $add_action = $this->get_add_action();
+        if($add_action)
+        {
+            $add_menu_block = $this->template['context_element_add_click_function'];
+            $add_menu_block = str_replace('%disabled4nodes%', json_encode($this->get_nodes_add_disabled()), $add_menu_block);
+            $add_menu_block = str_replace('%add_context_label%', $this->add_context_label, $add_menu_block);
+            $add_action = $kernel->pub_redirect_for_form($add_action, $this->relativ_url);
+            $add_binding = $this->template['add_binding'];
+            $add_binding = str_replace('%add_action%',$add_action,$add_binding);
+            $this->bindings[] = $add_binding;
+        }
+        else
+            $add_menu_block = $this->template['context_element_add_disabled'];
+        $html = str_replace("//%context_menu_add%", $add_menu_block, $html);
+
+
         //Настройки drag&drop, меняются 3 части шаблона
         if ($this->drag_and_drop)
         {
             $html = str_replace("//%dnd_enabled%", $this->template['dnd_enabled'], $html);
             $html = str_replace("//%dnd_action1%", $this->template['dnd_action1'], $html);
-            $html = str_replace("//%dnd_action2%", $this->template['dnd_action2'], $html);
+            $this->bindings[]=$this->template['dnd_action2'];
+            //$html = str_replace("//%dnd_action2%", $this->template['dnd_action2'], $html);
         }
         else
         {
             $html = str_replace("//%dnd_enabled%", "", $html);
             $html = str_replace("//%dnd_action1%", "", $html);
-            $html = str_replace("//%dnd_action2%", "", $html);
+            //$html = str_replace("//%dnd_action2%", "", $html);
         }
-        $html = str_replace("%move_url%", $move_url, $html);
+
         $html = str_replace("//%context_menu_functions%", $html_context_menu_function, $html);
         if ($this->is_page_structure)
             $link = $this->template['linkmenu_struct'];
@@ -458,6 +510,7 @@ class data_tree
         $html = str_replace("//%linkmenu%", $link, $html);
         $html = str_replace("//%click_node_default%", $def_link, $html);
         $html = str_replace("%cookie_name_tree%", $this->name_for_cookie , $html);
+
 
         //И последнее, вставим признак необходимости выставлять дефолтную ноду, или ноду из кук
         //Это можно делать только в том случае, если текущего пункта левого меню нет вообще
@@ -471,6 +524,10 @@ class data_tree
             else
                 $html = str_replace("%nod_select_node%" , "false" , $html);
         }
+
+        $html = str_replace('//%bindings%',implode("\n",$this->bindings),$html);
+
+        $html = str_replace("%move_url%", $move_url, $html);
         return $html;
     }
 
@@ -478,5 +535,7 @@ class data_tree
     {
         return "divtree_".$this->root_id;
     }
+
+    protected $bindings = array();
 
 }

@@ -6575,13 +6575,13 @@ class catalog extends BaseModule
         $tree->set_action_move_node('category_move');
         $tree->set_drag_and_drop(true);
         $tree->set_tree_ID($kernel->pub_module_id_get());
+        $tree->set_add_action('category_add');
+        $tree->set_add_context_label('[#catalog_category_add_label#]');
 
         //$tree->not_click_main = true;
         //$tree->set_node_default($node_default);
 
         //Создаём контекстное меню
-        $tree->contextmenu_action_set('[#catalog_category_add_label#]', 'category_add');
-        $tree->contextmenu_delimiter();
         $tree->contextmenu_action_remove('[#catalog_category_remove_label#]', 'category_delete', 0, '[#catalog_category_del_alert#]');
         $tree->set_name_cookie($this->structure_cookie_name);
         return $tree;
@@ -8710,18 +8710,14 @@ class catalog extends BaseModule
 
             //Добавляем новую категорию через дерево
             case 'category_add':
-                $pid = $kernel->pub_httppost_get("node");
-                $name = $kernel->pub_page_textlabel_replace('[#catalog_category_new_name#]');
-                if ($pid == 'index')
-                    $pid = 0;
+                $pid = intval($kernel->pub_httppost_get("pid"));
+                $name = $kernel->pub_httppost_get('name');
+                if(mb_strlen($name)==0)
+                    $name = mysql_real_escape_string($kernel->pub_page_textlabel_replace('[#catalog_category_new_name#]'));
                 $order = $this->get_last_order_in_cat($pid) + 2;
-                $query = 'INSERT INTO `'.$kernel->pub_prefix_get().'_catalog_'.$moduleid.'_cats` (`parent_id`,`name`,`order`) '.
-                    'VALUES ('.$pid.',"'.$kernel->pub_str_prepare_set($name).'", '.$order.')';
-                $kernel->runSQL($query);
-                $cid = mysql_insert_id();
+                $cid=$kernel->db_add_record('_catalog_'.$moduleid.'_cats',array('parent_id'=>$pid,'name'=>$name,'order'=>$order));
                 $this->regenerate_all_groups_tpls(false);
-                $kernel->pub_redirect_refresh_reload('category_edit&id='.$cid.'&selectcat='.$cid);
-                break;
+                return $kernel->pub_httppost_response($cid);
 
             //Вызов формы редактирования категории
             case 'category_edit':

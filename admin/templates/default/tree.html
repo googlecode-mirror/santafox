@@ -145,12 +145,14 @@ start_interface.link_go("%action_node%&id=" + currNodeId);
                             "rename" : false,
                             "remove" : false,//Delete
                             "ccp" : false,
-                            "create":false
+                            //%context_menu_add%
                             //%context_menu_functions%
                         }
                     }
                 }
-            });
+            })
+        //%bindings%
+    ;
 
 </script>
 
@@ -194,20 +196,22 @@ start_interface.link_go("%action_node%&id=" + currNodeId);
         //%action%
     }
 }
+<!-- @context_element_add_disabled -->
+"create":false
 <!-- @context_element_add_click_function -->
 
 "create":{
-    "label"	: "Создать",
+    "label"	: "%add_context_label%",
     "action": function (par) {
-        var disabledForNodes = new String("%node_exclude%").split(",");
+        var disabledForNodes = %disabled4nodes%;
         if (jQuery.inArray( par.attr("id"), disabledForNodes)>-1)
             return;
-        //%action%
+        this.create(par);
     }
 }
 <!-- @context_element_remov_click_function -->
 "delete":{
-    "label" : "Удалить", // @todo use lang[]
+    "label" : "[#common_delete#]",
     "_class" : "ic_delete",
     "_disabled": node.attr('rel')=='root'|| (jQuery.inArray( node.attr("id"), (new String ("%node_exclude%")).split(",")))>-1,
     "action":function (par){
@@ -249,3 +253,32 @@ $.post('%link%',{ node :  par.attr("id")}, function(data){
 $.post('%link%',{ node :  par.attr("id")}, function(data){
     santaUpdateRegion('west','index.php?action=get_left_menu');
 });
+
+<!-- @add_binding -->
+.bind("create.jstree", function (e, data) {
+    var pid=data.rslt.parent.attr("id");
+    if (typeof pid === "undefined")
+        pid=0;
+    $.post(
+        "%add_action%",
+        {
+            "pid" : pid,
+            //"position" : data.rslt.position,
+            //"type" : data.rslt.obj.attr("rel")
+            "name" : data.rslt.name,
+        },
+        function (r) {
+            if(r.errore_count){
+                $.jstree.rollback(data.rlbk);
+                santaShowPopupHint('Error',r.errore_text);
+            }
+            else{
+                data.inst.set_type("folder", data.rslt.parent);
+                var newid=r.result_message;
+                $(data.rslt.obj).attr("id", newid);
+                data.inst.select_node("#"+newid,true);
+            }
+        },
+        'json'
+    ).error(function(jqXHR, status, error) {r=jqXHR.responseText; santaShowPopupHint('Error',r)});
+})

@@ -441,3 +441,5 @@ $il['common_edit_property_pict_transparency'] =  'Прозрачность во�
 $il['common_module_tpl']='Шаблон';
 $il['common_delete']='Удалить';
 $il['common_add_child']='Добавить';
+$il['common_tree_newnode_name']='Новый элемент';
+$il['common_loading']='Загрузка...';

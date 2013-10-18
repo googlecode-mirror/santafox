@@ -6577,6 +6577,7 @@ class catalog extends BaseModule
         $tree->set_tree_ID($kernel->pub_module_id_get());
         $tree->set_add_action('category_add');
         $tree->set_add_context_label('[#catalog_category_add_label#]');
+        $tree->set_new_node_name('[#catalog_category_new_name#]');
 
         //$tree->not_click_main = true;
         //$tree->set_node_default($node_default);

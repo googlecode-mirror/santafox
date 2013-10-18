@@ -17,36 +17,6 @@
  */
 class data_tree
 {
-
-    protected $is_add_allowed = false;
-
-    protected $nodes_add_disabled = array();
-
-    protected $add_context_label='[#common_add_child#]';
-
-    protected $add_action = null;
-
-    public function set_add_context_label($label)
-    {
-        $this->add_context_label = $label;
-    }
-
-    /**
-     * @param null $add_action
-     */
-    public function set_add_action($add_action)
-    {
-        $this->add_action = $add_action;
-    }
-
-    /**
-     * @return null
-     */
-    public function get_add_action()
-    {
-        return $this->add_action;
-    }
-
     /**
      * Поределяет приоритет выставления текущей ноды
      *
@@ -162,6 +132,42 @@ class data_tree
      * @var boolean
      */
     protected $is_page_structure = false;
+
+    protected $new_node_name='[#common_tree_newnode_name#]';
+
+    protected $is_add_allowed = false;
+
+    protected $nodes_add_disabled = array();
+
+    protected $add_context_label='[#common_add_child#]';
+
+    protected $add_action = null;
+
+    public function set_new_node_name($name)
+    {
+        $this->new_node_name=$name;
+    }
+
+    public function set_add_context_label($label)
+    {
+        $this->add_context_label = $label;
+    }
+
+    /**
+     * @param null $add_action
+     */
+    public function set_add_action($add_action)
+    {
+        $this->add_action = $add_action;
+    }
+
+    /**
+     * @return null
+     */
+    public function get_add_action()
+    {
+        return $this->add_action;
+    }
 
     public function set_tree_ID($id)
     {
@@ -528,6 +534,7 @@ class data_tree
         $html = str_replace('//%bindings%',implode("\n",$this->bindings),$html);
 
         $html = str_replace("%move_url%", $move_url, $html);
+        $html = str_replace("%newnode_name%", $this->new_node_name, $html);
         return $html;
     }
 

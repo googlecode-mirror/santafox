@@ -108,6 +108,15 @@ class frontoffice_manager
         $kernel->redirect_404("/" . $redirPage . ".html");
     }
 
+    public static function sanitize_redir_url($url)
+    {
+        $url = htmlspecialchars($url,ENT_QUOTES);
+        $url = trim(str_replace(array("\n","\r"),'',$url));
+        if(strlen($url)==0)
+            return '/';
+        return $url;
+    }
+
     /**
      * Точка входа
      *

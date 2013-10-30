@@ -102,7 +102,7 @@ class feedback
                 $file = basename($template);
         	    $settings = $this->pub_get_js('modules/feedback/templates_user/'.$file.'.ini');
         	    $content = $this->get_template_block('form');
-        	    $content = str_replace('%form_action%', $this->get_return_url().$this->get_action_name().'=form_processing', $content);
+        	    $content = str_replace('%form_action%', frontoffice_manager::sanitize_redir_url($this->get_return_url()).$this->get_action_name().'=form_processing', $content);
         	    $content = $content.$settings;
         		break;
 
@@ -127,7 +127,7 @@ class feedback
                     $rurl.='processing_success';
         	    else
                     $rurl.='processing_fail';
-                $kernel->pub_redirect_refresh_global($rurl);
+                $kernel->pub_redirect_refresh_global(frontoffice_manager::sanitize_redir_url($rurl));
         	    break;
 
         	// Выведем собщение об успешной отправке данных

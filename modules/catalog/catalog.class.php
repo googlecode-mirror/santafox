@@ -172,12 +172,8 @@ class catalog extends BaseModule
                 }
                 $this->add_basket_item(intval($add_item_id), $qty);
             }
-            if (isset($_REQUEST['redir2']) && !empty($_REQUEST['redir2']))
-            {
-                $redirURL = $_REQUEST['redir2'];
-                if (substr($redirURL, 0, 1) != "/")
-                    $redirURL = "/".$redirURL;
-            }
+            if (isset($_REQUEST['redir2']) && strlen($_REQUEST['redir2']))
+                $redirURL = frontoffice_manager::sanitize_redir_url($_REQUEST['redir2']);
             else
                 $redirURL = "/".$kernel->pub_page_current_get().".html";
             $kernel->pub_redirect_refresh_global($redirURL);
@@ -1661,7 +1657,7 @@ class catalog extends BaseModule
         global $kernel;
         $filter = CatalogCommons::get_inner_filter_by_stringid($filter_stringid);
         if (!$filter)
-            return "Inner filter '".$filter_stringid."' not found";
+            return "Inner filter '".htmlspecialchars($filter_stringid)."' not found";
         if (empty($filter['groupid']))
             $group = false;
         else
@@ -9359,11 +9355,7 @@ class catalog extends BaseModule
         if ($is_modifed_list)
         {
             if (isset($_REQUEST['redir2']) && !empty($_REQUEST['redir2']))
-            {
-                $redirURL = $_REQUEST['redir2'];
-                if (substr($redirURL, 0, 1) != "/")
-                    $redirURL = "/".$redirURL;
-            }
+                $redirURL = frontoffice_manager::sanitize_redir_url($_REQUEST['redir2']);
             else
                 $redirURL = "/".$kernel->pub_page_current_get().".html";
             $kernel->pub_redirect_refresh_global($redirURL);

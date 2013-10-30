@@ -4057,7 +4057,7 @@ class kernel
      */
     public function pub_is_valid_email($email)
     {
-        return preg_match('/^[a-z0-9][a-z0-9_\\.-]*@[a-z0-9\\.-]+\\.[a-z]{2,6}$/i',$email);
+        return preg_match('/^[a-z0-9][a-z0-9_\.-]*@[a-z0-9\.-]+\.[a-z0-9\-]{2,8}$/i',$email);
     }
 
     /**

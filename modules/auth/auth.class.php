@@ -185,8 +185,8 @@ class auth extends basemodule
                         case 1:
                             if ($is_ajax)
                                 return $this->get_template_block('ajax_auth_ok');
-                            if (isset($my_post['redirect2page']) && !empty($my_post['redirect2page']))
-                                $kernel->pub_redirect_refresh_global($my_post['redirect2page']);
+                            if (isset($my_post['redirect2page']) && strlen($my_post['redirect2page']))
+                                $kernel->pub_redirect_refresh_global(frontoffice_manager::sanitize_redir_url($my_post['redirect2page']));
                             else
                                 $kernel->pub_redirect_refresh_global("/".$page_cabinet.".html");
                             break;
@@ -223,8 +223,8 @@ class auth extends basemodule
             $kernel->pub_user_unregister();
             $kernel->pub_redirect_refresh_global("/");
         }
-        elseif (isset($my_post['redirect2page']) && !empty($my_post['redirect2page']))
-            $kernel->pub_redirect_refresh_global($my_post['redirect2page']);
+        elseif (isset($my_post['redirect2page']) && strlen($my_post['redirect2page']))
+            $kernel->pub_redirect_refresh_global(frontoffice_manager::sanitize_redir_url($my_post['redirect2page']));
         else
         {
             $html .= $this->get_template_block('exit');

@@ -235,8 +235,13 @@ if (par.attr("id")!="index")
         "[#common_yes#]": function() {
             jspub_cookie_set("%cookie_name_tree%","");
             $.post('%link%',{ node :  par.attr("id")}, function(data){
-                jQuery.jstree._reference("#%tree_id%").select_node("#"+parentNode.attr("id"),true);
+                var tref=jQuery.jstree._reference("#%tree_id%");
+                tref.select_node("#"+parentNode.attr("id"),true);
                 $("#%tree_id%").jstree("remove","#"+par.attr("id"));
+                var parentType = tref._get_type(parentNode);
+                //set "leaf" type if parent node has no childs now (except root)
+                if(parentType=='folder' && tref._get_children(parentNode).length==0)
+                    tref.set_type('default',parentNode);
                 //santaUpdateRegion('west','index.php?action=get_left_menu');
             });
             $(this).dialog("close");

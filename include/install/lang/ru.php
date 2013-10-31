@@ -443,3 +443,5 @@ $il['common_delete']='Удалить';
 $il['common_add_child']='Добавить';
 $il['common_tree_newnode_name']='Новый элемент';
 $il['common_loading']='Загрузка...';
+$il['common_yes']='Да';
+$il['common_no']='Нет';

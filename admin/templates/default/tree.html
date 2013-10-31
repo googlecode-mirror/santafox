@@ -219,6 +219,7 @@ start_interface.link_go("%action_node%&id=" + currNodeId);
     "_class" : "ic_delete",
     "_disabled": node.attr('rel')=='root'|| (jQuery.inArray( node.attr("id"), (new String ("%node_exclude%")).split(",")))>-1,
     "action":function (par){
+        var parentNode=jQuery.jstree._reference("#%tree_id%")._get_parent(par);
         //%action%
     }
 }
@@ -231,15 +232,17 @@ if (par.attr("id")!="index")
     height:140,
     modal: true,
     buttons: {
-        "Yes": function() {// @todo use lang[]
+        "[#common_yes#]": function() {
             jspub_cookie_set("%cookie_name_tree%","");
             $.post('%link%',{ node :  par.attr("id")}, function(data){
-            santaUpdateRegion('west','index.php?action=get_left_menu');
+                jQuery.jstree._reference("#%tree_id%").select_node("#"+parentNode.attr("id"),true);
+                $("#%tree_id%").jstree("remove","#"+par.attr("id"));
+                //santaUpdateRegion('west','index.php?action=get_left_menu');
             });
-            $(this).dialog( "close" );
+            $(this).dialog("close");
         },
-        "No": function() {// @todo use lang[]
-            $(this).dialog( "close" );
+        "[#common_no#]": function() {
+            $(this).dialog("close");
         }
     }
 });

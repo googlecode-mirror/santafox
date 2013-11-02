@@ -1867,7 +1867,7 @@ class catalog extends BaseModule
         {
             foreach ($matches as $match)
             {
-                $block = str_replace($match[0], str_replace(array('"', '&', '>', '<', '\''), array('&quot;', '&amp;', '&gt;', '&lt;', '&apos;'), $match[1]), $block);
+                $block = str_replace($match[0], str_replace(array( '&', '"','>', '<', '\''), array('&amp;', '&quot;', '&gt;', '&lt;', '&apos;'), $match[1]), $block);
             }
         }
 
